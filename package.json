@@ -1,0 +1,22 @@
+{
+  "name": "formyst",
+  "version": "0.0.0",
+  "description": "Pluggable form generation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "browserify": "^4.1.10",
+    "gulp": "^3.8.0",
+    "vinyl-source-stream": "^0.1.1"
+  },
+  "dependencies": {
+    "component-emitter": "^1.1.2",
+    "envify": "^1.2.1",
+    "react": "^0.10.0",
+    "underscore": "^1.6.0"
+  }
+}

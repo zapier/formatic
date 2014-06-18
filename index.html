@@ -1,0 +1,63 @@
+<html>
+<head></head>
+<body>
+  <div id="user"></div>
+  <div id="json"></div>
+  <script src="./bundle.js"></script>
+  <script>
+    var formyst = require('formyst');
+
+    var form = formyst();
+
+    form.fields([
+      {
+        type: 'text',
+        key: 'name.first',
+        label: 'First Name'
+      },
+      {
+        type: 'text',
+        key: 'name.last',
+        label: 'Last Name'
+      },
+      {
+        type: 'text',
+        key: 'address.city',
+        label: 'City'
+      },
+      {
+        type: 'select',
+        key: 'address.state',
+        label: 'State',
+        choices: ['MO', 'IL']
+      },
+      {
+        type: 'select',
+        key: 'os',
+        label: 'Operating System',
+        choices: [
+          {value: 'osx', label: 'Mac OS X'},
+          {value: 'vista', label: 'Windows Vista'},
+          {value: 'win7', label: 'Windows 7'},
+          {value: 'win8', label: 'Windows 8'}
+        ]
+      }
+    ]);
+
+    form.render(document.getElementById('user'));
+
+    jsonForm = formyst();
+
+    jsonForm.render(document.getElementById('json'));
+
+    form.on('update', function () {
+      jsonForm.fields([
+        {
+          type: 'code',
+          value: JSON.stringify(form.val(), null, 2)
+        }
+      ]);
+    });
+  </script>
+</body>
+</html>
