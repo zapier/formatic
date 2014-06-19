@@ -6,7 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:zapier/formatic.git"
+  },
+  "author": "Justin Deal",
   "license": "MIT",
   "devDependencies": {
     "browserify": "^4.1.10",
