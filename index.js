@@ -1,1 +1,1 @@
-module.exports = require('./lib/formyst');
+module.exports = require('./lib/formatic');

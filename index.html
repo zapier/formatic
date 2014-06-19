@@ -5,9 +5,9 @@
   <div id="json"></div>
   <script src="./bundle.js"></script>
   <script>
-    var formyst = require('formyst');
+    var formatic = require('formatic');
 
-    var form = formyst();
+    var form = formatic();
 
     form.fields([
       {
@@ -47,7 +47,7 @@
 
     form.render(document.getElementById('user'));
 
-    jsonForm = formyst();
+    jsonForm = formatic();
 
     jsonForm.render(document.getElementById('json'));
 

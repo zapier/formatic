@@ -6,7 +6,7 @@ var source = require('vinyl-source-stream');
 
 gulp.task('build', function () {
   return browserify({entries: ['./index.js']})
-    .require('./index.js', {expose: 'formyst'})
+    .require('./index.js', {expose: 'formatic'})
     .bundle({debug: true})
     .pipe(source('bundle.js'))
     .pipe(gulp.dest('./'));
