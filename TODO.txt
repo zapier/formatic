@@ -1,3 +1,8 @@
 derived fields
 buttons
 dependent fields
+multiple nodes (return react components)
+clean up construction api
+tests
+allow multiple views of same data
+allow external render
