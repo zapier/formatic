@@ -3,7 +3,7 @@
 
 describe('type:text', function() {
 
-  var formatic = require('../');
+  var formatic = require('../')('react');
   var React = require('react/addons');
   var TestUtils = React.addons.TestUtils;
 
