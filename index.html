@@ -53,6 +53,8 @@
           sad: 'Sad'
         }
       },
+      // Crazy experimental if type. Will dynamically return node depending on
+      // expression (which is also made up of crazy experimental types).
       {
         type: 'if',
         fields: [
@@ -72,9 +74,15 @@
           {
             type: 'code',
             value: 'So sorry!'
+          },
+          {
+            type: 'code',
+            value: "Glad you're feeling good!"
           }
         ]
       },
+      // Even crazier experimental terse compiler used with if. Same expression
+      // as above, but done with terse string.
       {
         type: 'if',
         fields: [
@@ -83,8 +91,10 @@
             type: 'code',
             value: 'Seriously, I feel bad about that!'
           }
+          // leaving out else field
         ]
       },
+      // Another terse compiler.
       "text:terseKey:Some terse field",
       {
         type: 'textarea',
