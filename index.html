@@ -8,6 +8,12 @@
   <script>
     var formatic = require('formatic')('react');
 
+    formatic.config({
+      typeMap: {
+        unicode: 'text'
+      }
+    })
+
     var form = formatic();
 
     form.fields([
@@ -17,7 +23,7 @@
         label: 'First Name'
       },
       {
-        type: 'text',
+        type: 'unicode',
         key: 'name.last',
         label: 'Last Name'
       },

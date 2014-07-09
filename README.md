@@ -154,7 +154,7 @@ console.log(form.greet());
 
 Yay, our form can say hello! Hey, what does that have to do with forms?
 Well, vanilla formatic doesn't know anything about forms. It's the job of
-plugins to teach formatic about forms. We're just hear to learn about
+plugins to teach formatic about forms. We're just here to learn about
 plugins, but the same principles can be used to extend an already functional
 formatic.
 
