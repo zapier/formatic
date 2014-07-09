@@ -45,17 +45,48 @@
         ]
       },
       {
+        type: 'select',
+        key: 'mood',
+        label: 'How do you feel?',
+        choices: {
+          happy: 'Happy',
+          sad: 'Sad'
+        }
+      },
+      {
+        type: 'if',
+        fields: [
+          {
+            type: 'eq',
+            fields: [
+              {
+                type: 'get',
+                value: 'mood'
+              },
+              {
+                type: 'string',
+                value: 'sad'
+              }
+            ]
+          },
+          {
+            type: 'code',
+            value: 'So sorry!'
+          }
+        ]
+      },
+      {
         type: 'textarea',
         key: 'story',
         label: 'Tell me a story'
       }
     ]);
 
-    form.render(document.getElementById('user'));
+    form.attach(document.getElementById('user'));
 
     jsonForm = formatic();
 
-    jsonForm.render(document.getElementById('json'));
+    jsonForm.attach(document.getElementById('json'));
 
     form.on('update', function () {
       jsonForm.fields([

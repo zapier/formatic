@@ -14,3 +14,7 @@ readme
 watcher
 types as a plugin
 type validations
+template plugin (self references)
+object for choices
+unique keys
+root changes type
