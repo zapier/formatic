@@ -262,3 +262,8 @@ console.log(form.greet());
 
 Yeah, yeah. Look at the plugins in `/lib/plugins` to see how plugins are used
 to build a formatic instance that can do, you guessed it, forms!
+
+Forms are currently a work in progress though. So far, the effort has gone
+toward getting the plugin system working so we can build form stuff on top
+of that. In fact, the types plugin is a plugin that adds in "mini plugins" to
+support various form elements and cool dynamic stuff.
