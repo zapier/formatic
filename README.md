@@ -166,7 +166,7 @@ formatic instance creates. More about hooks below.
 3. Plugins can be stacked and run in the order that they are stacked. So, later
 plugins can depend on earlier plugins.
 
-### Hooks
+## Hooks
 
 At a basic level, a hook is just a method attached to a formatic instance or the
 form that a formatic instance creates. You saw that above. The `hook` sugar is
@@ -197,7 +197,7 @@ like this. This is useful only in cases where a plugin needs to take over the
 underlying implementation. Hooks offer a more composable extension mechanism
 though, in the form of hook middleware.
 
-### Hook middleware
+## Hook middleware
 
 You can leave the underlying hook implementation alone and simply modify what
 goes into or comes out of the hook via hook middleware.
