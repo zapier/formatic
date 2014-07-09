@@ -76,6 +76,17 @@
         ]
       },
       {
+        type: 'if',
+        fields: [
+          "eq(get('mood'),'sad')",
+          {
+            type: 'code',
+            value: 'Seriously, I feel bad about that!'
+          }
+        ]
+      },
+      "text:terseKey:Some terse field",
+      {
         type: 'textarea',
         key: 'story',
         label: 'Tell me a story'
