@@ -1,15 +1,20 @@
 'use strict';
 
 var gulp = require('gulp');
-var browserify = require('browserify');
-var source = require('vinyl-source-stream');
+var plugins = require('gulp-load-plugins')();
 
-gulp.task('build', function () {
-  return browserify({entries: ['./index.js']})
-    .require('./index.js', {expose: 'formatic'})
-    .bundle({debug: true})
-    .pipe(source('bundle.js'))
-    .pipe(gulp.dest('./'));
+var requireDir = require('require-dir');
+
+requireDir('./tasks');
+
+gulp.task('lint', function () {
+  return gulp.src(['gulpfile.js', 'lib/**/*.js'])
+    .pipe(plugins.eslint())
+    .pipe(plugins.eslint.format());
 });
+
+gulp.task('watch', ['bundle-watch']);
+
+gulp.task('build', ['build-dev', 'build-prod']);
 
 gulp.task('default', ['build']);

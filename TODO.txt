@@ -18,3 +18,4 @@ template plugin (self references)
 object for choices
 unique keys
 root changes type
+get bundle smaller!!!

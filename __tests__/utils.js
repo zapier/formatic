@@ -88,7 +88,7 @@ describe('utils', function() {
 
   });
 
-  it('should make an object pluggable', function () {
+  it('should make an object hookable', function () {
 
     var obj = {};
 
@@ -107,6 +107,12 @@ describe('utils', function() {
     });
 
     expect(obj.greet()).toEqual('HELLO, BOB!');
+
+    obj.replaceHook('greet', function () {
+      return 'Hola';
+    });
+
+    expect(obj.greet()).toEqual('HOLA, BOB!');
 
   });
 
