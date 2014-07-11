@@ -2,7 +2,19 @@
 
 Automatic forms.
 
-## Get started:
+## Start hacking
+
+```
+git clone git@github.com:zapier/formatic.git
+cd formatic
+npm install
+gulp live
+```
+
+Open `index.html` in your browser. Hack away on the code, and the browser will
+automatically reload with your changes.
+
+## Build
 
 ```
 git clone git@github.com:zapier/formatic.git
@@ -11,7 +23,8 @@ npm install
 gulp build
 ```
 
-Then open `index.html` in your browser.
+This will build two files: formatic-min.js (minified) and formatic-dev.js
+(not minified and includes source maps for development).
 
 ## What is formatic?
 
