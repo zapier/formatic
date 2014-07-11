@@ -29,14 +29,20 @@ gulp.task('bundle-watch', function () {
     .require('./index.js', {expose: 'formatic'});
 
   var rebundle = function () {
-    return bundler
+    var bundle = bundler.bundle({debug: true});
 
-      .bundle({debug: true})
+    bundle.on('error', function (err) {
+      console.log(err);
+    });
+
+    return bundle
       .pipe(source('formatic-dev.js'))
       .pipe(gulp.dest('./'));
   };
 
   bundler.on('update', rebundle);
+
+
 
   return rebundle();
 });
