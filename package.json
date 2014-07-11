@@ -13,8 +13,10 @@
   "author": "Justin Deal",
   "license": "MIT",
   "devDependencies": {
+    "body-parser": "^1.4.3",
     "browserify": "^4.1.10",
     "chai": "^1.9.1",
+    "express": "^4.5.1",
     "gulp": "^3.8.0",
     "gulp-eslint": "^0.1.8",
     "gulp-load-plugins": "^0.5.3",
@@ -22,6 +24,7 @@
     "gulp-uglify": "^0.3.1",
     "jest-cli": "^0.1.15",
     "require-dir": "^0.1.0",
+    "tiny-lr": "0.0.9",
     "vinyl-source-stream": "^0.1.1",
     "watchify": "^0.10.2"
   },

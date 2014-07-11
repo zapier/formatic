@@ -25,11 +25,12 @@ gulp.task('bundle-prod', ['lint'], function () {
 });
 
 gulp.task('bundle-watch', function () {
-  var bundler = watchify({entries: ['./index.js']});
+  var bundler = watchify({entries: ['./index.js']})
+    .require('./index.js', {expose: 'formatic'});
 
   var rebundle = function () {
     return bundler
-      .require('./index.js', {expose: 'formatic'})
+
       .bundle({debug: true})
       .pipe(source('formatic-dev.js'))
       .pipe(gulp.dest('./'));
