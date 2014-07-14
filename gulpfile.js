@@ -19,4 +19,8 @@ gulp.task('build', ['build-dev', 'build-prod']);
 
 gulp.task('live', ['watch', 'server-live-app', 'server-live-reload']);
 
+gulp.task('test', ['lint'], plugins.shell.task([
+  'npm test'
+]));
+
 gulp.task('default', ['build']);

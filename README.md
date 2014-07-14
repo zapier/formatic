@@ -11,8 +11,8 @@ npm install
 gulp live
 ```
 
-Open `index.html` in your browser. Hack away on the code, and the browser will
-automatically reload with your changes.
+Point your browser to `localhost:3000/index.html`. Hack away on the code,
+and the browser will automatically reload with your changes.
 
 ## Build
 
@@ -242,7 +242,7 @@ but simply changes the result of the underlying implementation.
 Note that method middleware runs in the order in which it is attached. The
 first middleware receives the arguments first and must call the next
 function in the chain. The middleware attached last will call the method
-itself. The return path is reversed. So the middleware attached last will 
+itself. The return path is reversed. So the middleware attached last will
 receive the result of the method first and return to the previous middleware
 in the chain. The middleware attached first will return the final result of
 the method.
