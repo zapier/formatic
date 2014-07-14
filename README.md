@@ -138,15 +138,15 @@ var helloPlugin = function (formatic) {
 
   var name;
 
-  formatic.hook('setName', function (myName) {
+  formatic.method('setName', function (myName) {
     name = myName;
   });
 
-  formatic.hook('getName', function () {
+  formatic.method('getName', function () {
     return name;
   });
 
-  formatic.form.hook('greet', function () {
+  formatic.form.method('greet', function () {
     return 'Hello, ' + name;
   });
 };
@@ -173,25 +173,26 @@ formatic.
 
 The above shows:
 
-1. Hooks can be added to the formatic instance or to the forms that your
-formatic instance creates. More about hooks below.
-2. You can call a hook just like you would any other method.
+1. Methods can be added to the formatic instance or to the forms that your
+formatic instance creates. More about methods below.
+2. You can call a method added with `.method()` just like you would any other
+method.
 3. Plugins can be stacked and run in the order that they are stacked. So, later
 plugins can depend on earlier plugins.
 
-## Hooks
+## Methods
 
-At a basic level, a hook is just a method attached to a formatic instance or the
-form that a formatic instance creates. You saw that above. The `hook` sugar is
-there to warn you if you accidentally stomp on an existing hook. You can choose
-to override any hook implementation like this:
+As shown above, you can add methods to your formatic instance or to your forms
+using `.method()`. Using this bit of sugar gives you a warning if you
+accidentally stomp on an existing method. You can choose to override any method
+implementation like this:
 
 ```js
 // ... continued from above
 
 var spanishPlugin = function (formatic) {
 
-  formatic.form.replaceHook('greet', function () {
+  formatic.form.replaceMethod('greet', function () {
     return 'Hola, ' + this.getName();
   });
 };
@@ -207,20 +208,20 @@ console.log(form.greet());
 
 This is pretty brute force though. Obviously, multiple plugins can't cooperate
 like this. This is useful only in cases where a plugin needs to take over the
-underlying implementation. Hooks offer a more composable extension mechanism
-though, in the form of hook middleware.
+underlying implementation. Methods offer a more composable extension mechanism
+though, in the form of method middleware.
 
-## Hook middleware
+## Method middleware
 
-You can leave the underlying hook implementation alone and simply modify what
-goes into or comes out of the hook via hook middleware.
+You can leave the underlying method implementation alone and simply modify what
+goes into or comes out of the method via method middleware.
 
 ```js
 // ... continued from above
 
 var upperPlugin = function (formatic) {
 
-  formatic.form.use('greet', function (next) {
+  formatic.form.wrap('greet', function (next) {
     return next().toUpperCase();
   });
 };
@@ -235,15 +236,16 @@ console.log(form.greet());
 ```
 
 This is the way good plugins should work. The `upperPlugin` attaches some
-middleware to the `greet` hook. It doesn't change the underlying implementation
+middleware to the `greet` method. It doesn't change the underlying implementation
 but simply changes the result of the underlying implementation.
 
-Note that hook middleware runs in the order in which it is attached. The first
-middleware receives the arguments first and must call the next function in the
-chain. The middleware attached last will call the hook itself. The return path
-is reversed. So the middleware attached last will receive the result of the hook
-first and return to the previous middleware in the chain. The middleware
-attached first will return the final result of the hook.
+Note that method middleware runs in the order in which it is attached. The
+first middleware receives the arguments first and must call the next
+function in the chain. The middleware attached last will call the method
+itself. The return path is reversed. So the middleware attached last will 
+receive the result of the method first and return to the previous middleware
+in the chain. The middleware attached first will return the final result of
+the method.
 
 ## Plugins in your plugins
 

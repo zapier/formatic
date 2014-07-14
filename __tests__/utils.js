@@ -94,21 +94,21 @@ describe('utils', function() {
 
     utils.hookable(obj);
 
-    obj.hook('greet', function () {
+    obj.method('greet', function () {
       return 'Hello';
     });
 
-    obj.use('greet', function (next) {
+    obj.wrap('greet', function (next) {
       return next().toUpperCase();
     });
 
-    obj.use('greet', function (next) {
+    obj.wrap('greet', function (next) {
       return next() + ', Bob!';
     });
 
     expect(obj.greet()).toEqual('HELLO, BOB!');
 
-    obj.replaceHook('greet', function () {
+    obj.replaceMethod('greet', function () {
       return 'Hola';
     });
 
