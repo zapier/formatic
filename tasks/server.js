@@ -23,7 +23,7 @@ gulp.task('server-live-reload', function () {
   lr.listen(LR_PORT, function () {
     console.log('reload server listening on %d', LR_PORT);
   });
-  gulp.watch(['index.html', 'formatic-dev.js'], function (evt) {
+  gulp.watch(['index.html', 'style/**/*.css', 'formatic-dev.js'], function (evt) {
 
     console.log(evt.path)
     lr.changed({
