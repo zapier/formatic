@@ -32,7 +32,12 @@
   border: 1px solid #ccc;
 }
 
-.zf-select-arrow::before {
+.zf-select-arrow.zf-open::before {
+  content: '▲';
+  vertical-align: middle;
+}
+
+.zf-select-arrow.zf-closed::before {
   content: '▼';
   vertical-align: middle;
 }
