@@ -1,5 +1,7 @@
 # Formatic
 
+![travis](https://travis-ci.org/jdeal/doctor.svg?branch=master)
+
 Automatic forms.
 
 ## Warning!
