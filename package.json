@@ -1,7 +1,7 @@
 {
   "name": "formatic",
-  "version": "0.0.0",
-  "description": "Pluggable form generation",
+  "version": "0.0.1",
+  "description": "Automatic, pluggable form generation",
   "main": "index.js",
   "scripts": {
     "test": "./node_modules/jest-cli/bin/jest.js"
@@ -10,7 +10,6 @@
     "type": "git",
     "url": "git@github.com:zapier/formatic.git"
   },
-  "author": "Justin Deal",
   "license": "MIT",
   "devDependencies": {
     "body-parser": "^1.4.3",

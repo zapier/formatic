@@ -2,6 +2,12 @@
 
 Automatic forms.
 
+## Warning!
+
+Formatic is currently early alpha and still in heavy development. Everything is
+subject to change! You should probably just look away till this warning goes
+away!
+
 ## Start hacking
 
 ```
