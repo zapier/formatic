@@ -29,7 +29,7 @@ describe('types', function() {
       return types;
     };
 
-    var testValueType = function (field, tagName) {
+    var testValueType = function (field, selector, setter) {
 
       var types = unmapType(field.type);
 
@@ -50,12 +50,29 @@ describe('types', function() {
           });
           form.set('name', 'Joe');
 
-          var node = component.getDOMNode().getElementsByTagName(tagName)[0];
+          var value;
+          var node;
 
-          expect(node.value).toEqual('Joe');
-          node.value = 'Mary';
+          if (typeof selector === 'function') {
+            value = selector(component.getDOMNode());
+          } else {
+            if (selector[0] === '.') {
+              node = component.getDOMNode().getElementsByClassName(selector)[0];
+            } else {
+              node = component.getDOMNode().getElementsByTagName(selector)[0];
+            }
+            value = node.value;
+          }
 
-          TestUtils.Simulate.change(node);
+          expect(value).toEqual('Joe');
+
+          if (typeof setter === 'function') {
+            setter(component.getDOMNode(), 'Mary');
+          } else {
+            node.value = 'Mary';
+            TestUtils.Simulate.change(node);
+          }
+
           expect(form.val()).toEqual({name: 'Mary'});
         });
       });
@@ -75,7 +92,18 @@ describe('types', function() {
       type: 'select',
       key: 'name',
       choices: ['Joe', 'Mary']
-    }, 'select');
+    }, function (node) {
+      return node.getElementsByClassName('zf-select-active')[0].innerHTML;
+    }, function (node, value) {
+      var arrowNode = node.getElementsByClassName('zf-select-arrow')[0];
+      TestUtils.Simulate.click(arrowNode);
+      var choiceNodes = node.getElementsByClassName('zf-select-choice');
+      choiceNodes = Array.prototype.slice.call(choiceNodes, 0);
+      var matchingNodes = choiceNodes.filter(function (node) {
+        return node.innerHTML === value;
+      });
+      TestUtils.Simulate.click(matchingNodes[0]);
+    });
 
     testValueType({
       type: 'password',
