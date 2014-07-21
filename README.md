@@ -1,6 +1,6 @@
 # Formatic
 
-![travis](https://travis-ci.org/jdeal/doctor.svg?branch=master)
+![travis](https://travis-ci.org/jdeal/formatic.svg?branch=master)
 
 Automatic forms.
 
