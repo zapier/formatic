@@ -1,6 +1,6 @@
 # Formatic
 
-![travis](https://travis-ci.org/zapier/formatic.svg?branch=master)
+[![travis](https://travis-ci.org/zapier/formatic.svg?branch=master)](https://travis-ci.org/zapier/formatic)
 
 Automatic forms.
 
