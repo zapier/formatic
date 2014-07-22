@@ -18,6 +18,7 @@
     "connect-livereload": "^0.4.0",
     "express": "^4.5.1",
     "gulp": "^3.8.0",
+    "gulp-changed": "^0.4.0",
     "gulp-eslint": "^0.1.8",
     "gulp-load-plugins": "^0.5.3",
     "gulp-shell": "^0.2.8",

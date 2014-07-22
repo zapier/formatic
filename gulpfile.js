@@ -13,7 +13,11 @@ gulp.task('lint', function () {
     .pipe(plugins.eslint.format());
 });
 
-gulp.task('watch', ['bundle-watch']);
+gulp.task('test-watch', function () {
+  gulp.watch(['./formatic-dev.js', './__tests__/**/*.js'], ['test']);
+});
+
+gulp.task('watch', ['bundle-watch', 'test-watch']);
 
 gulp.task('build', ['build-dev', 'build-prod']);
 

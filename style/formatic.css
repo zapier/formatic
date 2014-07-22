@@ -42,7 +42,7 @@
   vertical-align: middle;
 }
 
-.formatic .field-choices {
+.formatic .dropdown-field .field-choices {
   list-style-type: none;
   position: absolute;
   background: #fff;
@@ -51,7 +51,7 @@
   padding-left: 0px;
 }
 
-.formatic .field-choice {
+.formatic .dropdown-field .field-choice {
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
@@ -74,4 +74,8 @@
 
 .formatic .reveal-leave.reveal-leave-active {
   opacity: 0.01;
+}
+
+.formatic .checkbox-boolean-field label {
+  display: inline
 }
