@@ -23,7 +23,11 @@ describe('types', function() {
       });
 
       if (types.length === 0) {
-        types.push(type);
+        // If this type maps to itself, make sure that type doesn't map to
+        // something else.
+        if (!(type in typeMap)) {
+          types.push(type);
+        }
       }
 
       return types;
@@ -92,12 +96,18 @@ describe('types', function() {
       type: 'select',
       key: 'name',
       choices: ['Joe', 'Mary']
+    }, 'select');
+
+    testValueType({
+      type: 'dropdown',
+      key: 'name',
+      choices: ['Joe', 'Mary']
     }, function (node) {
-      return node.getElementsByClassName('zf-select-active')[0].innerHTML;
+      return node.getElementsByClassName('field-value')[0].innerHTML;
     }, function (node, value) {
-      var arrowNode = node.getElementsByClassName('zf-select-arrow')[0];
+      var arrowNode = node.getElementsByClassName('field-toggle')[0];
       TestUtils.Simulate.click(arrowNode);
-      var choiceNodes = node.getElementsByClassName('zf-select-choice');
+      var choiceNodes = node.getElementsByClassName('field-choice');
       choiceNodes = Array.prototype.slice.call(choiceNodes, 0);
       var matchingNodes = choiceNodes.filter(function (node) {
         return node.innerHTML === value;
