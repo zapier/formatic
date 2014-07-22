@@ -1,27 +1,27 @@
-.zf-form {
+.formatic {
   font-family: 'Open Sans', Helvetica, arial, sans-serif;
 }
 
-.zf-field {
+.formatic .field {
   padding: 10px;
 }
 
-.zf-field > label {
+.formatic .field label {
   display: block;
   padding-bottom: 10px;
 }
 
-.zf-select {
+.formatic .dropdown-field {
   position: relative;
   max-width: 600px;
 }
 
-.zf-select-active {
+.formatic .field-value {
   border: 1px solid #ccc;
   padding: 10px;
 }
 
-.zf-select-arrow {
+.formatic .field-toggle {
   top: 0;
   bottom: 0;
   right: 0;
@@ -32,17 +32,17 @@
   border: 1px solid #ccc;
 }
 
-.zf-select-arrow.zf-open::before {
+.formatic .field-toggle.field-open::before {
   content: '▲';
   vertical-align: middle;
 }
 
-.zf-select-arrow.zf-closed::before {
+.formatic .field-toggle.field-closed::before {
   content: '▼';
   vertical-align: middle;
 }
 
-.zf-select-choices {
+.formatic .field-choices {
   list-style-type: none;
   position: absolute;
   background: #fff;
@@ -51,27 +51,27 @@
   padding-left: 0px;
 }
 
-.zf-select-choice {
+.formatic .field-choice {
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   padding: 10px;
 }
 
-.zf-slide-enter {
+.formatic .reveal-enter {
   opacity: 0.01;
   transition: opacity .1s ease-in;
 }
 
-.zf-slide-enter.zf-slide-enter-active {
+.formatic .reveal-enter.reveal-enter-active {
   opacity: 1;
 }
 
-.zf-slide-leave {
+.formatic .reveal-leave {
   opacity: 1;
   transition: opacity .1s ease-in;
 }
 
-.zf-slide-leave.zf-slide-leave-active {
+.formatic .reveal-leave.reveal-leave-active {
   opacity: 0.01;
 }
