@@ -6,9 +6,38 @@
   padding: 10px;
 }
 
-.formatic .field label {
+/*.formatic .field label {
   display: block;
   padding-bottom: 10px;
+}*/
+
+.formatic .field-label {
+  padding-bottom: 10px;
+}
+
+.formatic .required-text {
+  font-size: 80%;
+  color: #aaa;
+}
+
+/*.formatic .required .required-text {
+  color: #ff4a00;
+}*/
+
+.formatic .required .required-text:after {
+  content: '(required)'
+}
+
+/*.formatic .not-required .required-text {
+  color: #aaa;
+}*/
+
+/*.formatic .not-required .required-text:after {
+  content: '(optional)'
+}*/
+
+.formatic .validation-error-required .required-text:after {
+  color: #ff4a00;
 }
 
 .formatic .dropdown-field {
@@ -78,8 +107,4 @@
 
 .formatic .checkbox-boolean-field label {
   display: inline
-}
-
-.formatic .validation-error-required {
-  color: red
 }
