@@ -79,3 +79,7 @@
 .formatic .checkbox-boolean-field label {
   display: inline
 }
+
+.formatic .validation-error-required {
+  color: red
+}

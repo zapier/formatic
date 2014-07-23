@@ -22,12 +22,14 @@
       {
         type: 'text',
         key: 'name.first',
-        label: 'First Name'
+        label: 'First Name',
+        required: true
       },
       {
         type: 'unicode',
         key: 'name.last',
-        label: 'Last Name'
+        label: 'Last Name',
+        required: true
       },
       {
         type: 'text',
@@ -56,6 +58,7 @@
         type: 'dropdown',
         key: 'mood',
         label: 'How do you feel?',
+        required: true,
         choices: {
           happy: 'Happy',
           sad: 'Sad'

@@ -46,7 +46,7 @@ describe('types', function() {
           form.fields([
             field
           ]);
-
+          
           var component = mounted(form.component());
 
           form.on('update', function (props) {
