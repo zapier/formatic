@@ -108,3 +108,24 @@
 .formatic .checkbox-boolean-field label {
   display: inline
 }
+
+.formatic .pretty-part {
+  border-radius: 12px;
+  background: #ff9266;
+  cursor: pointer;
+  box-shadow: 0px 0px 0px 1px #ff9266;
+}
+
+.formatic .pretty-part-left, .formatic .pretty-part-right {
+  opacity: 0.0;
+}
+
+.formatic .textarea-pretty-field textarea {
+  font-family: 'Open Sans', Helvetica, arial, sans-serif;
+  font-size: 13px;
+  width: 500px;
+  border: solid 1px;
+  heght: 200px;
+  padding: 2px;
+  margin: 2px;
+}
