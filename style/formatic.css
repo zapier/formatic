@@ -114,10 +114,24 @@
   background: #ff9266;
   cursor: pointer;
   box-shadow: 0px 0px 0px 1px #ff9266;
+  color: transparent;
+  position: relative;
 }
 
 .formatic .pretty-part-left, .formatic .pretty-part-right {
   opacity: 0.0;
+}
+
+.formatic .pretty-part .pretty-part-text:before {
+  content: attr(data-pretty-part-label) " ";
+  position: absolute;
+  color: black;
+  top: 0;
+  left: 4px;
+  right: 4px;
+  bottom: 0;
+  overflow: hidden;
+  text-align: center;
 }
 
 .formatic .textarea-pretty-field textarea {
