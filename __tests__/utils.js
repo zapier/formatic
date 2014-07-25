@@ -151,11 +151,19 @@ describe('utils', function() {
     ]);
   });
 
-  it('should convert text to hidden unicode and back', function () {
+  it('should convert ascii text to hidden unicode and back', function () {
 
     var hidden = utils.hideUnicodeMessage('foobar');
     var original = utils.unhideUnicodeMessage(hidden);
 
     expect(original).toEqual('foobar');
+  });
+
+  it('should convert unicode text to hidden unicode and back', function () {
+
+    var hidden = utils.hideUnicodeMessage('€');
+    var original = utils.unhideUnicodeMessage(hidden);
+
+    expect(original).toEqual('€');
   });
 });
