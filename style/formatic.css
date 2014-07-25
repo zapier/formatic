@@ -105,7 +105,7 @@
   opacity: 0.01;
 }
 
-.formatic .checkbox-boolean-field label {
+.formatic .boolean-checkbox-field label {
   display: inline
 }
 
@@ -120,7 +120,7 @@
   opacity: 0.0;
 }
 
-.formatic .textarea-pretty-field textarea {
+.formatic .pretty-textarea-field textarea {
   font-family: 'Open Sans', Helvetica, arial, sans-serif;
   font-size: 13px;
   width: 500px;
