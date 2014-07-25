@@ -19,6 +19,23 @@
 
     var form = formatic();
 
+    form.meta('prettyTextareaLabels', {
+      'field1': 'First Name',
+      'field2': 'Last Name',
+      'field3': 'First Name'
+    });
+
+    var humanize = function(property) {
+      property = property.replace(/\{\{/g, '');
+      property = property.replace(/\}\}/g, '');
+      return property.replace(/_/g, ' ')
+        .replace(/(\w+)/g, function(match) {
+          return match.charAt(0).toUpperCase() + match.slice(1);
+        });
+    };
+
+    form.meta('prettyTextareaLabelFallback', humanize);
+
     form.fields([
       {
         type: 'text',
@@ -33,7 +50,7 @@
         required: true
       },
       {
-        type: 'textarea-pretty',
+        type: 'pretty-textarea',
         key: 'party',
         label: 'Party'
       },
