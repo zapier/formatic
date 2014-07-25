@@ -116,4 +116,46 @@ describe('utils', function() {
 
   });
 
+  it('should parse blank text', function () {
+
+    expect(utils.parseTextWithTags('')).toEqual([]);
+  });
+
+  it('should parse plain text', function () {
+
+    expect(utils.parseTextWithTags('foo')).toEqual([{type: 'text', value: 'foo'}]);
+  });
+
+  it('should parse text with tag in middle', function () {
+
+    expect(utils.parseTextWithTags('foo {{bar}} baz')).toEqual([
+      {type: 'text', value: 'foo '},
+      {type: 'tag', value: 'bar'},
+      {type: 'text', value: ' baz'}
+    ]);
+  });
+
+  it('should parse text with tag at front', function () {
+
+    expect(utils.parseTextWithTags('{{bar}} baz')).toEqual([
+      {type: 'tag', value: 'bar'},
+      {type: 'text', value: ' baz'}
+    ]);
+  });
+
+  it('should parse text with tag at back', function () {
+
+    expect(utils.parseTextWithTags('{{bar}} baz')).toEqual([
+      {type: 'tag', value: 'bar'},
+      {type: 'text', value: ' baz'}
+    ]);
+  });
+
+  it('should convert text to hidden unicode and back', function () {
+
+    var hidden = utils.hideUnicodeMessage('foobar');
+    var original = utils.unhideUnicodeMessage(hidden);
+
+    expect(original).toEqual('foobar');
+  });
 });
