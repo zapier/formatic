@@ -1,6 +1,6 @@
 derived fields
 buttons
-dependent fields
+dependent fields (like mutually exclusive/inclusive fields)
 multiple nodes (return react components)
 clean up construction api
 allow differential/mixin construction
