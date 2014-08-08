@@ -38,6 +38,7 @@
     form.meta('prettyTextareaLabelFallback', humanize);
 
     form.fields([
+      /*
       {
         type: 'text',
         key: 'name.first',
@@ -50,11 +51,13 @@
         label: 'Last Name',
         required: true
       },
+      */
       {
         type: 'pretty-textarea',
         key: 'party',
         label: 'Party'
-      },
+      }
+      /*,
       {
         type: 'text',
         key: 'address.city',
@@ -157,7 +160,7 @@
         type: 'checkbox',
         key: 'optIn',
         label: 'Send me stuff!'
-      }
+      }*/
     ]);
 
     form.attach(document.getElementById('user'));
