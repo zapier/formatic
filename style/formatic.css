@@ -119,7 +119,7 @@
   opacity: 0.0;
 }*/
 
-.formatic .pretty-textarea-field textarea {
+/*.formatic .pretty-textarea-field textarea {
   font-family: 'Open Sans', Helvetica, arial, sans-serif;
   font-size: 13px;
   width: 500px;
@@ -131,4 +131,50 @@
 
 .formatic pre {
   width 500px;
+}*/
+
+.formatic .pretty-textarea-field textarea, .formatic .pretty-textarea-field pre {
+  font-family: 'Open Sans', Helvetica, arial, sans-serif;
+  font-size: 13px;
+  width: 500px;
+  border: solid 1px;
+  height: 100px;
+  padding: 2px;
+  margin: 2px;
+  overflow: scroll;
 }
+
+.formatic .pretty-textarea-field pre {
+  -moz-padding-end: 1.5px;
+  -moz-padding-start: 1.5px
+  -moz-box-sizing: border-box;
+}
+
+//       fontSize: document.defaultView
+//         .getComputedStyle(this.refs.text.getDOMNode(), null)
+//         .getPropertyValue('font-size'),
+//       fontFamily: document.defaultView
+//         .getComputedStyle(this.refs.text.getDOMNode(), null)
+//         .getPropertyValue('font-family'),
+//       width: document.defaultView
+//         .getComputedStyle(this.refs.text.getDOMNode(), null)
+//         .getPropertyValue('width'),
+//       height: document.defaultView
+//         .getComputedStyle(this.refs.text.getDOMNode(), null)
+//         .getPropertyValue('height'),
+//       margin: document.defaultView
+//         .getComputedStyle(this.refs.text.getDOMNode(), null)
+//         .getPropertyValue('margin') || "0px",
+//       padding: document.defaultView
+//         .getComputedStyle(this.refs.text.getDOMNode(), null)
+//         .getPropertyValue('padding') || "0px",
+//       border: document.defaultView
+//         .getComputedStyle(this.refs.text.getDOMNode(), null)
+//         .getPropertyValue('border') || "0px",
+//       overflow: 'scroll',
+//       wordWrap: document.defaultView
+//         .getComputedStyle(this.refs.text.getDOMNode(), null)
+//         .getPropertyValue('word-wrap')
+//       // whiteSpace: document.defaultView
+//       //   .getComputedStyle(this.refs.text.getDOMNode(), null)
+//       //   .getPropertyValue('white-space')
