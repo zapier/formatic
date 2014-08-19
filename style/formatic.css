@@ -145,6 +145,7 @@
 }
 
 .formatic .pretty-textarea-field pre {
+  color: rgba(0, 0, 0, 0);
   /* stupid height hack for firefox; needs to be 2px less than textarea */
   height: 98px;
   border-bottom: 0px;
