@@ -145,12 +145,17 @@
 }
 
 .formatic .pretty-textarea-field pre {
-  -moz-padding-end: 1.5px;
-  -moz-padding-start: 1.5px
-  -moz-box-sizing: border-box;
+  /* stupid height hack for firefox; needs to be 2px less than textarea */
+  height: 98px;
+  border-bottom: 0px;
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;
 }
 
-//       fontSize: document.defaultView
+/*//       fontSize: document.defaultView
 //         .getComputedStyle(this.refs.text.getDOMNode(), null)
 //         .getPropertyValue('font-size'),
 //       fontFamily: document.defaultView
@@ -177,4 +182,4 @@
 //         .getPropertyValue('word-wrap')
 //       // whiteSpace: document.defaultView
 //       //   .getComputedStyle(this.refs.text.getDOMNode(), null)
-//       //   .getPropertyValue('white-space')
+//       //   .getPropertyValue('white-space')*/
