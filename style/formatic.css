@@ -113,21 +113,33 @@
   border-radius: 12px;
   background: #ff9266;
   cursor: pointer;
-  box-shadow: 0px 0px 0px 1px #ff9266;
 }
 
-.formatic .pretty-part-left, .formatic .pretty-part-right {
+/*.formatic .pretty-part-left, .formatic .pretty-part-right {
   opacity: 0.0;
-}
+}*/
 
-.formatic .pretty-textarea-field textarea {
+.formatic .pretty-textarea-field textarea, .formatic .pretty-textarea-field pre {
   font-family: 'Open Sans', Helvetica, arial, sans-serif;
   font-size: 13px;
   width: 500px;
   border: solid 1px;
-  height: 200px;
+  height: 100px;
   padding: 2px;
   margin: 2px;
+  overflow: scroll;
+}
+
+.formatic .pretty-textarea-field pre {
+  color: rgba(0, 0, 0, 0);
+  /* stupid height hack for firefox; needs to be 2px less than textarea */
+  height: 98px;
+  border-bottom: 0px;
+  white-space: pre-wrap;       /* css-3 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;
 }
 
 .formatic pre {

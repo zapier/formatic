@@ -166,4 +166,70 @@ describe('utils', function() {
 
     expect(original).toEqual('€');
   });
+
+  // it('should diff same', function () {
+  //
+  //   expect(utils.diff('foo', 'foo')).toEqual(null);
+  // });
+  //
+  // it('should diff front insert', function () {
+  //
+  //   expect(utils.diff('bar', 'foobar')).toEqual({
+  //     insert: 'foo',
+  //     delete: '',
+  //     pos: 0
+  //   });
+  // });
+  //
+  // it('should diff back insert', function () {
+  //
+  //   expect(utils.diff('foo', 'foobar')).toEqual({
+  //     insert: 'bar',
+  //     delete: '',
+  //     pos: 3
+  //   });
+  // });
+  //
+  // it('should diff front delete', function () {
+  //
+  //   expect(utils.diff('foobar', 'bar')).toEqual({
+  //     insert: '',
+  //     delete: 'foo',
+  //     pos: 0
+  //   });
+  // });
+  //
+  // it('should diff back delete', function () {
+  //
+  //   expect(utils.diff('foobar', 'foo')).toEqual({
+  //     insert: '',
+  //     delete: 'bar',
+  //     pos: 3
+  //   });
+  // });
+  //
+  // it('should diff middle insert', function () {
+  //
+  //   expect(utils.diff('foobaz', 'foobarbaz')).toEqual({
+  //     insert: 'bar',
+  //     delete: '',
+  //     pos: 3
+  //   });
+  // });
+  //
+  // it('should diff middle delete', function () {
+  //
+  //   expect(utils.diff('foobarbaz', 'foobaz')).toEqual({
+  //     insert: '',
+  //     delete: 'bar',
+  //     pos: 3
+  //   });
+  // });
+  //
+  // it('should char diff', function () {
+  //
+  //   expect(utils.charDiff('foobar', 'foocar')).toEqual(3);
+  //
+  //   expect(utils.charDiff('foobar', 'feebar', -1)).toEqual(3);
+  // });
 });

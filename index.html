@@ -22,7 +22,8 @@
     form.meta('prettyTextareaLabels', {
       'field1': 'First Name',
       'field2': 'Last Name',
-      'field3': 'First Name'
+      'field3': 'First Name',
+      'longfield1': 'Shorty'
     });
 
     var humanize = function(property) {
@@ -48,6 +49,11 @@
         key: 'name.last',
         label: 'Last Name',
         required: true
+      },
+      {
+        type: 'textarea',
+        key: 'foo',
+        label: 'Foo'
       },
       {
         type: 'pretty-textarea',
