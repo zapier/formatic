@@ -180,4 +180,25 @@ describe('plugins', function() {
     expect(form.words).toEqual(['foo', 'bar']);
   });
 
+  it('should take parameters for a plugin', function () {
+
+    var plugin = function (formatic, answer) {
+
+      formatic.method('ask', function () {
+        return answer;
+      });
+    };
+
+    var formatic = Formatic();
+
+    formatic.plugin(plugin, 42);
+
+    expect(formatic.ask()).toEqual(42);
+
+    formatic = Formatic(plugin, [42]);
+
+    expect(formatic.ask()).toEqual(42);
+
+  });
+
 });
