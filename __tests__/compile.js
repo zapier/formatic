@@ -16,7 +16,11 @@ describe('form data', function() {
     ]);
 
     _.each(props, function (value, key) {
-      expect(form.root.fields[0][key]).toEqual(value);
+      var child = form.root.fields[0];
+      if (child.type === 'field') {
+        child = child.fields[0];
+      }
+      expect(child[key]).toEqual(value);
     });
   };
 
