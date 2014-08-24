@@ -142,6 +142,11 @@
   word-wrap: break-word;
 }
 
+.formatic textarea {
+  height: 5em;
+  width: 50em;
+}
+
 .formatic pre {
   width:; 500px;
 }

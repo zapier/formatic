@@ -21,3 +21,4 @@ root changes type
 get bundle smaller!!!
 
 config vs meta!!!
+default values?
