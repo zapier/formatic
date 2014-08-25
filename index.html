@@ -170,6 +170,14 @@
         value: {
           foo: 'bar'
         }
+      },
+      {
+        type: 'dropdown',
+        key: 'letters',
+        label: 'Favorite letter',
+        choices: Array.apply(null, Array(26)).map(function (num, i) {
+          return String.fromCharCode(65 + i);
+        })
       }
     ]);
 
