@@ -77,6 +77,7 @@
   position: absolute;
   z-index: 1000;
   background: #fff;
+  border-bottom: 1px solid #ccc;
 }
 
 .formatic .dropdown-field .field-choices {
