@@ -5,7 +5,7 @@ var _ = require('underscore');
 
 describe('form data', function() {
 
-  var formatic = require('../')('react');
+  var formatic = require('../').create('react');
 
   var compile = function (field, props) {
 
@@ -16,7 +16,11 @@ describe('form data', function() {
     ]);
 
     _.each(props, function (value, key) {
-      expect(form.root.fields[0][key]).toEqual(value);
+      var child = form.root.fields[0];
+      if (child.type === 'field') {
+        child = child.fields[0];
+      }
+      expect(child[key]).toEqual(value);
     });
   };
 

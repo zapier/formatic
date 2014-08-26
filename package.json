@@ -1,6 +1,6 @@
 {
   "name": "formatic",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Automatic, pluggable form generation",
   "main": "index.js",
   "scripts": {

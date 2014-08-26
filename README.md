@@ -36,18 +36,17 @@ This will build two files: formatic-min.js (minified) and formatic-dev.js
 
 ## What is formatic?
 
-Formatic is a forms builder builder. Thats not a typo. Formatic can't build
-anything until you tell it how to build something. You tell it how to build
-things by providing plugins that configure it.
+Formatic is a configurable, pluggable forms builder. Out of the box, it can
+build React-based forms, but you can configure it and add/remove plugins to make
+it work exactly how you want.
 
 ## Using formatic (quick version)
 
-If you don't want to extend formatic, you'll use it with an included plugin
-like this:
+If you don't want to extend formatic, you'll use it like this:
 
 ```js
-// Get a formatic instance configured with the react plugin.
-var formatic = require('formatic')('react');
+// Get the default formatic instance.
+var formatic = require('formatic');
 
 // Get a new form.
 var form = formatic();
@@ -83,7 +82,7 @@ form.on('update', function () {
 form.set('firstName', 'Joseph');
 ```
 
-## Vanilla formatic
+<!-- ## Vanilla formatic
 
 If you require formatic:
 
@@ -289,4 +288,4 @@ to build a formatic instance that can do, you guessed it, forms!
 Forms are currently a work in progress though. So far, the effort has gone
 toward getting the plugin system working so we can build form stuff on top
 of that. In fact, the types plugin is a plugin that adds in "mini plugins" to
-support various form elements and cool dynamic stuff.
+support various form elements and cool dynamic stuff. -->

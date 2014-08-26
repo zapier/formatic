@@ -3,7 +3,7 @@
 
 describe('plugins', function() {
 
-  var Formatic = require('../');
+  var Formatic = require('../').create;
 
   var pigLatin = function (word) {
     return word.substring(1) + word[0] + 'ay';
@@ -178,6 +178,43 @@ describe('plugins', function() {
     form.addWord('bar');
 
     expect(form.words).toEqual(['foo', 'bar']);
+  });
+
+  it('should take parameters for a plugin', function () {
+
+    var plugin = function (formatic, plugin) {
+
+      formatic.method('ask', function () {
+        return plugin.config.answer;
+      });
+    };
+
+    var formatic = Formatic();
+
+    formatic.plugin(plugin, {
+      answer: 42
+    });
+
+    expect(formatic.ask()).toEqual(42);
+  });
+
+  it('should listen for plugin', function () {
+
+    var formatic = Formatic();
+
+    var foundPlugin = false;
+
+    formatic.onPlugin(function (plugin) {
+      if (plugin.tag === 'gotcha') {
+        foundPlugin = true;
+      }
+    });
+
+    formatic.plugin(function (formatic, plugin) {
+      plugin.tag = 'gotcha';
+    });
+
+    expect(foundPlugin).toEqual(true);
   });
 
 });

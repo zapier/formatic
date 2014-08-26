@@ -9,14 +9,12 @@
   <div id="json"></div>
   <script src="./formatic-dev.js"></script>
   <script>
-    var formatic = require('formatic')('react');
+    var formatic = require('formatic');
 
-    formatic.config({
-      typeMap: {
-        unicode: 'text'
-      }
+    formatic.config('core-type.typeMap', {
+      unicode: 'text'
     });
-
+    
     var form = formatic();
 
     form.meta('prettyTextareaLabels', {
@@ -34,6 +32,8 @@
           return match.charAt(0).toUpperCase() + match.slice(1);
         });
     };
+
+    formatic.config('view-pretty-textarea.labelFallback', humanize);
 
     form.meta('prettyTextareaLabelFallback', humanize);
 
@@ -170,6 +170,14 @@
         value: {
           foo: 'bar'
         }
+      },
+      {
+        type: 'dropdown',
+        key: 'letters',
+        label: 'Favorite letter',
+        choices: Array.apply(null, Array(26)).map(function (num, i) {
+          return String.fromCharCode(65 + i);
+        })
       }
     ]);
 

@@ -71,11 +71,17 @@
   vertical-align: middle;
 }
 
+.formatic .dropdown-field .field-choices-container {
+  max-height: 400px;
+  overflow-y: scroll;
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
 .formatic .dropdown-field .field-choices {
   list-style-type: none;
-  position: absolute;
-  background: #fff;
-  z-index: 1000;
   margin-top: 0px;
   padding-left: 0px;
 }
@@ -140,6 +146,11 @@
   white-space: -pre-wrap;      /* Opera 4-6 */
   white-space: -o-pre-wrap;    /* Opera 7 */
   word-wrap: break-word;
+}
+
+.formatic textarea {
+  height: 5em;
+  width: 50em;
 }
 
 .formatic pre {

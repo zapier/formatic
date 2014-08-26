@@ -15,7 +15,7 @@ describe('types', function() {
 
     var unmapType = function (type) {
 
-      var typeMap = formatic.options.typeMap || {};
+      var typeMap = formatic.config('core-type.typeMap') || {};
       var types = Object.keys(typeMap).filter(function (key) {
         return typeMap[key] === type;
       }).map(function (key) {
@@ -46,7 +46,7 @@ describe('types', function() {
           form.fields([
             field
           ]);
-          
+
           var component = mounted(form.component());
 
           form.on('update', function (props) {
@@ -192,7 +192,7 @@ describe('types', function() {
     });
   };
 
-  testWithFormatic(require('../')('react'));
-  testWithFormatic(require('../')('zapier'));
+  testWithFormatic(require('../').create('react'));
+  testWithFormatic(require('../').create('zapier'));
 
 });
