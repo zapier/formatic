@@ -15,7 +15,7 @@ describe('types', function() {
 
     var unmapType = function (type) {
 
-      var typeMap = formatic.options.typeMap || {};
+      var typeMap = formatic.config('core-type.typeMap') || {};
       var types = Object.keys(typeMap).filter(function (key) {
         return typeMap[key] === type;
       }).map(function (key) {
