@@ -9,13 +9,13 @@
   <div id="json"></div>
   <script src="./formatic-dev.js"></script>
   <script>
-    var formatic = require('formatic')('react');
+    var formatic = require('formatic');
 
-    formatic.config({
-      typeMap: {
-        unicode: 'text'
-      }
-    });
+    // formatic.config({
+    //   typeMap: {
+    //     unicode: 'text'
+    //   }
+    // });
 
     var form = formatic();
 
@@ -45,7 +45,8 @@
         required: true
       },
       {
-        type: 'unicode',
+        //type: 'unicode',
+        type: 'text',
         key: 'name.last',
         label: 'Last Name',
         required: true

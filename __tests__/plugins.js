@@ -182,23 +182,39 @@ describe('plugins', function() {
 
   it('should take parameters for a plugin', function () {
 
-    var plugin = function (formatic, answer) {
+    var plugin = function (formatic, plugin) {
 
       formatic.method('ask', function () {
-        return answer;
+        return plugin.config.answer;
       });
     };
 
     var formatic = Formatic();
 
-    formatic.plugin(plugin, 42);
+    formatic.plugin(plugin, {
+      answer: 42
+    });
 
     expect(formatic.ask()).toEqual(42);
+  });
 
-    formatic = Formatic(plugin, [42]);
+  it('should listen for plugin', function () {
 
-    expect(formatic.ask()).toEqual(42);
+    var formatic = Formatic();
 
+    var foundPlugin = false;
+
+    formatic.onPlugin(function (plugin) {
+      if (plugin.tag === 'gotcha') {
+        foundPlugin = true;
+      }
+    });
+
+    formatic.plugin(function (formatic, plugin) {
+      plugin.tag = 'gotcha';
+    });
+
+    expect(foundPlugin).toEqual(true);
   });
 
 });
