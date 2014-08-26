@@ -46,7 +46,7 @@ describe('types', function() {
           form.fields([
             field
           ]);
-          
+
           var component = mounted(form.component());
 
           form.on('update', function (props) {
@@ -192,7 +192,7 @@ describe('types', function() {
     });
   };
 
-  testWithFormatic(require('../')('react'));
-  testWithFormatic(require('../')('zapier'));
+  testWithFormatic(require('../').create('react'));
+  testWithFormatic(require('../').create('zapier'));
 
 });

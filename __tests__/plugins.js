@@ -3,7 +3,7 @@
 
 describe('plugins', function() {
 
-  var Formatic = require('../');
+  var Formatic = require('../').create;
 
   var pigLatin = function (word) {
     return word.substring(1) + word[0] + 'ay';

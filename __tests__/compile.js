@@ -5,7 +5,7 @@ var _ = require('underscore');
 
 describe('form data', function() {
 
-  var formatic = require('../')('react');
+  var formatic = require('../').create('react');
 
   var compile = function (field, props) {
 

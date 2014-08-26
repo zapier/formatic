@@ -3,7 +3,7 @@
 
 describe('form data', function() {
 
-  var formatic = require('../')('react');
+  var formatic = require('../').create('react');
 
   it('form can hold data', function () {
 
