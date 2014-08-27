@@ -154,7 +154,11 @@
 }
 
 .formatic pre {
-  width:; 500px;
+  width: 500px;
+}
+
+.formatic .code-field pre {
+  white-space: pre-wrap;
 }
 
 .formatic .list-field {
