@@ -156,3 +156,19 @@
 .formatic pre {
   width:; 500px;
 }
+
+.formatic .list-field {
+  border: 1px solid #ccc;
+}
+
+.formatic .list-item {
+  border: 1px solid #ccc;
+}
+
+.formatic .list-control-add {
+  cursor: pointer;
+}
+
+.formatic .list-control-remove {
+  cursor: pointer;
+}
