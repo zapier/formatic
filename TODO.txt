@@ -21,4 +21,7 @@ root changes type
 get bundle smaller!!!
 
 config vs meta!!!
-default values?
+
+get initial data from fields (so list type doesn't have to side-effect data)
+
+less magic bindings??

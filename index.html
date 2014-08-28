@@ -14,7 +14,7 @@
     formatic.config('core-type.typeMap', {
       unicode: 'text'
     });
-    
+
     var form = formatic();
 
     form.meta('prettyTextareaLabels', {
@@ -178,6 +178,29 @@
         choices: Array.apply(null, Array(26)).map(function (num, i) {
           return String.fromCharCode(65 + i);
         })
+      },
+      {
+        type: 'list',
+        key: 'notes',
+        label: 'Notes',
+        item: {
+          key: '[]',
+          type: 'fieldset',
+          fields: [{
+            type: 'textarea',
+            key: 'note',
+            label: 'Note'
+          },{
+            type: 'list',
+            key: 'tags',
+            label: 'Tags'
+          },{
+            type: 'select',
+            key: 'state',
+            choices: ['draft', 'publish'],
+            value: 'draft'
+          }]
+        }
       }
     ]);
 
