@@ -23,7 +23,7 @@ Point your browser to `localhost:3000/index.html`. Hack away on the code, the
 styles or the HTML in the demo directory, and the browser will automatically
 reload with your changes.
 
-__Note__ Don't mess with the files in the `live` directory. All those are copied
+__Note__: Don't mess with the files in the `live` directory. All those are copied
 from elsewhere.
 
 ## Build
