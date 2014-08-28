@@ -176,3 +176,11 @@
 .formatic .list-control-remove {
   cursor: pointer;
 }
+
+.formatic .list-control-up {
+  cursor: pointer;
+}
+
+.formatic .list-control-down {
+  cursor: pointer;
+}
