@@ -42,7 +42,7 @@
 
 .formatic .dropdown-field {
   position: relative;
-  max-width: 600px;
+  max-width: 870px;
 }
 
 .formatic .field-value {
@@ -128,7 +128,7 @@
 .formatic .pretty-textarea-field textarea, .formatic .pretty-textarea-field pre {
   font-family: 'Open Sans', Helvetica, arial, sans-serif;
   font-size: 13px;
-  width: 500px;
+  max-width: 870px;
   border: solid 1px;
   height: 100px;
   padding: 2px;
@@ -150,7 +150,7 @@
 
 .formatic textarea {
   height: 5em;
-  width: 50em;
+  max-width: 870px;
 }
 
 .formatic pre {
@@ -161,19 +161,19 @@
   white-space: pre-wrap;
 }
 
-.formatic .list-field {
+.formatic .list-field, .formatic .object-field {
   border: 1px solid #ccc;
 }
 
-.formatic .list-item {
+.formatic .list-item, .formatic .object-item {
   border: 1px solid #ccc;
 }
 
-.formatic .list-control-add {
+.formatic .list-control-add, .formatic .object-control-add {
   cursor: pointer;
 }
 
-.formatic .list-control-remove {
+.formatic .list-control-remove, .formatic .object-control-remove {
   cursor: pointer;
 }
 
