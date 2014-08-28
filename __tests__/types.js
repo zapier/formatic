@@ -192,7 +192,11 @@ describe('types', function() {
     });
   };
 
-  testWithFormatic(require('../').create('react'));
-  testWithFormatic(require('../').create('zapier'));
+  var reactFormatic = require('../').create('react');
+  var zapierFormatic = require('../').create('react');
+  zapierFormatic.plugin('zapier-types');
+
+  testWithFormatic(reactFormatic);
+  testWithFormatic(zapierFormatic);
 
 });

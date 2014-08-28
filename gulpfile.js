@@ -21,7 +21,7 @@ gulp.task('watch', ['bundle-watch', 'test-watch', 'html-watch', 'css-watch']);
 
 gulp.task('build', ['build-dev', 'build-prod']);
 
-gulp.task('live', ['html-copy', 'css-copy', 'watch', 'server-live-app', 'server-live-reload']);
+gulp.task('live', ['copy-watch', 'watch', 'server-live-app', 'server-live-reload']);
 
 gulp.task('test', ['lint'], plugins.shell.task([
   'npm test'
