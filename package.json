@@ -21,6 +21,7 @@
     "gulp-changed": "^0.4.0",
     "gulp-eslint": "^0.1.8",
     "gulp-load-plugins": "^0.5.3",
+    "gulp-rename": "^1.2.0",
     "gulp-shell": "^0.2.8",
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^0.3.1",

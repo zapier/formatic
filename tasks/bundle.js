@@ -12,7 +12,7 @@ gulp.task('bundle-dev', function () {
     .require('./index.js', {expose: 'formatic'})
     .bundle({debug: true})
     .pipe(source('formatic-dev.js'))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./build'));
 });
 
 gulp.task('bundle-prod', ['lint'], function () {
@@ -21,7 +21,7 @@ gulp.task('bundle-prod', ['lint'], function () {
     .bundle()
     .pipe(source('formatic-min.js'))
     .pipe(plugins.streamify(plugins.uglify()))
-    .pipe(gulp.dest('./'));
+    .pipe(gulp.dest('./build'));
 });
 
 gulp.task('bundle-watch', function () {
@@ -37,7 +37,8 @@ gulp.task('bundle-watch', function () {
 
     return bundle
       .pipe(source('formatic-dev.js'))
-      .pipe(gulp.dest('./'));
+      .pipe(plugins.rename('formatic.js'))
+      .pipe(gulp.dest('./live/lib'));
   };
 
   bundler.on('update', rebundle);

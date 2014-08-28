@@ -12,7 +12,7 @@ gulp.task('server-live-app', function (done) {
 
   app
     .use(require('connect-livereload')())
-    .use('/', express.static('./'))
+    .use('/', express.static('./live'))
     .listen(APP_PORT, function() {
       console.log('app server listening on %d', APP_PORT);
       done();
@@ -25,7 +25,7 @@ gulp.task('server-live-reload', function (done) {
     console.log('reload server listening on %d', LR_PORT);
     done();
   });
-  gulp.watch(['index.html', 'style/**/*.css', 'formatic-dev.js'], function (evt) {
+  gulp.watch(['live/*.html', 'live/style/*.css', 'live/lib/formatic.js'], function (evt) {
 
     console.log(evt.path)
     lr.changed({

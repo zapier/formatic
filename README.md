@@ -31,8 +31,8 @@ npm install
 gulp build
 ```
 
-This will build two files: formatic-min.js (minified) and formatic-dev.js
-(not minified and includes source maps for development).
+This will build two files in the build directory: formatic-min.js (minified) and
+formatic-dev.js (not minified and includes source maps for development).
 
 ## What is formatic?
 

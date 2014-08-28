@@ -14,14 +14,14 @@ gulp.task('lint', function () {
 });
 
 gulp.task('test-watch', function () {
-  gulp.watch(['./formatic-dev.js', './__tests__/**/*.js'], ['test']);
+  return gulp.watch(['./live/lib/formatic.js', './__tests__/**/*.js'], ['test']);
 });
 
-gulp.task('watch', ['bundle-watch', 'test-watch']);
+gulp.task('watch', ['bundle-watch', 'test-watch', 'html-watch', 'css-watch']);
 
 gulp.task('build', ['build-dev', 'build-prod']);
 
-gulp.task('live', ['watch', 'server-live-app', 'server-live-reload']);
+gulp.task('live', ['html-copy', 'css-copy', 'watch', 'server-live-app', 'server-live-reload']);
 
 gulp.task('test', ['lint'], plugins.shell.task([
   'npm test'
