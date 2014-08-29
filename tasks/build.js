@@ -15,4 +15,6 @@ gulp.task('copy-build', ['bundle-prod'], function () {
     .pipe(gulp.dest('./demo/lib'));
 });
 
-gulp.task('build-prod', ['bundle-prod', 'copy-build']);
+gulp.task('build-prod-min', ['bundle-prod-min', 'copy-build']);
+
+gulp.task('build-prod', ['bundle-prod']);

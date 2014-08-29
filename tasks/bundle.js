@@ -19,6 +19,14 @@ gulp.task('bundle-prod', ['lint'], function () {
   return browserify({entries: ['./index.js']})
     .require('./index.js', {expose: 'formatic'})
     .bundle()
+    .pipe(source('formatic.js'))
+    .pipe(gulp.dest('./build'));
+});
+
+gulp.task('bundle-prod-min', ['lint'], function () {
+  return browserify({entries: ['./index.js']})
+    .require('./index.js', {expose: 'formatic'})
+    .bundle()
     .pipe(source('formatic-min.js'))
     .pipe(plugins.streamify(plugins.uglify()))
     .pipe(gulp.dest('./build'));

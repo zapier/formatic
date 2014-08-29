@@ -210,7 +210,69 @@
             choices: ['draft', 'publish'],
             value: 'draft'
           }]
-        }
+        },
+        itemTypes: [
+          {
+            label: 'Basic Note',
+            type: 'basic',
+            item: {
+              type: 'fieldset',
+              key: '[]',
+              fields: [
+                {
+                  key: 'type',
+                  type: 'text',
+                  label: 'Type',
+                  value: 'basic',
+                  isReadOnly: true
+                },
+                {
+                  key: 'note',
+                  type: 'unicode',
+                  label: 'Note'
+                }
+              ]
+            }
+          },
+          {
+            label: 'Advanced Note',
+            type: 'advanced',
+            item: {
+              type: 'fieldset',
+              key: '[]',
+              fields: [
+                {
+                  key: 'type',
+                  type: 'text',
+                  label: 'Type',
+                  value: 'advanced',
+                  isReadOnly: true
+                },
+                {
+                  type: 'textarea',
+                  key: 'note',
+                  label: 'Note'
+                },{
+                  type: 'list',
+                  key: 'tags',
+                  label: 'Tags'
+                },
+
+                {label: 'Params', key: 'params', type: 'object', help_text: 'What params do you want?', item: {
+                            type: 'text', key: '[]', value: ''
+                }},
+
+                
+                {
+                  type: 'select',
+                  key: 'state',
+                  choices: ['draft', 'publish'],
+                  value: 'draft'
+                }
+              ]
+            }
+          }
+        ]
       },
       {
         type: 'object',
