@@ -257,12 +257,6 @@
                   key: 'tags',
                   label: 'Tags'
                 },
-
-                {label: 'Params', key: 'params', type: 'object', help_text: 'What params do you want?', item: {
-                            type: 'text', key: '[]', value: ''
-                }},
-
-                
                 {
                   type: 'select',
                   key: 'state',
@@ -282,7 +276,14 @@
         item: {
           key: '[]',
           type: 'text'
-        }
+        },
+        value: {'mary': 'Mary'}
+      },
+      {
+        type: 'select',
+        choices: [],
+        key: 'nochoice',
+        value: 'none'
       }
     ]);
 

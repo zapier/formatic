@@ -443,7 +443,7 @@ module.exports = function (formatic) {
     }
   });
 
-  var tempPrefix = '$$temp::';
+  var tempPrefix = '__missing_key__';
 
   formatic.form.method('tempKey', function (field) {
     if (field.key) {
@@ -1101,6 +1101,18 @@ module.exports = function (formatic) {
       formatic.updateComponent(info.component, props);
     }.bind(this));
   });
+
+  formatic.method('className', function () {
+
+    var classNames = Array.prototype.slice.call(arguments, 0);
+
+    classNames = classNames.filter(function (name) {
+      return name;
+    });
+
+    return classNames.join(' ');
+  });
+
 };
 
 },{"underscore":212}],11:[function(require,module,exports){
@@ -1975,7 +1987,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = plugin.config.className || '';
+      var className = formatic.className(plugin.config.className, this.props.field.className);
 
       // return R.div({className: 'field checkbox-boolean-field'},
       //   R.input({
@@ -2044,10 +2056,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = 'field-choices';
-      if (plugin.config.className) {
-        className += ' ' + plugin.config.className;
-      }
+      var className = formatic.className('field-choices', plugin.config.className, this.props.field.className);
 
       var props = {className: className, ref: 'choices'};
 
@@ -2088,11 +2097,7 @@ module.exports = function (formatic, plugin) {
   plugin.view = React.createClass({
 
     render: function () {
-
-      var className = 'field code-field';
-      if (plugin.config.className) {
-        className += ' ' + plugin.config.className;
-      }
+      var className = formatic.className('field code-field', plugin.config.className, this.props.field.className);
 
       return R.pre(_.extend({className: className}, plugin.config.attributes),
         this.props.field.value
@@ -2144,11 +2149,7 @@ module.exports = function (formatic, plugin) {
     },
 
     render: function () {
-
-      var className = 'dropdown-field';
-      if (plugin.config.className) {
-        className += ' ' + plugin.config.className;
-      }
+      var className = formatic.className('dropdown-field', plugin.config.className, this.props.field.className);
 
       var selectedLabel = '';
       var matchingLabels = this.props.field.choices.filter(function (choice) {
@@ -2197,27 +2198,17 @@ module.exports = function (formatic, plugin) {
 
       var field = this.props.field.field;
 
-      var classes = [
+      var className = formatic.className(
         'field',
-        field.type + '-field'
-      ];
-
-      if (field.errors.required) {
-        classes.push('validation-error-required');
-      }
-
-      if (field.required) {
-        classes.push('required');
-      } else {
-        classes.push('not-required');
-      }
-
-      if (plugin.config.className) {
-        classes.push(plugin.config.className);
-      }
+        field.type + '-field',
+        field.errors.required ? 'validation-error-required' : '',
+        field.required ? 'required' : 'not-required',
+        plugin.config.className,
+        field.className
+      );
 
       var props = {
-        className: classes.join(' ')
+        className: className
       };
 
       _.extend(props, plugin.config.attributes);
@@ -2266,7 +2257,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = plugin.config.className || '';
+      var className = formatic.className(plugin.config.className, this.props.field.className);
 
       return R.form(_.extend({className: className}, plugin.config.attributes),
         this.props.field.fields.map(function (field) {
@@ -2293,11 +2284,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = 'formatic';
-
-      if (plugin.config.className) {
-        className += ' ' + plugin.config.className;
-      }
+      var className = formatic.className('formatic', plugin.config.className, this.props.field.className);
 
       return R.form(_.extend({className: className}, plugin.config.attributes),
         this.props.field.fields.map(function (field) {
@@ -2362,7 +2349,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = plugin.config.className || '';
+      var className = formatic.className(plugin.config.className, this.props.field.className);
 
       var field = this.props.field;
 
@@ -2410,10 +2397,12 @@ module.exports = function (formatic, plugin) {
       var item = field.field;
       var form = this.props.form;
 
-      var className = plugin.addClass('className', 'list-item');
-      var removeClassName = plugin.addClass('removeButton_className', 'list-control-remove');
-      var upClassName = plugin.addClass('upButton_className', 'list-control-up');
-      var downClassName = plugin.addClass('downButton_className', 'list-control-down');
+      var className = formatic.className('list-item', plugin.config.className, field.className);
+
+      var removeClassName = formatic.className('list-control-remove', plugin.config.removeButton_className, field.removeButton_className);
+      var upClassName = formatic.className('list-control-up', plugin.config.upButton_className, field.upButton_className);
+      var downClassName = formatic.className('list-control-down', plugin.config.downButton_className, field.downButton_className);
+
       var removeLabel = plugin.configValue('removeButton_label', '[remove]');
       var upLabel = plugin.configValue('upButton_label', '[up]');
       var downLabel = plugin.configValue('downButton_label', '[down]');
@@ -2456,8 +2445,8 @@ module.exports = function (formatic, plugin) {
       var field = this.props.field;
       var form = this.props.form;
 
-      var className = plugin.addClass('className');
-      var addClassName = plugin.addClass('addButton_className', 'list-control-add');
+      var className = formatic.className(plugin.config.className, field.className);
+      var addClassName = formatic.className('list-control-add', plugin.config.addButton_className, field.addButton_className);
       var addLabel = plugin.configValue('addButton_label', '[add]');
 
       var numItems = field.fields.length;
@@ -2674,8 +2663,8 @@ module.exports = function (formatic, plugin) {
       var item = field.field;
       var form = this.props.form;
 
-      var className = plugin.addClass('className', 'object-item');
-      var removeClassName = plugin.addClass('removeButton_className', 'object-control-remove');
+      var className = formatic.className('object-item', plugin.config.className, field.className);
+      var removeClassName = formatic.className('object-control-remove', plugin.config.removeButton_className, field.removeButton_className);
       var removeLabel = plugin.configValue('removeButton_label', '[remove]');
 
       var propertyKey = item.propertyKey;
@@ -2688,11 +2677,15 @@ module.exports = function (formatic, plugin) {
         if (propertyKey === '') {
           keyChoices = [''].concat(keyChoices);
         }
+        if (keyChoices.indexOf(propertyKey) < 0) {
+          keyChoices = keyChoices.concat([propertyKey]);
+        }
         keyInput = R.select({value: propertyKey, onChange: this.onChangeKey},
           keyChoices.map(function (choice) {
             return R.option({}, choice);
           })
         );
+
       } else {
         keyInput = R.input({type: 'text', value: propertyKey, onChange: this.onChangeKey});
       }
@@ -2785,8 +2778,8 @@ module.exports = function (formatic, plugin) {
       var field = this.props.field;
       var form = this.props.form;
 
-      var className = plugin.addClass('className');
-      var addClassName = plugin.addClass('addButton_className', 'object-control-add');
+      var className = formatic.className(plugin.config.className, field.className);
+      var addClassName = formatic.className('object-control-add', plugin.config.addButton_className, field.addButton_className);
       var addLabel = plugin.configValue('addButton_label', '[add]');
 
       var sortedFields = _.sortBy(field.fields, function (field) {
@@ -3201,7 +3194,7 @@ module.exports = function (formatic, plugin) {
     },
 
     render: function () {
-      var className = plugin.config.className || '';
+      var className = formatic.className(plugin.config.className, this.props.field.className);
 
       var field = this.props.field;
 
@@ -3258,7 +3251,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = plugin.config.className || '';
+      var className = formatic.className(plugin.config.className, this.props.field.className);
 
       var choices = this.props.field.choices;
 
@@ -3267,6 +3260,16 @@ module.exports = function (formatic, plugin) {
           value: '',
           label: ''
         }].concat(choices);
+      } else {
+        var valueChoice = _.find(choices, function (choice) {
+          return choice.value === this.props.field.value;
+        }.bind(this));
+        if (!valueChoice) {
+          choices = choices.concat({
+            value: this.props.field.value,
+            label: this.props.field.value
+          });
+        }
       }
 
       return R.select(_.extend({
@@ -3303,7 +3306,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = plugin.config.className || '';
+      var className = formatic.className(plugin.config.className, this.props.field.className);
 
       var field = this.props.field;
 
@@ -3336,7 +3339,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = plugin.config.className || '';
+      var className = formatic.className(plugin.config.className, this.props.field.className);
 
       var field = this.props.field;
 
