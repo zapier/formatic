@@ -24,7 +24,7 @@ describe('plugins', function() {
   it('can add method to formatic', function () {
 
     var plugin = function (formatic) {
-      formatic.method('greet', greet);
+      formatic.greet = greet;
     };
 
     var formatic = Formatic(plugin);
@@ -36,7 +36,7 @@ describe('plugins', function() {
   it('can wrap method on formatic, auto args', function () {
 
     var plugin = function (formatic) {
-      formatic.method('greet', greet);
+      formatic.greet = greet;
     };
 
     var upperPlugin = function (formatic) {
@@ -52,7 +52,7 @@ describe('plugins', function() {
   it('can wrap method on formatic, change args', function () {
 
     var plugin = function (formatic) {
-      formatic.method('greet', greet);
+      formatic.greet = greet;
     };
 
     var upperPlugin = function (formatic) {
@@ -68,7 +68,7 @@ describe('plugins', function() {
   it('can add method to form', function () {
 
     var plugin = function (formatic) {
-      formatic.form.method('greet', greet);
+      formatic.form.greet = greet;
     };
 
     var formatic = Formatic(plugin);
@@ -82,7 +82,7 @@ describe('plugins', function() {
   it('can wrap method on form, auto args', function () {
 
     var plugin = function (formatic) {
-      formatic.form.method('greet', greet);
+      formatic.form.greet = greet;
     };
 
     var upperPlugin = function (formatic) {
@@ -100,7 +100,7 @@ describe('plugins', function() {
   it('can wrap method on form, change args', function () {
 
     var plugin = function (formatic) {
-      formatic.form.method('greet', greet);
+      formatic.form.greet = greet;
     };
 
     var upperPlugin = function (formatic) {
@@ -115,28 +115,16 @@ describe('plugins', function() {
 
   });
 
-  it('warns against replacing method', function () {
-
-    var plugin = function (formatic) {
-      formatic.form.method('greet', greet);
-    };
-
-    expect(function () {
-      Formatic(plugin, plugin);
-    }).toThrow();
-
-  });
-
   it('allows replacing method', function () {
 
     var plugin = function (formatic) {
-      formatic.form.method('greet', greet);
+      formatic.form.greet = greet;
     };
 
     var spanishPlugin = function (formatic) {
-      formatic.form.replaceMethod('greet', function (name) {
+      formatic.form.greet = function (name) {
         return 'hola ' + name;
-      });
+      };
     };
 
     var formatic = Formatic(plugin, spanishPlugin);
@@ -157,9 +145,9 @@ describe('plugins', function() {
         ];
       });
 
-      formatic.form.method('addWord', function (word) {
+      formatic.form.addWord = function (word) {
         this.words.push(word);
-      });
+      };
 
       formatic.form.wrap('addWord', function (next, word) {
         if (this.badWords.indexOf(word) >= 0) {
@@ -184,9 +172,9 @@ describe('plugins', function() {
 
     var plugin = function (formatic, plugin) {
 
-      formatic.method('ask', function () {
+      formatic.ask = function () {
         return plugin.config.answer;
-      });
+      };
     };
 
     var formatic = Formatic();

@@ -88,15 +88,15 @@ describe('utils', function() {
 
   });
 
-  it('should make an object hookable', function () {
+  it('should make an object wrappable', function () {
 
     var obj = {};
 
-    utils.hookable(obj);
+    utils.wrappable(obj);
 
-    obj.method('greet', function () {
+    obj.greet = function () {
       return 'Hello';
-    });
+    };
 
     obj.wrap('greet', function (next) {
       return next().toUpperCase();
@@ -108,8 +108,16 @@ describe('utils', function() {
 
     expect(obj.greet()).toEqual('HELLO, BOB!');
 
-    obj.replaceMethod('greet', function () {
+    obj.greet = function () {
       return 'Hola';
+    };
+
+    obj.wrap('greet', function (next) {
+      return next().toUpperCase();
+    });
+
+    obj.wrap('greet', function (next) {
+      return next() + ', Bob!';
     });
 
     expect(obj.greet()).toEqual('HOLA, BOB!');
@@ -150,86 +158,4 @@ describe('utils', function() {
       {type: 'text', value: ' baz'}
     ]);
   });
-
-  it('should convert ascii text to hidden unicode and back', function () {
-
-    var hidden = utils.hideUnicodeMessage('foobar');
-    var original = utils.unhideUnicodeMessage(hidden);
-
-    expect(original).toEqual('foobar');
-  });
-
-  it('should convert unicode text to hidden unicode and back', function () {
-
-    var hidden = utils.hideUnicodeMessage('€');
-    var original = utils.unhideUnicodeMessage(hidden);
-
-    expect(original).toEqual('€');
-  });
-
-  // it('should diff same', function () {
-  //
-  //   expect(utils.diff('foo', 'foo')).toEqual(null);
-  // });
-  //
-  // it('should diff front insert', function () {
-  //
-  //   expect(utils.diff('bar', 'foobar')).toEqual({
-  //     insert: 'foo',
-  //     delete: '',
-  //     pos: 0
-  //   });
-  // });
-  //
-  // it('should diff back insert', function () {
-  //
-  //   expect(utils.diff('foo', 'foobar')).toEqual({
-  //     insert: 'bar',
-  //     delete: '',
-  //     pos: 3
-  //   });
-  // });
-  //
-  // it('should diff front delete', function () {
-  //
-  //   expect(utils.diff('foobar', 'bar')).toEqual({
-  //     insert: '',
-  //     delete: 'foo',
-  //     pos: 0
-  //   });
-  // });
-  //
-  // it('should diff back delete', function () {
-  //
-  //   expect(utils.diff('foobar', 'foo')).toEqual({
-  //     insert: '',
-  //     delete: 'bar',
-  //     pos: 3
-  //   });
-  // });
-  //
-  // it('should diff middle insert', function () {
-  //
-  //   expect(utils.diff('foobaz', 'foobarbaz')).toEqual({
-  //     insert: 'bar',
-  //     delete: '',
-  //     pos: 3
-  //   });
-  // });
-  //
-  // it('should diff middle delete', function () {
-  //
-  //   expect(utils.diff('foobarbaz', 'foobaz')).toEqual({
-  //     insert: '',
-  //     delete: 'bar',
-  //     pos: 3
-  //   });
-  // });
-  //
-  // it('should char diff', function () {
-  //
-  //   expect(utils.charDiff('foobar', 'foocar')).toEqual(3);
-  //
-  //   expect(utils.charDiff('foobar', 'feebar', -1)).toEqual(3);
-  // });
 });
