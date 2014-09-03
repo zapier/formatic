@@ -2303,6 +2303,12 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
+    getInitialState: function () {
+      return {
+        maybeDelete: false
+      };
+    },
+
     onDelete: function () {
       var parent = this.props.field.parent;
       if (this.props.onDelete) {
@@ -2327,6 +2333,18 @@ module.exports = function (formatic, plugin) {
       this.props.form.actions.move(parent, this.props.field.index, this.props.field.index + 1);
     },
 
+    onMouseOver: function () {
+      this.setState({
+        maybeDelete: true
+      });
+    },
+
+    onMouseOut: function () {
+      this.setState({
+        maybeDelete: false
+      });
+    },
+
     render: function () {
       var field = this.props.field;
       var parent = field.parent;
@@ -2344,7 +2362,8 @@ module.exports = function (formatic, plugin) {
       var removeLabel = plugin.configValue('removeButton_label', '[remove]');
       var upLabel = plugin.configValue('upButton_label', '[up]');
       var downLabel = plugin.configValue('downButton_label', '[down]');
-      return R.div(_.extend({className: className}, plugin.config.attributes),
+      return R.div(_.extend({className: className,
+        style: {border: this.state.maybeDelete ? 'solid 1px red' : ''}}, plugin.config.attributes),
         R.div({className: valueClassName},
           form.component({
             type: 'field',
@@ -2357,7 +2376,7 @@ module.exports = function (formatic, plugin) {
           })
         ),
         R.div({className: controlClassName},
-          R.span({className: removeClassName, onClick: this.onDelete}, removeLabel),
+          R.span({className: removeClassName, onMouseOver: this.onMouseOver, onMouseOut: this.onMouseOut, onClick: this.onDelete}, removeLabel),
           this.props.field.index > 0 ? R.span({className: upClassName, onClick: this.onMoveUp}, upLabel) : null,
           this.props.field.index < (this.props.field.numItems - 1) ? R.span({className: downClassName, onClick: this.onMoveDown}, downLabel) : null
         )
@@ -2693,7 +2712,8 @@ module.exports = function (formatic, plugin) {
 
     getInitialState: function () {
       return {
-        useCustomKey: false
+        useCustomKey: false,
+        maybeDelete: false
       };
     },
 
@@ -2713,6 +2733,18 @@ module.exports = function (formatic, plugin) {
       var oldKey = this.props.field.propertyKey;
       this.props.onMove(oldKey, newKey);
       this.props.form.actions.move(parent, oldKey, newKey);
+    },
+
+    onMouseOver: function () {
+      this.setState({
+        maybeDelete: true
+      });
+    },
+
+    onMouseOut: function () {
+      this.setState({
+        maybeDelete: false
+      });
     },
 
     render: function () {
@@ -2756,7 +2788,7 @@ module.exports = function (formatic, plugin) {
         keyInput = R.input({className: keyInputClassName, type: 'text', value: propertyKey, onChange: this.onChangeKey});
       }
 
-      return R.div(_.extend({className: className}, plugin.config.attributes),
+      return R.div(_.extend({className: className, style: {border: this.state.maybeDelete ? 'solid 1px red' : ''}}, plugin.config.attributes),
         R.div({className: keyClassName},
           parent.itemKeyLabel ? R.span({}, parent.itemKeyLabel) : null,
           keyInput
@@ -2768,7 +2800,7 @@ module.exports = function (formatic, plugin) {
           })
         ),
         R.div({className: controlClassName},
-          R.div({className: removeClassName, onClick: this.onDelete}, removeLabel)
+          R.div({className: removeClassName, onMouseOver: this.onMouseOver, onMouseOut: this.onMouseOut, onClick: this.onDelete}, removeLabel)
         )
       );
     }
