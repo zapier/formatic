@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
 </head>
 <body>
-  <div class="container">
+  <div class="container-fluid">
     <div id="user"></div>
     <div id="extra"></div>
     <div id="json"></div>
@@ -193,6 +193,8 @@
         type: 'list',
         key: 'notes',
         label: 'Notes',
+        collapsable: true,
+        value: [{note: 'foo', type: 'basic'}],
         item: {
           key: '[]',
           type: 'fieldset',
@@ -216,6 +218,7 @@
             label: 'Basic Note',
             type: 'basic',
             item: {
+              label: 'Basic Note',
               type: 'fieldset',
               key: '[]',
               fields: [
@@ -238,6 +241,7 @@
             label: 'Advanced Note',
             type: 'advanced',
             item: {
+              label: 'Advanced Note',
               type: 'fieldset',
               key: '[]',
               fields: [
@@ -255,7 +259,12 @@
                 },{
                   type: 'list',
                   key: 'tags',
-                  label: 'Tags'
+                  label: 'Tags',
+                  item: {
+                    type: 'text',
+                    key: '[]',
+                    label: 'Tag'
+                  }
                 },
                 {
                   type: 'select',
@@ -273,6 +282,7 @@
         key: 'users',
         label: 'Users',
         keyChoices: ['joe', 'bob'],
+        customKeyChoice: true,
         item: {
           key: '[]',
           type: 'text'
@@ -284,6 +294,12 @@
         choices: [],
         key: 'nochoice',
         value: 'none'
+      },
+      {
+        type: 'text',
+        hidden: true,
+        key: 'someHidden',
+        value: 'my hidden value'
       }
     ]);
 

@@ -163,10 +163,12 @@
 }*/
 
 .formatic .list-control-add, .formatic .object-control-add {
+  color: green;
   cursor: pointer;
 }
 
 .formatic .list-control-remove, .formatic .object-control-remove {
+  color: red;
   cursor: pointer;
   padding-right: 1em;
 }
