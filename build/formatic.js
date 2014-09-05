@@ -295,7 +295,10 @@ module.exports = function (formatic) {
 
   formatic.config('view-form.attributes', {role: 'form'});
 
-  formatic.config('view-field.className', 'form-group');
+  formatic.config('view-field', {
+    className: 'form-group',
+    help_className: 'help-block'
+  });
 
   formatic.config('view-text.className', 'form-control');
 
@@ -306,38 +309,38 @@ module.exports = function (formatic) {
   formatic.config('view-select.className', 'form-control');
 
   formatic.config('view-list', {
-    'className': 'well',
-    'addButton_className': 'glyphicon glyphicon-plus',
-    'addButton_label': ''
+    className: 'well',
+    addButton_className: 'glyphicon glyphicon-plus',
+    addButton_label: ''
   });
 
   formatic.config('view-list-item', {
-    'className': 'well',
-    'value_className': '',
-    'control_className': '',
-    'removeButton_className': 'glyphicon glyphicon-remove',
-    'removeButton_label': '',
-    'upButton_className': 'glyphicon glyphicon-arrow-up',
-    'upButton_label': '',
-    'downButton_className': 'glyphicon glyphicon-arrow-down',
-    'downButton_label': ''
+    className: 'well',
+    value_className: '',
+    control_className: '',
+    removeButton_className: 'glyphicon glyphicon-remove',
+    removeButton_label: '',
+    upButton_className: 'glyphicon glyphicon-arrow-up',
+    upButton_label: '',
+    downButton_className: 'glyphicon glyphicon-arrow-down',
+    downButton_label: ''
   });
 
   formatic.config('view-object', {
-    'className': 'well',
-    'addButton_className': 'glyphicon glyphicon-plus',
-    'addButton_label': ''
+    className: 'well',
+    addButton_className: 'glyphicon glyphicon-plus',
+    addButton_label: ''
   });
 
   formatic.config('view-object-item', {
-    'className': 'well',
-    'key_className': '',
-    'keyInput_className': 'form-control',
-    'keyChoice_className': 'form-control',
-    'value_className': '',
-    'control_className': '',
-    'removeButton_className': 'glyphicon glyphicon-remove',
-    'removeButton_label': ''
+    className: 'well',
+    key_className: '',
+    keyInput_className: 'form-control',
+    keyChoice_className: 'form-control',
+    value_className: '',
+    control_className: '',
+    removeButton_className: 'glyphicon glyphicon-remove',
+    removeButton_label: ''
   });
 };
 
@@ -423,7 +426,7 @@ module.exports = function (formatic) {
       try {
         var type = formatic.type(field.type);
         if (type && type.parseField) {
-          value = type.parseField(value);
+          value = type.parseField(field, value);
         }
         this.set(field.keyPath, value);
       } catch (e) {
@@ -1131,12 +1134,14 @@ module.exports = function (formatic) {
     props = props || {};
 
     props.form = this;
-    props.field = field;
 
     var type = formatic.type(field.type);
     if (type && type.formatField) {
-      field.value = type.formatField(field.value);
+      field = _.extend({}, field);
+      field.value = type.formatField(field, field.value);
     }
+
+    props.field = field;
 
     return view(props);
   };
@@ -1378,7 +1383,7 @@ module.exports = function (formatic) {
     'select': 'dropdown',
     'plain-select': 'select',
     'file': 'text',
-    'checkbox': 'checkbox-boolean',
+    'checkbox': 'boolean-checkbox',
     'datetime': 'text'
   });
 };
@@ -1516,11 +1521,11 @@ module.exports = function (formatic, plugin) {
     return field;
   };
 
-  plugin.formatField = function (value) {
+  plugin.formatField = function (field, value) {
     return JSON.stringify(value, null, 2);
   };
 
-  plugin.parseField = function (value) {
+  plugin.parseField = function (field, value) {
     return JSON.parse(value);
   };
 };
@@ -1587,6 +1592,8 @@ module.exports = function (formatic, plugin) {
           }
         }
 
+        item = _.extend({}, item, {index: i});
+
         var child = run(item, i);
 
         field.fields.push(child);
@@ -1623,6 +1630,14 @@ module.exports = function (formatic, plugin) {
       key: '[]'
     });
 
+    if (field.itemTypes) {
+      field.itemTypes = field.itemTypes.map(function (itemType) {
+        itemType = _.extend({}, itemType);
+        itemType.item = compile(itemType.item);
+        return itemType;
+      });
+    }
+
     field.value = field.value || {};
 
     if (field.keyChoices) {
@@ -1650,7 +1665,19 @@ module.exports = function (formatic, plugin) {
 
       _.each(obj, function (value, key) {
 
-        var child = run(field.item, key);
+        var item = field.item;
+
+        if (field.itemTypes) {
+          var itemType = _.find(field.itemTypes, function (itemType) {
+            return key === itemType.type;
+          });
+
+          if (itemType) {
+            item = itemType.item;
+          }
+        }
+
+        var child = run(item, key);
 
         child.propertyKey = key;
 
@@ -1700,13 +1727,66 @@ module.exports = function (formatic, plugin) {
 
   plugin.compileField = function (field) {
 
-    field.value = field.value || '';
-
     field.choices = field.choices || [];
 
     field.choices = plugin.buildChoices(field.choices);
 
+    if (typeof field.value === 'boolean') {
+      field.isBoolean = true;
+      var hasTrue = false;
+      var hasFalse = false;
+      field.choices = field.choices.map(function (choice) {
+        var value = choice.value.toLowerCase();
+        if (value === 'true' || value === 'yes') {
+          value = 'true';
+        } else {
+          value = 'false';
+        }
+        if (value === 'true') {
+          hasTrue = true;
+        }
+        if (value === 'false') {
+          hasFalse = true;
+        }
+        return;
+      });
+
+      if (!hasTrue) {
+        field.choices = field.choices.concat([
+          {
+            value: 'true',
+            label: 'Yes'
+          }
+        ]);
+      }
+      if (!hasFalse) {
+        field.choices = field.choices.concat([
+          {
+            value: 'false',
+            label: 'No'
+          }
+        ]);
+      }
+
+    } else {
+      field.value = field.value || '';
+    }
+
     return field;
+  };
+
+  plugin.formatField = function (field, value) {
+    if (field.isBoolean) {
+      return value ? 'true' : 'false';
+    }
+    return value;
+  };
+
+  plugin.parseField = function (field, value) {
+    if (field.isBoolean) {
+      return value === 'true';
+    }
+    return value;
   };
 };
 
@@ -1943,19 +2023,22 @@ module.exports = function (formatic, plugin) {
       return R.div(props,
         this.props.field.choices.map(function (choice) {
           return R.span({className: 'field-choice'},
-            R.input({
-              name: this.props.field.key,
-              type: 'checkbox',
-              value: choice.value,
-              checked: this.props.field.value.indexOf(choice.value) >= 0 ? true : false,
-              onChange: this.onChange,
-              onFocus: this.onFocus,
-              onBlur: this.onBlur
-              //onFocus: this.props.actions.focus
-            }),
-            R.span({className: 'field-choice-label'},
-              choice.label
-            )
+            R.span({style: {whiteSpace: 'nowrap'}},
+              R.input({
+                name: this.props.field.key,
+                type: 'checkbox',
+                value: choice.value,
+                checked: this.props.field.value.indexOf(choice.value) >= 0 ? true : false,
+                onChange: this.onChange,
+                onFocus: this.onFocus,
+                onBlur: this.onBlur
+                //onFocus: this.props.actions.focus
+              }),
+              R.span({className: 'field-choice-label'},
+                choice.label
+              )
+            ),
+            ' '
           );
         }.bind(this))
       );
@@ -2072,6 +2155,55 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
+    isCollapsableProps: function (props) {
+      if (props.field.collapsable === true || props.field.field.collapsable === true) {
+        return true;
+      }
+      if (typeof props.field.collapsed === 'boolean' || typeof props.field.field.collapsed === 'boolean') {
+        return true;
+      }
+      return false;
+    },
+
+    isCollapsedProps: function (props) {
+      if (this.state && !props.onClickLabel) {
+        return this.state.collapsed;
+      }
+      if (typeof props.field.collapsed === 'boolean') {
+        return props.field.collapsed;
+      }
+      if (typeof props.field.field.collapsed === 'boolean') {
+        return props.field.field.collapsed;
+      }
+      if (props.field.collapsable === true) {
+        if (this.state.collapsed === false) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    },
+
+    getInitialState: function () {
+      return {
+        collapsable: this.isCollapsableProps(this.props),
+        collapsed: this.isCollapsedProps(this.props)
+      };
+    },
+
+    componentWillReceiveProps: function (props) {
+      this.setState({
+        collapsable: this.isCollapsableProps(props),
+        collapsed: this.isCollapsedProps(props)
+      });
+    },
+
+    onClickLabel: function () {
+      this.setState({
+        collapsed: !this.state.collapsed
+      });
+    },
+
     render: function () {
 
       var field = this.props.field.field;
@@ -2084,6 +2216,8 @@ module.exports = function (formatic, plugin) {
         plugin.config.className,
         field.className
       );
+
+      var helpClassName = formatic.className('field-help', plugin.config.help_className);
 
       var props = {
         className: className
@@ -2101,8 +2235,8 @@ module.exports = function (formatic, plugin) {
 
       if (field.label || label) {
         var text = label || field.label;
-        if (this.props.field.collapsable) {
-          text = R.a({href: 'JavaScript' + ':', onClick: this.props.onClickLabel}, text);
+        if (this.state.collapsable) {
+          text = R.a({href: 'JavaScript' + ':', onClick: this.props.onClickLabel || this.onClickLabel}, text);
         }
         label = R.label({}, text);
       }
@@ -2127,7 +2261,15 @@ module.exports = function (formatic, plugin) {
             required
           ),
           React.addons.CSSTransitionGroup({transitionName: 'reveal'},
-            this.props.field.collapsed ? [] : [this.props.form.component(field)]
+            this.state.collapsed ? [] : [
+              field.help_text ? R.div({
+                key: 'help',
+                className: helpClassName
+              },
+                field.help_text
+              ) : R.span({key: 'help'}),
+              this.props.form.component(field, {key: 'component'})
+            ]
           )
         );
       }
@@ -2152,7 +2294,7 @@ module.exports = function (formatic, plugin) {
 
       var className = formatic.className(plugin.config.className, this.props.field.className);
 
-      return R.form(_.extend({className: className}, plugin.config.attributes),
+      return R.fieldset(_.extend({className: className}, plugin.config.attributes),
         this.props.field.fields.filter(function (field) {
           return !field.hidden;
         }).map(function (field) {
@@ -2514,7 +2656,7 @@ module.exports = function (formatic, plugin) {
       if (field.itemTypes) {
         typeChoices = R.select({ref: 'typeSelect'},
           field.itemTypes.map(function (item, i) {
-            return R.option({value: i}, item.label);
+            return R.option({value: i}, item.label || item.type);
           })
         );
       }
@@ -2833,8 +2975,14 @@ module.exports = function (formatic, plugin) {
     },
 
     onAppend: function () {
+      var field = this.props.field;
       var tempKey = this.props.form.tempKey(this.props.field);
-      this.props.form.actions.insert(this.props.field, tempKey);
+      var item = null;
+      // if (this.refs.typeSelect) {
+      //   var index = parseInt(this.refs.typeSelect.getDOMNode().value);
+      //   item = field.itemTypes[index].item;
+      // }
+      this.props.form.actions.insert(field, tempKey, item);
     },
 
     onMove: function (fromKey, toKey) {
@@ -2892,6 +3040,15 @@ module.exports = function (formatic, plugin) {
         return idNum;
       }.bind(this));
 
+      // var typeChoices = null;
+      // if (field.itemTypes) {
+      //   typeChoices = R.select({ref: 'typeSelect'},
+      //     field.itemTypes.map(function (item, i) {
+      //       return R.option({value: i}, item.label || item.type);
+      //     })
+      //   );
+      // }
+
       return R.div(_.extend({className: className}, plugin.config.attributes),
         React.addons.CSSTransitionGroup({transitionName: 'reveal'},
           sortedFields.map(function (child, i) {
@@ -2911,6 +3068,7 @@ module.exports = function (formatic, plugin) {
             });
           }.bind(this))
         ),
+        //typeChoices,
         R.span({className: addClassName, onClick: this.onAppend}, addLabel)
       );
     }

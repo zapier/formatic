@@ -52,6 +52,7 @@
         type: 'text',
         key: 'name.first',
         label: 'First Name',
+        help_text: 'What your momma calls you.',
         required: true
       },
       {
@@ -71,6 +72,7 @@
         label: 'Party'
       },
       {
+        collapsed: false,
         type: 'text',
         key: 'address.city',
         label: 'City'
@@ -172,6 +174,13 @@
         type: 'checkbox',
         key: 'optIn',
         label: 'Send me stuff!'
+      },
+      {
+        type: 'select',
+        key: 'optInMore',
+        help_text: 'Seriously, if you like getting stuff...',
+        label: 'Send me MOAR stuff!',
+        value: false
       },
       {
         type: 'json',
@@ -283,9 +292,22 @@
         label: 'Users',
         keyChoices: ['joe', 'bob'],
         customKeyChoice: true,
+        itemTypes: [{
+          type: 'joe',
+          item: {
+            key: '[]',
+            type: 'text'
+          }
+        },{
+          type: 'bob',
+          item: {
+            key: '[]',
+            type: 'list'
+          }
+        }],
         item: {
           key: '[]',
-          type: 'text'
+          type: 'json'
         },
         value: {'mary': 'Mary'}
       },
