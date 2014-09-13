@@ -311,7 +311,9 @@ module.exports = function (formatic) {
   formatic.config('view-list', {
     className: 'well',
     addButton_className: 'glyphicon glyphicon-plus',
-    addButton_label: ''
+    addButton_label: '',
+    addContainer_className: 'form-inline',
+    typeChoice_className: 'form-control'
   });
 
   formatic.config('view-list-item', {
@@ -2551,7 +2553,7 @@ module.exports = function (formatic, plugin) {
         lookups: lookups,
         nextId: nextId,
         collapsed: this.props.field.fields.map(function () {
-          return this.props.field.collapsable ? true : false;
+          return this.props.field.collapsableItems ? true : false;
         }.bind(this))
       };
     },
@@ -2567,7 +2569,7 @@ module.exports = function (formatic, plugin) {
         }
         if (collapsed.length === i) {
           collapsed.push(false);
-          if (this.props.field.collapsable) {
+          if (this.props.field.collapsableItems) {
             collapsed[i] = true;
           }
         }
@@ -2586,7 +2588,7 @@ module.exports = function (formatic, plugin) {
         item = field.itemTypes[index].item;
       }
       this.props.form.actions.insert(this.props.field, null, item);
-      if (this.props.field.collapsable) {
+      if (this.props.field.collapsableItems) {
         // var collapsed = this.props.field.fields.map(function () {
         //   return true;
         // }.bind(this));
@@ -2599,7 +2601,7 @@ module.exports = function (formatic, plugin) {
     },
 
     onClickLabel: function (i) {
-      if (this.props.field.collapsable) {
+      if (this.props.field.collapsableItems) {
         var collapsed;
         // if (!this.state.collapsed[i]) {
         //   collapsed = this.state.collapsed;
@@ -2647,6 +2649,8 @@ module.exports = function (formatic, plugin) {
       var form = this.props.form;
 
       var className = formatic.className(plugin.config.className, field.className);
+      var typeChoiceClassName = formatic.className('list-type-choice', plugin.config.typeChoice_className, field.typeChoice_className);
+      var addContainerClassName = formatic.className('list-control-add-container', plugin.config.addContainer_className, field.addContainer_className);
       var addClassName = formatic.className('list-control-add', plugin.config.addButton_className, field.addButton_className);
       var addLabel = plugin.configValue('addButton_label', '[add]');
 
@@ -2654,7 +2658,7 @@ module.exports = function (formatic, plugin) {
 
       var typeChoices = null;
       if (field.itemTypes) {
-        typeChoices = R.select({ref: 'typeSelect'},
+        typeChoices = R.select({ref: 'typeSelect', className: typeChoiceClassName},
           field.itemTypes.map(function (item, i) {
             return R.option({value: i}, item.label || item.type);
           })
@@ -2670,17 +2674,19 @@ module.exports = function (formatic, plugin) {
               parent: field,
               index: i,
               numItems: numItems,
-              collapsed: this.props.field.collapsable ? this.state.collapsed[i] : false
+              collapsed: this.props.field.collapsableItems ? this.state.collapsed[i] : undefined
             }, {
               key: this.state.lookups[i] || i,
-              onClickLabel: this.onClickLabel.bind(this, i),
+              //onClickLabel: this.onClickLabel.bind(this, i),
               onDelete: this.onDelete,
               onMove: this.onMove
             });
           }.bind(this))
         ),
-        typeChoices,
-        R.span({className: addClassName, onClick: this.onAppend}, addLabel)
+        R.div({className: addContainerClassName},
+          typeChoices, ' ',
+          R.span({className: addClassName, onClick: this.onAppend}, addLabel)
+        )
       );
     }
   });
@@ -3613,7 +3619,8 @@ module.exports = function (formatic, plugin) {
         value: field.value,
         onChange: this.onChange,
         onFocus: this.onFocus,
-        onBlur: this.onBlur
+        onBlur: this.onBlur,
+        rows: field.rows
       }, plugin.config.attributes));
     }
   });

@@ -64,7 +64,8 @@
       {
         type: 'textarea',
         key: 'foo',
-        label: 'Foo'
+        label: 'Foo',
+        rows: 10
       },
       {
         type: 'pretty-textarea',
@@ -202,7 +203,7 @@
         type: 'list',
         key: 'notes',
         label: 'Notes',
-        collapsable: true,
+        collapsableItems: true,
         value: [{note: 'foo', type: 'basic'}],
         item: {
           key: '[]',
