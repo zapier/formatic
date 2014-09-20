@@ -18,328 +18,48 @@
   <script src="./lib/formatic.js"></script>
   <script>
     var formatic = require('formatic');
-
-    formatic.plugin('bootstrap');
-
-    formatic.config('core-type.typeMap', {
-      unicode: 'text'
-    });
-
     var form = formatic();
-
-    form.meta('prettyTextareaLabels', {
-      'field1': 'First Name',
-      'field2': 'Last Name',
-      'field3': 'First Name',
-      'longfield1': 'Shorty'
-    });
-
-    var humanize = function(property) {
-      property = property.replace(/\{\{/g, '');
-      property = property.replace(/\}\}/g, '');
-      return property.replace(/_/g, ' ')
-        .replace(/(\w+)/g, function(match) {
-          return match.charAt(0).toUpperCase() + match.slice(1);
-        });
-    };
-
-    formatic.config('view-pretty-textarea.labelFallback', humanize);
-
-    form.meta('prettyTextareaLabelFallback', humanize);
 
     form.fields([
       {
-        type: 'text',
-        key: 'name.first',
-        label: 'First Name',
-        help_text: 'What your momma calls you.',
-        required: true
-      },
-      {
-        type: 'unicode',
-        key: 'name.last',
-        label: 'Last Name',
-        required: true
-      },
-      {
-        type: 'textarea',
-        key: 'foo',
-        label: 'Foo',
-        rows: 10
-      },
-      {
-        type: 'pretty-textarea',
-        key: 'party',
-        label: 'Party'
-      },
-      {
-        collapsed: false,
-        type: 'text',
-        key: 'address.city',
-        label: 'City'
-      },
-      {
-        type: 'select',
-        key: 'address.state',
-        label: 'State',
-        choices: ['MO', 'IL']
-      },
-      {
-        type: 'dropdown',
-        key: 'os',
-        label: 'Operating System',
-        choices: [
-          {value: 'osx', label: 'Mac OS X'},
-          {value: 'linux', label: 'Linux'},
-          {value: 'vista', label: 'Windows Vista'},
-          {value: 'win7', label: 'Windows 7'},
-          {value: 'win8', label: 'Windows 8'}
-        ]
-      },
-      {
-        type: 'dropdown',
-        key: 'mood',
-        label: 'How do you feel?',
-        required: true,
-        choices: {
-          happy: 'Happy',
-          sad: 'Sad'
-        }
-      },
-      // Crazy experimental if type. Will dynamically return node depending on
-      // expression (which is also made up of crazy experimental types).
-      {
-        type: 'if',
-        fields: [
-          {
-            type: 'eq',
-            fields: [
-              {
-                type: 'get',
-                value: 'mood'
-              },
-              {
-                type: 'string',
-                value: 'sad'
-              }
-            ]
-          },
-          {
-            type: 'code',
-            value: 'So sorry!'
-          },
-          {
-            type: 'code',
-            value: "Glad you're feeling good!"
-          }
-        ]
-      },
-      // Even crazier experimental terse compiler used with if. Same expression
-      // as above, but done with terse string.
-      {
-        type: 'if',
-        fields: [
-          "eq(get('mood'),'sad')",
-          {
-            type: 'code',
-            value: 'Seriously, I feel bad about that!'
-          }
-          // leaving out else field
-        ]
-      },
-      // Another terse compiler.
-      "text:terseKey:Some terse field",
-      "textarea:myKey:Some text area",
-      {
-        type: 'textarea',
-        key: 'story',
-        label: 'Tell me a story'
-      },
-      {
-        type: 'text',
-        label: 'Some readonly field',
-        value: 'Some readonly value'
-      },
-      {
-        type: 'password',
-        key: 'password',
-        label: 'What is your password?'
-      },
-      {
-        type: 'checkbox',
-        key: 'colors',
-        label: 'Favorite colors',
-        choices: ['red', 'green']
-      },
-      {
-        type: 'checkbox',
-        key: 'optIn',
-        label: 'Send me stuff!'
-      },
-      {
-        type: 'select',
-        key: 'optInMore',
-        help_text: 'Seriously, if you like getting stuff...',
-        label: 'Send me MOAR stuff!',
-        value: false
-      },
-      {
-        type: 'json',
-        key: 'helmig',
-        label: 'Some JSON for you',
-        value: {
-          foo: 'bar'
-        }
-      },
-      {
-        type: 'dropdown',
-        key: 'letters',
-        label: 'Favorite letter',
-        choices: Array.apply(null, Array(26)).map(function (num, i) {
-          return String.fromCharCode(65 + i);
-        })
-      },
-      {
-        type: 'list',
-        key: 'notes',
-        label: 'Notes',
-        collapsableItems: true,
-        value: [{note: 'foo', type: 'basic'}],
-        item: {
-          key: '[]',
-          type: 'fieldset',
-          fields: [{
-            type: 'textarea',
-            key: 'note',
-            label: 'Note'
-          },{
-            type: 'list',
-            key: 'tags',
-            label: 'Tags'
-          },{
-            type: 'select',
-            key: 'state',
-            choices: ['draft', 'publish'],
-            value: 'draft'
-          }]
-        },
-        itemTypes: [
-          {
-            label: 'Basic Note',
-            type: 'basic',
-            item: {
-              label: 'Basic Note',
-              type: 'fieldset',
-              key: '[]',
-              fields: [
-                {
-                  key: 'type',
-                  type: 'text',
-                  label: 'Type',
-                  value: 'basic',
-                  isReadOnly: true
-                },
-                {
-                  key: 'note',
-                  type: 'unicode',
-                  label: 'Note'
-                }
-              ]
-            }
-          },
-          {
-            label: 'Advanced Note',
-            type: 'advanced',
-            item: {
-              label: 'Advanced Note',
-              type: 'fieldset',
-              key: '[]',
-              fields: [
-                {
-                  key: 'type',
-                  type: 'text',
-                  label: 'Type',
-                  value: 'advanced',
-                  isReadOnly: true
-                },
-                {
-                  type: 'textarea',
-                  key: 'note',
-                  label: 'Note'
-                },{
-                  type: 'list',
-                  key: 'tags',
-                  label: 'Tags',
-                  item: {
-                    type: 'text',
-                    key: '[]',
-                    label: 'Tag'
-                  }
-                },
-                {
-                  type: 'select',
-                  key: 'state',
-                  choices: ['draft', 'publish'],
-                  value: 'draft'
-                }
-              ]
-            }
-          }
-        ]
+        type: 'object',
+        key: 'name',
+        fields: ['firstName', 'lastName']
       },
       {
         type: 'object',
-        key: 'users',
-        label: 'Users',
-        keyChoices: ['joe', 'bob'],
-        customKeyChoice: true,
-        itemTypes: [{
-          type: 'joe',
-          item: {
-            key: '[]',
-            type: 'text'
-          }
-        },{
-          type: 'bob',
-          item: {
-            key: '[]',
-            type: 'list'
-          }
-        }],
-        item: {
-          key: '[]',
-          type: 'json'
-        },
-        value: {'mary': 'Mary'}
+        key: 'address_home',
+        fields: ['city']
       },
       {
-        type: 'select',
-        choices: [],
-        key: 'nochoice',
-        value: 'none'
+        type: 'object',
+        key: 'address_work',
+        fields: ['city']
       },
       {
-        type: 'text',
-        hidden: true,
-        key: 'someHidden',
-        value: 'my hidden value'
+        type: 'string',
+        key: 'city',
+        data: {
+          choices: 'cities'
+        }
+      },
+      {
+        id: 'firstName',
+        type: 'string',
+        key: 'first'
+      },
+      {
+        id: 'lastName',
+        type: 'string',
+        key: 'last'
+      },
+      {
+        id: 'cities',
+        type: 'data'
       }
     ]);
 
     form.attach(document.getElementById('user'));
-
-    jsonForm = formatic();
-
-    jsonForm.attach(document.getElementById('json'));
-
-    form.on('update', function () {
-      jsonForm.fields([
-        {
-          type: 'code',
-          value: JSON.stringify(form.val(), null, 2)
-        }
-      ]);
-    });
   </script>
 </body>
 </html>
