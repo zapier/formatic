@@ -18,9 +18,7 @@
   <script src="./lib/formatic.js"></script>
   <script>
     var formatic = require('formatic');
-    var form = formatic();
-
-    form.fields([
+    var form = formatic([
       {
         type: 'object',
         key: 'name',
