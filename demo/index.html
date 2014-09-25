@@ -20,6 +20,7 @@
     var formatic = require('formatic').create('default', 'bootstrap');
     var form = formatic([
       {
+        label: 'Short Name',
         type: 'object',
         key: 'name',
         fields: ['firstName', 'lastName'],
@@ -53,6 +54,7 @@
       },
       {
         template: true,
+        label: 'Full Name',
         type: 'object',
         key: 'fullName',
         fields: ['firstName', 'middleName', 'lastName'],
