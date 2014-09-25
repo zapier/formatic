@@ -35,6 +35,11 @@
         fields: ['city']
       },
       {
+        type: 'array',
+        key: 'aliases'
+      },
+      {
+        template: true,
         type: 'string',
         key: 'city',
         data: {
@@ -42,13 +47,13 @@
         }
       },
       {
-        label: 'First Name',
+        template: true,
         id: 'firstName',
         type: 'string',
         key: 'first'
       },
       {
-        label: 'Last Name',
+        template: true,
         id: 'lastName',
         type: 'string',
         key: 'last'
