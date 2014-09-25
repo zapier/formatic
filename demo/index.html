@@ -17,12 +17,15 @@
 
   <script src="./lib/formatic.js"></script>
   <script>
-    var formatic = require('formatic');
+    var formatic = require('formatic').create('default', 'bootstrap');
     var form = formatic([
       {
         type: 'object',
         key: 'name',
-        fields: ['firstName', 'lastName']
+        fields: ['firstName', 'lastName'],
+        match: [
+          {key: 'type', value: 'short'}
+        ]
       },
       {
         type: 'object',
@@ -36,10 +39,12 @@
       },
       {
         type: 'array',
-        key: 'aliases'
+        key: 'aliases',
+        items: ['name', 'fullName']
       },
       {
         template: true,
+        label: 'City',
         type: 'string',
         key: 'city',
         data: {
@@ -48,15 +53,37 @@
       },
       {
         template: true,
-        id: 'firstName',
-        type: 'string',
-        key: 'first'
+        type: 'object',
+        key: 'fullName',
+        fields: ['firstName', 'middleName', 'lastName'],
+        match: [
+          {key: 'type', value: 'full'}
+        ]
       },
       {
         template: true,
+        label: 'First Name',
+        id: 'firstName',
+        type: 'string',
+        key: 'first',
+        maxLines: 1,
+        helpText: 'The name your momma calls you.'
+      },
+      {
+        template: true,
+        label: 'Last Name',
         id: 'lastName',
         type: 'string',
-        key: 'last'
+        key: 'last',
+        maxLines: 1
+      },
+      {
+        template: true,
+        label: 'Middle Name',
+        id: 'middleName',
+        type: 'string',
+        key: 'middle',
+        maxLines: 1
       },
       {
         id: 'cities',
