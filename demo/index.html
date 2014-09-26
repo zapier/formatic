@@ -69,7 +69,7 @@
         label: 'Full Name',
         type: 'object',
         key: 'fullName',
-        fields: ['firstName', 'middleName', 'lastName', 'nameType', 'city'],
+        fields: ['firstName', 'middleName', 'lastName', 'nameType', 'reverseName', 'city', 'reverser'],
         match: [
           {key: 'type', value: 'full'}
         ]
@@ -103,11 +103,41 @@
         maxRows: 1
       },
       {
+        template: true,
+        label: 'Reverse Name',
+        id: 'reverseName',
+        type: 'string',
+        key: 'reverse',
+        maxRows: 1,
+        data: {
+          value: 'reverser'
+        },
+        when: [
+          'reverser'
+        ]
+      },
+      {
+        template: true,
+        id: 'reverser',
+        type: 'data'
+      },
+      {
         id: 'cities',
         type: 'data',
         default: []
       }
     ]);
+
+    formatic.source('reverser', function (field) {
+      var firstNameField = field.find('firstName');
+      if (firstNameField) {
+        var firstName = firstNameField.val();
+        if (firstName) {
+          return firstName.split('').reverse().join('');
+        }
+      }
+      return '';
+    });
 
     form.attach(document.getElementById('user'));
   </script>
