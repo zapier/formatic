@@ -23,7 +23,7 @@
         label: 'Short Name',
         type: 'object',
         key: 'name',
-        fields: ['firstName', 'lastName'],
+        fields: ['firstName', 'lastName', 'nameType'],
         match: [
           {key: 'type', value: 'short'}
         ]
@@ -54,10 +54,17 @@
       },
       {
         template: true,
+        type: 'string',
+        hidden: true,
+        id: 'nameType',
+        key: 'type'
+      },
+      {
+        template: true,
         label: 'Full Name',
         type: 'object',
         key: 'fullName',
-        fields: ['firstName', 'middleName', 'lastName'],
+        fields: ['firstName', 'middleName', 'lastName', 'nameType'],
         match: [
           {key: 'type', value: 'full'}
         ]
@@ -77,7 +84,10 @@
         id: 'lastName',
         type: 'string',
         key: 'last',
-        maxLines: 1
+        maxLines: 1,
+        when: [
+          'firstName'
+        ]
       },
       {
         template: true,
