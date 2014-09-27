@@ -125,19 +125,78 @@
         id: 'cities',
         type: 'data',
         default: []
+      },
+      {
+        id: 'reversedNames',
+        type: 'data',
+        default: {}
       }
     ]);
 
+    var loadReverse = function (name) {
+      if (name) {
+
+        var reversedNamesField = form.find('reversedNames');
+
+        if (!reversedNamesField.hasValAt(name)) {
+          //form.find('reversedNames').valAt(name, 'loading...');
+          setTimeout(function () {
+
+            console.log('writing...:', name)
+            //reversedNamesField.valAt(name, name.split('').reverse().join(''));
+
+          }, 1000);
+        }
+      }
+    };
+
     formatic.source('reverser', function (field) {
+
       var firstNameField = field.find('firstName');
       if (firstNameField) {
         var firstName = firstNameField.val();
         if (firstName) {
-          return firstName.split('').reverse().join('');
+
+          console.log('reading...')
+          var reversedNamesField = form.find('reversedNames');
+
+          if (reversedNamesField.hasValAt(firstName)) {
+            return reversedNamesField.valAt(firstName);
+          } else {
+            loadReverse(firstName);
+          }
         }
       }
       return '';
     });
+
+    // var loadReverse = function (name) {
+    //   if (name) {
+    //     setTimeout(function () {
+    //       var reverseNamesField = form.find('reverseNames');
+    //
+    //       var valueCursor = reverseNamesField.valCursor();
+    //
+    //       valueCursor.set(name, name.split('').reverse().join(''));
+    //     }, 1000);
+    //   }
+    // };
+    //
+    // formatic.source('reverser', function (field) {
+    //
+    //   var firstNameField = field.find('firstName');
+    //   if (firstNameField) {
+    //     var firstName = firstNameField.val();
+    //     if (firstName) {
+    //       var reverseNamesField = form.find('reverseNames');
+    //       var valueCursor = reverseNamesField.valCursor();
+    //       if (valueCursor.has(firstName)) {
+    //         return valueCursor.get(firstName);
+    //       }
+    //     }
+    //   }
+    //   return '';
+    // });
 
     form.attach(document.getElementById('user'));
   </script>
