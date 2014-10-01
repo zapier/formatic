@@ -3,38 +3,29 @@
 
 describe('form data', function() {
 
-  var formatic = require('../').create('react');
+  var formatic = require('../');
+
+  var getIds = function (fieldDefs) {
+    return fieldDefs.map(function (fieldDef) {
+      return fieldDef.id;
+    });
+  };
 
   it('can make ids from keys', function () {
 
-    var result = formatic.buildFieldIds([
+    var fieldDefs = formatic.fillInFormDefIds([
       {
         type: 'string',
         key: 'name'
       }
     ]);
 
-    expect(result).toEqual({
-      map: {
-        name: {
-          id: 'name',
-          key: 'name',
-          type: 'string'
-        }
-      },
-      list: [
-        {
-          id: 'name',
-          key: 'name',
-          type: 'string'
-        }
-      ]
-    });
+    expect(getIds(fieldDefs)).toEqual(['name']);
   });
 
   it('can make fake ids', function () {
 
-    var result = formatic.buildFieldIds([
+    var fieldDefs = formatic.fillInFormDefIds([
       {
         type: 'string',
         key: 'name'
@@ -47,38 +38,14 @@ describe('form data', function() {
       }
     ]);
 
-    expect(result).toEqual({
-      map: {
-        name: {
-          id: 'name',
-          key: 'name',
-          type: 'string'
-        },
-        __name__string__0: {
-          id: '__name__string__0',
-          type: 'string'
-        },
-        __name__string__1: {
-          id: '__name__string__1',
-          type: 'string'
-        }
-      },
-      list: [
-        {
-          id: 'name',
-          key: 'name',
-          type: 'string'
-        },
-        {
-          id: '__name__string__0',
-          type: 'string'
-        },
-        {
-          id: '__name__string__1',
-          type: 'string'
-        }
-      ]
-    });
+    expect(getIds(fieldDefs)).toEqual(['name', '__name__string__0', '__name__string__1']);
+  });
+
+  it('can get id of field', function () {
+
+    expect(formatic.idOfFieldDef({id:'foo'})).toEqual('foo');
+    expect(formatic.idOfFieldDef({key:'foo'})).toEqual('foo');
+    expect(formatic.idOfFieldDef({id:'foo', key: 'bar'})).toEqual('foo');
   });
 
 

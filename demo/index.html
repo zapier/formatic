@@ -19,6 +19,50 @@
   <script>
     var formatic = require('formatic').create('default', 'bootstrap');
     var form = formatic([
+
+      {
+        label: 'Short Name',
+        type: 'object',
+        key: 'name',
+        fields: ['firstName', 'lastName', 'nameType'],
+        match: [
+          {key: 'type', value: 'short'}
+        ]
+      },
+      {
+        template: true,
+        label: 'First Name',
+        id: 'firstName',
+        type: 'string',
+        key: 'first',
+        maxRows: 1,
+        helpText: 'The name your momma calls you.'
+      },
+      {
+        template: true,
+        label: 'Last Name',
+        id: 'lastName',
+        type: 'string',
+        key: 'last',
+        maxRows: 1,
+        when: [
+          'firstName'
+        ]
+      },
+      {
+        template: true,
+        type: 'string',
+        hidden: true,
+        id: 'nameType',
+        key: 'type'
+      },
+      {
+        type: 'array',
+        key: 'aliases',
+        items: ['name']
+      }
+
+      /*
       {
         label: 'Short Name',
         type: 'object',
@@ -131,44 +175,45 @@
         type: 'data',
         default: {}
       }
+      */
     ]);
 
-    var loadReverse = function (name) {
-      if (name) {
-
-        var reversedNamesField = form.find('reversedNames');
-
-        if (!reversedNamesField.hasValAt(name)) {
-          //form.find('reversedNames').valAt(name, 'loading...');
-          setTimeout(function () {
-
-            console.log('writing...:', name)
-            //reversedNamesField.valAt(name, name.split('').reverse().join(''));
-
-          }, 1000);
-        }
-      }
-    };
-
-    formatic.source('reverser', function (field) {
-
-      var firstNameField = field.find('firstName');
-      if (firstNameField) {
-        var firstName = firstNameField.val();
-        if (firstName) {
-
-          console.log('reading...')
-          var reversedNamesField = form.find('reversedNames');
-
-          if (reversedNamesField.hasValAt(firstName)) {
-            return reversedNamesField.valAt(firstName);
-          } else {
-            loadReverse(firstName);
-          }
-        }
-      }
-      return '';
-    });
+    // var loadReverse = function (name) {
+    //   if (name) {
+    //
+    //     var reversedNamesField = form.find('reversedNames');
+    //
+    //     if (!reversedNamesField.hasValAt(name)) {
+    //       //form.find('reversedNames').valAt(name, 'loading...');
+    //       setTimeout(function () {
+    //
+    //         console.log('writing...:', name)
+    //         //reversedNamesField.valAt(name, name.split('').reverse().join(''));
+    //
+    //       }, 1000);
+    //     }
+    //   }
+    // };
+    //
+    // formatic.source('reverser', function (field) {
+    //
+    //   var firstNameField = field.find('firstName');
+    //   if (firstNameField) {
+    //     var firstName = firstNameField.val();
+    //     if (firstName) {
+    //
+    //       console.log('reading...')
+    //       var reversedNamesField = form.find('reversedNames');
+    //
+    //       if (reversedNamesField.hasValAt(firstName)) {
+    //         return reversedNamesField.valAt(firstName);
+    //       } else {
+    //         loadReverse(firstName);
+    //       }
+    //     }
+    //   }
+    //   return '';
+    // });
 
     // var loadReverse = function (name) {
     //   if (name) {

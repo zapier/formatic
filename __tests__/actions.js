@@ -3,7 +3,7 @@
 
 describe('form data', function() {
 
-  var formatic = require('../').create('react');
+  //var formatic = require('../').create('react');
 
   // it('form can send and receive action', function () {
   //
