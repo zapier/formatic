@@ -30,6 +30,17 @@
         ]
       },
       {
+        label: 'Home Address',
+        type: 'object',
+        key: 'address_home',
+        fields: ['address']
+      },
+      {
+        type: 'object',
+        key: 'address_work',
+        fields: ['address']
+      },
+      {
         template: true,
         label: 'First Name',
         id: 'firstName',
@@ -59,7 +70,62 @@
       {
         type: 'array',
         key: 'aliases',
-        items: ['name']
+        items: ['name', 'fullName']
+      },
+      {
+        template: true,
+        id: 'address',
+        label: 'Address',
+        type: 'object',
+        fields: ['country', 'state', 'city']
+      },
+      {
+        template: true,
+        label: 'Country',
+        type: 'string',
+        key: 'country',
+        choices: [],
+        eval: {
+          choices: {lookup: ['locations']}
+        }
+      },
+      {
+        template: true,
+        label: 'State',
+        type: 'string',
+        key: 'state',
+        choices: {},
+        eval: {
+          choices: {lookup: ['locations', '=country']}
+        }
+      },
+      {
+        template: true,
+        label: 'City',
+        type: 'string',
+        key: 'city',
+        choices: [],
+        eval: {
+          choices: {lookup: ['locations', '=country', '=state']}
+        }
+      },
+      {
+        template: true,
+        label: 'Full Name',
+        type: 'object',
+        key: 'fullName',
+        fields: ['firstName', 'middleName', 'lastName', 'nameType', 'city'],
+        match: [
+          {key: 'type', value: 'full'}
+        ]
+      },
+      {
+        template: true,
+        label: 'Middle Name',
+        id: 'middleName',
+        type: 'string',
+        key: 'middle',
+        maxRows: 1
       }
 
       /*
@@ -177,6 +243,55 @@
       }
       */
     ]);
+
+    form.source('locations', function (country, state) {
+      if (country && state) {
+
+        return {
+          us: {
+            'us:mo': ['St. Louis', 'Jefferson City'],
+            'us:il': ['Chicago', 'Springfield']
+          },
+          ca: {
+            'ca:on': ['Toronto']
+          }
+        }[country][state];
+
+      } else if (country) {
+
+        return {
+          us: [
+            {
+              value: 'us:mo',
+              label: 'Missouri'
+            },
+            {
+              value: 'us:il',
+              label: 'Illinois'
+            }
+          ],
+          ca: [
+            {
+              value: 'ca:on',
+              label: 'Ontario'
+            }
+          ]
+        }[country];
+
+      } else {
+
+        return [
+          {
+            value: 'us',
+            label: 'United States'
+          },
+          {
+            value: 'ca',
+            label: 'Canada'
+          }
+        ]
+      }
+    });
 
     // var loadReverse = function (name) {
     //   if (name) {
