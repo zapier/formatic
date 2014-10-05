@@ -24,7 +24,7 @@
         label: 'Short Name',
         type: 'object',
         key: 'name',
-        fields: ['firstName', 'lastName', 'nameType'],
+        fields: ['firstName', 'lastName', 'nameType', 'silly'],
         match: [
           {key: 'type', value: 'short'}
         ]
@@ -36,9 +36,27 @@
         fields: ['address']
       },
       {
+        label: 'Work Address',
         type: 'object',
         key: 'address_work',
         fields: ['address']
+      },
+      {
+        label: 'Other Addresses',
+        type: 'object',
+        key: 'addresses_other',
+        items: ['address']
+      },
+      {
+        label: 'Do you like cookies?',
+        type: 'boolean',
+        key: 'likesCookies'
+      },
+      {
+        label: 'Colors',
+        type: 'array',
+        key: 'colors',
+        choices: ['red', 'green', 'blue']
       },
       {
         template: true,
@@ -66,6 +84,14 @@
         hidden: true,
         id: 'nameType',
         key: 'type'
+      },
+      {
+        template: true,
+        type: 'string',
+        key: 'silly',
+        eval: {
+          value: '{x:"y" z:"foo"}'
+        }
       },
       {
         type: 'array',
@@ -245,52 +271,60 @@
     ]);
 
     form.source('locations', function (country, state) {
-      if (country && state) {
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          if (country && state) {
 
-        return {
-          us: {
-            'us:mo': ['St. Louis', 'Jefferson City'],
-            'us:il': ['Chicago', 'Springfield']
-          },
-          ca: {
-            'ca:on': ['Toronto']
+            return resolve({
+              us: {
+                'us:mo': ['St. Louis', 'Jefferson City'],
+                'us:il': ['Chicago', 'Springfield']
+              },
+              ca: {
+                'ca:on': ['Toronto']
+              }
+            }[country][state]);
+
+          } else if (country) {
+
+            return resolve({
+              us: [
+                {
+                  value: 'us:mo',
+                  label: 'Missouri'
+                },
+                {
+                  value: 'us:il',
+                  label: 'Illinois'
+                }
+              ],
+              ca: [
+                {
+                  value: 'ca:on',
+                  label: 'Ontario'
+                }
+              ]
+            }[country]);
+
+          } else {
+
+            return resolve([
+              {
+                value: 'us',
+                label: 'United States'
+              },
+              {
+                value: 'ca',
+                label: 'Canada'
+              }
+            ]);
           }
-        }[country][state];
 
-      } else if (country) {
+          return reject('crap');
+        }, 100)
 
-        return {
-          us: [
-            {
-              value: 'us:mo',
-              label: 'Missouri'
-            },
-            {
-              value: 'us:il',
-              label: 'Illinois'
-            }
-          ],
-          ca: [
-            {
-              value: 'ca:on',
-              label: 'Ontario'
-            }
-          ]
-        }[country];
+      });
 
-      } else {
-
-        return [
-          {
-            value: 'us',
-            label: 'United States'
-          },
-          {
-            value: 'ca',
-            label: 'Canada'
-          }
-        ]
-      }
     });
 
     // var loadReverse = function (name) {

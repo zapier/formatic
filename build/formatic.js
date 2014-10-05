@@ -18,18 +18,6 @@ var Plugin = function () {
   }
 };
 
-Plugin.prototype.addClass = function (key, className) {
-
-  className = className || '';
-  if (this.config[key]) {
-    if (className) {
-      className += ' ';
-    }
-    className += this.config[key];
-  }
-  return className;
-};
-
 Plugin.prototype.configValue = function (key, defaultValue) {
 
   if (typeof this.config[key] !== 'undefined') {
@@ -42,13 +30,13 @@ var Formatic = function () {
 
   var formatic;
 
-  formatic = function () {
-    return formatic.form();
+  formatic = function (fields) {
+    return formatic.form(fields);
   };
 
   formatic.registerPlugin = function (name, pluginFactory, config) {
     pluginRegistry[name] = {
-      create: pluginFactory,
+      createPlugin: pluginFactory,
       config: config || {},
       name: name
     };
@@ -75,41 +63,28 @@ var Formatic = function () {
 
   var plugins = {};
 
-  var getConfig = function (name, key) {
+  var getConfig = function (name) {
     if (!plugins[name]) {
       return null;
     }
-    if (!key) {
-      return plugins[name].config;
-    }
-    return plugins[name].config[key] || null;
+    return plugins[name].config;
   };
 
-  var setConfig = function (name, key, config) {
+  var setConfig = function (name, config) {
     if (!plugins[name]) {
       throw new Error('No config for plugin: ' + name);
     }
-    if (!key) {
-      if (!_.isObject(config)) {
-        throw new Error('Invalid config for plugin: ' + name);
-      }
-      _.extend(plugins[name].config, config);
+    if (!_.isObject(config)) {
+      throw new Error('Invalid config for plugin: ' + name);
     }
-    plugins[name].config[key] = config;
+    _.extend(plugins[name].config, config);
   };
 
-  formatic.config = function (key, config) {
-    var pluginName = key;
-    if (key.indexOf('.') >= 0) {
-      pluginName = key.substring(0, key.indexOf('.'));
-      key = key.substring(key.indexOf('.') + 1);
-    } else {
-      key = null;
-    }
+  formatic.config = function (name, config) {
     if (typeof config === 'undefined') {
-      return getConfig(pluginName, key);
+      return getConfig(name);
     }
-    setConfig(pluginName, key, config);
+    setConfig(name, config);
   };
 
   formatic.loadPlugin = function (pluginFactory, config) {
@@ -121,7 +96,7 @@ var Formatic = function () {
     }
     var plugin = Plugin();
     plugin = utils.wrappable(plugin);
-    plugin.create = pluginFactory;
+    plugin.createPlugin = pluginFactory;
     plugin.config = config;
     plugin.name = name;
     pluginFactory(formatic, plugin);
@@ -152,25 +127,44 @@ var Formatic = function () {
     return null;
   };
 
-  formatic.plugin = function (pluginFactory, config) {
-    var plugin;
-    if (_.isString(pluginFactory)) {
-      plugin = formatic.findPlugin(pluginFactory, config);
-      if (plugin) {
-        return plugin;
+  formatic.findOrLoadPlugin = function (name, config) {
+    var plugin = formatic.findPlugin(name, config);
+    if (!plugin) {
+
+      var pluginReg = pluginRegistry[name];
+      if (pluginReg) {
+        config = config || {};
+        if (!config.name) {
+          config.name = name;
+        }
+        plugin = formatic.loadPlugin(pluginReg.createPlugin, config);
       }
-      plugin = pluginRegistry[pluginFactory];
-      if (plugin) {
-        config = _.extend({}, plugin.config, config);
-        config.name = config.name || pluginFactory;
-        return formatic.loadPlugin(plugin.create, config);
-      }
-      var name = pluginFactory;
+    }
+    if (!plugin) {
       if (config && config.name) {
         name += '/' + config.name;
       }
       throw new Error('Plugin not found: ' + name);
     }
+    return plugin;
+  };
+
+  formatic.plugin = function (name, pluginFactory, config) {
+    // signature (pluginFactory, config)
+    if (_.isFunction(name)) {
+      config = pluginFactory;
+      pluginFactory = name;
+      return formatic.loadPlugin(pluginFactory, config);
+    // signature (name, config)
+    } else if (_.isString(name) && (_.isObject(pluginFactory) || _.isUndefined(pluginFactory)) && !_.isFunction(pluginFactory)) {
+      config = pluginFactory;
+      return formatic.findOrLoadPlugin(name, config);
+    // signature (pluginName, pluginFactoryName, config)
+    } else if (_.isString(name) && _.isString(pluginFactory)) {
+      config = _.extend({}, config, {name: name});
+      return formatic.findOrLoadPlugin(pluginFactory, config);
+    }
+    config = _.extend({}, config, {name: name});
     return formatic.loadPlugin(pluginFactory, config);
   };
 
@@ -182,12 +176,12 @@ var Formatic = function () {
     return Formatic.apply(null, arguments);
   };
 
-  var Form = function () {
-    this.init();
+  var Form = function (fields) {
+    this.init(fields);
   };
 
-  formatic.form = function () {
-    return new Form();
+  formatic.form = function (fields) {
+    return new Form(fields);
   };
 
   Form.prototype = formatic.form;
@@ -204,7 +198,7 @@ var Formatic = function () {
   // Where {x: 1} is config for pluginA.
   for (var i = 0; i < arguments.length; i++) {
     var pluginFactory = arguments[i];
-    var config = config || {};
+    var config = {};
     if (arguments[i + 1]) {
       var nextArg = arguments[i + 1];
       if (!_.isFunction(nextArg) && _.isObject(nextArg)) {
@@ -221,128 +215,186 @@ var Formatic = function () {
 var defaultFormatic = Formatic();
 
 defaultFormatic.registerPlugins(
+  ['core-fn', require('./plugins/core-fn')],
   ['core-data', require('./plugins/core-data')],
-  ['core-meta', require('./plugins/core-meta')],
   ['core-type', require('./plugins/core-type')],
   ['core-types', require('./plugins/core-types')],
   ['core-view', require('./plugins/core-view')],
-  ['core-validation', require('./plugins/core-validation')],
+  ['core-loader', require('./plugins/core-loader')],
   ['core', require('./plugins/core')],
-  ['terse', require('./plugins/terse')],
-  ['react', require('./plugins/react')],
-  ['zapier-types', require('./plugins/zapier-types')],
-  ['zapier-keys', require('./plugins/zapier-keys')],
-  ['react-viewer', require('./plugins/react-viewer')],
-  ['read-only', require('./plugins/read-only')],
-  ['required', require('./plugins/required')],
   ['default', require('./plugins/default')],
+  ['ensure-path', require('./plugins/ensure-path')],
+  ['prop-aliases', require('./plugins/prop-aliases')],
+  ['ensure-default', require('./plugins/ensure-default')],
+  ['ensure-fields', require('./plugins/ensure-fields')],
+  ['normalize-choices', require('./plugins/normalize-choices')],
+
+  ['types.wrapper', require('./types/wrapper')],
+  ['types.data', require('./types/data')],
+  ['types.null', require('./types/null')],
+  ['types.string', require('./types/string')],
+  ['types.object', require('./types/object')],
+  ['types.array', require('./types/array')],
+  ['types.json', require('./types/json')],
+  ['types.boolean', require('./types/boolean')],
+
+  ['views.formatic', require('./views/formatic')],
+  ['views.field', require('./views/field')],
+  ['views.label', require('./views/label')],
+  ['views.help', require('./views/help')],
+  ['views.fieldset', require('./views/fieldset')],
+  ['views.text', require('./views/text')],
+  ['views.textarea', require('./views/textarea')],
+  ['views.select', require('./views/select')],
+  ['views.list', require('./views/list')],
+  ['views.list-control', require('./views/list-control')],
+  ['views.list-item', require('./views/list-item')],
+  ['views.list-item-value', require('./views/list-item-value')],
+  ['views.list-item-control', require('./views/list-item-control')],
+  ['views.item-choices', require('./views/item-choices')],
+  ['views.add-item', require('./views/add-item')],
+  ['views.remove-item', require('./views/remove-item')],
+  ['views.move-item-back', require('./views/move-item-back')],
+  ['views.move-item-forward', require('./views/move-item-forward')],
+  ['views.json', require('./views/json')],
+  ['views.checkbox-list', require('./views/checkbox-list')],
+
   ['bootstrap', require('./plugins/bootstrap')],
 
-  ['type-formatic', require('./types/formatic')],
-  ['type-form', require('./types/form')],
-  ['type-fieldset', require('./types/fieldset')],
-  ['type-select', require('./types/select')],
-  ['type-text', require('./types/text')],
-  ['type-textarea', require('./types/text')],
-  ['type-pretty-textarea', require('./types/text')],
-  ['type-password', require('./types/text')],
-  ['type-checkbox', require('./types/checkbox')],
-  ['type-dropdown', require('./types/select')],
-  ['type-string', require('./types/text')],
-  ['type-float', require('./types/number')],
-  ['type-integer', require('./types/number')],
-  ['type-number', require('./types/number')],
-  ['type-json', require('./types/json')],
-  ['type-if', require('./types/if')],
-  ['type-get', require('./types/get')],
-  ['type-eq', require('./types/eq')],
-  ['type-list', require('./types/list')],
-  ['type-object', require('./types/object')],
-  ['type-code', require('./types/code')],
+  ['stores.meta', require('./stores/meta')],
+  ['stores.form', require('./stores/form')]
 
-  ['view-formatic', require('./views/react/formatic')],
-  ['view-form', require('./views/react/form')],
-  ['view-field', require('./views/react/field')],
-  ['view-fieldset', require('./views/react/fieldset')],
-  ['view-code', require('./views/react/code')],
-  ['view-select', require('./views/react/select')],
-  ['view-text', require('./views/react/text')],
-  ['view-string', require('./views/react/text')],
-  ['view-textarea', require('./views/react/textarea')],
-  ['view-password', require('./views/react/text')],
-  ['view-checkbox', require('./views/react/checkbox')],
-  ['view-boolean-checkbox', require('./views/react/boolean-checkbox')],
-  ['view-pretty-textarea', require('./views/react/pretty-textarea')],
-  ['view-dropdown', require('./views/react/dropdown')],
-  ['view-json', require('./views/react/json')],
-  ['view-float', require('./views/react/text')],
-  ['view-integer', require('./views/react/text')],
-  ['view-number', require('./views/react/text')],
-  ['view-list', require('./views/react/list')],
-  ['view-list-item', require('./views/react/list-item')],
-  ['view-object', require('./views/react/object')],
-  ['view-object-item', require('./views/react/object-item')]
+  // ,
+  // ['core-meta', require('./plugins/core-meta')],
+  // ['core-type', require('./plugins/core-type')],
+  // ['core-types', require('./plugins/core-types')],
+  // ['core-view', require('./plugins/core-view')],
+  // ['core-validation', require('./plugins/core-validation')],
+  // ['core', require('./plugins/core')],
+  // ['terse', require('./plugins/terse')],
+  // ['react', require('./plugins/react')],
+  // ['zapier-types', require('./plugins/zapier-types')],
+  // ['zapier-keys', require('./plugins/zapier-keys')],
+  // ['react-viewer', require('./plugins/react-viewer')],
+  // ['read-only', require('./plugins/read-only')],
+  // ['required', require('./plugins/required')],
+  // ['default', require('./plugins/default')],
+
+  //
+  // ['type-formatic', require('./types/formatic')],
+  // ['type-form', require('./types/form')],
+  // ['type-fieldset', require('./types/fieldset')],
+  // ['type-select', require('./types/select')],
+  // ['type-text', require('./types/text')],
+  // ['type-textarea', require('./types/text')],
+  // ['type-pretty-textarea', require('./types/text')],
+  // ['type-password', require('./types/text')],
+  // ['type-checkbox', require('./types/checkbox')],
+  // ['type-dropdown', require('./types/select')],
+  // ['type-string', require('./types/text')],
+  // ['type-float', require('./types/number')],
+  // ['type-integer', require('./types/number')],
+  // ['type-number', require('./types/number')],
+  // ['type-json', require('./types/json')],
+  // ['type-if', require('./types/if')],
+  // ['type-get', require('./types/get')],
+  // ['type-eq', require('./types/eq')],
+  // ['type-list', require('./types/list')],
+  // ['type-object', require('./types/object')],
+  // ['type-code', require('./types/code')],
+  //
+  // ['view-formatic', require('./views/react/formatic')],
+  // ['view-form', require('./views/react/form')],
+  // ['view-field', require('./views/react/field')],
+  // ['view-fieldset', require('./views/react/fieldset')],
+  // ['view-code', require('./views/react/code')],
+  // ['view-select', require('./views/react/select')],
+  // ['view-text', require('./views/react/text')],
+  // ['view-string', require('./views/react/text')],
+  // ['view-textarea', require('./views/react/textarea')],
+  // ['view-password', require('./views/react/text')],
+  // ['view-checkbox', require('./views/react/checkbox')],
+  // ['view-boolean-checkbox', require('./views/react/boolean-checkbox')],
+  // ['view-pretty-textarea', require('./views/react/pretty-textarea')],
+  // ['view-dropdown', require('./views/react/dropdown')],
+  // ['view-json', require('./views/react/json')],
+  // ['view-float', require('./views/react/text')],
+  // ['view-integer', require('./views/react/text')],
+  // ['view-number', require('./views/react/text')],
+  // ['view-list', require('./views/react/list')],
+  // ['view-list-item', require('./views/react/list-item')],
+  // ['view-object', require('./views/react/object')],
+  // ['view-object-item', require('./views/react/object-item')]
 );
 
-defaultFormatic.plugin('react');
+defaultFormatic.plugin('default');
 
 module.exports = defaultFormatic;
 
-},{"./plugins/bootstrap":4,"./plugins/core":11,"./plugins/core-data":5,"./plugins/core-meta":6,"./plugins/core-type":7,"./plugins/core-types":8,"./plugins/core-validation":9,"./plugins/core-view":10,"./plugins/default":12,"./plugins/react":14,"./plugins/react-viewer":13,"./plugins/read-only":15,"./plugins/required":16,"./plugins/terse":17,"./plugins/zapier-keys":18,"./plugins/zapier-types":19,"./types/checkbox":20,"./types/code":21,"./types/eq":22,"./types/fieldset":23,"./types/form":24,"./types/formatic":25,"./types/get":26,"./types/if":27,"./types/json":28,"./types/list":29,"./types/number":30,"./types/object":31,"./types/select":32,"./types/text":33,"./utils":34,"./views/react/boolean-checkbox":35,"./views/react/checkbox":36,"./views/react/code":37,"./views/react/dropdown":38,"./views/react/field":39,"./views/react/fieldset":40,"./views/react/form":41,"./views/react/formatic":42,"./views/react/json":43,"./views/react/list":45,"./views/react/list-item":44,"./views/react/object":51,"./views/react/object-item":50,"./views/react/pretty-textarea":52,"./views/react/select":53,"./views/react/text":54,"./views/react/textarea":55,"underscore":214}],4:[function(require,module,exports){
+},{"./plugins/bootstrap":4,"./plugins/core":11,"./plugins/core-data":5,"./plugins/core-fn":6,"./plugins/core-loader":7,"./plugins/core-type":8,"./plugins/core-types":9,"./plugins/core-view":10,"./plugins/default":12,"./plugins/ensure-default":13,"./plugins/ensure-fields":14,"./plugins/ensure-path":15,"./plugins/normalize-choices":16,"./plugins/prop-aliases":17,"./stores/form":18,"./stores/meta":19,"./types/array":20,"./types/boolean":21,"./types/data":22,"./types/json":23,"./types/null":24,"./types/object":25,"./types/string":26,"./types/wrapper":27,"./utils":28,"./views/add-item":29,"./views/checkbox-list":30,"./views/field":31,"./views/fieldset":32,"./views/formatic":33,"./views/help":34,"./views/item-choices":35,"./views/json":36,"./views/label":37,"./views/list":42,"./views/list-control":38,"./views/list-item":41,"./views/list-item-control":39,"./views/list-item-value":40,"./views/move-item-back":43,"./views/move-item-forward":44,"./views/remove-item":45,"./views/select":46,"./views/text":47,"./views/textarea":48,"underscore":217}],4:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic) {
 
-  formatic.config('view-form.attributes', {role: 'form'});
+  //formatic.config('views.formatic..attributes', {role: 'form'});
 
-  formatic.config('view-field', {
-    className: 'form-group',
-    help_className: 'help-block'
+  formatic.config('views.field', {className: 'form-group'});
+
+  formatic.config('views.help', {className: 'help-block'});
+
+  formatic.config('views.text', {className: 'form-control'});
+
+  formatic.config('views.textarea', {className: 'form-control'});
+
+  formatic.config('views.json', {className: 'form-control'});
+
+  formatic.config('views.select', {className: 'form-control'});
+
+  formatic.config('views.list', {className: 'well'});
+
+  formatic.config('views.list-control', {className: 'form-inline'});
+
+  formatic.config('views.list-item', {className: 'well'});
+
+  // formatic.config('view-object', {
+  //   className: 'well',
+  //   addButton_className: 'glyphicon glyphicon-plus',
+  //   addButton_label: ''
+  // });
+  //
+  // formatic.config('view-object-item', {
+  //   className: 'well',
+  //   key_className: '',
+  //   keyInput_className: 'form-control',
+  //   keyChoice_className: 'form-control',
+  //   value_className: '',
+  //   control_className: '',
+  //   removeButton_className: 'glyphicon glyphicon-remove',
+  //   removeButton_label: ''
+  // });
+
+  formatic.config('views.item-choices', {
+    className: 'form-control'
   });
 
-  formatic.config('view-text.className', 'form-control');
-
-  formatic.config('view-textarea.className', 'form-control');
-
-  formatic.config('view-json.className', 'form-control');
-
-  formatic.config('view-select.className', 'form-control');
-
-  formatic.config('view-list', {
-    className: 'well',
-    addButton_className: 'glyphicon glyphicon-plus',
-    addButton_label: '',
-    addContainer_className: 'form-inline',
-    typeChoice_className: 'form-control'
+  formatic.config('views.add-item', {
+    className: 'glyphicon glyphicon-plus',
+    label: ''
   });
 
-  formatic.config('view-list-item', {
-    className: 'well',
-    value_className: '',
-    control_className: '',
-    removeButton_className: 'glyphicon glyphicon-remove',
-    removeButton_label: '',
-    upButton_className: 'glyphicon glyphicon-arrow-up',
-    upButton_label: '',
-    downButton_className: 'glyphicon glyphicon-arrow-down',
-    downButton_label: ''
+  formatic.config('views.remove-item', {
+    className: 'glyphicon glyphicon-remove',
+    label: ''
   });
 
-  formatic.config('view-object', {
-    className: 'well',
-    addButton_className: 'glyphicon glyphicon-plus',
-    addButton_label: ''
+  formatic.config('views.move-item-back', {
+    className: 'glyphicon glyphicon-arrow-up',
+    label: ''
   });
 
-  formatic.config('view-object-item', {
-    className: 'well',
-    key_className: '',
-    keyInput_className: 'form-control',
-    keyChoice_className: 'form-control',
-    value_className: '',
-    control_className: '',
-    removeButton_className: 'glyphicon glyphicon-remove',
-    removeButton_label: ''
+  formatic.config('views.move-item-forward', {
+    className: 'glyphicon glyphicon-arrow-down',
+    label: ''
   });
 };
 
@@ -352,519 +404,1648 @@ module.exports = function (formatic) {
 var _ = require('underscore');
 var Emitter = require('component-emitter');
 var objectpath = require('objectpath');
+var Immutable = require('immutable');
 
 module.exports = function (formatic) {
 
-  var Actions = function (form) {
-    this.form = form;
-  };
-
-  formatic.action = function (name) {
-    Actions.prototype[name] = function () {
-      var args = [name].concat(Array.prototype.slice.call(arguments));
-      this.form.emitter.emit.apply(this.form.emitter, args);
-    };
-  };
-
   formatic.form.wrap('init', function (next) {
-    this.data = {};
-    this.root = this.defaultRoot();
-    this.emitter = new Emitter();
-    this.actions = new Actions(this);
-    this.emitter.on('change', function (field, value) {
-      this.onChange(field, value);
-    }.bind(this));
-    this.emitter.on('delete', function (field, key) {
-      this.onDelete(field, key);
-    }.bind(this));
-    this.emitter.on('insert', function (field, index, item) {
-      this.onInsert(field, index, item);
-    }.bind(this));
-    this.emitter.on('move', function (field, fromIndex, toIndex) {
-      this.onMove(field, fromIndex, toIndex);
-    }.bind(this));
-    next();
+    return next();
   });
 
-  formatic.action('change');
-  formatic.action('focus');
-  formatic.action('blur');
-  formatic.action('delete');
-  formatic.action('insert');
-  formatic.action('move');
-
-  formatic.form.defaultRoot = function () {
-    return {
-      type: 'formatic',
-      fields: []
-    };
+  formatic.formStatePath = function (field) {
+    var path = field;
+    if (!_.isArray(field)) {
+      path = field._path;
+    }
+    path = path.map(function (index) {
+      return ['fields', index];
+    });
+    path = _.flatten(path);
+    return path;
   };
 
-  formatic.form.fields = function (fields) {
-    this.root = this.compile(fields);
-    this.update();
+  formatic.setValueOfField = function (formState, field, value) {
+    var path = formatic.formStatePath(field);
+    return formState.updateIn(path.concat('value'), function () {
+      return formatic.fromJS(value);
+    });
   };
 
-  formatic.form.set = function (key, value) {
+  formatic.appendField = function (formState, field, item, templateMap) {
+    var path = formatic.formStatePath(field);
+    var childDef = formatic.createFieldDef(item, templateMap);
+    childDef.id = formatic.newId(field, childDef);
+    return formState.updateIn(path.concat('fields'), function (fields) {
+      return fields.push(formatic.fromJS(childDef));
+    });
+  };
 
+  formatic.removeField = function (formState, field, index) {
+    var path = formatic.formStatePath(field);
+    return formState.updateIn(path.concat('fields'), function (fields) {
+      return fields.splice(index, 1);
+    });
+  };
+
+  formatic.moveField = function (formState, field, fromKeyOrIndex, toKeyOrIndex) {
+
+    var path = formatic.formStatePath(field);
+
+    if (_.isNumber(fromKeyOrIndex) && _.isNumber(toKeyOrIndex)) {
+      var fromIndex = fromKeyOrIndex;
+      var toIndex = toKeyOrIndex;
+
+      var fields = formState.get('fields');
+
+      if (fields) {
+        if (fromIndex !== toIndex &&
+          fromIndex >= 0 && fromIndex < fields.length &&
+          toIndex >= 0 && toIndex < fields.length
+        ) {
+          return formState.updateIn(path.concat('fields'), function (fields) {
+            var removedField = fields.get(fromIndex);
+            fields = fields.splice(fromIndex, 1);
+            fields = fields.splice(toIndex, 0, removedField);
+            return fields;
+          });
+        }
+      }
+    }
+
+    // TODO: move keys
+
+    return formState;
+  };
+
+  formatic.formToJS = function (form) {
+    if (form._hasDirtyValue) {
+      form._jsForm = form._formState.toJS();
+    }
+    return form._jsForm;
+  };
+
+  formatic.getFormValue = function (form) {
+    var jsForm = formatic.formToJS(form);
+    return formatic.getFieldValue(jsForm);
+  };
+
+  formatic.getFieldValue = function (field) {
+
+    var typePlugin = formatic.type(field.type);
+
+    if (typePlugin.getFieldValue) {
+      return typePlugin.getFieldValue(field);
+    }
+
+    if (typeof field.value !== 'undefined') {
+      return field.value;
+    }
+    if (typeof field.default === 'undefined') {
+      return null;
+    }
+    return field.default;
+  };
+
+  // formatic.modifyFormValue = function (form, value) {
+  //   var field = formatic.formToJS(form);
+  //   formatic.modifyFieldValue(field, value);
+  //   form._formActions.set
+  // };
+  //
+  // formatic.modifyFieldValue = function (field, value) {
+  //   var typePlugin = formatic.type(field.type);
+  //
+  //   if (typePlugin.modifyFieldValue) {
+  //     typePlugin.modifyFieldValue(field, value);
+  //     return;
+  //   }
+  //
+  //   field.value = value;
+  // };
+
+  formatic.setFormValue = function (form, value) {
+    form._formActions.setFormValue(value);
+  };
+
+  formatic.setFieldValue = function (formState, value, templateMap) {
+    var type = formState.get('type');
+    var typePlugin = formatic.type(type);
+
+    if (typePlugin.setFieldValue) {
+      return typePlugin.setFieldValue(formState, value, templateMap);
+    }
+
+    return formState.set('value', formatic.fromJS(value));
+  };
+
+  formatic.form.val = function (value) {
     if (typeof value === 'undefined') {
-      this.setData(key);
-    } else {
-      this.setKey(key, value);
+      return formatic.getFormValue(this);
+    }
+    return formatic.setFormValue(this, value);
+  };
+
+  formatic.setMetaValue = function (form, key, value) {
+    form._metaActions.setItem(key, value);
+  };
+
+  formatic.form.meta = function (key, value) {
+    return formatic.setMetaValue(this, key, value);
+  };
+
+  formatic.matchesKey = function (key, formState) {
+    if (formState.get('id') && formState.get('id') === key) {
+      return true;
+    }
+    if (formState.get('key') && formState.get('key') === key) {
+      return true;
+    }
+    return false;
+  };
+
+  formatic.findAroundField = function (key, formState, rootFormState, path) {
+    var parentPath = path.slice(0, path.length - 1);
+
+    if (parentPath.length === 0) {
+      return null;
     }
 
-    this.update();
-  };
+    var parentStatePath = formatic.formStatePath(parentPath);
 
-  formatic.form.val = function () {
+    var parent = rootFormState.getIn(parentStatePath);
 
-    var field = this.run(this.root, this.data);
+    var siblings = parent.get('fields').toArray();
 
-    return formatic.fieldValue(field);
-  };
+    var matchingSibling = null;
 
-  formatic.form.onChange = function (field, value) {
-    if (field && field.keyPath) {
-      try {
-        var type = formatic.type(field.type);
-        if (type && type.parseField) {
-          value = type.parseField(field, value);
-        }
-        this.set(field.keyPath, value);
-      } catch (e) {
-        // failed to parse; don't respond to this change and leave state in
-        // view till it is parseable
+    _.find(siblings, function (sibling) {
+      if (sibling !== formState) {
+        matchingSibling = formatic.findInField(key, sibling);
+        return matchingSibling;
       }
+    });
+
+    if (matchingSibling) {
+      return matchingSibling;
     }
+
+    return formatic.findAroundField(key, parent, rootFormState, parentPath);
   };
 
-  formatic.form.onDelete = function (field, key) {
-    if (field && field.keyPath) {
-      var parent = formatic.getObject(this.data, field.keyPath);
-
-      if (_.isArray(parent)) {
-        if (typeof key === 'number') {
-          parent.splice(key, 1);
-          this.update();
-        }
-      } else if (_.isObject(parent)) {
-        delete parent[key];
-        this.update();
-      }
+  formatic.findInField = function (key, formState) {
+    if (formatic.matchesKey(key, formState)) {
+      return formState;
     }
-  };
-
-  var tempPrefix = '__missing_key__';
-
-  formatic.form.tempKey = function (field) {
-    if (field.keyPath) {
-      var parent = formatic.getObject(this.data, field.keyPath);
-
-      if (_.isObject(parent) && !_.isArray(parent)) {
-        var id = 0;
-        var key = tempPrefix + id;
-        while (key in parent) {
-          id++;
-          key = tempPrefix + id;
-        }
-        return key;
-      }
+    if (formState.get('fields')) {
+      formState.get('fields').forEach(function (child) {
+        return formatic.findInField(key, child);
+      });
     }
     return null;
   };
 
-  formatic.form.isTempKey = function (key) {
-    return key.substring(0, tempPrefix.length) === tempPrefix;
-  };
-
-  formatic.form.onInsert = function (field, index, item) {
-    if (field.keyPath) {
-
-      item = item || field.item || {
-        type: 'text',
-        value: '',
-        key: '[]'
-      };
-
-      item = this.compileField(item);
-
-      // Need to evaluate the field to get a default value out.
-      item = this.runField(item, {});
-
-      var value = formatic.fieldValue(item);
-
-      value = value[''];
-
-      var parent = formatic.getObject(this.data, field.keyPath);
-
-      if (_.isArray(parent)) {
-        if (typeof index !== 'number' || index > parent.length) {
-          index = parent.length;
-        }
-
-        parent.splice(index, 0, value);
-      } else {
-        parent[index] = value;
-      }
-
-      this.update();
+  formatic.getInData = function (data, keys) {
+    if (!_.isArray(keys)) {
+      keys = [keys];
+    }
+    if (keys.length === 0) {
+      return data;
+    }
+    if (data[keys[0]]) {
+      return formatic.getInData(data[keys[0]], keys.slice(1));
     }
   };
 
-  formatic.form.onMove = function (field, fromIndex, toIndex) {
-    if (field.keyPath) {
-
-      var parent = formatic.getObject(this.data, field.keyPath);
-
-      if (_.isArray(parent)) {
-        if (fromIndex !== toIndex &&
-          fromIndex >= 0 && fromIndex < parent.length &&
-          toIndex >= 0 && toIndex < parent.length
-        ) {
-          parent.splice(toIndex, 0, parent.splice(fromIndex, 1)[0]);
-          this.update();
-        }
-      } else if (_.isObject(parent)) {
-        if (fromIndex !== toIndex) {
-          parent[toIndex] = parent[fromIndex];
-          delete parent[fromIndex];
-          this.update();
+  formatic.lookupKey = function (formState, rootFormState, path, lookup) {
+    var args = lookup.map(function (arg) {
+      if (arg[0] === '=') {
+        var fieldId = arg.slice(1);
+        var field = formatic.findAroundField(fieldId, formState, rootFormState, path);
+        if (field) {
+          return field.get('value');
+        } else {
+          return null;
         }
       }
+      return arg;
+    });
+    var hasAllArgs = _.every(args, function (arg) {
+      return arg;
+    });
+    if (hasAllArgs) {
+      return args.join('::');
     }
+    return null;
   };
 
-  formatic.form.on = function () {
-    return this.emitter.on.apply(this.emitter, arguments);
-  };
+  formatic.updateData = function (formState, data, rootFormState, path) {
+    rootFormState = rootFormState || formState;
+    path = path || [];
+    return formState.withMutations(function (field) {
+      if (field.get('eval')) {
+        field.get('eval').keySeq().forEach(function (propKey) {
+          if (propKey === 'eval') {
+            throw new Error("Can't eval value of eval property.");
+          }
+          var fallbackPropKey = '__fallback__' + propKey;
+          if (!field.get(fallbackPropKey)) {
+            if (field.has(propKey)) {
+              field.set(fallbackPropKey, field.get(propKey));
+            }
+          }
 
-  formatic.form.off = function () {
-    return this.emitter.off.apply(this.emitter, arguments);
-  };
+          var evalExpr = field.get('eval').get(propKey);
 
-  formatic.form.compileField = function (field) {
-    return field;
-  };
+          if (evalExpr.get('lookup')) {
+            var lookup = evalExpr.get('lookup');
+            if (lookup.toArray) {
+              lookup = lookup.toJS();
+            }
+            var dataKey = formatic.lookupKey(formState, rootFormState, path, lookup);
 
-  formatic.form.compile = function (field) {
-    return this.compileField(field);
-  };
+            var result = data[dataKey];
 
-  formatic.form.setData = function (value) {
-    this.data = value;
-  };
-
-  formatic.form.setKey = function (key, value) {
-    formatic.setObject(this.data, key, value);
-  };
-
-  formatic.form.update = function () {
-
-    var field = this.run(this.root, this.data);
-
-    var props = {form: this, field: field};
-
-    this.emitter.emit('update', props);
-
-    this.updateView(props);
-  };
-
-  formatic.fieldValue = function (field) {
-
-    var obj = null;
-
-    var ops = formatic.fieldValues(field);
-
-    ops.forEach(function (op) {
-
-      if (typeof op.value !== 'undefined' && formatic.isRootKey(op.path)) {
-        obj = op.value;
-      } else {
-        if (obj === null) {
-          obj = {};
-        }
-        formatic.setObject(obj, op.path, op.value);
+            if (result) {
+              field.set('needLookupKey', null);
+              field.set(propKey, formatic.fromJS(result));
+            } else {
+              field.set('needLookupKey', dataKey);
+              field.set(propKey, field.get(fallbackPropKey));
+            }
+          }
+        });
+      }
+      if (field.get('fields')) {
+        field.set('fields', field.get('fields').map(function (field, i) {
+          return formatic.updateData(field, data, rootFormState, path.concat(i));
+        }).toVector());
       }
     });
-
-    return obj;
   };
 
-  formatic.fieldValues = function (field, path, values) {
-    path = path || '';
-    values = values || [];
-    if (field.key && typeof field.value !== 'undefined') {
-      values.push({
-        path: formatic.joinKey(path, field.key),
-        value: field.value
-      });
-    } else {
-      if (field.key) {
-        path = formatic.joinKey(path, field.key);
-      }
-      if (field.isArray) {
-        values.push({
-          value: [],
-          path: path
-        });
-      } else if (field.isObject) {
-        values.push({
-          value: {},
-          path: path
-        });
-      }
-      if (field.fields) {
-        field.fields.forEach(function (childField) {
-          formatic.fieldValues(childField, path, values);
-        });
-      }
-    }
-    return values;
-  };
-
-  formatic.splitKey = function (key) {
-    return objectpath.parse(key);
-    //return key.split('.');
-  };
-
-  formatic.getObject = function (obj, key) {
-
-    if (!_.isObject(obj)) {
-      return undefined;
-    }
-
-    if (!key) {
-      return obj;
-    }
-
-    var parts = key;
-
-    if (!_.isArray(key)) {
-      parts = formatic.splitKey(key);
-    }
-
-    var value = obj[parts[0]];
-
-    if (parts.length > 1) {
-
-      return formatic.getObject(value, parts.slice(1));
-    }
-
-    return value;
-  };
-
-  formatic.setObject = function (obj, key, value) {
-
-    var parts = formatic.splitKey(key);
-
-    _.each(parts, function (part, i) {
-      if (i === (parts.length - 1)) {
-        return;
-      }
-      if (!(part in obj)) {
-        obj[part] = {};
-      }
-      obj = obj[part];
-    });
-
-    key = parts[parts.length - 1];
-
-    obj[key] = value;
-  };
-
-  formatic.isRootKey = function (key) {
-    if (key === '' || key === '.') {
-      return true;
-    }
-  };
-
-  formatic.joinKey = function (fromKey, toKey) {
-    if (formatic.isRootKey(fromKey)) {
-      return toKey;
-    } else if (toKey[0] === '[') {
-      return fromKey + toKey;
-    } else {
-      return fromKey + '.' + toKey;
-    }
-  };
-
-  formatic.form.bindField = function (field, data, parentKey, index) {
-
-    // console.log('-----')
-    // console.log(field.key);
-    // console.log(JSON.stringify(field));
-    // console.log(JSON.stringify(data));
-
-    //console.log('FIELD:', JSON.stringify(field))
-
-    field = _.extend({}, field);
-
-    if (field.key) {
-
-      var key = field.key;
-
-      if (key === '[]' && typeof index !== 'undefined') {
-        key = '[' + JSON.stringify(index) + ']';
-      }
-
-      if (parentKey) {
-        key = formatic.joinKey(parentKey, key);
-      }
-
-      field.keyPath = key;
-
-      //console.log(field.key);
-
-      var value = formatic.getObject(data, field.keyPath);
-      // console.log(value);
-      if (typeof field.value !== 'undefined' && typeof value !== 'undefined') {
-        field.value = value;
-      }
-    }
-
-    // console.log(JSON.stringify(field));
-
-    return field;
-  };
-
-  formatic.form.evalField = function (field, data, parentKey, index) {
-
-    var children = field.fields;
-
-    if (children) {
-      field.fields = [];
-
-      _.each(children, function (child, i) {
-        field.fields.push(this.runField(child, data, field.key || parentKey, field.key ? i : index));
-      }.bind(this));
-    }
-
-    return field;
-  };
-
-  formatic.form.runField = function (field, data, parentKey, index) {
-
-    if (typeof field !== 'object') {
-      return null;
-    }
-
-    field = this.bindField(field, data, parentKey, index);
-
-    field = this.evalField(field, data, parentKey, index);
-
-    return field;
-  };
-
-  formatic.form.cleanField = function (field) {
-
-    if (field && field.fields) {
-      field.fields = field.fields.filter(function (field) {
-        return field;
-      }).map(function (field) {
-        return this.cleanField(field);
-      }.bind(this));
-
-      return field;
-    }
-
-    return field;
-
-  };
-
-  formatic.form.run = function (field, data) {
-
-    field = this.runField(field, data);
-
-    field = this.cleanField(field);
-
-    return field;
-  };
+  // var sources = {};
+  //
+  // formatic.form.wrap('init', function (next) {
+  //   return next();
+  // });
+  //
+  // formatic.source = function (key, fn) {
+  //   if (typeof fn === 'undefined') {
+  //     return sources[key];
+  //   }
+  //   sources[key] = fn;
+  // };
+  //
+  // formatic.form.val = function (value) {
+  //   if (typeof value === 'undefined') {
+  //     return this.getValue();
+  //   }
+  //   return this.setValue(value);
+  // };
+  //
+  // formatic.form.valAt = function (key, value) {
+  //   if (typeof value === 'undefined') {
+  //     return this.getValAt(key);
+  //   } else {
+  //     return this.setValAt(key, value);
+  //   }
+  // };
+  //
+  // formatic.form.getValAt = function (key) {
+  //   var value;
+  //   if (this.has('value')) {
+  //     value = this.get('value');
+  //   }
+  //   if (this.has('default')) {
+  //     value = this.get('default');
+  //   }
+  //   if (value && value.get) {
+  //     return formatic.toJS(value.get(key));
+  //   }
+  //   return null;
+  // };
+  //
+  // formatic.form.setValAt = function (key, subValue) {
+  //   this._cursor.withMutations(function (field) {
+  //     var value = field.get('value');
+  //     if (!value) {
+  //       value = field.get('default');
+  //     }
+  //     if (value) {
+  //       field.set('value', value);
+  //     }
+  //     if (!value) {
+  //       if (typeof key === 'number') {
+  //         field.set('value', Immutable.fromJS([]));
+  //       } else {
+  //         field.set('value', Immutable.fromJS({}));
+  //       }
+  //     }
+  //     value.set(key, subValue);
+  //   });
+  // };
+  //
+  // formatic.form.hasValAt = function (key) {
+  //   var value;
+  //   if (this.has('value')) {
+  //     value = this.get('value');
+  //   }
+  //   if (this.has('default')) {
+  //     value = this.get('default');
+  //   }
+  //   if (value && value.has) {
+  //     return value.has(key);
+  //   }
+  //   return false;
+  // };
+  //
+  // formatic.form.getValue = function () {
+  //   if (this.typePlugin().getValue) {
+  //     return formatic.toJS(this.typePlugin().getValue(this));
+  //   }
+  //   return formatic.toJS(this.getData());
+  // };
+  //
+  // formatic.form.getData = function () {
+  //   if (this.has('value')) {
+  //     return this.get('value');
+  //   }
+  //   if (!this.has('default')) {
+  //     return null;
+  //   }
+  //   return this.get('default');
+  // };
+  //
+  // formatic.form.setValue = function (value) {
+  //   if (_.isObject(value)) {
+  //     if (value.deref && _.isFunction(value.deref)) {
+  //       value = value.deref();
+  //     }
+  //     if (value.toJS && _.isFunction(value.toJS)) {
+  //       value = value.toJS();
+  //     }
+  //   }
+  //   if (this.typePlugin().setValue) {
+  //     this.modify(function (form) {
+  //       this.typePlugin().setValue(form, value);
+  //     }.bind(this));
+  //     return this;
+  //   }
+  //   return this.setData(value);
+  // };
+  //
+  // formatic.form.modifyValue = function (fn) {
+  //   var newData = this.get('value').withMutations(function (data) {
+  //     fn(data);
+  //   });
+  //   this.set('value', newData);
+  // };
+  //
+  // formatic.form.setData = function (data) {
+  //   this.set('value', data);
+  // };
+  //
+  // // formatic.buildMutableField = function (fieldDef, templateMap) {
+  // //   if (!fieldDef.type) {
+  // //     throw new Error('Field must specify type.');
+  // //   }
+  // //   var type = formatic.type(fieldDef.type);
+  // //   var field = _.extend({
+  // //     fields: [],
+  // //     default: typeof type.default === 'undefined' ? null : type.default
+  // //   }, fieldDef, formatic.getValidProps(fieldDef), type.getValidProps ? type.getValidProps(fieldDef) : {});
+  // //   field.fields = field.fields.map(function (templateId) {
+  // //     if (!templateMap[templateId]) {
+  // //       throw new Error('Field ' + field.id + ' tried to reference unknown template: ' + templateId);
+  // //     }
+  // //     return formatic.buildMutableField(templateMap[templateId], templateMap);
+  // //   });
+  // //   return field;
+  // // };
+  //
+  // formatic.modifyField = function (/*root, current*/) {
+  //
+  // };
+  //
+  // formatic.inflateField = function (root, parent, templateName) {
+  //
+  //   var templateMap = parent.child('_templates');
+  //
+  //   if (templateMap) {
+  //     var map = templateMap.getData();
+  //     if (map.has(templateName)) {
+  //       return map.get(templateName).deref();
+  //     }
+  //   }
+  //
+  //   parent = parent.parent();
+  //
+  //   if (parent) {
+  //     return formatic.inflateField(root, parent, templateName);
+  //   }
+  //
+  //   throw new Error('Template ' + templateName + ' not found.');
+  // };
+  //
+  // formatic.hasDep = function (root, current, dep) {
+  //   var depField = root.find(dep, current);
+  //   var depValue = depField.val();
+  //   if (depValue) {
+  //     if (_.isArray(depValue)) {
+  //       return depValue.length > 0;
+  //     }
+  //     return true;
+  //   }
+  // };
+  //
+  // formatic.walkEval = function (root, current) {
+  //   current = current || root;
+  //
+  //   var type = current.get('type');
+  //
+  //   if (!type) {
+  //     throw new Error('Field must specify type.');
+  //   }
+  //
+  //   var typePlugin = formatic.type(type);
+  //
+  //   if (!typePlugin) {
+  //     throw new Error('Field must have a valid type.');
+  //   }
+  //
+  //   var defaultValue = current.get('default');
+  //
+  //   if (typeof defaultValue === 'undefined') {
+  //     defaultValue = typeof typePlugin.default === 'undefined' ? null : typePlugin.default;
+  //     current.set('default', Immutable.fromJS(defaultValue));
+  //   }
+  //
+  //   var fields = current.get('fields');
+  //
+  //   if (!fields) {
+  //     current.set('fields', []);
+  //     fields = current.get('fields');
+  //   }
+  //
+  //   fields.forEach(function (field, i) {
+  //     if (_.isString(field)) {
+  //       var inflated = formatic.inflateField(root, current, field);
+  //       inflated = inflated.set('id', formatic.newId(current, current.childFromCursor(inflated, field)));
+  //       fields.set(i, inflated);
+  //     }
+  //   });
+  //
+  //   if (current.get('_value')) {
+  //     var _value = formatic.toJS(current.get('_value'));
+  //     current._cursor.remove('_value');
+  //     current.val(_value);
+  //   }
+  //
+  //   var dataDeps = current.deref('data');
+  //
+  //   if (dataDeps) {
+  //     dataDeps.keySeq().forEach(function (propKey) {
+  //       var dataKey = dataDeps.get(propKey);
+  //       var dataField = current.find(dataKey, current);
+  //       if (dataField) {
+  //         var propValue = dataField.val();
+  //         current.set(propKey, propValue);
+  //       }
+  //     });
+  //   }
+  //
+  //   var showDeps = current.deref('when');
+  //
+  //   if (showDeps) {
+  //     showDeps = showDeps.toArray();
+  //     current.set('hidden', true);
+  //     if (_.every(showDeps, function (dep) {
+  //       return formatic.hasDep(root, current, dep);
+  //     })) {
+  //       current.set('hidden', false);
+  //     }
+  //   }
+  //
+  //   formatic.modifyField(root, current);
+  //
+  //   if (typePlugin.modifyField) {
+  //     typePlugin.modifyField(root, current);
+  //   }
+  //
+  //   if (fields && fields.length > 0) {
+  //     current.each(function (child) {
+  //       formatic.walkEval(root, child);
+  //     });
+  //   }
+  //
+  //   var items = current.get('items');
+  //
+  //   // Need to inflate first level so we have any match rules.
+  //   if (items && items.count() > 0) {
+  //     items.forEach(function (field, i) {
+  //       if (_.isString(field)) {
+  //         var inflated = formatic.inflateField(root, current, field);
+  //         items.set(i, inflated);
+  //       }
+  //     });
+  //   }
+  // };
+  //
+  // formatic.eval = function (form) {
+  //   return form.modify(function (form) {
+  //     formatic.walkEval(form);
+  //   });
+  // };
+  //
+  // formatic.form.eval = function () {
+  //   return formatic.eval(this);
+  // };
 };
 
-},{"component-emitter":57,"objectpath":62,"underscore":214}],6:[function(require,module,exports){
+},{"component-emitter":50,"immutable":51,"objectpath":52,"underscore":217}],6:[function(require,module,exports){
 'use strict';
+
+var _ = require('underscore');
+var Immutable = require('immutable');
+//var Emitter = require('component-emitter');
+var Reflux = require('reflux');
 
 module.exports = function (formatic) {
 
-  formatic.form.wrap('init', function (next) {
+  formatic.form.wrap('init', function (next, formDef) {
 
-    this.metadata = {};
+    formatic.initForm(this, formDef);
 
     return next();
   });
 
-  formatic.form.setMeta = function (key, value) {
-    this.metadata[key] = value;
-  };
-
-  formatic.form.getMeta = function (key) {
-    if (key in this.metadata) {
-      return this.metadata[key];
-    }
-    return null;
-  };
-
-  formatic.form.meta = function (key, value) {
-    if (arguments.length === 1) {
-      return this.getMeta(key);
+  var converter = function (key, sequence) {
+    if (_.isArray(this[key])) {
+      return sequence.toVector();
     } else {
-      return this.setMeta(key, value);
+      return sequence.toOrderedMap();
+    }
+  };
+
+  formatic.fromJS = function (obj) {
+    return Immutable.fromJS(obj, converter);
+  };
+
+  formatic.onFormStoreChanged = function (form, data) {
+
+    form._formState = data;
+    form._hasDirtyValue = true;
+
+    formatic.loadNeededData(form);
+
+    formatic.render(form);
+  };
+
+  formatic.initForm = function (form, formDef) {
+
+    form._hasDirtyValue = true;
+
+    formDef = formatic.fillInFormDefIds(formDef);
+    formDef = formatic.createFormDefTree(formDef);
+    formDef = _.extend({}, formDef);
+    var templateMap = formDef._templates || {};
+    delete formDef._templates;
+    form._formState = formatic.createFormState(formDef, templateMap);
+
+    //form._templateMap = templateMap;
+
+    form._metaActions = Reflux.createActions(['setItem']);
+
+    form._metaStore = formatic.plugin('stores.meta').create(form._metaActions);
+
+    form._formActions = Reflux.createActions(['setFormValue', 'setValue', 'append', 'move', 'remove', 'undo']);
+
+    form._formStore = formatic.plugin('stores.form').create(form._formActions, form._formState, form._metaStore);
+    form._formStore.listen(function (data) {
+      formatic.onFormStoreChanged(form, data);
+    });
+
+    form._metaActions.setItem('_templateMap', templateMap);
+  };
+
+  formatic.createFormState = function (formDef, templateMap) {
+    var formState = formatic.fromJS(formDef);
+    var compiled = formatic.createModifiedFieldFromFormState(formState);
+    var inflated = formatic.inflateItems(compiled, templateMap);
+    return formatic.fromJS(inflated);
+  };
+
+  formatic.fillInFormDefIds = function (formDef) {
+    var lastId = '';
+    var typeIndexes = {};
+    var map = {};
+    var fieldDefs = formDef;
+    var isArray = true;
+    if (!_.isArray(fieldDefs)) {
+      isArray = false;
+      fieldDefs = [fieldDefs];
+    }
+    fieldDefs = fieldDefs.map(function (fieldDef) {
+      return _.extend({}, fieldDef);
+    });
+    fieldDefs.forEach(function (fieldDef) {
+
+      if (!fieldDef.type) {
+        throw new Error('Field definitions must have types: ' + JSON.stringify(fieldDef));
+      }
+
+      if (!formatic.type(fieldDef.type)) {
+        throw new Error('Unknown type for field definition: ' + fieldDef.type);
+      }
+
+      var id = formatic.idOfFieldDef(fieldDef);
+      if (id) {
+        if (map[id]) {
+          throw new Error('Field ids must be unique. id: ' + id);
+        }
+        lastId = id;
+        typeIndexes = {};
+      } else {
+        // Making a best guess at an id that will stay the same.
+        if (!(fieldDef.type in typeIndexes)) {
+          typeIndexes[fieldDef.type] = -1;
+        }
+        typeIndexes[fieldDef.type]++;
+        id = '__' + lastId + '__' + fieldDef.type + '__' + typeIndexes[fieldDef.type];
+      }
+      fieldDef.id = id;
+      map[id] = fieldDef;
+    });
+
+    if (!isArray) {
+      fieldDefs = fieldDefs[0];
+    }
+
+    return fieldDefs;
+  };
+
+  formatic.idOfFieldDef = function (fieldDef) {
+    return fieldDef.id || fieldDef.key || null;
+  };
+
+  formatic.createFormDefTree = function (formDef) {
+    formDef = formatic.createRootFormDef(formDef);
+    formDef = formatic.inflateFormDefTemplates(formDef);
+    return formDef;
+  };
+
+  formatic.createRootFormDef = function (formDef) {
+    if (_.isArray(formDef)) {
+
+      var fieldDefs = formDef;
+
+      var templates = fieldDefs.filter(function (fieldDef) {
+        return fieldDef.template === true;
+      });
+
+      var concretes = fieldDefs.filter(function (fieldDef) {
+        return fieldDef.template !== true;
+      });
+
+      var root = _.find(concretes, function (fieldDef) {
+        return fieldDef.key === '.';
+      });
+
+      if (root) {
+        concretes = concretes.filter(function (fieldDef) {
+          return fieldDef.key !== '.';
+        });
+      }
+
+      var templateMap = {};
+
+      concretes.forEach(function (template) {
+        if (template.key) {
+          templateMap[template.key] = template;
+        }
+        if (template.id) {
+          templateMap[template.id] = template;
+        }
+      });
+
+      templates.forEach(function (template) {
+        if (template.key) {
+          templateMap[template.key] = template;
+        }
+        if (template.id) {
+          templateMap[template.id] = template;
+        }
+      });
+
+      concretes.forEach(function (concrete, i) {
+        if (_.isString(concrete)) {
+          if (templateMap[concrete]) {
+            concretes[i] = templateMap[concrete];
+          } else {
+            throw new Error('Template not found: ', concrete);
+          }
+        }
+      });
+
+      if (root && concretes.length === 0) {
+        return formatic.addTemplateData(root, templateMap);
+      } else {
+        var concreteKeys = concretes.map(function (concrete) {
+          return concrete.id;
+        });
+        if (root) {
+          return formatic.addTemplateData({
+            id: '.',
+            type: 'wrapper',
+            fields: [root].concat(concreteKeys)
+          }, templateMap);
+        } else {
+          return formatic.addTemplateData({
+            id: '.',
+            type: 'object',
+            fields: concreteKeys
+          }, templateMap);
+        }
+      }
+
+    } else if (_.isObject(formDef)) {
+      return formDef;
+    }
+  };
+
+  formatic.addTemplateData = function (formDef, templateMap) {
+    formDef = _.extend({}, formDef);
+    formDef._templates = templateMap;
+    return formDef;
+  };
+
+  // formatic.findFormDefTemplate = function (templateName, parents) {
+  //   if (parents.length > 0) {
+  //     var parent = parents[parents.length - 1];
+  //     var templateFieldDef = _.find(parent.fields, function (fieldDef) {
+  //       return fieldDef.id === '_templates';
+  //     });
+  //     if (templateFieldDef) {
+  //       if (templateFieldDef.value[templateName]) {
+  //         return templateFieldDef.value[templateName];
+  //       }
+  //     }
+  //   }
+  //   return null;
+  // };
+
+  formatic.createFieldDef = function (fieldDef, templates) {
+    fieldDef = JSON.parse(JSON.stringify(fieldDef));
+    fieldDef = formatic.inflateFormDefTemplates(fieldDef, templates);
+    formatic.modifyField(fieldDef);
+    fieldDef = formatic.inflateItems(fieldDef, templates);
+    return fieldDef;
+  };
+
+  formatic.inflateFormDefTemplates = function (fieldDef, templateMap) {
+    templateMap = templateMap || fieldDef._templates || {};
+    fieldDef = _.extend({}, fieldDef);
+    if (fieldDef.fields) {
+      fieldDef.fields = fieldDef.fields.map(function (childDef) {
+        return childDef;
+      });
+      fieldDef.fields.forEach(function (childDef, i) {
+        if (_.isString(childDef)) {
+          if (templateMap[childDef]) {
+            var template = templateMap[childDef];
+            childDef = _.extend({}, template);
+          } else {
+            throw new Error('Template not found: ' + childDef);
+          }
+        }
+        fieldDef.fields[i] = formatic.inflateFormDefTemplates(childDef, templateMap);
+      });
+    }
+    return fieldDef;
+  };
+
+  formatic.createModifiedFieldFromFormState = function (formState) {
+    var field = formState.toJS();
+    formatic.modifyField(field);
+    return field;
+  };
+
+  formatic.modifyField = function (field, parent, i) {
+    var typePlugin = formatic.type(field.type);
+    if (typePlugin.modifyField) {
+      typePlugin.modifyField(field, parent, i);
+    }
+    if (field.fields) {
+      field.fields.forEach(function (child, i) {
+        formatic.modifyField(child, field, i);
+      });
+    }
+  };
+
+  formatic.inflateItems = function (field, templateMap) {
+    if (field.fields || field.items) {
+      field = _.extend({}, field);
+      if (field.items) {
+        field.items = field.items.map(function (item) {
+          if (_.isString(item)) {
+            if (!templateMap[item]) {
+              throw new Error('No template found for item: ', item);
+            }
+            return templateMap[item];
+          }
+        });
+      }
+      if (field.fields) {
+        field.fields = field.fields.map(function (child) {
+          return formatic.inflateItems(child, templateMap);
+        });
+      }
+    }
+
+    return field;
+  };
+
+  formatic.childIdMap = function (field) {
+    var idMap = {};
+    if (field.get && _.isFunction(field.get)) {
+      field.get('fields').forEach(function (child) {
+        idMap[child.get('id')] = true;
+      });
+    } else {
+      field.fields.forEach(function (child) {
+        idMap[child.id] = true;
+      });
+    }
+    return idMap;
+  };
+
+  formatic.newId = function (field, child) {
+    var idMap = formatic.childIdMap(field);
+    if (child.id && !idMap[child.id]) {
+      return child.id;
+    }
+    if (child.key && !idMap[child.key]) {
+      return child.key;
+    }
+    var childId = child.id || child.key || '__auto';
+    childId += '__';
+    var i = 0;
+    var newId = childId + i;
+    while (idMap[newId]) {
+      i++;
+      newId = childId + i;
+    }
+    return newId;
+  };
+
+  formatic.fieldDefFromValue = function (value, items, templateMap) {
+    if (items && items.count() > 0) {
+      var template = _.find(items.toArray(), function (template) {
+        var imValue = formatic.fromJS(value);
+        return formatic.matchValueToTemplate(imValue, template);
+      });
+      if (template) {
+        return formatic.createFieldDef(template.toJS(), templateMap);
+      }
+    }
+    var fieldDef = {
+      type: 'json'
+    };
+    if (_.isString(value)) {
+      fieldDef = {
+        type: 'string'
+      };
+    } else if (_.isArray(value)) {
+      var arrayItemFields = value.map(function (value, i) {
+        var childDef = formatic.fieldDefFromValue(value);
+        childDef.key = i;
+        return childDef;
+      });
+      fieldDef = {
+        type: 'array',
+        fields: arrayItemFields
+      };
+    } else if (_.isObject(value)) {
+      var objectItemFields = Object.keys(value).map(function (key) {
+        var childDef = formatic.fieldDefFromValue(value[key]);
+        childDef.key = key;
+        childDef.label = formatic.humanize(key);
+        return childDef;
+      });
+      fieldDef = {
+        type: 'object',
+        fields: objectItemFields
+      };
+    } else if (_.isNull(value)) {
+      fieldDef = {
+        type: 'null'
+      };
+    }
+    return formatic.createFieldDef(fieldDef, {});
+  };
+
+  formatic.humanize = function(property) {
+    property = property.replace(/\{\{/g, '');
+    property = property.replace(/\}\}/g, '');
+    return property.replace(/_/g, ' ')
+      .replace(/(\w+)/g, function(match) {
+        return match.charAt(0).toUpperCase() + match.slice(1);
+      });
+  };
+
+  var equals = formatic.equals = function (a, b) {
+    if (a && a.equals && a.equals(b)) {
+      return true;
+    } else if (b && b.equals && b.equals(a)) {
+      return true;
+    } else if (_.isEqual(a, b)) {
+      return true;
+    }
+  };
+
+  formatic.matchValueToRule = function (value, rule) {
+    if (rule.get('key')) {
+      var key = rule.get('key');
+      if (!(value.has(key))) {
+        return false;
+      }
+      if (rule.has('value')) {
+        if (!equals(value.get(key), rule.get('value'))) {
+          return false;
+        }
+      }
+      if (rule.has('notValue')) {
+        if (equals(value.get(key), rule.get('notValue'))) {
+          return false;
+        }
+      }
+    }
+    if (rule.get('notKey') && value.has(rule.get('notKey'))) {
+      return false;
+    }
+    return true;
+  };
+
+  formatic.matchValueToTemplate = function (value, template) {
+    var match = template.get('match');
+    if (!match) {
+      return true;
+    } else {
+      return _.every(match.toArray(), function (rule) {
+        return formatic.matchValueToRule(value, rule);
+      });
+    }
+  };
+
+  // formatic.compileFields = function (fields) {
+  //   return fields.map(function (field) {
+  //     return formatic.compileField(field);
+  //   });
+  // };
+
+  // formatic.compileFormDef = function (formDef) {
+  //   return formatic.compileField(formDef);
+  // };
+  //
+  // formatic.compileField = function (field) {
+  //   var typePlugin = formatic.type(field.type);
+  //   if (typePlugin.compileField) {
+  //     field = typePlugin.compileField(field);
+  //   }
+  //   if (field.fields) {
+  //     field = _.extend({}, field);
+  //     field.fields = formatic.compileFields(field.fields);
+  //   }
+  //   return field;
+  // };
+  //
+  // formatic.compileFields = function (fields) {
+  //   return fields.map(function (field) {
+  //     return formatic.compileField(field);
+  //   });
+  // };
+
+// (cursor, viewRules) -> (viewComponentDesc)
+//
+// (viewComponentDesc) -> (liveViewComponent)
+//
+// (formState, formChangeHandler) -> (cursor)
+//
+// (formDef) -> (formState)
+//
+// (formState) -> (ref)
+//
+// (viewComponentFactory) -> (viewComponentDesc)
+//
+//
+// (data, formState) -> (formState)
+//
+//
+// (id, params) -> (dataPromise)
+//
+//
+// (formState) -> (data requirements)
+//
+// (formState, action) -> (formState)
+
+  // formatic.form.wrap('init', function (next, fieldDefs) {
+  //   if (!fieldDefs) {
+  //     fieldDefs = [];
+  //   }
+  //   if (fieldDefs._cursor) {
+  //     this._cursor = fieldDefs._cursor;
+  //     this._parents = fieldDefs._parents;
+  //     //this._path = fieldDefs._path;
+  //     this._root = fieldDefs._root;
+  //   } else {
+  //     this._parents = [];
+  //     //this._path = [];
+  //     this._root = this;
+  //     var inEval = false;
+  //     // Parent form is just a reference to underlying data which is immutable.
+  //     // Keep reference updated, rather than requiring external bookkeeping.
+  //     var changeRef = function (field) {
+  //       console.log('changing...')
+  //       this._field = field;
+  //       this._cursor = field.cursor(changeRef);
+  //       if (!inEval) {
+  //         inEval = true;
+  //         this.eval();
+  //       } else {
+  //         inEval = false;
+  //         this.render();
+  //       }
+  //       console.log('the end???')
+  //     }.bind(this);
+  //
+  //     changeRef(formatic.buildFields(fieldDefs));
+  //   }
+  //   // this._parent = null;
+  //   // this._children = [];
+  //   // this._childMap = {};
+  //   // this.fields(fieldDefs);
+  //   // this._emitter = new Emitter();
+  //   return next();
+  // });
+  //
+  // formatic.idOfFieldDef = function (fieldDef) {
+  //   return fieldDef.id || fieldDef.key || null;
+  // };
+  //
+  // formatic.buildFieldIds = function (fieldDefs) {
+  //   var lastId = '';
+  //   var typeIndexes = {};
+  //   var map = {};
+  //   fieldDefs.forEach(function (fieldDef) {
+  //
+  //     if (!fieldDef.type) {
+  //       throw new Error('Field definitions must have types: ' + JSON.stringify(fieldDef));
+  //     }
+  //
+  //     if (!formatic.type(fieldDef.type)) {
+  //       throw new Error('Unknown type for field definition: ' + fieldDef.type);
+  //     }
+  //
+  //     var id = formatic.idOfFieldDef(fieldDef);
+  //     if (id) {
+  //       if (map[id]) {
+  //         throw new Error('Field ids must be unique. id: ' + id);
+  //       }
+  //       lastId = id;
+  //       typeIndexes = {};
+  //     } else {
+  //       // Making a best guess at an id that will stay the same.
+  //       if (!(fieldDef.type in typeIndexes)) {
+  //         typeIndexes[fieldDef.type] = -1;
+  //       }
+  //       typeIndexes[fieldDef.type]++;
+  //       id = '__' + lastId + '__' + fieldDef.type + '__' + typeIndexes[fieldDef.type];
+  //     }
+  //     fieldDef.id = id;
+  //     map[id] = fieldDef;
+  //   });
+  // };
+  //
+  // formatic.buildFields = function (fieldDefs) {
+  //   if (_.isArray(fieldDefs)) {
+  //
+  //     var templates = fieldDefs.filter(function (fieldDef) {
+  //       return fieldDef.template === true;
+  //     });
+  //
+  //     var concretes = fieldDefs.filter(function (fieldDef) {
+  //       return fieldDef.template !== true;
+  //     });
+  //
+  //     var root = _.find(concretes, function (fieldDef) {
+  //       return fieldDef.key === '.';
+  //     });
+  //
+  //     if (root) {
+  //       concretes = concretes.filter(function (fieldDef) {
+  //         return fieldDef.key !== '.';
+  //       });
+  //     }
+  //
+  //     var templateMap = {};
+  //
+  //     concretes.forEach(function (template) {
+  //       if (template.key) {
+  //         templateMap[template.key] = template;
+  //       }
+  //       if (template.id) {
+  //         templateMap[template.id] = template;
+  //       }
+  //     });
+  //
+  //     templates.forEach(function (template) {
+  //       if (template.key) {
+  //         templateMap[template.key] = template;
+  //       }
+  //       if (template.id) {
+  //         templateMap[template.id] = template;
+  //       }
+  //     });
+  //
+  //     concretes.forEach(function (concrete, i) {
+  //       if (_.isString(concrete)) {
+  //         if (templateMap[concrete]) {
+  //           concretes[i] = templateMap[concrete];
+  //         } else {
+  //           throw new Error('Template not found: ', concrete);
+  //         }
+  //       }
+  //     });
+  //
+  //     formatic.buildFieldIds(concretes);
+  //
+  //     if (root && concretes.length === 0) {
+  //       return formatic.buildField(root, templateMap);
+  //     } else {
+  //       var concreteKeys = concretes.map(function (concrete) {
+  //         return concrete.id;
+  //       });
+  //       if (root) {
+  //         return formatic.buildField({
+  //           id: '.',
+  //           type: 'wrapper',
+  //           fields: [root].concat(concreteKeys)
+  //         }, templateMap);
+  //       } else {
+  //         return formatic.buildField({
+  //           id: '.',
+  //           type: 'object',
+  //           fields: concreteKeys
+  //         }, templateMap);
+  //       }
+  //     }
+  //
+  //   } else if (_.isObject(fieldDefs)) {
+  //     var fieldDef = fieldDefs;
+  //     return formatic.buildField(fieldDef);
+  //   }
+  // };
+  //
+  // formatic.buildField = function (fieldDef, templateMap) {
+  //
+  //   fieldDef = _.extend({}, fieldDef);
+  //   if (templateMap) {
+  //     fieldDef.fields = fieldDef.fields.concat({
+  //       type: 'data',
+  //       id: '_templates',
+  //       value: templateMap
+  //     });
+  //   }
+  //
+  //   var field = Immutable.fromJS(fieldDef);
+  //   return field;
+  // };
+  //
+  // formatic.newId = function (field, child) {
+  //   var idMap = {};
+  //   field.each(function (child) {
+  //     idMap[child.id()] = true;
+  //   });
+  //   if (child.id() && !idMap[child.id()]) {
+  //     return child.id();
+  //   }
+  //   if (child.key() && !idMap[child.key()]) {
+  //     return child.key();
+  //   }
+  //   var childId = child.id() || child.key() || '__auto';
+  //   childId += '__';
+  //   var i = 0;
+  //   var newId = childId + i;
+  //   while (idMap[newId]) {
+  //     i++;
+  //     newId = childId + i;
+  //   }
+  //   return newId;
+  // };
+  //
+  // formatic.form.append = function (fieldDef) {
+  //   this.modify(function (field) {
+  //     var fields = field.get('fields');
+  //     var nextIndex = fields.count();
+  //     fields.set(nextIndex, Immutable.fromJS(fieldDef));
+  //     var child = this.childFromCursor(fields.get(nextIndex), field);
+  //     child.set('id', formatic.newId(field, child));
+  //     //formatic.walkEval(field._root, child);
+  //   }.bind(this));
+  // };
+  //
+  // formatic.form.remove = function (keyOrIndex) {
+  //   if (_.isNumber(keyOrIndex)) {
+  //     var index = keyOrIndex;
+  //     var fields = this.deref('fields');
+  //     if (fields.length > index) {
+  //       fields = fields.splice(index, 1).toVector();
+  //       this.set('fields', fields);
+  //     }
+  //   }
+  // };
+  //
+  // formatic.form.move = function (fromKeyOrIndex, toKeyOrIndex) {
+  //   if (_.isNumber(fromKeyOrIndex) && _.isNumber(toKeyOrIndex)) {
+  //     var fromIndex = fromKeyOrIndex;
+  //     var toIndex = toKeyOrIndex;
+  //
+  //     var fields = this.deref('fields');
+  //
+  //     if (fromIndex !== toIndex &&
+  //       fromIndex >= 0 && fromIndex < fields.length &&
+  //       toIndex >= 0 && toIndex < fields.length
+  //     ) {
+  //       var removedField = fields.get(fromIndex);
+  //       fields = fields.splice(fromIndex, 1).toVector();
+  //       fields = fields.splice(toIndex, 0, removedField).toVector();
+  //       this.set('fields', fields);
+  //     }
+  //   }
+  // };
+  //
+  // formatic.fieldDefFromValue = function (value) {
+  //   if (_.isString(value)) {
+  //     return {
+  //       type: 'string',
+  //       default: value
+  //     };
+  //   } else if (_.isArray(value)) {
+  //     var arrayItemFields = value.map(function (value, i) {
+  //       var fieldDef = formatic.fieldDefFromValue(value);
+  //       fieldDef.key = i;
+  //       return fieldDef;
+  //     });
+  //     return {
+  //       type: 'array',
+  //       fields: arrayItemFields
+  //     };
+  //   } else if (_.isObject(value)) {
+  //     var objectItemFields = Object.keys(value).map(function (key) {
+  //       var fieldDef = formatic.fieldDefFromValue(value[key]);
+  //       fieldDef.key = key;
+  //       fieldDef.label = formatic.humanize(key);
+  //       return fieldDef;
+  //     });
+  //     return {
+  //       type: 'object',
+  //       fields: objectItemFields
+  //     };
+  //   } else if (_.isNull(value)) {
+  //     return {
+  //       type: 'null'
+  //     };
+  //   }
+  // };
+  //
+
+  //
+  // formatic.form.fieldDefFromValue = function (value) {
+  //   var items = this.get('items');
+  //   if (items && items.count() > 0) {
+  //     var template = _.find(items.toArray(), function (template) {
+  //       var imValue = Immutable.fromJS(value);
+  //       return formatic.matchValueToTemplate(imValue, template);
+  //     });
+  //     if (template) {
+  //       return template.deref().toJS();
+  //     }
+  //   }
+  //   return formatic.fieldDefFromValue(value);
+  // };
+  //
+  // formatic.addFormProperty = function (name) {
+  //   formatic.form[name] = function (value) {
+  //     if (typeof value === 'undefined') {
+  //       return this.get(name);
+  //     }
+  //     return this.set(name, value);
+  //   };
+  // };
+  //
+  // formatic.addFormProperty('type');
+  // formatic.addFormProperty('key');
+  // formatic.addFormProperty('id');
+  // formatic.addFormProperty('hidden');
+  // formatic.addFormProperty('choices');
+  // formatic.addFormProperty('default');
+  // formatic.addFormProperty('label');
+  // formatic.addFormProperty('helpText');
+  //
+  // formatic.form.typePlugin = function () {
+  //   return formatic.type(this.type());
+  // };
+  //
+  // formatic.form.childFromCursor = function (cursor, newParent) {
+  //   if (!newParent) {
+  //     newParent = this;
+  //   }
+  //   return formatic({
+  //     _cursor: cursor,
+  //     _parents: this._parents.slice(0, this._parents.length - 1).concat(newParent),
+  //     //_path: this._path.concat(index),
+  //     _root: this._root
+  //   });
+  // };
+  //
+  // formatic.form.cloneFromCursor = function (cursor) {
+  //   return formatic({
+  //     _cursor: cursor,
+  //     //_path: this._path,
+  //     _parents: this._parents,
+  //     _root: this._root
+  //   });
+  // };
+  //
+  // formatic.form.children = function () {
+  //   if (!this.has('fields')) {
+  //     return Immutable.Vector();
+  //   }
+  //   return this.get('fields').filter(function (field) {
+  //     return field.cursor;
+  //   }).map(function (fieldCursor) {
+  //     return this.childFromCursor(fieldCursor);
+  //   }.bind(this));
+  // };
+  //
+  // formatic.form.child = function (key) {
+  //   var children = this.children().toArray();
+  //   var matchingField = _.find(children, function (child) {
+  //     return child.id() === key || child.key() === key;
+  //   });
+  //   return matchingField;
+  // };
+  //
+  // formatic.form.each = function () {
+  //   var children = this.children();
+  //   return children.forEach.apply(children, arguments);
+  // };
+  //
+  // formatic.form.hasKey = function () {
+  //   return this.get('key') ? true : false;
+  // };
+  //
+  // formatic.form.modify = function (fn) {
+  //   var newCursor = this._cursor.withMutations(function (field) {
+  //     var cursor = field.cursor();
+  //     fn(this.cloneFromCursor(cursor));
+  //   }.bind(this));
+  //   return this.cloneFromCursor(newCursor);
+  // };
+  //
+  // formatic.form.parent = function () {
+  //   if (this._parents.length === 0) {
+  //     return null;
+  //   }
+  //   return this._parents[this._parents.length - 1];
+  // };
+  //
+  // formatic.form.index = function () {
+  //   if (this._path.length > 0) {
+  //     return this._path[this._path.length - 1];
+  //   }
+  //   return 0;
+  // };
+  //
+  // formatic.form.has = function (key) {
+  //   return this._cursor.has(key);
+  // };
+  //
+  // formatic.form.get = function (key) {
+  //   return this._cursor.get(key);
+  // };
+  //
+  // formatic.toJS = function (value) {
+  //   if (value && value.cursor) {
+  //     return value.deref().toJS();
+  //   }
+  //   return value;
+  // };
+  //
+  // formatic.form.getJS = function (key) {
+  //   return formatic.toJS(this._cursor.get(key));
+  // };
+  //
+  // formatic.form.set = function (key, value) {
+  //   if (value && value.cursor) {
+  //     return this._cursor.set(key, value);
+  //   } else {
+  //     return this._cursor.set(key, Immutable.fromJS(value));
+  //   }
+  // };
+  //
+  // formatic.form.deref = function (key) {
+  //   if (key) {
+  //     return this._cursor.deref().get(key);
+  //   }
+  //   return this._cursor.deref();
+  // };
+  //
+  // formatic.form.find = function (key, upFrom) {
+  //   /*eslint no-loop-func:0*/
+  //
+  //   // start by looking at self
+  //   var fields = [this];
+  //
+  //   while (fields.length > 0) {
+  //     var matchingField = _.find(fields, function (field) {
+  //       return field.id() === key || field.key() === key;
+  //     });
+  //     if (matchingField) {
+  //       return matchingField;
+  //     }
+  //     // keep going into children (breadth first)
+  //     fields = _.flatten(fields.map(function (field) {
+  //       return field.children().toArray();
+  //     }));
+  //
+  //     // just an efficiency thing; don't dig back into same child
+  //     if (upFrom) {
+  //       fields = fields.filter(function (field) {
+  //         return !(field._cursor.equals(upFrom._cursor));
+  //       });
+  //       upFrom = null;
+  //     }
+  //   }
+  //
+  //   var parent = this.parent();
+  //
+  //   if (parent) {
+  //     return parent.find(key, this);
+  //   }
+  //
+  //   return null;
+  // };
+  //
+  // formatic.form.findChild = function (fn) {
+  //   return _.find(this.children(), fn);
+  // };
+  //
+};
+
+},{"immutable":51,"reflux":213,"underscore":217}],7:[function(require,module,exports){
+'use strict';
+
+var _ = require('underscore');
+var Emitter = require('component-emitter');
+var objectpath = require('objectpath');
+var Immutable = require('immutable');
+
+module.exports = function (formatic) {
+
+  formatic.form.wrap('init', function (next) {
+    this._isLoading = {};
+    this._sources = {};
+
+    return next();
+  });
+
+  formatic.needKeys = function (data, keys) {
+    keys = keys || [];
+    if (data) {
+      if (data.get('needLookupKey')) {
+        keys.push(data.get('needLookupKey'));
+      }
+      if (data.get('fields')) {
+        data.get('fields').forEach(function (field) {
+          formatic.needKeys(field, keys);
+        });
+      }
+    }
+    return _.unique(keys);
+  };
+
+  formatic.loadNeededData = function (form) {
+
+    var keys = formatic.needKeys(form._formState);
+
+    keys.forEach(function (key) {
+      if (!form._isLoading[key]) {
+        form._isLoading[key] = true;
+        formatic.loadAsyncFromSource(form, key);
+      }
+    });
+  };
+
+  formatic.loadAsyncFromSource = function (form, key, waitTime) {
+    setTimeout(function () {
+      formatic.loadFromSource(form, key);
+    }, waitTime || 0);
+  };
+
+  formatic.loadFromSource = function (form, key) {
+
+    var source = formatic.bestSource(form, key);
+    if (source) {
+      var args = key.split('::');
+      args = args.slice(source.staticArgs.length);
+
+      var result = source.fn.apply(null, args);
+
+      if (result) {
+        if (result.then) {
+          var promise = result.then(function (result) {
+            form.meta(key, result);
+            form._isLoading[key] = false;
+          });
+
+          var onError = function () {
+            form._isLoading[key] = false;
+          };
+
+          if (promise.catch) {
+            promise.catch(onError);
+          } else {
+            // silly jQuery promises
+            promise.fail(onError);
+          }
+
+        } else {
+          setTimeout(function () {
+            form.meta(key, result);
+            form._isLoading[key] = false;
+          }, 0);
+        }
+      } else {
+        form._isLoading[key] = false;
+      }
+
+    } else {
+      form._isLoading[key] = false;
+    }
+  };
+
+  formatic.bestSource = function (form, key) {
+    if (form._sources[key]) {
+      return {
+        staticArgs: key.split('::'),
+        fn: form._sources[key]
+      };
+    } else {
+      var args = key.split('::');
+      if (args.length > 1) {
+        args = args.slice(0, args.length - 1);
+        return formatic.bestSource(form, args.join('::'));
+      } else if (form._sources.__default__) {
+        return {
+          staticArgs: [],
+          fn: form._sources.__default__
+        };
+      } else {
+        return null;
+      }
+    }
+  };
+
+  formatic.form.source = function () {
+    var args = _.toArray(arguments);
+
+    if (args.length > 0 && _.isFunction(args[args.length - 1])) {
+      var fn = args[args.length - 1];
+      var sourceKey = '__default__';
+      if (args.length > 1) {
+        sourceKey = args.slice(0, args.length - 1).join('::');
+      }
+      this._sources[sourceKey] = fn;
     }
   };
 };
 
-},{}],7:[function(require,module,exports){
+},{"component-emitter":50,"immutable":51,"objectpath":52,"underscore":217}],8:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 
-module.exports = function (formatic, plugin) {
-
-  var fixType = function (field) {
-    var typeMap = plugin.config.typeMap;
-    if (!typeMap) {
-      return;
-    }
-    if (field.type && field.type in typeMap) {
-      field.type = typeMap[field.type];
-    }
-  };
-
-  var toValue = function (field) {
-    if (field.fields && field.fields.length > 0) {
-      field.value = field.fields[0];
-      if (field.value && field.value.value) {
-        field.value = field.value.value;
-      }
-      field.fields = undefined;
-    } else {
-      if (typeof field.value === 'undefined') {
-        field.value = field.value || null;
-      }
-    }
-  };
-
-  var toFields = function (field) {
-    // if (typeof field.value !== 'undefined') {
-    //   //field.value = undefined;
-    // }
-    field.fields = field.fields || [];
-  };
+module.exports = function (formatic) {
 
   var types = {};
 
   // Auto register types.
   formatic.onPlugin(function (plugin) {
-    if (plugin.name.indexOf('type-') === 0) {
-      var type = plugin.name.substring('type-'.length);
-      if (plugin.hasFields) {
-        plugin.initField = toFields;
-      } else {
-        plugin.initField = toValue;
-      }
-      if (!types[type]) {
-        types[type] = plugin;
-      }
+
+    if (plugin.name.indexOf('types.') === 0) {
+      var type = plugin.name.substring('types.'.length);
+      types[type] = plugin;
     }
   });
 
@@ -877,307 +2058,247 @@ module.exports = function (formatic, plugin) {
     // Create a type plugin to be picked up.
     formatic.plugin(function (formatic, plugin) {
       _.extend(plugin, methods);
-    }, {name: 'type-' + name});
-  };
-
-  formatic.type('default', {});
-
-  formatic.form.compileField = function (field) {
-
-    if (_.isArray(field)) {
-      return _.map(field, function (field) {
-        return this.compileField(field);
-      }.bind(this));
-    }
-
-    field = _.extend({}, field);
-
-    fixType(field);
-
-    var type = formatic.type(field.type) || formatic.type('default');
-
-    type.initField(field);
-    if (type.isArray) {
-      field.isArray = true;
-    } else if (type.isObject) {
-      field.isObject = true;
-    }
-
-    if (type.compileField) {
-      return type.compileField(field, this.compileField.bind(this));
-    } else {
-
-      var children = field.fields;
-
-      if (children) {
-        field.fields = [];
-
-        _.each(children, function (child) {
-          field.fields.push(this.compileField(child));
-        }.bind(this));
-      }
-
-      return field;
-    }
-
-  };
-
-  var runField = function (ctx, field, index) {
-
-    if (typeof index === 'undefined') {
-      index = ctx.index;
-    }
-
-    if (_.isArray(field)) {
-      return _.map(field, function (field) {
-        return this.runField(field, ctx.data, ctx.parentKey, index);
-      }.bind(this));
-    }
-
-    return this.runField(field, ctx.data, ctx.parentKey, index);
-  };
-
-  formatic.form.evalField = function (field, data, parentKey, index) {
-
-    var type = formatic.type(field.type) || formatic.type('default');
-
-    if (type.evalField) {
-
-      field = type.evalField(field, data, runField.bind(this, {
-        data: data,
-        parentKey: field.keyPath || parentKey,
-        index: field.keyPath ? undefined : index
-      }));
-      return field;
-    } else {
-
-      var children = field.fields;
-
-      if (children) {
-        field.fields = [];
-
-        _.each(children, function (child, i) {
-
-          field.fields.push(this.runField(child, data, field.keyPath || parentKey, field.keyPath ? i : index));
-        }.bind(this));
-      }
-
-      return field;
-    }
+    }, {name: 'types.' + name});
   };
 };
 
-},{"underscore":214}],8:[function(require,module,exports){
+},{"underscore":217}],9:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 
 module.exports = function (formatic) {
 
-  formatic.form.wrap('compile', function (next, field) {
-
-    if (typeof field === 'undefined') {
-      field = {
-        type: 'formatic',
-        fields: []
-      };
-    } else if (_.isArray(field)) {
-      field = {
-        type: 'formatic',
-        fields: field
-      };
-    } else if (field.type !== 'formatic') {
-      field = {
-        type: 'formatic',
-        fields: [field]
-      };
-    }
-
-    return next(field);
-  });
-
   formatic.filterPluginsInRegistry(function (plugin) {
-    return plugin.name.indexOf('type-') === 0;
+    return plugin.name.indexOf('types.') === 0;
   }).forEach(function (plugin) {
     formatic.plugin(plugin.name);
   });
 };
 
-},{"underscore":214}],9:[function(require,module,exports){
+},{"underscore":217}],10:[function(require,module,exports){
 'use strict';
+
+var _ = require('underscore');
+var React = require('react');
 
 module.exports = function (formatic) {
 
-  formatic.form.wrap('evalField', function (next, field) {
+  formatic.form.wrap('init', function (next) {
 
-    field.errors = {};
+    this._attachedNodes = [];
 
     return next();
   });
 
-  formatic.form.invalidFields = function (field) {
-
-    field = field || this.run(this.root, this.data);
-
-    if (field) {
-      var fields = [];
-
-      if (Object.keys(field.errors).length > 0) {
-        fields.push(field);
-      }
-
-      var children = field.fields || [];
-
-      var childrenFields = children.map(function (child) {
-        return this.invalidFields(child);
-      }.bind(this));
-
-      childrenFields = [].concat.apply([], childrenFields);
-
-      return fields.concat(
-        childrenFields
-      );
-    } else {
-      return [];
-    }
-  };
-
-  formatic.form.isValid = function () {
-    return this.invalidFields().length === 0;
-  };
-};
-
-},{}],10:[function(require,module,exports){
-'use strict';
-
-var _ = require('underscore');
-
-module.exports = function (formatic) {
-
   var views = {};
 
+  formatic.view = function (name, viewFn) {
+    if (typeof viewFn === 'undefined') {
+      return views[name];
+    }
+    views[name] = viewFn;
+  };
+
   formatic.onPlugin(function (plugin) {
-    if (plugin.name.indexOf('view-') === 0) {
-      var type = plugin.name.substring('view-'.length);
+    if (plugin.name.indexOf('views.') === 0) {
+      var name = plugin.name.substring('views.'.length);
       if (plugin.view) {
-        views[type] = plugin.view;
+        views[name] = plugin.view;
       } else {
         throw new Error('View created without view property: ' + plugin.name);
       }
     }
   });
 
-  formatic.view = function (name, view) {
+  var routes = {};
 
-    views[name] = view;
+  formatic.route = function (typeName, viewName, testFn) {
+    if (!routes[typeName]) {
+      routes[typeName] = [];
+    }
+    routes[typeName].push({
+      view: viewName,
+      test: testFn
+    });
   };
 
-  formatic.form.wrap('init', function (next) {
+  formatic.viewForField = function (field) {
+    var typeName = field.type;
 
-    this.attached = [];
-
-    next();
-  });
-
-  formatic.form.attach = function (node, done) {
-
-    var field = this.run(this.root, this.data);
-    var component = this.component(field);
-    var attachedComponent = formatic.attachComponent(component, node, done);
-
-    var info = _.find(this.attached, function (info) {
-      return info.node === node;
-    });
-
-    if (info) {
-      info.component = attachedComponent;
-    } else {
-      this.attached.push({
-        component: attachedComponent,
-        node: node
+    if (routes[typeName]) {
+      var routesForType = routes[typeName];
+      var route = _.find(routesForType, function (route) {
+        return !route.test || route.test(field);
       });
+      if (route) {
+        return views[route.view];
+      }
     }
 
-    return attachedComponent;
+    if (views[typeName]) {
+      return views[typeName];
+    }
+
+    throw new Error('No view for field: ' + field.id + ':' + field.type);
+  };
+
+  formatic.attach = function (form, node) {
+    if (!_.find(form._attachedNodes, function (attachedNode) {
+      return attachedNode === node;
+    })) {
+      form._attachedNodes.push(node);
+      formatic.renderFormToNode(form, node);
+    }
+  };
+
+  formatic.form.attach = function (node) {
+    return formatic.attach(this, node);
+  };
+
+  formatic.detach = function (form, node) {
+    var i = form._attachedNodes.indexOf(node);
+    if (i >= 0) {
+      form._attachedNodes.splice(i, 1);
+    }
   };
 
   formatic.form.detach = function (node) {
-
-    if (node) {
-      var infoIndex = -1;
-      _.find(this.attached, function (info, i) {
-        if (info.node === node) {
-          formatic.detachComponent(node);
-          infoIndex = i;
-          return;
-        }
-      });
-      if (infoIndex >= 0) {
-        this.attached.splice(infoIndex, 1);
-      }
-    } else {
-      _.each(this.attached, function (info) {
-        formatic.detachComponent(info.node);
-      });
-      this.attached = [];
-    }
+    return formatic.detach(this, node);
   };
 
-  formatic.form.component = function (field, props) {
+  formatic.render = function (form) {
+    if (!form._attachedNodes) {
+      return;
+    }
+    form._attachedNodes.forEach(function (node) {
+      formatic.renderFormToNode(form, node);
+    });
+  };
 
-    field = field || this.run(this.root, this.data);
+  // formatic.createField = function (formState) {
+  //   var field = formState.toJS();
+  //   formatic.modifyFieldPaths(field);
+  //   return field;
+  // };
+  //
+  // formatic.modifyFieldPaths = function (field, parent, index) {
+  //   if (!parent) {
+  //     field._path = [];
+  //   } else {
+  //     field._path = parent._path.concat(index);
+  //   }
+  //   if (field.fields) {
+  //     field.fields.forEach(function (child, i) {
+  //       formatic.modifyFieldPaths(child, field, i);
+  //     });
+  //   }
+  // };
 
-    var view = views[field.type];
+  formatic.renderFormToNode = function (form, node) {
+    var field = formatic.createModifiedFieldFromFormState(form._formState);
+    var component = formatic.component(form, field);
+    React.renderComponent(formatic.view('formatic')({}, component), node);
+  };
 
-    if (!view) {
-      throw new Error('No view for type: ' + field.type);
+  formatic.component = function (form, field, props) {
+
+    if (!field) {
+      field = formatic.createModifiedFieldFromFormState(form._formState);
     }
 
-    props = props || {};
+    props = _.extend({}, props);
 
-    props.form = this;
+    var view = formatic.viewForField(field);
 
-    var type = formatic.type(field.type);
-    if (type && type.formatField) {
-      field = _.extend({}, field);
-      field.value = type.formatField(field, field.value);
+    var fields = [];
+
+    var typePlugin = formatic.type(field.type);
+
+    if (field.fields) {
+      fields = field.fields;
+      fields = fields.map(function (field) {
+          var childTypePlugin = formatic.type(field.type);
+          if (childTypePlugin.visibleField) {
+            return childTypePlugin.visibleField(field);
+          }
+          return field;
+        }).filter(function (field) {
+          return field && !field.hidden && !typePlugin.hidden;
+        });
     }
 
     props.field = field;
+    props.fields = fields;
+    props.actions = form._formActions;
+    props.form = form;
 
     return view(props);
   };
 
-  formatic.form.updateView = function (props) {
-    _.each(this.attached, function (info) {
-      formatic.updateComponent(info.component, props);
-    }.bind(this));
+  formatic.form.component = function (field, props) {
+
+    return formatic.component(this, field, props);
   };
 
-  formatic.className = function () {
-
-    var classNames = Array.prototype.slice.call(arguments, 0);
-
-    classNames = classNames.filter(function (name) {
-      return name;
-    });
-
-    return classNames.join(' ');
-  };
-
+  //
+  // formatic.renderFieldToNode = function (field, node) {
+  //   var component = field.component();
+  //   React.renderComponent(formatic.view('formatic')({foo:'bar'}, component), node);
+  // };
+  //
+  // formatic.component = function (field, props) {
+  //   props = _.extend({}, props);
+  //   var view = formatic.viewForField(field);
+  //   if (field.typePlugin().visibleField) {
+  //     field = field.typePlugin().visibleField(field);
+  //   }
+  //   if (!field) {
+  //     return React.DOM.div();
+  //   }
+  //   props.field = field;
+  //   props.fields = field.visibleChildren().toArray();
+  //   return view(props);
+  // };
+  //
+  // formatic.form.visibleChildren = function () {
+  //   return this.children().map(function (field) {
+  //     if (field.typePlugin().visibleField) {
+  //       return field.Plugin().visibleField(field);
+  //     }
+  //     return field;
+  //   }).filter(function (field) {
+  //     return field && !field.get('hidden') && !field.typePlugin().hidden;
+  //   });
+  // };
+  //
+  // formatic.form.component = function (props) {
+  //   return formatic.component(this, props);
+  // };
+  //
+  // formatic.className = function () {
+  //
+  //   var classNames = Array.prototype.slice.call(arguments, 0);
+  //
+  //   classNames = classNames.filter(function (name) {
+  //     return name;
+  //   });
+  //
+  //   return classNames.join(' ');
+  // };
 };
 
-},{"underscore":214}],11:[function(require,module,exports){
+},{"react":203,"underscore":217}],11:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic) {
 
+  formatic.plugin('core-fn');
   formatic.plugin('core-data');
-  formatic.plugin('core-meta');
   formatic.plugin('core-type');
-  formatic.plugin('core-validation');
   formatic.plugin('core-types');
   formatic.plugin('core-view');
+  formatic.plugin('core-loader');
 };
 
 },{}],12:[function(require,module,exports){
@@ -1185,253 +2306,423 @@ module.exports = function (formatic) {
 
 module.exports = function (formatic) {
 
-  formatic.form.wrap('compileField', function (next, field) {
+  formatic.plugin('core');
+  formatic.plugin('ensure-path');
+  formatic.plugin('prop-aliases');
+  formatic.plugin('ensure-default');
+  formatic.plugin('ensure-fields');
+  formatic.plugin('normalize-choices');
 
-    if (typeof field.default !== 'undefined') {
-      if (typeof field.value === 'undefined') {
-        field.value = field.default;
-      }
-    }
-
-    return next();
+  formatic.filterPluginsInRegistry(function (plugin) {
+    return plugin.name.indexOf('views.') === 0;
+  }).forEach(function (plugin) {
+    formatic.plugin(plugin.name);
   });
+
+  formatic.route('object', 'fieldset');
+  formatic.route('string', 'select', function (field) {
+    return field.choices ? true : false;
+  });
+  formatic.route('string', 'text', function (field) {
+    return field.maxRows === 1;
+  });
+  formatic.route('string', 'textarea');
+  formatic.route('array', 'checkbox-list', function (field) {
+    return field.choices ? true : false;
+  });
+  formatic.route('array', 'list');
+  formatic.route('boolean', 'select');
 };
 
 },{}],13:[function(require,module,exports){
 'use strict';
 
-var React = require('react');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.React = React;
-
-  formatic.attachComponent = function (component, node, done) {
-    return React.renderComponent(component, node, done);
-  };
-
-  formatic.detachComponent = function (node) {
-    React.unmountComponentAtNode(node);
-  };
-
-  formatic.updateComponent = function (component, props) {
-    component.setProps(props);
-  };
-};
-
-},{"react":213}],14:[function(require,module,exports){
-'use strict';
+var _ = require('underscore');
 
 module.exports = function (formatic) {
 
-  formatic.plugin('core');
-  formatic.plugin('terse');
-  formatic.plugin('read-only');
-  formatic.plugin('required');
-  formatic.plugin('default');
-  formatic.plugin('react-viewer');
+  formatic.wrap('modifyField', function (next, field) {
 
-  formatic.filterPluginsInRegistry(function (plugin) {
-    return plugin.name.indexOf('view-') === 0;
-  }).forEach(function (plugin) {
-    formatic.plugin(plugin.name);
-  });
-};
+    var typePlugin = formatic.type(field.type);
 
-},{}],15:[function(require,module,exports){
-'use strict';
-
-module.exports = function (formatic) {
-
-  formatic.form.wrap('compileField', function (next, field) {
-
-    if (!field.key) {
-      field.isReadOnly = true;
-    }
-    
-    return next();
-  });
-};
-
-},{}],16:[function(require,module,exports){
-'use strict';
-
-module.exports = function (formatic) {
-
-  formatic.form.wrap('evalField', function (next, field) {
-
-    if (field.required) {
-      if (typeof field.value === 'undefined' || field.value === '') {
-        field.errors.required = true;
+    if (typeof field.default === 'undefined') {
+      if (typeof typePlugin.default !== 'undefined') {
+        field.default = typePlugin.default;
+      } else {
+        field.default = null;
       }
     }
 
+    if (typeof field.value === 'undefined') {
+      field.value = field.default;
+    }
+
     return next();
   });
 };
 
-},{}],17:[function(require,module,exports){
+},{"underscore":217}],14:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
-var funql = require('funql');
-
-var compileTerse = funql.compiler({
-  call: function (node, compile) {
-    var type = compile(node.nodes[0]);
-    var args = compile(node.nodes[1]);
-    var field = {
-      type: type
-    };
-    var props;
-    if (args.length > 0) {
-      if (_.isObject(args[0]) && !_.isArray(args[0]) && !args[0].type) {
-        props = args[0];
-        args.shift();
-      } else {
-        props = {};
-      }
-    }
-    field.fields = args;
-    if (props) {
-      _.extend(field, props);
-    }
-    return field;
-  },
-  name: function (node) {
-    return node.value;
-  },
-  arguments: function (node, compile) {
-    return compile(node.nodes);
-  },
-  empty: function () {
-    return null;
-  },
-  value: function (node, compile, context) {
-    if (context.returnValue) {
-      return node.value;
-    }
-    return {
-      type: typeof node.value,
-      value: node.value
-    };
-  },
-  array: function (node, compile) {
-    return compile(node.nodes);
-  },
-  object: function (node, compile) {
-    var props = compile(node.nodes);
-    var obj = {};
-    _.each(props, function (prop) {
-      obj[prop.key] = prop.value;
-    });
-    return obj;
-  },
-  property: function (node, compile) {
-    var key = compile(node.nodes[0], {returnValue: true});
-    var value = compile(node.nodes[1], {returnValue: true});
-    return {
-      key: key,
-      value: value
-    };
-  }
-});
 
 module.exports = function (formatic) {
 
-  formatic.form.wrap('compileField', function (next, field) {
+  formatic.wrap('modifyField', function (next, field) {
 
-    if (typeof field === 'string') {
-      try {
-        return next(compileTerse(field));
-      } catch (e) {
-        var parts = field.split(':');
-        return next({
-          type: parts[0],
-          key: parts[1],
-          value: parts[2]
+    var typePlugin = formatic.type(field.type);
+
+    if (typeof typePlugin.hasFields) {
+      if (!field.fields) {
+        field.fields = [];
+      }
+    }
+
+    return next();
+  });
+};
+
+},{"underscore":217}],15:[function(require,module,exports){
+'use strict';
+
+var _ = require('underscore');
+
+module.exports = function (formatic) {
+
+  formatic.wrap('modifyField', function (next, field, parent, index) {
+
+    if (!parent) {
+      field._path = [];
+    } else {
+      field._path = parent._path.concat(index);
+    }
+
+    return next();
+  });
+};
+
+},{"underscore":217}],16:[function(require,module,exports){
+'use strict';
+
+var _ = require('underscore');
+
+module.exports = function (formatic) {
+
+  formatic.wrap('modifyField', function (next, field) {
+
+    if (field.choices) {
+
+      var choices = field.choices;
+
+      if (_.isString(choices)) {
+        choices = choices.split(',');
+      }
+
+      if (!_.isArray(choices) && _.isObject(choices)) {
+        choices = Object.keys(choices).map(function (key) {
+          return {
+            value: key,
+            label: choices[key]
+          };
         });
       }
+
+      choices.forEach(function (choice, i) {
+        if (_.isString(choice)) {
+          choices[i] = {
+            value: choice,
+            label: choice
+          };
+        }
+      });
+
+      field.choices = choices;
     }
 
     return next();
   });
 };
 
-},{"funql":59,"underscore":214}],18:[function(require,module,exports){
-'use strict';
-
-module.exports = function (formatic) {
-
-  formatic.splitKey = function (key) {
-    return [key];
-    //return key.split('__');
-  };
-};
-
-},{}],19:[function(require,module,exports){
-'use strict';
-
-module.exports = function (formatic) {
-
-  formatic.config('core-type.typeMap', {
-    'unicode': 'text',
-    'str': 'text',
-    'text': 'textarea',
-    'decimal': 'float',
-    'int': 'integer',
-    'num': 'integer',
-    'number': 'integer',
-    'select': 'dropdown',
-    'plain-select': 'select',
-    'file': 'text',
-    'checkbox': 'boolean-checkbox',
-    'datetime': 'text'
-  });
-};
-
-},{}],20:[function(require,module,exports){
+},{"underscore":217}],17:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 
+var aliases = {
+  help_text: 'helpText'
+};
+
+module.exports = function (formatic) {
+
+  formatic.wrap('modifyField', function (next, field) {
+
+    Object.keys(aliases).forEach(function (alias) {
+      var propName = aliases[alias];
+      if (typeof field[propName] === 'undefined' && typeof field[alias] !== 'undefined') {
+        field[propName] = field[alias];
+      }
+    });
+
+    return next();
+  });
+};
+
+},{"underscore":217}],18:[function(require,module,exports){
+'use strict';
+
+var Reflux = require('reflux');
+
 module.exports = function (formatic, plugin) {
 
-  plugin.compileField = function (field) {
+  plugin.create = function (actions, formState, metaStore) {
 
-    field = formatic.type('select').compileField(field);
+    return Reflux.createStore({
 
-    if (field.type === 'field') {
-      field = field.fields[0];
-    }
+      init: function () {
+        //this.history = [];
+        this.formState = formState;
+        this.templateMap = {};
+        this.metaData = {};
 
-    if (!_.isArray(field.value)) {
-      if (!field.value) {
-        field.value = [];
-      } else {
-        field.value = [field.value];
+        this.listenToMany(actions);
+        this.listenTo(metaStore, this.onMetaStoreChanged);
+      },
+
+      onSetFormValue: function (value) {
+        this.update(formatic.setFieldValue(this.formState, value, this.templateMap));
+      },
+
+      onSetValue: function (field, value) {
+        this.update(formatic.setValueOfField(this.formState, field, value));
+      },
+
+      onAppend: function (field, item) {
+        this.update(formatic.appendField(this.formState, field, item, this.templateMap));
+      },
+
+      onRemove: function (field, index) {
+        this.update(formatic.removeField(this.formState, field, index));
+      },
+
+      onMove: function (field, fromIndex, toIndex) {
+        this.update(formatic.moveField(this.formState, field, fromIndex, toIndex));
+      },
+
+      onMetaStoreChanged: function (data) {
+        // Later, may want to trigger on this. For now, just assuming one set.
+        this.templateMap = data._templateMap;
+        this.metaData = data;
+
+        this.update();
+      },
+
+      onUndo: function () {
+        // if (this.history.length > 0) {
+        //   this.formState = this.history.pop();
+        //   this.trigger(this.formState);
+        // }
+      },
+
+      getDefaultData: function () {
+        return this.formState;
+      },
+
+      update: function (formState) {
+        formState = formState || this.formState;
+        var newFormState = formatic.updateData(formState, this.metaData);
+        if (!newFormState.equals(this.formState)) {
+          //this.history.push(this.formState);
+          this.formState = newFormState;
+          this.trigger(this.formState);
+        }
       }
-    }
 
-    if (field.choices.length === 0) {
-      field.value = (typeof field.value === 'boolean') ? field.value : (field.value[0] ? field.value[0] : false);
-      field.type = 'boolean-checkbox';
-    }
-
-    return field;
+    });
   };
 };
 
-},{"underscore":214}],21:[function(require,module,exports){
+},{"reflux":213}],19:[function(require,module,exports){
+'use strict';
+
+var Reflux = require('reflux');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.create = function (actions) {
+
+    return Reflux.createStore({
+
+      init: function () {
+        this.data = {};
+
+        this.listenTo(actions.setItem, this.setItem);
+      },
+
+      setItem: function (key, value) {
+        this.data[key] = value;
+        this.trigger(this.data);
+      },
+
+      getDefaultData: function () {
+        return this.data;
+      }
+
+    });
+  };
+};
+
+},{"reflux":213}],20:[function(require,module,exports){
+'use strict';
+
+var _ = require('underscore');
+var Immutable = require('immutable');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.default = [];
+
+  plugin.hasFields = true;
+
+  plugin.getFieldValue = function (field) {
+    var array = [];
+
+    if (!field.fields || (field.fields.length === 0 && typeof field.value !== 'undefined')) {
+      return field.value;
+    }
+
+    field.fields.forEach(function (child) {
+      array.push(formatic.getFieldValue(child));
+    });
+
+    return array;
+  };
+
+  plugin.setFieldValue = function (fieldState, values, templateMap) {
+
+    if (!_.isArray(values)) {
+      throw new Error('Trying to put non-array value into array field.');
+    }
+
+    return fieldState.withMutations(function (field) {
+
+      var children = field.get('fields').toArray();
+
+      var identities = children.map(function (child) {
+        var identity = {};
+        if (child.get('id')) {
+          identity.id = child.get('id');
+          identity.key = child.get('key');
+        }
+        return identity;
+      });
+
+      field.set('fields', formatic.fromJS([]));
+
+      var items = field.get('items');
+
+      values.forEach(function (value, i) {
+        var childDef = formatic.fieldDefFromValue(value, items, templateMap);
+        childDef.key = 'item___' + i;
+        childDef.id = formatic.newId(field, childDef);
+        if (identities[i]) {
+          _.extend(childDef, identities[i]);
+        }
+        field.updateIn(['fields'], function (fields) {
+          var childState = Immutable.fromJS(childDef);
+          childState = formatic.setFieldValue(childState, value, templateMap);
+          return fields.push(childState);
+        });
+      });
+    });
+  };
+
+  plugin.setValue = function (field, values) {
+    var children = field.children().toArray();
+
+    var identities = children.map(function (child) {
+      var identity = {};
+      if (child.id()) {
+        identity.id = child.id();
+        identity.key = child.key();
+      }
+      return identity;
+    });
+
+    field.get('fields').clear();
+
+    values.forEach(function (value, i) {
+      var fieldDef = field.fieldDefFromValue(value);
+      if (identities[i]) {
+        _.extend(fieldDef, identities[i]);
+      }
+      fieldDef._value = value;
+      field.append(fieldDef);
+    });
+
+    field.children().forEach(function (child, i) {
+      //console.log(child._cursor.deref().toJS());
+      //child.val(values[i]);
+      //console.log(child._cursor.deref().toJS());
+    });
+
+    // if (children.count() < values.length) {
+    //   for (var i = children.count(); i < values.length; i++) {
+    //     var fieldDef = formatic.fieldDefFromValue(values[i]);
+    //     field.append(fieldDef);
+    //   }
+    // }
+  };
+};
+
+},{"immutable":51,"underscore":217}],21:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic, plugin) {
 
-  plugin.compileField = function (field) {
+  plugin.default = false;
 
-    field.value = field.value || '';
+  plugin.modifyField = function (field) {
+    if (!field.choices) {
+      field.choices = [
+        {value: 'true', label: 'Yes'},
+        {value: 'false', label: 'No'}
+      ];
+    }
+  };
 
-    return field;
+  plugin.getFieldValue = function (field) {
+
+    var value = field.value;
+
+    if (!value) {
+      return false;
+    }
+
+    if (typeof value === 'string') {
+      value = value.toLowerCase();
+    }
+
+    if (value === 'false' || value === 'no') {
+      return false;
+    }
+
+    return value ? true : false;
+  };
+
+  plugin.setFieldValue = function (fieldState, value) {
+    if (!value) {
+      return fieldState.set('value', false);
+    }
+
+    if (typeof value === 'string') {
+      value = value.toLowerCase();
+    }
+
+    if (value === 'false' || value === 'no') {
+      return fieldState.set('value', false);
+    }
+
+    return value ? fieldState.set('value', true) : fieldState.set('value', false);
   };
 };
 
@@ -1440,16 +2731,20 @@ module.exports = function (formatic, plugin) {
 
 module.exports = function (formatic, plugin) {
 
-  plugin.hasFields = true;
+  plugin.default = null;
 
-  plugin.evalField = function (field, data, run) {
+  plugin.hidden = true;
 
-    var fields = run(field.fields);
-
-    return {
-      type: 'value',
-      value: fields[0].value === fields[1].value
-    };
+  plugin.getValue = function (field) {
+    var id = field.get('id');
+    var key = field.get('key');
+    if (formatic.source(id)) {
+      return formatic.source(id)(field);
+    }
+    if (formatic.source(key)) {
+      return formatic.source(key)(field);
+    }
+    return field.getData();
   };
 };
 
@@ -1458,343 +2753,173 @@ module.exports = function (formatic, plugin) {
 
 module.exports = function (formatic, plugin) {
 
-  plugin.hasFields = true;
-
-  plugin.compileField = function (field, compile) {
-
-    field.fields = compile(field.fields);
-
-    return field;
-  };
+  plugin.default = {};
 };
 
 },{}],24:[function(require,module,exports){
-module.exports=require(23)
+'use strict';
+
+module.exports = function (formatic, plugin) {
+
+  plugin.default = null;
+
+  plugin.getValue = function (field) {
+    return null;
+  };
+
+  plugin.setValue = function (field, value) {
+    if (typeof value !== null && typeof value !== 'undefined') {
+      throw new Error('You can only set the value of a null field to null.');
+    }
+  };
+};
+
 },{}],25:[function(require,module,exports){
 'use strict';
 
-module.exports = function (formatic, plugin) {
-
-  plugin.hasFields = true;
-};
-
-},{}],26:[function(require,module,exports){
-'use strict';
-
-module.exports = function (formatic, plugin) {
-
-  plugin.evalField = function (field, data) {
-
-    return {
-      type: 'value',
-      value: formatic.getObject(data, field.value)
-    };
-  };
-};
-
-},{}],27:[function(require,module,exports){
-'use strict';
-
-module.exports = function (formatic, plugin) {
-
-  plugin.hasFields = true;
-
-  plugin.evalField = function (field, data, run) {
-
-    var test = run(field.fields[0]);
-
-    if (test.value) {
-      return run(field.fields[1]);
-    } else {
-      return run(field.fields[2]);
-    }
-  };
-};
-
-},{}],28:[function(require,module,exports){
-'use strict';
-
-module.exports = function (formatic, plugin) {
-
-  plugin.compileField = function (field) {
-
-    field.value = field.value || '';
-
-    return field;
-  };
-
-  plugin.formatField = function (field, value) {
-    return JSON.stringify(value, null, 2);
-  };
-
-  plugin.parseField = function (field, value) {
-    return JSON.parse(value);
-  };
-};
-
-},{}],29:[function(require,module,exports){
-'use strict';
-
 var _ = require('underscore');
+var Immutable = require('immutable');
 
 module.exports = function (formatic, plugin) {
 
+  plugin.default = {};
+
   plugin.hasFields = true;
 
-  plugin.compileField = function (field, compile) {
-
-    field.item = compile(field.item || {
-      type: 'text',
-      value: '',
-      key: '[]'
+  plugin.getFieldValue = function (field) {
+    var obj = {};
+    field.fields.forEach(function (child) {
+      if (child.key) {
+        obj[child.key] = formatic.getFieldValue(child);
+      }
     });
-
-    if (field.itemTypes) {
-      field.itemTypes = field.itemTypes.map(function (itemType) {
-        itemType = _.extend({}, itemType);
-        itemType.item = compile(itemType.item);
-        return itemType;
-      });
-    }
-
-    field.value = field.value || [];
-
-    return field;
+    return obj;
   };
 
-  plugin.evalField = function (field, data, run) {
+  plugin.setFieldValue = function (fieldState, value, templateMap) {
 
-    var array = formatic.getObject(data, field.keyPath);
+    return fieldState.withMutations(function (field) {
 
-    // Evaluation causing side effect. Bad??? Alternative???
-    if (!array) {
-      if (field.value && _.isArray(field.value)) {
-        array = field.value;
-        field.value = undefined;
-        formatic.setObject(data, field.keyPath, array);
-      }
-    }
+      var unusedKeys = Object.keys(value);
 
-    if (array) {
-      field.fields = [];
+      field.get('fields').forEach(function (child, i) {
+        if (child.has('key')) {
+          unusedKeys = _.without(unusedKeys, child.get('key'));
+          if (typeof value[child.get('key')] !== 'undefined') {
+            field.updateIn(['fields', i], function () {
+              return formatic.setFieldValue(child, value[child.get('key')], templateMap);
+            });
+          }
+        }
+      });
 
-      _.each(array, function (value, i) {
+      var items = field.get('items');
 
-        //console.log(value);
+      if (unusedKeys.length > 0) {
+        unusedKeys.forEach(function (key) {
 
-        var item = field.item;
-
-        if (field.itemTypes) {
-          var itemType = _.find(field.itemTypes, function (itemType) {
-            return value.type === itemType.type;
+          var childDef = formatic.fieldDefFromValue(value[key], items, templateMap);
+          childDef.key = key;
+          childDef.id = formatic.newId(field, childDef);
+          childDef.label = formatic.humanize(key);
+          field.updateIn(['fields'], function (fields) {
+            var childState = formatic.fromJS(childDef);
+            childState = formatic.setFieldValue(childState, value[key], templateMap);
+            return fields.push(childState);
           });
-
-          if (itemType) {
-            item = itemType.item;
-          }
-        }
-
-        item = _.extend({}, item, {index: i});
-
-        var child = run(item, i);
-
-        field.fields.push(child);
-      });
-    }
-
-    return field;
+        });
+      }
+    });
   };
-
-  plugin.isArray = true;
 };
 
-},{"underscore":214}],30:[function(require,module,exports){
+},{"immutable":51,"underscore":217}],26:[function(require,module,exports){
 'use strict';
 
-module.exports = function () {
-  // just a placeholder
+var _ = require('underscore');
+var Immutable = require('immutable');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.default = '';
+
+  plugin.modifyField = function (field) {
+
+    if (field.choices) {
+
+      var choices = field.choices;
+
+      if (_.isString(choices)) {
+        choices = choices.split(',');
+      }
+
+      if (!_.isArray(choices) && _.isObject(choices)) {
+        choices = Object.keys(choices).map(function (key) {
+          return {
+            value: key,
+            label: choices[key]
+          };
+        });
+      }
+
+      choices.forEach(function (choice, i) {
+        if (_.isString(choice)) {
+          choices[i] = {
+            value: choice,
+            label: choice
+          };
+        }
+      });
+
+      field.choices = choices;
+    }
+  };
 };
 
-},{}],31:[function(require,module,exports){
+},{"immutable":51,"underscore":217}],27:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 
 module.exports = function (formatic, plugin) {
+
+  plugin.default = null;
 
   plugin.hasFields = true;
 
-  plugin.compileField = function (field, compile) {
-
-    field.item = compile(field.item || {
-      type: 'text',
-      value: '',
-      key: '[]'
+  plugin.getValue = function (field) {
+    var self = field.findChild(function (child) {
+      return child.key() === '.';
     });
-
-    if (field.itemTypes) {
-      field.itemTypes = field.itemTypes.map(function (itemType) {
-        itemType = _.extend({}, itemType);
-        itemType.item = compile(itemType.item);
-        return itemType;
-      });
-    }
-
-    field.value = field.value || {};
-
-    if (field.keyChoices) {
-      field.keyChoices = formatic.type('select').buildChoices(field.keyChoices);
-    }
-
-    return field;
-  };
-
-  plugin.evalField = function (field, data, run) {
-
-    var obj = formatic.getObject(data, field.keyPath);
-
-    // Evaluation causing side effect. Bad??? Alternative???
-    if (!_.isObject(obj)) {
-      if (field.value && _.isObject(field.value)) {
-        obj = field.value;
-        field.value = undefined;
-        formatic.setObject(data, field.keyPath, obj);
-      }
-    }
-
-    if (obj) {
-      field.fields = [];
-
-      _.each(obj, function (value, key) {
-
-        var item = field.item;
-
-        if (field.itemTypes) {
-          var itemType = _.find(field.itemTypes, function (itemType) {
-            return key === itemType.type;
-          });
-
-          if (itemType) {
-            item = itemType.item;
-          }
-        }
-
-        var child = run(item, key);
-
-        child.propertyKey = key;
-
-        field.fields.push(child);
-      });
-    }
-
-    return field;
-  };
-
-  plugin.isObject = true;
-};
-
-},{"underscore":214}],32:[function(require,module,exports){
-'use strict';
-
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.buildChoices = function (choices) {
-
-    if (!_.isArray(choices)) {
-      choices = Object.keys(choices).map(function (key) {
-        return {
-          value: key,
-          label: choices[key]
-        };
-      });
-    }
-
-    choices = choices.map(function (choice) {
-      if (typeof choice === 'string') {
-        return {value: choice, label: choice};
-      }
-      if (typeof choice.label === 'undefined') {
-        choice.label = choice.value;
-      }
-      if (typeof choice.value === 'undefined') {
-        choice.value = choice.label;
-      }
-      return choice;
-    });
-
-    return choices;
-  };
-
-  plugin.compileField = function (field) {
-
-    field.choices = field.choices || [];
-
-    field.choices = plugin.buildChoices(field.choices);
-
-    if (typeof field.value === 'boolean') {
-      field.isBoolean = true;
-      var hasTrue = false;
-      var hasFalse = false;
-      field.choices = field.choices.map(function (choice) {
-        var value = choice.value.toLowerCase();
-        if (value === 'true' || value === 'yes') {
-          value = 'true';
-        } else {
-          value = 'false';
-        }
-        if (value === 'true') {
-          hasTrue = true;
-        }
-        if (value === 'false') {
-          hasFalse = true;
-        }
-        return;
-      });
-
-      if (!hasTrue) {
-        field.choices = field.choices.concat([
-          {
-            value: 'true',
-            label: 'Yes'
-          }
-        ]);
-      }
-      if (!hasFalse) {
-        field.choices = field.choices.concat([
-          {
-            value: 'false',
-            label: 'No'
-          }
-        ]);
-      }
-
+    if (self) {
+      return self.val();
     } else {
-      field.value = field.value || '';
+      return null;
     }
-
-    return field;
   };
 
-  plugin.formatField = function (field, value) {
-    if (field.isBoolean) {
-      return value ? 'true' : 'false';
+  plugin.setValue = function (field, value) {
+    var self = field.findChild(function (child) {
+      return child.key() === '.';
+    });
+    if (self) {
+      return self.val(value);
+    } else {
+      throw new Error('No self field inside field wrapper.');
     }
-    return value;
   };
 
-  plugin.parseField = function (field, value) {
-    if (field.isBoolean) {
-      return value === 'true';
+  plugin.visibleField = function (field) {
+    if (field.fields) {
+      return _.find(field.fields, function (child) {
+        return child.key === '.';
+      }) || null;
     }
-    return value;
+    return null;
   };
 };
 
-},{"underscore":214}],33:[function(require,module,exports){
-module.exports=require(21)
-},{}],34:[function(require,module,exports){
+},{"underscore":217}],28:[function(require,module,exports){
 'use strict';
 
 var utils = {};
@@ -1922,154 +3047,7 @@ utils.parseTextWithTags = function (value) {
 
 module.exports = utils;
 
-},{}],35:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    onFocus: function () {
-      this.props.form.actions.focus(this.props.field);
-    },
-
-    onBlur: function () {
-      this.props.form.actions.blur(this.props.field);
-    },
-
-    onChange: function () {
-      this.props.form.actions.change(this.props.field, this.refs.input.getDOMNode().checked);
-    },
-
-    render: function () {
-
-      var className = formatic.className(plugin.config.className, this.props.field.className);
-
-      // return R.div({className: 'field checkbox-boolean-field'},
-      //   R.input({
-      //     name: this.props.field.key,
-      //     type: 'checkbox',
-      //     checked: this.props.field.value ? true : false,
-      //     onChange: this.onChange,
-      //     onFocus: this.onFocus,
-      //     onBlur: this.onBlur,
-      //     //onFocus: this.props.actions.focus,
-      //     ref: 'input'
-      //   }),
-      //   R.label({},
-      //     this.props.field.label
-      //   )
-      // );
-
-      var props = {
-        className: className,
-        name: this.props.field.key,
-        type: 'checkbox',
-        checked: this.props.field.value ? true : false,
-        onChange: this.onChange,
-        onFocus: this.onFocus,
-        onBlur: this.onBlur,
-        //onFocus: this.props.actions.focus,
-        ref: 'input'
-      };
-
-      _.extend(props, plugin.config.attributes);
-
-      return R.input(props);
-    }
-  });
-};
-
-},{"react":213,"underscore":214}],36:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    onFocus: function () {
-      this.props.form.actions.focus(this.props.field);
-    },
-
-    onBlur: function () {
-      this.props.form.actions.blur(this.props.field);
-    },
-
-    onChange: function () {
-      var choiceNodes = this.refs.choices.getDOMNode().getElementsByTagName('input');
-      choiceNodes = Array.prototype.slice.call(choiceNodes, 0);
-      var values = choiceNodes.map(function (node) {
-        return node.checked ? node.value : null;
-      }).filter(function (value) {
-        return value;
-      });
-      this.props.form.actions.change(this.props.field, values);
-    },
-
-    render: function () {
-
-      var className = formatic.className('field-choices', plugin.config.className, this.props.field.className);
-
-      var props = {className: className, ref: 'choices'};
-
-      _.extend(props, plugin.config.attributes);
-
-      return R.div(props,
-        this.props.field.choices.map(function (choice) {
-          return R.span({className: 'field-choice'},
-            R.span({style: {whiteSpace: 'nowrap'}},
-              R.input({
-                name: this.props.field.key,
-                type: 'checkbox',
-                value: choice.value,
-                checked: this.props.field.value.indexOf(choice.value) >= 0 ? true : false,
-                onChange: this.onChange,
-                onFocus: this.onFocus,
-                onBlur: this.onBlur
-                //onFocus: this.props.actions.focus
-              }),
-              R.span({className: 'field-choice-label'},
-                choice.label
-              )
-            ),
-            ' '
-          );
-        }.bind(this))
-      );
-    }
-  });
-};
-
-},{"react":213,"underscore":214}],37:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    render: function () {
-      var className = formatic.className('field code-field', plugin.config.className, this.props.field.className);
-
-      return R.pre(_.extend({className: className}, plugin.config.attributes),
-        this.props.field.value
-      );
-    }
-  });
-};
-
-},{"react":213,"underscore":214}],38:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -2080,76 +3058,83 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
-    mixins: [require('./mixins/click-outside'), require('./mixins/resize')],
-
-    getInitialState: function () {
+    getDefaultProps: function () {
       return {
-        open: false
+        className: plugin.config.className,
+        label: plugin.configValue('label', '[add]')
       };
     },
 
-    onToggle: function () {
-      this.setState({open: !this.state.open});
+    render: function () {
+      return R.span({className: this.props.className, onClick: this.props.onClick}, this.props.label);
+    }
+  });
+};
+
+},{"react/addons":54,"underscore":217}],30:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
     },
 
-    onClose: function () {
-      this.setState({open: false});
-    },
-
-    fixChoicesWidth: function () {
-      this.setState({
-        choicesWidth: this.refs.active.getDOMNode().offsetWidth
+    onChange: function () {
+      var choiceNodes = this.refs.choices.getDOMNode().getElementsByTagName('input');
+      choiceNodes = Array.prototype.slice.call(choiceNodes, 0);
+      var values = choiceNodes.map(function (node) {
+        return node.checked ? node.value : null;
+      }).filter(function (value) {
+        return value;
       });
-    },
-
-    onResizeWindow: function () {
-      this.fixChoicesWidth();
-    },
-
-    componentDidMount: function () {
-      this.fixChoicesWidth();
-      this.setOnClickOutside('select', this.onClose);
+      this.props.actions.setValue(this.props.field, values);
     },
 
     render: function () {
-      var className = formatic.className('dropdown-field', plugin.config.className, this.props.field.className);
 
-      var selectedLabel = '';
-      var matchingLabels = this.props.field.choices.filter(function (choice) {
-        return choice.value === this.props.field.value;
-      }.bind(this));
-      if (matchingLabels.length > 0) {
-        selectedLabel = matchingLabels[0].label;
-      }
-      selectedLabel = selectedLabel || '\u00a0';
+      var field = this.props.field;
 
-      return R.div(_.extend({className: className, ref: 'select'}, plugin.config.attributes),
-        R.div({className: 'field-value', ref: 'active', onClick: this.onToggle}, selectedLabel),
-        R.div({className: 'field-toggle ' + (this.state.open ? 'field-open' : 'field-closed'), onClick: this.onToggle}),
-        React.addons.CSSTransitionGroup({transitionName: 'reveal'},
-          R.div({className: 'field-choices-container'},
-            this.state.open ? R.ul({ref: 'choices', className: 'field-choices', style: {width: this.state.choicesWidth}},
-              this.props.field.choices.map(function (choice) {
-                return R.li({
-                  className: 'field-choice',
-                  onClick: function () {
-                    this.setState({open: false});
-                    this.props.form.actions.change(this.props.field, choice.value);
-                  }.bind(this)
-                }, choice.label);
-              }.bind(this))
-            ) : []
-          )
+      return formatic.view('field')({
+        field: field
+      },
+        R.div({className: this.props.className, ref: 'choices'},
+          this.props.field.choices.map(function (choice) {
+            return R.span({className: 'field-choice'},
+              R.span({style: {whiteSpace: 'nowrap'}},
+                R.input({
+                  name: field.key,
+                  type: 'checkbox',
+                  value: choice.value,
+                  checked: field.value.indexOf(choice.value) >= 0 ? true : false,
+                  onChange: this.onChange
+                  //onFocus: this.props.actions.focus
+                }),
+                R.span({className: 'field-choice-label'},
+                  choice.label
+                )
+              ),
+              ' '
+            );
+          }.bind(this))
         )
       );
     }
   });
 };
 
-},{"./mixins/click-outside":46,"./mixins/resize":48,"react/addons":64,"underscore":214}],39:[function(require,module,exports){
+},{"react":203,"underscore":217}],31:[function(require,module,exports){
 'use strict';
 
-var React = require('react');
+var React = require('react/addons');
 var R = React.DOM;
 var _ = require('underscore');
 
@@ -2157,234 +3142,166 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
-    isCollapsableProps: function (props) {
-      if (props.field.collapsable === true || props.field.field.collapsable === true) {
-        return true;
-      }
-      if (typeof props.field.collapsed === 'boolean' || typeof props.field.field.collapsed === 'boolean') {
-        return true;
-      }
-      return false;
-    },
-
-    isCollapsedProps: function (props) {
-      if (this.state && !props.onClickLabel) {
-        return this.state.collapsed;
-      }
-      if (typeof props.field.collapsed === 'boolean') {
-        return props.field.collapsed;
-      }
-      if (typeof props.field.field.collapsed === 'boolean') {
-        return props.field.field.collapsed;
-      }
-      if (props.field.collapsable === true) {
-        if (this.state.collapsed === false) {
-          return false;
-        }
-        return true;
-      }
-      return false;
-    },
-
-    getInitialState: function () {
+    getDefaultProps: function () {
       return {
-        collapsable: this.isCollapsableProps(this.props),
-        collapsed: this.isCollapsedProps(this.props)
+        className: plugin.config.className
       };
     },
 
-    componentWillReceiveProps: function (props) {
-      this.setState({
-        collapsable: this.isCollapsableProps(props),
-        collapsed: this.isCollapsedProps(props)
-      });
-    },
-
-    onClickLabel: function () {
-      this.setState({
-        collapsed: !this.state.collapsed
-      });
-    },
-
     render: function () {
 
-      var field = this.props.field.field;
+      var field = this.props.field;
 
-      var className = formatic.className(
-        'field',
-        field.type + '-field',
-        field.errors.required ? 'validation-error-required' : '',
-        field.required ? 'required' : 'not-required',
-        plugin.config.className,
-        field.className
+      return R.div({className: this.props.className},
+        formatic.view('label')({field: field, index: this.props.index}),
+        React.addons.CSSTransitionGroup({transitionName: 'reveal'},
+          field.collapsed ? [] : [
+            formatic.view('help')({key: 'help', field: field}),
+            this.props.children
+          ]
+        )
       );
+    }
+  });
+};
 
-      var helpClassName = formatic.className('field-help', plugin.config.help_className);
+},{"react/addons":54,"underscore":217}],32:[function(require,module,exports){
+'use strict';
 
-      var props = {
-        className: className
+var React = require('react/addons');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
       };
-
-      _.extend(props, plugin.config.attributes);
-
-      var label = null;
-      if (typeof this.props.field.index === 'number') {
-        label = '' + (this.props.field.index + 1) + '.';
-        if (field.label) {
-          label = label + ' ' + field.label;
-        }
-      }
-
-      if (field.label || label) {
-        var text = label || field.label;
-        if (this.state.collapsable) {
-          text = R.a({href: 'JavaScript' + ':', onClick: this.props.onClickLabel || this.onClickLabel}, text);
-        }
-        label = R.label({}, text);
-      }
-
-      var required = R.span({className: 'required-text'});
-
-      // Oddball for now, should configure for more of these.
-      if (field.type === 'boolean-checkbox') {
-        return R.div(props,
-          this.props.form.component(field),
-          label,
-          ' ',
-          required
-        );
-      } else {
-        return R.div(props,
-          R.div({
-            className: 'field-label'
-          },
-            label,
-            ' ',
-            required
-          ),
-          React.addons.CSSTransitionGroup({transitionName: 'reveal'},
-            this.state.collapsed ? [] : [
-              field.help_text ? R.div({
-                key: 'help',
-                className: helpClassName
-              },
-                field.help_text
-              ) : R.span({key: 'help'}),
-              this.props.form.component(field, {key: 'component'})
-            ]
-          )
-        );
-      }
-
-
-    }
-  });
-};
-
-},{"react":213,"underscore":214}],40:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    render: function () {
-
-      var className = formatic.className(plugin.config.className, this.props.field.className);
-
-      return R.fieldset(_.extend({className: className}, plugin.config.attributes),
-        this.props.field.fields.filter(function (field) {
-          return !field.hidden;
-        }).map(function (field) {
-          return this.props.form.component({
-            type: 'field',
-            field: field
-          });
-        }.bind(this))
-      );
-    }
-  });
-};
-
-},{"react":213,"underscore":214}],41:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    render: function () {
-
-      var className = formatic.className('formatic', plugin.config.className, this.props.field.className);
-
-      return R.form(_.extend({className: className}, plugin.config.attributes),
-        this.props.field.fields.filter(function (field) {
-          return !field.hidden;
-        }).map(function (field) {
-          return this.props.form.component({
-            type: 'field',
-            field: field
-          });
-        }.bind(this))
-      );
-    }
-  });
-};
-
-},{"react":213,"underscore":214}],42:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    render: function () {
-
-      var className = formatic.className('formatic', plugin.config.className, this.props.field.className);
-
-      return R.div(_.extend({className: className}, plugin.config.attributes),
-        this.props.field.fields.filter(function (field) {
-          return !field.hidden;
-        }).map(function (field) {
-          return this.props.form.component({
-            type: 'field',
-            field: field
-          });
-        }.bind(this))
-      );
-    }
-  });
-};
-
-},{"react":213,"underscore":214}],43:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    onFocus: function () {
-      this.props.form.actions.focus(this.props.field);
     },
 
-    onBlur: function () {
-      this.props.form.actions.blur(this.props.field);
+    render: function () {
+      var field = this.props.field;
+
+      return formatic.view('field')({
+        field: field
+      },
+        R.fieldset({className: this.props.className},
+          this.props.fields.map(function (field) {
+            return this.props.form.component(field, {key: field.id});
+          }.bind(this))
+        )
+      );
+    }
+  });
+};
+
+},{"react/addons":54,"underscore":217}],33:[function(require,module,exports){
+'use strict';
+
+var React = require('react/addons');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    render: function () {
+      //var className = formatic.className('formatic', plugin.config.className, this.props.field.className);
+      return R.div({className: 'formatic'},
+        this.props.children
+      );
+    }
+  });
+};
+
+},{"react/addons":54,"underscore":217}],34:[function(require,module,exports){
+'use strict';
+
+var React = require('react/addons');
+var R = React.DOM;
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
+    },
+
+    render: function () {
+
+      var field = this.props.field;
+
+      return field.helpText ?
+        R.div({className: this.props.className},
+          field.helpText
+        ) :
+        R.span(null);
+    }
+  });
+};
+
+},{"react/addons":54}],35:[function(require,module,exports){
+'use strict';
+
+var React = require('react/addons');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
+    },
+
+    onChange: function (event) {
+      this.props.onSelect(parseInt(event.target.value));
+    },
+
+    render: function () {
+
+      var field = this.props.field;
+
+      var typeChoices = null;
+      if (field.items) {
+        typeChoices = R.select({className: this.props.className, value: this.value, onChange: this.onChange},
+          field.items.map(function (item, i) {
+            return R.option({key: i, value: i}, item.label || i);
+          })
+        );
+      }
+
+      return typeChoices ? typeChoices : R.span(null);
+    }
+  });
+};
+
+},{"react/addons":54,"underscore":217}],36:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className,
+        rows: plugin.config.rows || 5
+      };
     },
 
     isValidValue: function (value) {
@@ -2399,8 +3316,8 @@ module.exports = function (formatic, plugin) {
 
     getInitialState: function () {
       return {
-        isValid: this.isValidValue(this.props.field.value),
-        value: this.props.field.value
+        isValid: true,
+        value: JSON.stringify(this.props.field.value)
       };
     },
 
@@ -2408,7 +3325,7 @@ module.exports = function (formatic, plugin) {
       var isValid = this.isValidValue(event.target.value);
 
       if (isValid) {
-        this.props.form.actions.change(this.props.field, event.target.value);
+        this.props.actions.setValue(this.props.field, JSON.parse(event.target.value));
       }
 
       this.setState({
@@ -2419,120 +3336,26 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
 
-      var className = formatic.className(plugin.config.className, this.props.field.className);
-
       var field = this.props.field;
 
-      return R.textarea(_.extend({
-        className: className,
-        name: field.key,
-        value: this.state.value,
-        onChange: this.onChange,
-        onFocus: this.onFocus,
-        onBlur: this.onBlur,
-        style: {backgroundColor: this.state.isValid ? '' : 'rgb(255,200,200)'}
-      }, plugin.config.attributes));
-    }
-  });
-};
-
-},{"react":213,"underscore":214}],44:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    getInitialState: function () {
-      return {
-        maybeDelete: false
-      };
-    },
-
-    onDelete: function () {
-      var parent = this.props.field.parent;
-      if (this.props.onDelete) {
-        this.props.onDelete(this.props.field.index);
-      }
-      this.props.form.actions.delete(parent, this.props.field.index);
-    },
-
-    onMoveUp: function () {
-      var parent = this.props.field.parent;
-      if (this.props.onMove) {
-        this.props.onMove(this.props.field.index, this.props.field.index - 1);
-      }
-      this.props.form.actions.move(parent, this.props.field.index, this.props.field.index - 1);
-    },
-
-    onMoveDown: function () {
-      var parent = this.props.field.parent;
-      if (this.props.onMove) {
-        this.props.onMove(this.props.field.index, this.props.field.index + 1);
-      }
-      this.props.form.actions.move(parent, this.props.field.index, this.props.field.index + 1);
-    },
-
-    onMouseOver: function () {
-      this.setState({
-        maybeDelete: true
-      });
-    },
-
-    onMouseOut: function () {
-      this.setState({
-        maybeDelete: false
-      });
-    },
-
-    render: function () {
-      var field = this.props.field;
-      var parent = field.parent;
-      var item = field.field;
-      var form = this.props.form;
-
-      var className = formatic.className('list-item', plugin.config.className, field.className);
-
-      var valueClassName = formatic.className('object-value', plugin.config.value_className, field.value_className);
-      var controlClassName = formatic.className('list-control', plugin.config.control_className, field.control_className);
-      var removeClassName = formatic.className('list-control-remove', plugin.config.removeButton_className, field.removeButton_className);
-      var upClassName = formatic.className('list-control-up', plugin.config.upButton_className, field.upButton_className);
-      var downClassName = formatic.className('list-control-down', plugin.config.downButton_className, field.downButton_className);
-
-      var removeLabel = plugin.configValue('removeButton_label', '[remove]');
-      var upLabel = plugin.configValue('upButton_label', '[up]');
-      var downLabel = plugin.configValue('downButton_label', '[down]');
-      return R.div(_.extend({className: className,
-        style: {border: this.state.maybeDelete ? 'solid 1px red' : ''}}, plugin.config.attributes),
-        R.div({className: valueClassName},
-          form.component({
-            type: 'field',
-            field: item,
-            index: this.props.field.index,
-            collapsed: field.collapsed,
-            collapsable: parent.collapsable
-          }, {
-            onClickLabel: this.props.onClickLabel
-          })
-        ),
-        R.div({className: controlClassName},
-          R.span({className: removeClassName, onMouseOver: this.onMouseOver, onMouseOut: this.onMouseOut, onClick: this.onDelete}, removeLabel),
-          this.props.field.index > 0 ? R.span({className: upClassName, onClick: this.onMoveUp}, upLabel) : null,
-          this.props.field.index < (this.props.field.numItems - 1) ? R.span({className: downClassName, onClick: this.onMoveDown}, downLabel) : null
-        )
+      return formatic.view('field')({
+        field: field
+      }, R.textarea({
+          className: this.props.className,
+          value: this.state.value,
+          onChange: this.onChange,
+          style: {backgroundColor: this.state.isValid ? '' : 'rgb(255,200,200)'},
+          rows: field.rows || this.props.rows
+        })
       );
     }
   });
 };
 
-},{"react":213,"underscore":214}],45:[function(require,module,exports){
+},{"react":203,"underscore":217}],37:[function(require,module,exports){
 'use strict';
 
-var React = require('react');
+var React = require('react/addons');
 var R = React.DOM;
 var _ = require('underscore');
 
@@ -2540,314 +3363,212 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
-    getInitialState: function () {
-
-      var nextId = 0;
-      var lookups = [];
-      this.props.field.fields.forEach(function (field, i) {
-        lookups[i] = '_' + nextId;
-        nextId++;
-      });
-
+    getDefaultProps: function () {
       return {
-        lookups: lookups,
-        nextId: nextId,
-        collapsed: this.props.field.fields.map(function () {
-          return this.props.field.collapsableItems ? true : false;
-        }.bind(this))
+        className: plugin.config.className
       };
     },
 
-    componentWillReceiveProps: function (newProps) {
-      var nextId = this.state.nextId;
-      var lookups = this.state.lookups;
-      var collapsed = this.state.collapsed;
-      newProps.field.fields.forEach(function (field, i) {
-        if (!lookups[i]) {
-          lookups[i] = '_' + nextId;
-          nextId++;
+    render: function () {
+
+      var field = this.props.field;
+
+      var label = null;
+      if (typeof this.props.index === 'number') {
+        label = '' + (this.props.index + 1) + '.';
+        if (field.label) {
+          label = label + ' ' + field.label;
         }
-        if (collapsed.length === i) {
-          collapsed.push(false);
-          if (this.props.field.collapsableItems) {
-            collapsed[i] = true;
-          }
-        }
-      }.bind(this));
+      }
+
+      if (field.label || label) {
+        var text = label || field.label;
+        // if (this.state.collapsable) {
+        //   text = R.a({href: 'JavaScript' + ':', onClick: this.props.onClickLabel || this.onClickLabel}, text);
+        // }
+        label = R.label({}, text);
+      }
+
+      var required = R.span({className: 'required-text'});
+
+      return R.div({
+        className: this.props.className
+      },
+        label,
+        ' ',
+        required
+      );
+    }
+  });
+};
+
+},{"react/addons":54,"underscore":217}],38:[function(require,module,exports){
+'use strict';
+
+var React = require('react/addons');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
+    },
+
+    getInitialState: function () {
+      return {
+        itemIndex: 0
+      };
+    },
+
+    onSelect: function (index) {
       this.setState({
-        lookups: lookups,
-        nextId: nextId
+        itemIndex: index
       });
     },
 
     onAppend: function () {
-      var field = this.props.field;
-      var item = null;
-      if (this.refs.typeSelect) {
-        var index = parseInt(this.refs.typeSelect.getDOMNode().value);
-        item = field.itemTypes[index].item;
-      }
-      this.props.form.actions.insert(this.props.field, null, item);
-      if (this.props.field.collapsableItems) {
-        // var collapsed = this.props.field.fields.map(function () {
-        //   return true;
-        // }.bind(this));
-        var collapsed = this.state.collapsed;
-        collapsed = collapsed.concat(false);
-        this.setState({
-          collapsed: collapsed
-        });
-      }
-    },
-
-    onClickLabel: function (i) {
-      if (this.props.field.collapsableItems) {
-        var collapsed;
-        // if (!this.state.collapsed[i]) {
-        //   collapsed = this.state.collapsed;
-        //   collapsed[i] = true;
-        //   this.setState({collapsed: collapsed});
-        // } else {
-        //   collapsed = this.props.field.fields.map(function () {
-        //     return true;
-        //   });
-        //   collapsed[i] = false;
-        //   this.setState({collapsed: collapsed});
-        // }
-        collapsed = this.state.collapsed;
-        collapsed[i] = !collapsed[i];
-        this.setState({collapsed: collapsed});
-      }
-    },
-
-    onDelete: function (i) {
-      var collapsed = this.state.collapsed;
-      collapsed.splice(i, 1);
-
-      var lookups = this.state.lookups;
-      lookups.splice(i, 1);
-
-      this.setState({
-        lookups: lookups,
-        collapsed: collapsed
-      });
-    },
-
-    onMove: function (fromIndex, toIndex) {
-      var collapsed = this.state.collapsed;
-      collapsed.splice(toIndex, 0, collapsed.splice(fromIndex, 1)[0]);
-      var lookups = this.state.lookups;
-      lookups.splice(toIndex, 0, lookups.splice(fromIndex, 1)[0]);
-      this.setState({
-        lookups: lookups,
-        collapsed: collapsed
-      });
+      this.props.onAppend(this.state.itemIndex);
     },
 
     render: function () {
+
       var field = this.props.field;
-      var form = this.props.form;
-
-      var className = formatic.className(plugin.config.className, field.className);
-      var typeChoiceClassName = formatic.className('list-type-choice', plugin.config.typeChoice_className, field.typeChoice_className);
-      var addContainerClassName = formatic.className('list-control-add-container', plugin.config.addContainer_className, field.addContainer_className);
-      var addClassName = formatic.className('list-control-add', plugin.config.addButton_className, field.addButton_className);
-      var addLabel = plugin.configValue('addButton_label', '[add]');
-
-      var numItems = field.fields.length;
 
       var typeChoices = null;
-      if (field.itemTypes) {
-        typeChoices = R.select({ref: 'typeSelect', className: typeChoiceClassName},
-          field.itemTypes.map(function (item, i) {
-            return R.option({value: i}, item.label || item.type);
-          })
-        );
+
+      if (field.items) {
+        typeChoices = formatic.view('item-choices')({field: field, value: this.state.itemIndex, onSelect: this.onSelect});
       }
 
-      return R.div(_.extend({className: className}, plugin.config.attributes),
-        React.addons.CSSTransitionGroup({transitionName: 'reveal'},
-          field.fields.map(function (child, i) {
-            return form.component({
-              type: 'list-item',
-              field: child,
-              parent: field,
-              index: i,
-              numItems: numItems,
-              collapsed: this.props.field.collapsableItems ? this.state.collapsed[i] : undefined
-            }, {
-              key: this.state.lookups[i] || i,
-              //onClickLabel: this.onClickLabel.bind(this, i),
-              onDelete: this.onDelete,
-              onMove: this.onMove
-            });
-          }.bind(this))
-        ),
-        R.div({className: addContainerClassName},
-          typeChoices, ' ',
-          R.span({className: addClassName, onClick: this.onAppend}, addLabel)
+      return R.div({className: this.props.className},
+        typeChoices, ' ',
+        formatic.view('add-item')({onClick: this.onAppend})
+      );
+    }
+  });
+};
+
+},{"react/addons":54,"underscore":217}],39:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
+    },
+
+    onMoveBack: function () {
+      this.props.onMove(this.props.index, this.props.index - 1);
+    },
+
+    onMoveForward: function () {
+      this.props.onMove(this.props.index, this.props.index + 1);
+    },
+
+    onRemove: function () {
+      this.props.onRemove(this.props.index);
+    },
+
+    render: function () {
+      var field = this.props.field;
+
+      return R.div({className: this.props.className},
+        formatic.view('remove-item')({field: field, onClick: this.onRemove}),
+        this.props.index > 0 ? formatic.view('move-item-back')({onClick: this.onMoveBack}) : null,
+        this.props.index < (this.props.numItems - 1) ? formatic.view('move-item-forward')({onClick: this.onMoveForward}) : null
+      );
+    }
+  });
+};
+
+},{"react":203,"underscore":217}],40:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
+    },
+    //
+    // getInitialState: function () {
+    //   return {
+    //     maybeDelete: false
+    //   };
+    // },
+    //
+    // onDelete: function () {
+    //   var parent = this.props.field.parent;
+    //   if (this.props.onDelete) {
+    //     this.props.onDelete(this.props.field.index);
+    //   }
+    //   this.props.form.actions.delete(parent, this.props.field.index);
+    // },
+    //
+    // onMoveUp: function () {
+    //   var parent = this.props.field.parent;
+    //   if (this.props.onMove) {
+    //     this.props.onMove(this.props.field.index, this.props.field.index - 1);
+    //   }
+    //   this.props.form.actions.move(parent, this.props.field.index, this.props.field.index - 1);
+    // },
+    //
+    // onMoveDown: function () {
+    //   var parent = this.props.field.parent;
+    //   if (this.props.onMove) {
+    //     this.props.onMove(this.props.field.index, this.props.field.index + 1);
+    //   }
+    //   this.props.form.actions.move(parent, this.props.field.index, this.props.field.index + 1);
+    // },
+    //
+    // onMouseOver: function () {
+    //   this.setState({
+    //     maybeDelete: true
+    //   });
+    // },
+    //
+    // onMouseOut: function () {
+    //   this.setState({
+    //     maybeDelete: false
+    //   });
+    // },
+
+    render: function () {
+      var field = this.props.field;
+
+      return R.div({className: this.props.className},
+        formatic.view('field')({
+          field: field,
+          index: this.props.index
+        },
+          this.props.form.component(field)
         )
       );
     }
   });
 };
 
-},{"react":213,"underscore":214}],46:[function(require,module,exports){
-'use strict';
-
-var hasAncestor = function (child, parent) {
-  if (child.parentNode === parent) {
-    return true;
-  }
-  if (child.parentNode === child.parentNode) {
-    return false;
-  }
-  if (child.parentNode === null) {
-    return false;
-  }
-  return hasAncestor(child.parentNode, parent);
-};
-
-var isOutside = function (nodeOut, nodeIn) {
-  if (nodeOut === nodeIn) {
-    return false;
-  }
-  if (hasAncestor(nodeOut, nodeIn)) {
-    return false;
-  }
-  return true;
-};
-
-var onClickDocument = function (event) {
-  Object.keys(this.clickOutsideHandlers).forEach(function (ref) {
-    if (this.clickOutsideHandlers[ref].length > 0) {
-      if (isOutside(event.target, this.refs[ref].getDOMNode())) {
-        this.clickOutsideHandlers[ref].forEach(function (fn) {
-          fn.call(this);
-        });
-      }
-    }
-  }.bind(this));
-};
-
-module.exports = {
-
-  setOnClickOutside: function (ref, fn) {
-    if (!this.clickOutsideHandlers[ref]) {
-      this.clickOutsideHandlers[ref] = [];
-    }
-    this.clickOutsideHandlers[ref].push(fn);
-  },
-
-  componentDidMount: function () {
-    this.clickOutsideHandlers = {};
-    document.addEventListener('click', onClickDocument.bind(this));
-  },
-
-  componentWillUnmount: function () {
-    this.clickOutsideHandlers = {};
-    document.removeEventListener('click', onClickDocument.bind(this));
-  }
-};
-
-},{}],47:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  onFocus: function () {
-    this.props.form.actions.focus(this.props.field);
-  },
-
-  onBlur: function () {
-    this.props.form.actions.blur(this.props.field);
-  },
-
-  onChange: function (event) {
-    this.props.form.actions.change(this.props.field, event.target.value);
-  }
-};
-
-},{}],48:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-
-  componentDidMount: function () {
-    if (this.onResizeWindow) {
-      window.addEventListener('resize', this.onResizeWindow);
-    }
-  },
-
-  componentWillUnmount: function () {
-    if (this.onResizeWindow) {
-      window.removeEventListener('resize', this.onResizeWindow);
-    }
-  }
-};
-
-},{}],49:[function(require,module,exports){
-// http://prometheusresearch.github.io/react-forms/examples/undo.html
-
-'use strict';
-
-var UndoStack = {
-  getInitialState: function() {
-    return {undo: [], redo: []};
-  },
-
-  snapshot: function() {
-    var undo = this.state.undo.concat(this.getStateSnapshot());
-    if (typeof this.state.undoDepth === 'number') {
-      if (undo.length > this.state.undoDepth) {
-        undo.shift();
-      }
-    }
-    this.setState({undo: undo, redo: []});
-  },
-
-  hasUndo: function() {
-    return this.state.undo.length > 0;
-  },
-
-  hasRedo: function() {
-    return this.state.redo.length > 0;
-  },
-
-  redo: function() {
-    this._undoImpl(true);
-  },
-
-  undo: function() {
-    this._undoImpl();
-  },
-
-  _undoImpl: function(isRedo) {
-    var undo = this.state.undo.slice(0);
-    var redo = this.state.redo.slice(0);
-    var snapshot;
-
-    if (isRedo) {
-      if (redo.length === 0) {
-        return;
-      }
-      snapshot = redo.pop();
-      undo.push(this.getStateSnapshot());
-    } else {
-      if (undo.length === 0) {
-        return;
-      }
-      snapshot = undo.pop();
-      redo.push(this.getStateSnapshot());
-    }
-
-    this.setStateSnapshot(snapshot);
-    this.setState({undo:undo, redo:redo});
-  }
-};
-
-module.exports = UndoStack;
-
-},{}],50:[function(require,module,exports){
+},{"react":203,"underscore":217}],41:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -2858,107 +3579,228 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
-    getInitialState: function () {
+    getDefaultProps: function () {
       return {
-        useCustomKey: false,
-        maybeDelete: false
+        className: plugin.config.className
+      };
+    },
+    //
+    // getInitialState: function () {
+    //   return {
+    //     maybeDelete: false
+    //   };
+    // },
+    //
+    // onDelete: function () {
+    //   var parent = this.props.field.parent;
+    //   if (this.props.onDelete) {
+    //     this.props.onDelete(this.props.field.index);
+    //   }
+    //   this.props.form.actions.delete(parent, this.props.field.index);
+    // },
+    //
+    // onMoveUp: function () {
+    //   var parent = this.props.field.parent;
+    //   if (this.props.onMove) {
+    //     this.props.onMove(this.props.field.index, this.props.field.index - 1);
+    //   }
+    //   this.props.form.actions.move(parent, this.props.field.index, this.props.field.index - 1);
+    // },
+    //
+    // onMoveDown: function () {
+    //   var parent = this.props.field.parent;
+    //   if (this.props.onMove) {
+    //     this.props.onMove(this.props.field.index, this.props.field.index + 1);
+    //   }
+    //   this.props.form.actions.move(parent, this.props.field.index, this.props.field.index + 1);
+    // },
+    //
+    // onMouseOver: function () {
+    //   this.setState({
+    //     maybeDelete: true
+    //   });
+    // },
+    //
+    // onMouseOut: function () {
+    //   this.setState({
+    //     maybeDelete: false
+    //   });
+    // },
+
+    render: function () {
+      var field = this.props.field;
+      //var parent = this.props.parent;
+      //var item = field.field;
+      //var form = this.props.form;
+
+      //var className = formatic.className('list-item', plugin.config.className, field.className);
+
+      // var valueClassName = formatic.className('object-value', plugin.config.value_className, field.value_className);
+      // var controlClassName = formatic.className('list-control', plugin.config.control_className, field.control_className);
+      // var removeClassName = formatic.className('list-control-remove', plugin.config.removeButton_className, field.removeButton_className);
+      // var upClassName = formatic.className('list-control-up', plugin.config.upButton_className, field.upButton_className);
+      // var downClassName = formatic.className('list-control-down', plugin.config.downButton_className, field.downButton_className);
+      //
+      // var removeLabel = plugin.configValue('removeButton_label', '[remove]');
+      // var upLabel = plugin.configValue('upButton_label', '[up]');
+      // var downLabel = plugin.configValue('downButton_label', '[down]');
+      return R.div({className: this.props.className},
+        formatic.view('list-item-value')({form: this.props.form, field: field, index: this.props.index}),
+        formatic.view('list-item-control')({field: field, index: this.props.index, numItems: this.props.numItems, onMove: this.props.onMove, onRemove: this.props.onRemove})
+        //,
+        // R.div({className: controlClassName},
+        //   R.span({className: removeClassName, onMouseOver: this.onMouseOver, onMouseOut: this.onMouseOut, onClick: this.onDelete}, removeLabel),
+        //   this.props.field.index > 0 ? R.span({className: upClassName, onClick: this.onMoveUp}, upLabel) : null,
+        //   this.props.field.index < (this.props.field.numItems - 1) ? R.span({className: downClassName, onClick: this.onMoveDown}, downLabel) : null
+        // )
+      );
+    }
+  });
+};
+
+},{"react":203,"underscore":217}],42:[function(require,module,exports){
+'use strict';
+
+var React = require('react/addons');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
       };
     },
 
-    onDelete: function () {
-      var parent = this.props.field.parent;
-      this.props.onDelete(this.props.field.propertyKey);
-      this.props.form.actions.delete(parent, this.props.field.propertyKey);
+    // getInitialState: function () {
+    //
+    //   var nextId = 0;
+    //   var lookups = [];
+    //   this.props.field.fields.forEach(function (field, i) {
+    //     lookups[i] = '_' + nextId;
+    //     nextId++;
+    //   });
+    //
+    //   return {
+    //     lookups: lookups,
+    //     nextId: nextId,
+    //     collapsed: this.props.field.fields.map(function () {
+    //       return this.props.field.collapsableItems ? true : false;
+    //     }.bind(this))
+    //   };
+    // },
+    //
+    // componentWillReceiveProps: function (newProps) {
+    //   var nextId = this.state.nextId;
+    //   var lookups = this.state.lookups;
+    //   var collapsed = this.state.collapsed;
+    //   newProps.field.fields.forEach(function (field, i) {
+    //     if (!lookups[i]) {
+    //       lookups[i] = '_' + nextId;
+    //       nextId++;
+    //     }
+    //     if (collapsed.length === i) {
+    //       collapsed.push(false);
+    //       if (this.props.field.collapsableItems) {
+    //         collapsed[i] = true;
+    //       }
+    //     }
+    //   }.bind(this));
+    //   this.setState({
+    //     lookups: lookups,
+    //     nextId: nextId
+    //   });
+    // },
+    //
+    onAppend: function (itemIndex) {
+      var fieldDef = this.props.field.items[itemIndex];
+      this.props.actions.append(this.props.field, fieldDef);
+    //   var field = this.props.field;
+    //   var item = null;
+    //   if (this.refs.typeSelect) {
+    //     var index = parseInt(this.refs.typeSelect.getDOMNode().value);
+    //     item = field.itemTypes[index].item;
+    //   }
+    //   this.props.form.actions.insert(this.props.field, null, item);
+    //   if (this.props.field.collapsableItems) {
+    //     // var collapsed = this.props.field.fields.map(function () {
+    //     //   return true;
+    //     // }.bind(this));
+    //     var collapsed = this.state.collapsed;
+    //     collapsed = collapsed.concat(false);
+    //     this.setState({
+    //       collapsed: collapsed
+    //     });
+    //   }
     },
-
-    onChangeKey: function (event) {
-      var parent = this.props.field.parent;
-      var newKey = event.target.value;
-      if (parent.keyChoices && parent.keyChoices.length > 0 && newKey === '--custom--') {
-        this.setState({useCustomKey: true});
-        return;
-      }
-      var oldKey = this.props.field.propertyKey;
-      this.props.onMove(oldKey, newKey);
-      this.props.form.actions.move(parent, oldKey, newKey);
+    //
+    // onClickLabel: function (i) {
+    //   if (this.props.field.collapsableItems) {
+    //     var collapsed;
+    //     // if (!this.state.collapsed[i]) {
+    //     //   collapsed = this.state.collapsed;
+    //     //   collapsed[i] = true;
+    //     //   this.setState({collapsed: collapsed});
+    //     // } else {
+    //     //   collapsed = this.props.field.fields.map(function () {
+    //     //     return true;
+    //     //   });
+    //     //   collapsed[i] = false;
+    //     //   this.setState({collapsed: collapsed});
+    //     // }
+    //     collapsed = this.state.collapsed;
+    //     collapsed[i] = !collapsed[i];
+    //     this.setState({collapsed: collapsed});
+    //   }
+    // },
+    //
+    onRemove: function (i) {
+      this.props.actions.remove(this.props.field, i);
     },
-
-    onMouseOver: function () {
-      this.setState({
-        maybeDelete: true
-      });
-    },
-
-    onMouseOut: function () {
-      this.setState({
-        maybeDelete: false
-      });
+    //
+    onMove: function (fromIndex, toIndex) {
+      this.props.actions.move(this.props.field, fromIndex, toIndex);
     },
 
     render: function () {
-      var parent = this.props.field.parent;
+
       var field = this.props.field;
-      var item = field.field;
-      var form = this.props.form;
+      var fields = this.props.fields;
 
-      var className = formatic.className('object-item', plugin.config.className, field.className);
-      var keyClassName = formatic.className('object-key', plugin.config.key_className, field.key_className);
-      var keyInputClassName = formatic.className(plugin.config.keyInput_className, field.keyInput_className);
-      var keyChoiceClassName = formatic.className(plugin.config.keyChoice_className, field.keyChoice_className);
-      var valueClassName = formatic.className('object-value', plugin.config.value_className, field.value_className);
-      var controlClassName = formatic.className('object-control', plugin.config.control_className, field.control_className);
-      var removeClassName = formatic.className('object-control-remove', plugin.config.removeButton_className, field.removeButton_className);
-      var removeLabel = plugin.configValue('removeButton_label', '[remove]');
+      var numItems = fields.length;
 
-      var propertyKey = item.propertyKey;
-
-      propertyKey = this.props.form.isTempKey(propertyKey) ? '' : propertyKey;
-
-      var keyInput;
-      if (parent.keyChoices && parent.keyChoices.length > 0 && !this.state.useCustomKey) {
-        var keyChoices = parent.keyChoices.slice(0);
-        if (propertyKey === '') {
-          keyChoices = [{value: '', label: ''}].concat(keyChoices);
-        }
-        if (!_.find(keyChoices, function (choice) {return choice.value === propertyKey;})) {
-          keyChoices = keyChoices.concat([{value: propertyKey, label: propertyKey}]);
-        }
-        if (parent.customKeyChoice) {
-          keyChoices = keyChoices.concat([{value: '--custom--', label: '--- Custom Key ---'}]);
-        }
-        keyInput = R.select({className: keyChoiceClassName, value: propertyKey, onChange: this.onChangeKey},
-          keyChoices.map(function (choice) {
-            return R.option({value: choice.value}, choice.label);
-          })
-        );
-
-      } else {
-        keyInput = R.input({className: keyInputClassName, type: 'text', value: propertyKey, onChange: this.onChangeKey});
-      }
-
-      return R.div(_.extend({className: className, style: {border: this.state.maybeDelete ? 'solid 1px red' : ''}}, plugin.config.attributes),
-        R.div({className: keyClassName},
-          parent.itemKeyLabel ? R.span({}, parent.itemKeyLabel) : null,
-          keyInput
-        ),
-        R.div({className: valueClassName},
-          form.component({
-            type: 'field',
-            field: item
-          })
-        ),
-        R.div({className: controlClassName},
-          R.div({className: removeClassName, onMouseOver: this.onMouseOver, onMouseOut: this.onMouseOut, onClick: this.onDelete}, removeLabel)
+      return formatic.view('field')({
+        field: field
+      },
+        R.div({className: this.props.className},
+          React.addons.CSSTransitionGroup({transitionName: 'reveal'},
+            fields.map(function (child, i) {
+              return formatic.view('list-item')({
+                key: child.id,
+                form: this.props.form,
+                field: child,
+                parent: field,
+                index: i,
+                numItems: numItems,
+                onMove: this.onMove,
+                onRemove: this.onRemove
+              });
+            }.bind(this))
+          ),
+          formatic.view('list-control')({field: field, onAppend: this.onAppend})
         )
       );
     }
   });
 };
 
-},{"react":213,"underscore":214}],51:[function(require,module,exports){
+},{"react/addons":54,"underscore":217}],43:[function(require,module,exports){
 'use strict';
 
-var React = require('react');
+var React = require('react/addons');
 var R = React.DOM;
 var _ = require('underscore');
 
@@ -2966,605 +3808,134 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
-    getInitialState: function () {
-      var nextId = 0;
-      var lookups = {};
-      this.props.field.fields.forEach(function (field) {
-        lookups[field.propertyKey] = '_' + nextId;
-        nextId++;
-      });
-
+    getDefaultProps: function () {
       return {
-        lookups: lookups,
-        nextId: nextId
+        className: plugin.config.className,
+        label: plugin.configValue('label', '[up]')
       };
     },
 
-    onAppend: function () {
-      var field = this.props.field;
-      var tempKey = this.props.form.tempKey(this.props.field);
-      var item = null;
-      // if (this.refs.typeSelect) {
-      //   var index = parseInt(this.refs.typeSelect.getDOMNode().value);
-      //   item = field.itemTypes[index].item;
-      // }
-      this.props.form.actions.insert(field, tempKey, item);
-    },
-
-    onMove: function (fromKey, toKey) {
-      if (fromKey !== toKey) {
-        var lookups = this.state.lookups;
-
-        if (lookups[fromKey]) {
-          var prevKey = fromKey;
-          fromKey = lookups[fromKey];
-          delete lookups[prevKey];
-        }
-
-        lookups[toKey] = fromKey;
-
-        this.setState({
-          lookups: lookups
-        });
-      }
-    },
-
-    onDelete: function (key) {
-      var lookups = this.state.lookups;
-      delete lookups[key];
-      this.setState({
-        lookups: lookups
-      });
-    },
-
-    componentWillReceiveProps: function (newProps) {
-      var nextId = this.state.nextId;
-      var lookups = this.state.lookups;
-      newProps.field.fields.forEach(function (field) {
-        if (!lookups[field.propertyKey]) {
-          lookups[field.propertyKey] = '_' + nextId;
-          nextId++;
-        }
-      });
-      this.setState({
-        lookups: lookups,
-        nextId: nextId
-      });
-    },
-
     render: function () {
-      var field = this.props.field;
-      var form = this.props.form;
-
-      var className = formatic.className(plugin.config.className, field.className);
-      var addClassName = formatic.className('object-control-add', plugin.config.addButton_className, field.addButton_className);
-      var addLabel = plugin.configValue('addButton_label', '[add]');
-
-      var sortedFields = _.sortBy(field.fields, function (field) {
-        var id = this.state.lookups[field.propertyKey];
-        var idNum = parseInt(id.substring(1));
-        return idNum;
-      }.bind(this));
-
-      // var typeChoices = null;
-      // if (field.itemTypes) {
-      //   typeChoices = R.select({ref: 'typeSelect'},
-      //     field.itemTypes.map(function (item, i) {
-      //       return R.option({value: i}, item.label || item.type);
-      //     })
-      //   );
-      // }
-
-      return R.div(_.extend({className: className}, plugin.config.attributes),
-        React.addons.CSSTransitionGroup({transitionName: 'reveal'},
-          sortedFields.map(function (child, i) {
-            if (!child) {
-              return null;
-            }
-            return form.component({
-              type: 'object-item',
-              field: child,
-              parent: field,
-              index: i,
-              propertyKey: child.propertyKey
-            }, {
-              key: this.state.lookups[child.propertyKey] || child.propertyKey,
-              onMove: this.onMove,
-              onDelete: this.onDelete
-            });
-          }.bind(this))
-        ),
-        //typeChoices,
-        R.span({className: addClassName, onClick: this.onAppend}, addLabel)
-      );
+      return R.span({className: this.props.className, onClick: this.props.onClick}, this.props.label);
     }
   });
 };
 
-},{"react":213,"underscore":214}],52:[function(require,module,exports){
+},{"react/addons":54,"underscore":217}],44:[function(require,module,exports){
 'use strict';
 
-var React = require('react');
+var React = require('react/addons');
 var R = React.DOM;
 var _ = require('underscore');
-
-var utils = require('../../utils');
-
-var noBreak = function (value) {
-  return value.replace(/ /g, '\u00a0');
-};
-
-var LEFT_PAD = '\u00a0\u00a0';
-var RIGHT_PAD = '\u00a0\u00a0';
 
 module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
-    mixins: [require('./mixins/undo-stack')],
-
-    onFocus: function () {
-      this.props.form.actions.focus(this.props.field);
-    },
-
-    onBlur: function () {
-      this.props.form.actions.blur(this.props.field);
-    },
-
-    getInitialState: function () {
-      var value = this.props.field.value || '';
-      var parts = utils.parseTextWithTags(value);
-      var tokens = this.tokens(parts);
-      var indexMap = this.indexMap(tokens);
-
+    getDefaultProps: function () {
       return {
-        prettyStyle: {},
-        prettyUpdateStyle: {},
-        tokens: tokens,
-        indexMap: indexMap,
-        value: value,
-        plainValue: this.plainValue(value),
-        pos: indexMap.length,
-        range: 0,
-        undoDepth: 100
+        className: plugin.config.className,
+        label: plugin.configValue('label', '[down]')
       };
     },
 
-    getStateSnapshot: function () {
+    render: function () {
+      return R.span({className: this.props.className, onClick: this.props.onClick}, this.props.label);
+    }
+  });
+};
+
+},{"react/addons":54,"underscore":217}],45:[function(require,module,exports){
+'use strict';
+
+var React = require('react/addons');
+var R = React.DOM;
+var _ = require('underscore');
+
+module.exports = function (formatic, plugin) {
+
+  plugin.view = React.createClass({
+
+    getDefaultProps: function () {
       return {
-        value: this.state.value,
-        pos: this.state.pos
+        className: plugin.config.className,
+        label: plugin.configValue('label', '[remove]')
       };
     },
 
-    setStateSnapshot: function (snapshot) {
-      this.props.onChange(snapshot.value);
-      this.setState({
-        pos: snapshot.pos
-      });
-    },
+    render: function () {
+      return R.span({className: this.props.className, onClick: this.props.onClick}, this.props.label);
+    }
+  });
+};
 
-    componentWillReceiveProps: function (props) {
-      var value = props.field.value || '';
-      var parts = utils.parseTextWithTags(value);
-      var tokens = this.tokens(parts);
-      var indexMap = this.indexMap(tokens);
+},{"react/addons":54,"underscore":217}],46:[function(require,module,exports){
+'use strict';
 
-      this.setState({
-        value: value,
-        plainValue: this.plainValue(value),
-        tokens: tokens,
-        indexMap: indexMap
-      });
-    },
+var React = require('react/addons');
+var R = React.DOM;
+var _ = require('underscore');
 
-    tokens: function (parts) {
-      return [].concat.apply([], parts.map(function (part) {
-        if (part.type === 'tag') {
-          return part;
-        } else {
-          return part.value.split('');
-        }
-      }));
-    },
+module.exports = function (formatic, plugin) {
 
-    indexMap: function (tokens) {
-      var indexMap = [];
-      _.each(tokens, function (token, tokenIndex) {
-        if (token.type === 'tag') {
-          var label = LEFT_PAD + noBreak(this.prettyLabel(token.value)) + RIGHT_PAD;
-          var labelChars = label.split('');
-          _.each(labelChars, function () {
-            indexMap.push(tokenIndex);
-          });
-        } else {
-          indexMap.push(tokenIndex);
-        }
-      }.bind(this));
-      return indexMap;
-    },
+  plugin.view = React.createClass({
 
-    onScroll: function () {
-      this.refs.pretty.getDOMNode().scrollTop = this.refs.text.getDOMNode().scrollTop;
-      this.refs.pretty.getDOMNode().scrollLeft = this.refs.text.getDOMNode().scrollLeft;
-    },
-
-    tokenIndex: function (pos, tokens, indexMap) {
-      tokens = tokens || this.state.tokens;
-      indexMap = indexMap || this.state.indexMap;
-      if (pos < 0) {
-        pos = 0;
-      } else if (pos >= indexMap.length) {
-        return tokens.length;
-      }
-      return indexMap[pos];
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
     },
 
     onChange: function (event) {
-
-      console.log('change');
-      console.log(event);
-
-      var node = this.refs.text.getDOMNode();
-
-      var prevPos = this.state.pos;
-      var prevRange = this.state.range;
-      var pos = node.selectionStart;
-
-      var tokens = this.state.tokens;
-      var realPrevIndex = this.tokenIndex(prevPos);
-      var realPrevEndIndex = this.tokenIndex(prevPos + prevRange);
-      var realPrevRange = realPrevEndIndex - realPrevIndex;
-
-      console.log(prevPos + ',' + prevRange + ',' + pos);
-      console.log(realPrevIndex + ',' + realPrevEndIndex + ',' + realPrevRange);
-      console.log(node.value);
-
-      if (realPrevRange > 0) {
-        tokens.splice(realPrevIndex, realPrevRange);
-      }
-
-      if (pos > prevPos) {
-        var addedText = node.value.substring(prevPos, pos);
-        tokens.splice(realPrevIndex, 0, addedText);
-      } else if ((node.value.length + 1) === this.state.plainValue.length) {
-        var token = this.tokenAt(pos);
-        var tokenBefore = this.tokenBefore(pos);
-        if (token === tokenBefore) {
-          pos = this.moveOffTag(pos, tokens, this.indexMap(tokens), -1);
-        }
-        tokens.splice(realPrevIndex - 1, 1);
-        node.setSelectionRange(pos, pos);
-      }
-
-      var rawValue = this.rawValue(tokens);
-
-      this.props.form.actions.change(this.props.field, rawValue);
-
-      this.snapshot();
-
-      this.setState({
-        range: 0,
-        pos: pos
-      });
-    },
-    //
-    componentDidUpdate: function () {
-      if (document.activeElement === this.refs.text.getDOMNode()) {
-      //   this.refs.text.getDOMNode().setSelectionRange(this.state.pos, this.state.pos + this.state.range);
-        this.refs.text.getDOMNode().setSelectionRange(this.state.pos, this.state.pos + this.state.range);
-      }
-    },
-
-    prettyLabel: function (key) {
-      var form = this.props.form;
-      if (form.meta('prettyTextareaLabels') && form.meta('prettyTextareaLabels')[key]) {
-        return form.meta('prettyTextareaLabels')[key];
-      }
-      if (formatic.config('view-pretty-textarea.labelFallback')) {
-        return formatic.config('view-pretty-textarea.labelFallback')(key);
-      }
-      return key;
-    },
-
-    plainValue: function (value) {
-      var parts = utils.parseTextWithTags(value);
-      return parts.map(function (part) {
-        if (part.type === 'text') {
-          return part.value;
-        } else {
-          return LEFT_PAD + noBreak(this.prettyLabel(part.value)) + RIGHT_PAD;
-        }
-      }.bind(this)).join('');
-    },
-
-    prettyValue: function (value) {
-      var parts = utils.parseTextWithTags(value);
-      return parts.map(function (part, i) {
-        if (part.type === 'text') {
-          if (i === (parts.length - 1)) {
-            if (part.value[part.value.length - 1] === '\n') {
-              return part.value + '\u00a0';
-            }
-          }
-          return part.value;
-        } else {
-          return R.span({className: 'pretty-part'},
-            R.span({className: 'pretty-part-left'}, LEFT_PAD),
-            R.span({className: 'pretty-part-text'}, noBreak(this.prettyLabel(part.value))),
-            R.span({className: 'pretty-part-right'}, RIGHT_PAD)
-          );
-        }
-      }.bind(this));
-    },
-
-    rawValue: function (tokens) {
-      return tokens.map(function (token) {
-        if (token.type === 'tag') {
-          return '{{' + token.value + '}}';
-        } else {
-          return token;
-        }
-      }).join('');
-    },
-
-    moveOffTag: function (pos, tokens, indexMap, dir) {
-      if (typeof dir === 'undefined' || dir > 0) {
-        dir = 1;
-      } else {
-        dir = -1;
-      }
-      var token;
-      if (dir > 0) {
-        token = tokens[indexMap[pos]];
-        while (pos < indexMap.length && tokens[indexMap[pos]].type === 'tag' && tokens[indexMap[pos]] === token) {
-          pos++;
-        }
-      } else {
-        token = tokens[indexMap[pos - 1]];
-        while (pos > 0 && tokens[indexMap[pos - 1]].type === 'tag' && tokens[indexMap[pos - 1]] === token) {
-          pos--;
-        }
-      }
-
-      return pos;
-    },
-
-    tokenAt: function (pos) {
-      if (pos >= this.state.indexMap.length) {
-        return null;
-      }
-      if (pos < 0) {
-        pos = 0;
-      }
-      return this.state.tokens[this.state.indexMap[pos]];
-    },
-
-    tokenBefore: function (pos) {
-      if (pos >= this.state.indexMap.length) {
-        pos = this.state.indexMap.length;
-      }
-      if (pos <= 0) {
-        return null;
-      }
-      return this.state.tokens[this.state.indexMap[pos - 1]];
-    },
-
-    normalizePosition: function (pos, selectDir) {
-      // At start or end, so okay.
-      if (pos <= 0 || pos >= this.state.indexMap.length) {
-        if (pos < 0) {
-          pos = 0;
-        }
-        if (pos > this.state.indexMap.length) {
-          pos = this.state.indexMap.length;
-        }
-        return pos;
-      }
-
-      var token = this.tokenAt(pos);
-      var tokenBefore = this.tokenBefore(pos);
-
-      // Between two tokens, so okay.
-      if (token !== tokenBefore) {
-        return pos;
-      }
-
-      var prevToken = this.tokenAt(this.state.pos);
-      var prevTokenBefore = this.tokenBefore(this.state.pos);
-
-      var rightPos = this.moveOffTag(pos, this.state.tokens, this.state.indexMap);
-      var leftPos = this.moveOffTag(pos, this.state.tokens, this.state.indexMap, -1);
-
-      if (prevToken !== prevTokenBefore) {
-        // Moved from left edge.
-        if (prevToken === token) {
-          return rightPos;
-        }
-        // Moved from right edge.
-        if (prevTokenBefore === token) {
-          return leftPos;
-        }
-      }
-
-      var newPos = rightPos;
-      if (typeof selectDir === 'undefined' || selectDir === -1) {
-        if (rightPos - pos > pos - leftPos) {
-          newPos = leftPos;
-        }
-      }
-      return newPos;
-    },
-
-    onSelect: function () {
-      console.log('select');
-      var node = this.refs.text.getDOMNode();
-
-      var start = node.selectionStart;
-      var pos = this.normalizePosition(start);
-
-
-      var end = node.selectionEnd;
-      var range = 0;
-      console.log(start + ',' + pos + ',' + end + ',' + range);
-      console.log(node.value);
-
-      if (node.value !== this.state.value) {
-        console.log(node.value + ' != ' + this.state.value);
-        return;
-      }
-
-      if (end > start) {
-        var selectDir = 1;
-        if (end === this.state.pos) {
-          selectDir = -1;
-        }
-        console.log(this.state.pos + ', selDir: ' + selectDir);
-        var endPos = this.normalizePosition(end, selectDir);
-        console.log('endPos:' + endPos);
-        if (endPos > pos) {
-          range = endPos - pos;
-        }
-      }
-
-      this.setState({
-        pos: pos,
-        range: range
-      });
-    },
-
-    onCopy: function () {
-      var node = this.refs.text.getDOMNode();
-      var start = node.selectionStart;
-      var end = node.selectionEnd;
-      var text = node.value.substring(start, end);
-      var realStartIndex = this.tokenIndex(start);
-      var realEndIndex = this.tokenIndex(end);
-      var tokens = this.state.tokens.slice(realStartIndex, realEndIndex);
-      text = this.rawValue(tokens);
-      var originalValue = node.value;
-      node.value = node.value + text;
-      node.setSelectionRange(originalValue.length, originalValue.length + text.length);
-      window.setTimeout(function() {
-        node.value = originalValue;
-        node.setSelectionRange(start, end);
-      },0);
-    },
-
-    onKeyDown: function (event) {
-      if (event.keyCode === 90 && (event.metaKey || event.ctrlKey) && !event.shiftKey) {
-        event.preventDefault();
-        this.undo();
-      } else if (
-        (event.keyCode === 89 && event.ctrlKey && !event.shiftKey) ||
-        (event.keyCode === 90 && event.metaKey && event.shiftKey)
-      ) {
-        this.redo();
-      }
+      this.props.actions.setValue(this.props.field, event.target.value);
     },
 
     render: function () {
-      var className = formatic.className(plugin.config.className, this.props.field.className);
 
       var field = this.props.field;
+      var choices = field.choices;
 
-      return R.div({style: {position: 'relative'}},
+      var value = field.value || '';
 
-        R.pre({
-          className: 'pretty-overlay',
-          ref: 'pretty',
-          style: {
-            position: 'absolute'
-          }
-        },
-          this.prettyValue(this.state.value)
-        ),
-
-        R.textarea(_.extend({
-          className: className,
-          ref: 'text',
-          rows: 5,
-          name: field.key,
-          value: this.state.plainValue,
-          onChange: this.onChange,
-          onFocus: this.onFocus,
-          onBlur: this.onBlur,
-          onScroll: this.onScroll,
-          style: {
-            backgroundColor: 'rgba(0,0,0,0)',
-            position: 'relative',
-            top: 0,
-            left: 0
-          },
-          onKeyPress: this.onKeyPress,
-          onKeyDown: this.onKeyDown,
-          onSelect: this.onSelect,
-          onCopy: this.onCopy
-        }, plugin.config.attributes))
-      );
-    }
-  });
-};
-
-},{"../../utils":34,"./mixins/undo-stack":49,"react":213,"underscore":214}],53:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var R = React.DOM;
-var _ = require('underscore');
-
-module.exports = function (formatic, plugin) {
-
-  plugin.view = React.createClass({
-
-    mixins: [require('./mixins/input-actions')],
-
-    render: function () {
-
-      var className = formatic.className(plugin.config.className, this.props.field.className);
-
-      var choices = this.props.field.choices;
-
-      if (!this.props.field.value) {
+      if (!value) {
         choices = [{
           value: '',
           label: ''
         }].concat(choices);
       } else {
         var valueChoice = _.find(choices, function (choice) {
-          return choice.value === this.props.field.value;
+          return choice.value === value;
         }.bind(this));
         if (!valueChoice) {
           choices = choices.concat({
-            value: this.props.field.value,
-            label: this.props.field.value
+            value: value,
+            label: value
           });
         }
       }
 
-      return R.select(_.extend({
-        className: className,
+      return formatic.view('field')({
+        field: field
+      }, R.select({
+        className: this.props.className,
         onChange: this.onChange,
-        onFocus: this.onFocus,
-        onBlur: this.onBlur,
-        name: this.props.field.key,
-        value: this.props.field.value //,
-        //onFocus: this.props.actions.focus
-      }, plugin.config.attributes),
-        choices.map(function (choice) {
+        value: value
+      },
+        choices.map(function (choice, i) {
           return R.option({
+            key: i,
             value: choice.value
           }, choice.label);
         }.bind(this))
-      );
+      ));
     }
   });
 };
 
-},{"./mixins/input-actions":47,"react":213,"underscore":214}],54:[function(require,module,exports){
+},{"react/addons":54,"underscore":217}],47:[function(require,module,exports){
 'use strict';
 
-var React = require('react');
+var React = require('react/addons');
 var R = React.DOM;
 var _ = require('underscore');
 
@@ -3572,32 +3943,38 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
-    mixins: [require('./mixins/input-actions')],
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
+    },
+
+    onChange: function (event) {
+      var newValue = event.target.value;
+      this.props.actions.setValue(this.props.field, newValue);
+    },
 
     render: function () {
 
-      var className = formatic.className(plugin.config.className, this.props.field.className);
-
       var field = this.props.field;
 
-      return R.input(_.extend({
-        className: className,
-        type: field.type,
-        name: field.key,
+      return formatic.view('field')({
+        field: field
+      }, R.input({
+        className: this.props.className,
+        type: 'text',
         value: field.value,
-        onChange: this.onChange,
-        onFocus: this.onFocus,
-        onBlur: this.onBlur,
-        readOnly: field.isReadOnly
-      }, plugin.config.attributes));
+        rows: this.props.rows,
+        onChange: this.onChange
+      }));
     }
   });
 };
 
-},{"./mixins/input-actions":47,"react":213,"underscore":214}],55:[function(require,module,exports){
+},{"react/addons":54,"underscore":217}],48:[function(require,module,exports){
 'use strict';
 
-var React = require('react');
+var React = require('react/addons');
 var R = React.DOM;
 var _ = require('underscore');
 
@@ -3605,28 +3982,35 @@ module.exports = function (formatic, plugin) {
 
   plugin.view = React.createClass({
 
-    mixins: [require('./mixins/input-actions')],
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className,
+        rows: plugin.config.rows || 5
+      };
+    },
+
+    onChange: function (event) {
+      var newValue = event.target.value;
+      this.props.actions.setValue(this.props.field, newValue);
+    },
 
     render: function () {
 
-      var className = formatic.className(plugin.config.className, this.props.field.className);
-
       var field = this.props.field;
 
-      return R.textarea(_.extend({
-        className: className,
-        name: field.key,
+      return formatic.view('field')({
+        field: field
+      }, R.textarea({
+        className: this.props.className,
         value: field.value,
-        onChange: this.onChange,
-        onFocus: this.onFocus,
-        onBlur: this.onBlur,
-        rows: field.rows
-      }, plugin.config.attributes));
+        rows: field.rows || this.props.rows,
+        onChange: this.onChange
+      }));
     }
   });
 };
 
-},{"./mixins/input-actions":47,"react":213,"underscore":214}],56:[function(require,module,exports){
+},{"react/addons":54,"underscore":217}],49:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -3691,7 +4075,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],57:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -3857,2145 +4241,2985 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],58:[function(require,module,exports){
-module.exports = (function(){
-  /*
-   * Generated by PEG.js 0.7.0.
-   *
-   * http://pegjs.majda.cz/
-   */
-  
-  function quote(s) {
-    /*
-     * ECMA-262, 5th ed., 7.8.4: All characters may appear literally in a
-     * string literal except for the closing quote character, backslash,
-     * carriage return, line separator, paragraph separator, and line feed.
-     * Any character may appear in the form of an escape sequence.
-     *
-     * For portability, we also escape escape all control and non-ASCII
-     * characters. Note that "\0" and "\v" escape sequences are not used
-     * because JSHint does not like the first and IE the second.
-     */
-     return '"' + s
-      .replace(/\\/g, '\\\\')  // backslash
-      .replace(/"/g, '\\"')    // closing quote character
-      .replace(/\x08/g, '\\b') // backspace
-      .replace(/\t/g, '\\t')   // horizontal tab
-      .replace(/\n/g, '\\n')   // line feed
-      .replace(/\f/g, '\\f')   // form feed
-      .replace(/\r/g, '\\r')   // carriage return
-      .replace(/[\x00-\x07\x0B\x0E-\x1F\x80-\uFFFF]/g, escape)
-      + '"';
+},{}],51:[function(require,module,exports){
+/**
+ *  Copyright (c) 2014, Facebook, Inc.
+ *  All rights reserved.
+ *
+ *  This source code is licensed under the BSD-style license found in the
+ *  LICENSE file in the root directory of this source tree. An additional grant
+ *  of patent rights can be found in the PATENTS file in the same directory.
+ */
+function universalModule() {
+  var $Object = Object;
+
+function createClass(ctor, methods, staticMethods, superClass) {
+  var proto;
+  if (superClass) {
+    var superProto = superClass.prototype;
+    proto = $Object.create(superProto);
+  } else {
+    proto = ctor.prototype;
   }
-  
-  var result = {
-    /*
-     * Parses the input with a generated parser. If the parsing is successfull,
-     * returns a value explicitly or implicitly specified by the grammar from
-     * which the parser was generated (see |PEG.buildParser|). If the parsing is
-     * unsuccessful, throws |PEG.parser.SyntaxError| describing the error.
-     */
-    parse: function(input, startRule) {
-      var parseFunctions = {
-        "start": parse_start,
-        "item": parse_item,
-        "object": parse_object,
-        "objectItem": parse_objectItem,
-        "array": parse_array,
-        "arrayItem": parse_arrayItem,
-        "call": parse_call,
-        "identifier": parse_identifier,
-        "identifierKey": parse_identifierKey,
-        "identifierStart": parse_identifierStart,
-        "identifierChar": parse_identifierChar,
-        "arguments": parse_arguments,
-        "argument": parse_argument,
-        "plainArgument": parse_plainArgument,
-        "keyValueArgument": parse_keyValueArgument,
-        "key": parse_key,
-        "boolean": parse_boolean,
-        "null": parse_null,
-        "string": parse_string,
-        "sqchars": parse_sqchars,
-        "dqchars": parse_dqchars,
-        "sqchar": parse_sqchar,
-        "dqchar": parse_dqchar,
-        "char": parse_char,
-        "number": parse_number,
-        "int": parse_int,
-        "frac": parse_frac,
-        "exp": parse_exp,
-        "digits": parse_digits,
-        "e": parse_e,
-        "digit": parse_digit,
-        "digit19": parse_digit19,
-        "hexDigit": parse_hexDigit,
-        "_": parse__,
-        "whitespace": parse_whitespace
-      };
-      
-      if (startRule !== undefined) {
-        if (parseFunctions[startRule] === undefined) {
-          throw new Error("Invalid rule name: " + quote(startRule) + ".");
+  $Object.keys(methods).forEach(function (key) {
+    proto[key] = methods[key];
+  });
+  $Object.keys(staticMethods).forEach(function (key) {
+    ctor[key] = staticMethods[key];
+  });
+  proto.constructor = ctor;
+  ctor.prototype = proto;
+  return ctor;
+}
+
+function superCall(self, proto, name, args) {
+  return $Object.getPrototypeOf(proto)[name].apply(self, args);
+}
+
+function defaultSuperCall(self, proto, args) {
+  superCall(self, proto, 'constructor', args);
+}
+
+var $traceurRuntime = {};
+$traceurRuntime.createClass = createClass;
+$traceurRuntime.superCall = superCall;
+$traceurRuntime.defaultSuperCall = defaultSuperCall;
+"use strict";
+var SHIFT = 5;
+var SIZE = 1 << SHIFT;
+var MASK = SIZE - 1;
+var NOT_SET = {};
+var CHANGE_LENGTH = {value: false};
+var DID_ALTER = {value: false};
+function MakeRef(ref) {
+  ref.value = false;
+  return ref;
+}
+function SetRef(ref) {
+  ref && (ref.value = true);
+}
+function OwnerID() {}
+function arrCopy(arr, offset) {
+  offset = offset || 0;
+  var len = Math.max(0, arr.length - offset);
+  var newArr = new Array(len);
+  for (var ii = 0; ii < len; ii++) {
+    newArr[ii] = arr[ii + offset];
+  }
+  return newArr;
+}
+var ITER_RESULT = {
+  value: undefined,
+  done: false
+};
+function iteratorValue(value) {
+  ITER_RESULT.value = value;
+  ITER_RESULT.done = false;
+  return ITER_RESULT;
+}
+function iteratorDone() {
+  ITER_RESULT.value = undefined;
+  ITER_RESULT.done = true;
+  return ITER_RESULT;
+}
+function invariant(condition, error) {
+  if (!condition)
+    throw new Error(error);
+}
+var DELETE = 'delete';
+var ITERATOR = typeof Symbol !== 'undefined' ? Symbol.iterator : '@@iterator';
+function hash(o) {
+  if (!o) {
+    return 0;
+  }
+  if (o === true) {
+    return 1;
+  }
+  var type = typeof o;
+  if (type === 'number') {
+    if ((o | 0) === o) {
+      return o & HASH_MAX_VAL;
+    }
+    o = '' + o;
+    type = 'string';
+  }
+  if (type === 'string') {
+    return o.length > STRING_HASH_CACHE_MIN_STRLEN ? cachedHashString(o) : hashString(o);
+  }
+  if (o.hashCode) {
+    return hash(typeof o.hashCode === 'function' ? o.hashCode() : o.hashCode);
+  }
+  return hashJSObj(o);
+}
+function cachedHashString(string) {
+  var hash = STRING_HASH_CACHE[string];
+  if (hash == null) {
+    hash = hashString(string);
+    if (STRING_HASH_CACHE_SIZE === STRING_HASH_CACHE_MAX_SIZE) {
+      STRING_HASH_CACHE_SIZE = 0;
+      STRING_HASH_CACHE = {};
+    }
+    STRING_HASH_CACHE_SIZE++;
+    STRING_HASH_CACHE[string] = hash;
+  }
+  return hash;
+}
+function hashString(string) {
+  var hash = 0;
+  for (var ii = 0; ii < string.length; ii++) {
+    hash = (31 * hash + string.charCodeAt(ii)) & HASH_MAX_VAL;
+  }
+  return hash;
+}
+function hashJSObj(obj) {
+  if (obj[UID_HASH_KEY]) {
+    return obj[UID_HASH_KEY];
+  }
+  var uid = ++UID_HASH_COUNT & HASH_MAX_VAL;
+  if (!isIE8) {
+    try {
+      Object.defineProperty(obj, UID_HASH_KEY, {
+        'enumerable': false,
+        'configurable': false,
+        'writable': false,
+        'value': uid
+      });
+      return uid;
+    } catch (e) {
+      isIE8 = true;
+    }
+  }
+  obj[UID_HASH_KEY] = uid;
+  return uid;
+}
+var HASH_MAX_VAL = 0x7FFFFFFF;
+var UID_HASH_COUNT = 0;
+var UID_HASH_KEY = '__immutablehash__';
+if (typeof Symbol !== 'undefined') {
+  UID_HASH_KEY = Symbol(UID_HASH_KEY);
+}
+var isIE8 = false;
+var STRING_HASH_CACHE_MIN_STRLEN = 16;
+var STRING_HASH_CACHE_MAX_SIZE = 255;
+var STRING_HASH_CACHE_SIZE = 0;
+var STRING_HASH_CACHE = {};
+var Sequence = function Sequence(value) {
+  return $Sequence.from(arguments.length === 1 ? value : Array.prototype.slice.call(arguments));
+};
+var $Sequence = Sequence;
+($traceurRuntime.createClass)(Sequence, {
+  toString: function() {
+    return this.__toString('Seq {', '}');
+  },
+  __toString: function(head, tail) {
+    if (this.length === 0) {
+      return head + tail;
+    }
+    return head + ' ' + this.map(this.__toStringMapper).join(', ') + ' ' + tail;
+  },
+  __toStringMapper: function(v, k) {
+    return k + ': ' + quoteString(v);
+  },
+  toJS: function() {
+    return this.map((function(value) {
+      return value instanceof $Sequence ? value.toJS() : value;
+    })).__toJS();
+  },
+  toArray: function() {
+    assertNotInfinite(this.length);
+    var array = new Array(this.length || 0);
+    this.valueSeq().forEach((function(v, i) {
+      array[i] = v;
+    }));
+    return array;
+  },
+  toObject: function() {
+    assertNotInfinite(this.length);
+    var object = {};
+    this.forEach((function(v, k) {
+      object[k] = v;
+    }));
+    return object;
+  },
+  toVector: function() {
+    assertNotInfinite(this.length);
+    return Vector.from(this);
+  },
+  toMap: function() {
+    assertNotInfinite(this.length);
+    return Map.from(this);
+  },
+  toOrderedMap: function() {
+    assertNotInfinite(this.length);
+    return OrderedMap.from(this);
+  },
+  toSet: function() {
+    assertNotInfinite(this.length);
+    return Set.from(this);
+  },
+  hashCode: function() {
+    return this.__hash || (this.__hash = this.length === Infinity ? 0 : this.reduce((function(h, v, k) {
+      return (h + (hash(v) ^ (v === k ? 0 : hash(k)))) & HASH_MAX_VAL;
+    }), 0));
+  },
+  equals: function(other) {
+    if (this === other) {
+      return true;
+    }
+    if (!(other instanceof $Sequence)) {
+      return false;
+    }
+    if (this.length != null && other.length != null) {
+      if (this.length !== other.length) {
+        return false;
+      }
+      if (this.length === 0 && other.length === 0) {
+        return true;
+      }
+    }
+    if (this.__hash != null && other.__hash != null && this.__hash !== other.__hash) {
+      return false;
+    }
+    return this.__deepEquals(other);
+  },
+  __deepEquals: function(other) {
+    var entries = this.cacheResult().entrySeq().toArray();
+    var iterations = 0;
+    return other.every((function(v, k) {
+      var entry = entries[iterations++];
+      return is(k, entry[0]) && is(v, entry[1]);
+    }));
+  },
+  join: function(separator) {
+    separator = separator || ',';
+    var string = '';
+    var isFirst = true;
+    this.forEach((function(v, k) {
+      if (isFirst) {
+        isFirst = false;
+        string += v;
+      } else {
+        string += separator + v;
+      }
+    }));
+    return string;
+  },
+  count: function(predicate, thisArg) {
+    if (!predicate) {
+      if (this.length == null) {
+        this.length = this.forEach(returnTrue);
+      }
+      return this.length;
+    }
+    return this.filter(predicate, thisArg).count();
+  },
+  countBy: function(mapper, context) {
+    var seq = this;
+    return OrderedMap.empty().withMutations((function(map) {
+      seq.forEach((function(value, key, collection) {
+        map.update(mapper(value, key, collection), increment);
+      }));
+    }));
+  },
+  concat: function() {
+    for (var values = [],
+        $__1 = 0; $__1 < arguments.length; $__1++)
+      values[$__1] = arguments[$__1];
+    var sequences = [this].concat(values.map((function(value) {
+      return $Sequence(value);
+    })));
+    var concatSequence = this.__makeSequence();
+    concatSequence.length = sequences.reduce((function(sum, seq) {
+      return sum != null && seq.length != null ? sum + seq.length : undefined;
+    }), 0);
+    concatSequence.__iterateUncached = (function(fn, reverse) {
+      var iterations = 0;
+      var stoppedIteration;
+      var lastIndex = sequences.length - 1;
+      for (var ii = 0; ii <= lastIndex && !stoppedIteration; ii++) {
+        var seq = sequences[reverse ? lastIndex - ii : ii];
+        iterations += seq.__iterate((function(v, k, c) {
+          if (fn(v, k, c) === false) {
+            stoppedIteration = true;
+            return false;
+          }
+        }), reverse);
+      }
+      return iterations;
+    });
+    return concatSequence;
+  },
+  reverse: function() {
+    var sequence = this;
+    var reversedSequence = sequence.__makeSequence();
+    reversedSequence.length = sequence.length;
+    reversedSequence.__iterateUncached = (function(fn, reverse) {
+      return sequence.__iterate(fn, !reverse);
+    });
+    reversedSequence.reverse = (function() {
+      return sequence;
+    });
+    return reversedSequence;
+  },
+  keySeq: function() {
+    return this.flip().valueSeq();
+  },
+  valueSeq: function() {
+    var sequence = this;
+    var valuesSequence = makeIndexedSequence(sequence);
+    valuesSequence.length = sequence.length;
+    valuesSequence.valueSeq = returnThis;
+    valuesSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (flipIndices && this.length == null) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var iterations = 0;
+      var predicate;
+      if (flipIndices) {
+        iterations = this.length - 1;
+        predicate = (function(v, k, c) {
+          return fn(v, iterations--, c) !== false;
+        });
+      } else {
+        predicate = (function(v, k, c) {
+          return fn(v, iterations++, c) !== false;
+        });
+      }
+      sequence.__iterate(predicate, reverse);
+      return flipIndices ? this.length : iterations;
+    };
+    return valuesSequence;
+  },
+  entrySeq: function() {
+    var sequence = this;
+    if (sequence._cache) {
+      return $Sequence(sequence._cache);
+    }
+    var entriesSequence = sequence.map(entryMapper).valueSeq();
+    entriesSequence.fromEntries = (function() {
+      return sequence;
+    });
+    return entriesSequence;
+  },
+  forEach: function(sideEffect, thisArg) {
+    return this.__iterate(thisArg ? sideEffect.bind(thisArg) : sideEffect);
+  },
+  reduce: function(reducer, initialReduction, thisArg) {
+    var reduction = initialReduction;
+    this.forEach((function(v, k, c) {
+      reduction = reducer.call(thisArg, reduction, v, k, c);
+    }));
+    return reduction;
+  },
+  reduceRight: function(reducer, initialReduction, thisArg) {
+    return this.reverse(true).reduce(reducer, initialReduction, thisArg);
+  },
+  every: function(predicate, thisArg) {
+    var returnValue = true;
+    this.forEach((function(v, k, c) {
+      if (!predicate.call(thisArg, v, k, c)) {
+        returnValue = false;
+        return false;
+      }
+    }));
+    return returnValue;
+  },
+  some: function(predicate, thisArg) {
+    return !this.every(not(predicate), thisArg);
+  },
+  first: function() {
+    return this.find(returnTrue);
+  },
+  last: function() {
+    return this.findLast(returnTrue);
+  },
+  rest: function() {
+    return this.slice(1);
+  },
+  butLast: function() {
+    return this.slice(0, -1);
+  },
+  has: function(searchKey) {
+    return this.get(searchKey, NOT_SET) !== NOT_SET;
+  },
+  get: function(searchKey, notSetValue) {
+    return this.find((function(_, key) {
+      return is(key, searchKey);
+    }), null, notSetValue);
+  },
+  getIn: function(searchKeyPath, notSetValue) {
+    if (!searchKeyPath || searchKeyPath.length === 0) {
+      return this;
+    }
+    return getInDeepSequence(this, searchKeyPath, notSetValue, 0);
+  },
+  contains: function(searchValue) {
+    return this.find((function(value) {
+      return is(value, searchValue);
+    }), null, NOT_SET) !== NOT_SET;
+  },
+  find: function(predicate, thisArg, notSetValue) {
+    var foundValue = notSetValue;
+    this.forEach((function(v, k, c) {
+      if (predicate.call(thisArg, v, k, c)) {
+        foundValue = v;
+        return false;
+      }
+    }));
+    return foundValue;
+  },
+  findKey: function(predicate, thisArg) {
+    var foundKey;
+    this.forEach((function(v, k, c) {
+      if (predicate.call(thisArg, v, k, c)) {
+        foundKey = k;
+        return false;
+      }
+    }));
+    return foundKey;
+  },
+  findLast: function(predicate, thisArg, notSetValue) {
+    return this.reverse(true).find(predicate, thisArg, notSetValue);
+  },
+  findLastKey: function(predicate, thisArg) {
+    return this.reverse(true).findKey(predicate, thisArg);
+  },
+  flip: function() {
+    var sequence = this;
+    var flipSequence = makeSequence();
+    flipSequence.length = sequence.length;
+    flipSequence.flip = (function() {
+      return sequence;
+    });
+    flipSequence.__iterateUncached = (function(fn, reverse) {
+      return sequence.__iterate((function(v, k, c) {
+        return fn(k, v, c) !== false;
+      }), reverse);
+    });
+    return flipSequence;
+  },
+  map: function(mapper, thisArg) {
+    var sequence = this;
+    var mappedSequence = sequence.__makeSequence();
+    mappedSequence.length = sequence.length;
+    mappedSequence.__iterateUncached = (function(fn, reverse) {
+      return sequence.__iterate((function(v, k, c) {
+        return fn(mapper.call(thisArg, v, k, c), k, c) !== false;
+      }), reverse);
+    });
+    return mappedSequence;
+  },
+  mapKeys: function(mapper, thisArg) {
+    var sequence = this;
+    var mappedSequence = sequence.__makeSequence();
+    mappedSequence.length = sequence.length;
+    mappedSequence.__iterateUncached = (function(fn, reverse) {
+      return sequence.__iterate((function(v, k, c) {
+        return fn(v, mapper.call(thisArg, k, v, c), c) !== false;
+      }), reverse);
+    });
+    return mappedSequence;
+  },
+  filter: function(predicate, thisArg) {
+    return filterFactory(this, predicate, thisArg, true, false);
+  },
+  slice: function(begin, end) {
+    if (wholeSlice(begin, end, this.length)) {
+      return this;
+    }
+    var resolvedBegin = resolveBegin(begin, this.length);
+    var resolvedEnd = resolveEnd(end, this.length);
+    if (resolvedBegin !== resolvedBegin || resolvedEnd !== resolvedEnd) {
+      return this.entrySeq().slice(begin, end).fromEntrySeq();
+    }
+    var skipped = resolvedBegin === 0 ? this : this.skip(resolvedBegin);
+    return resolvedEnd == null || resolvedEnd === this.length ? skipped : skipped.take(resolvedEnd - resolvedBegin);
+  },
+  take: function(amount) {
+    var sequence = this;
+    if (amount > sequence.length) {
+      return sequence;
+    }
+    var takeSequence = sequence.__makeSequence();
+    takeSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var iterations = 0;
+      sequence.__iterate((function(v, k, c) {
+        if (iterations < amount && fn(v, k, c) !== false) {
+          iterations++;
+        } else {
+          return false;
+        }
+      }), reverse, flipIndices);
+      return iterations;
+    };
+    takeSequence.length = this.length && Math.min(this.length, amount);
+    return takeSequence;
+  },
+  takeLast: function(amount, maintainIndices) {
+    return this.reverse(maintainIndices).take(amount).reverse(maintainIndices);
+  },
+  takeWhile: function(predicate, thisArg) {
+    var sequence = this;
+    var takeSequence = sequence.__makeSequence();
+    takeSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var iterations = 0;
+      sequence.__iterate((function(v, k, c) {
+        if (predicate.call(thisArg, v, k, c) && fn(v, k, c) !== false) {
+          iterations++;
+        } else {
+          return false;
+        }
+      }), reverse, flipIndices);
+      return iterations;
+    };
+    return takeSequence;
+  },
+  takeUntil: function(predicate, thisArg, maintainIndices) {
+    return this.takeWhile(not(predicate), thisArg, maintainIndices);
+  },
+  skip: function(amount, maintainIndices) {
+    var sequence = this;
+    if (amount === 0) {
+      return sequence;
+    }
+    var skipSequence = sequence.__makeSequence();
+    skipSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var isSkipping = true;
+      var iterations = 0;
+      var skipped = 0;
+      sequence.__iterate((function(v, k, c) {
+        if (!(isSkipping && (isSkipping = skipped++ < amount))) {
+          if (fn(v, k, c) !== false) {
+            iterations++;
+          } else {
+            return false;
+          }
+        }
+      }), reverse, flipIndices);
+      return iterations;
+    };
+    skipSequence.length = this.length && Math.max(0, this.length - amount);
+    return skipSequence;
+  },
+  skipLast: function(amount, maintainIndices) {
+    return this.reverse(maintainIndices).skip(amount).reverse(maintainIndices);
+  },
+  skipWhile: function(predicate, thisArg, maintainIndices) {
+    var sequence = this;
+    var skipSequence = sequence.__makeSequence();
+    skipSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var isSkipping = true;
+      var iterations = 0;
+      sequence.__iterate((function(v, k, c) {
+        if (!(isSkipping && (isSkipping = predicate.call(thisArg, v, k, c)))) {
+          if (fn(v, k, c) !== false) {
+            iterations++;
+          } else {
+            return false;
+          }
+        }
+      }), reverse, flipIndices);
+      return iterations;
+    };
+    return skipSequence;
+  },
+  skipUntil: function(predicate, thisArg, maintainIndices) {
+    return this.skipWhile(not(predicate), thisArg, maintainIndices);
+  },
+  groupBy: function(mapper, context) {
+    var seq = this;
+    var groups = OrderedMap.empty().withMutations((function(map) {
+      seq.forEach((function(value, key, collection) {
+        var groupKey = mapper(value, key, collection);
+        var group = map.get(groupKey, NOT_SET);
+        if (group === NOT_SET) {
+          group = [];
+          map.set(groupKey, group);
+        }
+        group.push([key, value]);
+      }));
+    }));
+    return groups.map((function(group) {
+      return $Sequence(group).fromEntrySeq();
+    }));
+  },
+  sort: function(comparator, maintainIndices) {
+    return this.sortBy(valueMapper, comparator, maintainIndices);
+  },
+  sortBy: function(mapper, comparator, maintainIndices) {
+    comparator = comparator || defaultComparator;
+    var seq = this;
+    return $Sequence(this.entrySeq().entrySeq().toArray().sort((function(indexedEntryA, indexedEntryB) {
+      return comparator(mapper(indexedEntryA[1][1], indexedEntryA[1][0], seq), mapper(indexedEntryB[1][1], indexedEntryB[1][0], seq)) || indexedEntryA[0] - indexedEntryB[0];
+    }))).fromEntrySeq().valueSeq().fromEntrySeq();
+  },
+  cacheResult: function() {
+    if (!this._cache && this.__iterateUncached) {
+      assertNotInfinite(this.length);
+      this._cache = this.entrySeq().toArray();
+      if (this.length == null) {
+        this.length = this._cache.length;
+      }
+    }
+    return this;
+  },
+  __iterate: function(fn, reverse, flipIndices) {
+    if (!this._cache) {
+      return this.__iterateUncached(fn, reverse, flipIndices);
+    }
+    var maxIndex = this.length - 1;
+    var cache = this._cache;
+    var c = this;
+    if (reverse) {
+      for (var ii = cache.length - 1; ii >= 0; ii--) {
+        var revEntry = cache[ii];
+        if (fn(revEntry[1], flipIndices ? revEntry[0] : maxIndex - revEntry[0], c) === false) {
+          break;
+        }
+      }
+    } else {
+      cache.every(flipIndices ? (function(entry) {
+        return fn(entry[1], maxIndex - entry[0], c) !== false;
+      }) : (function(entry) {
+        return fn(entry[1], entry[0], c) !== false;
+      }));
+    }
+    return this.length;
+  },
+  __makeSequence: function() {
+    return makeSequence();
+  }
+}, {from: function(value) {
+    if (value instanceof $Sequence) {
+      return value;
+    }
+    if (!Array.isArray(value)) {
+      if (value && value.constructor === Object) {
+        return new ObjectSequence(value);
+      }
+      value = [value];
+    }
+    return new ArraySequence(value);
+  }});
+var SequencePrototype = Sequence.prototype;
+SequencePrototype.toJSON = SequencePrototype.toJS;
+SequencePrototype.__toJS = SequencePrototype.toObject;
+SequencePrototype.inspect = SequencePrototype.toSource = function() {
+  return this.toString();
+};
+var IndexedSequence = function IndexedSequence() {
+  $traceurRuntime.defaultSuperCall(this, $IndexedSequence.prototype, arguments);
+};
+var $IndexedSequence = IndexedSequence;
+($traceurRuntime.createClass)(IndexedSequence, {
+  toString: function() {
+    return this.__toString('Seq [', ']');
+  },
+  toArray: function() {
+    assertNotInfinite(this.length);
+    var array = new Array(this.length || 0);
+    array.length = this.forEach((function(v, i) {
+      array[i] = v;
+    }));
+    return array;
+  },
+  fromEntrySeq: function() {
+    var sequence = this;
+    var fromEntriesSequence = makeSequence();
+    fromEntriesSequence.length = sequence.length;
+    fromEntriesSequence.entrySeq = (function() {
+      return sequence;
+    });
+    fromEntriesSequence.__iterateUncached = (function(fn, reverse, flipIndices) {
+      return sequence.__iterate((function(entry, _, c) {
+        return fn(entry[1], entry[0], c);
+      }), reverse, flipIndices);
+    });
+    return fromEntriesSequence;
+  },
+  join: function(separator) {
+    separator = separator || ',';
+    var string = '';
+    var prevIndex = 0;
+    this.forEach((function(v, i) {
+      var numSeparators = i - prevIndex;
+      prevIndex = i;
+      string += (numSeparators === 1 ? separator : repeatString(separator, numSeparators)) + v;
+    }));
+    if (this.length && prevIndex < this.length - 1) {
+      string += repeatString(separator, this.length - 1 - prevIndex);
+    }
+    return string;
+  },
+  concat: function() {
+    for (var values = [],
+        $__2 = 0; $__2 < arguments.length; $__2++)
+      values[$__2] = arguments[$__2];
+    var sequences = [this].concat(values).map((function(value) {
+      return Sequence(value);
+    }));
+    var concatSequence = this.__makeSequence();
+    concatSequence.length = sequences.reduce((function(sum, seq) {
+      return sum != null && seq.length != null ? sum + seq.length : undefined;
+    }), 0);
+    concatSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (flipIndices && !this.length) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var iterations = 0;
+      var stoppedIteration;
+      var maxIndex = flipIndices && this.length - 1;
+      var maxSequencesIndex = sequences.length - 1;
+      for (var ii = 0; ii <= maxSequencesIndex && !stoppedIteration; ii++) {
+        var sequence = sequences[reverse ? maxSequencesIndex - ii : ii];
+        if (!(sequence instanceof $IndexedSequence)) {
+          sequence = sequence.valueSeq();
+        }
+        iterations += sequence.__iterate((function(v, index, c) {
+          index += iterations;
+          if (fn(v, flipIndices ? maxIndex - index : index, c) === false) {
+            stoppedIteration = true;
+            return false;
+          }
+        }), reverse);
+      }
+      return iterations;
+    };
+    return concatSequence;
+  },
+  reverse: function(maintainIndices) {
+    var sequence = this;
+    var reversedSequence = sequence.__makeSequence();
+    reversedSequence.length = sequence.length;
+    reversedSequence.__reversedIndices = !!(maintainIndices ^ sequence.__reversedIndices);
+    reversedSequence.__iterateUncached = (function(fn, reverse, flipIndices) {
+      return sequence.__iterate(fn, !reverse, flipIndices ^ maintainIndices);
+    });
+    reversedSequence.reverse = function(_maintainIndices) {
+      return maintainIndices === _maintainIndices ? sequence : IndexedSequencePrototype.reverse.call(this, _maintainIndices);
+    };
+    return reversedSequence;
+  },
+  valueSeq: function() {
+    var valuesSequence = $traceurRuntime.superCall(this, $IndexedSequence.prototype, "valueSeq", []);
+    valuesSequence.length = undefined;
+    return valuesSequence;
+  },
+  filter: function(predicate, thisArg, maintainIndices) {
+    var filterSequence = filterFactory(this, predicate, thisArg, maintainIndices, maintainIndices);
+    if (maintainIndices) {
+      filterSequence.length = this.length;
+    }
+    return filterSequence;
+  },
+  indexOf: function(searchValue) {
+    return this.findIndex((function(value) {
+      return is(value, searchValue);
+    }));
+  },
+  lastIndexOf: function(searchValue) {
+    return this.reverse(true).indexOf(searchValue);
+  },
+  findIndex: function(predicate, thisArg) {
+    var key = this.findKey(predicate, thisArg);
+    return key == null ? -1 : key;
+  },
+  findLastIndex: function(predicate, thisArg) {
+    return this.reverse(true).findIndex(predicate, thisArg);
+  },
+  slice: function(begin, end, maintainIndices) {
+    var sequence = this;
+    if (wholeSlice(begin, end, sequence.length)) {
+      return sequence;
+    }
+    var sliceSequence = sequence.__makeSequence();
+    var resolvedBegin = resolveBegin(begin, sequence.length);
+    var resolvedEnd = resolveEnd(end, sequence.length);
+    sliceSequence.length = sequence.length && (maintainIndices ? sequence.length : resolvedEnd - resolvedBegin);
+    sliceSequence.__reversedIndices = sequence.__reversedIndices;
+    sliceSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var reversedIndices = this.__reversedIndices ^ flipIndices;
+      if (resolvedBegin !== resolvedBegin || resolvedEnd !== resolvedEnd || (reversedIndices && sequence.length == null)) {
+        var exactLength = sequence.count();
+        resolvedBegin = resolveBegin(begin, exactLength);
+        resolvedEnd = resolveEnd(end, exactLength);
+      }
+      var iiBegin = reversedIndices ? sequence.length - resolvedEnd : resolvedBegin;
+      var iiEnd = reversedIndices ? sequence.length - resolvedBegin : resolvedEnd;
+      var lengthIterated = sequence.__iterate((function(v, ii, c) {
+        return reversedIndices ? (iiEnd != null && ii >= iiEnd) || (ii >= iiBegin) && fn(v, maintainIndices ? ii : ii - iiBegin, c) !== false : (ii < iiBegin) || (iiEnd == null || ii < iiEnd) && fn(v, maintainIndices ? ii : ii - iiBegin, c) !== false;
+      }), reverse, flipIndices);
+      return this.length != null ? this.length : maintainIndices ? lengthIterated : Math.max(0, lengthIterated - iiBegin);
+    };
+    return sliceSequence;
+  },
+  splice: function(index, removeNum) {
+    var numArgs = arguments.length;
+    removeNum = Math.max(removeNum | 0, 0);
+    if (numArgs === 0 || (numArgs === 2 && !removeNum)) {
+      return this;
+    }
+    index = resolveBegin(index, this.length);
+    var spliced = this.slice(0, index);
+    return numArgs === 1 ? spliced : spliced.concat(arrCopy(arguments, 2), this.slice(index + removeNum));
+  },
+  take: function(amount) {
+    var sequence = this;
+    if (amount > sequence.length) {
+      return sequence;
+    }
+    var takeSequence = sequence.__makeSequence();
+    takeSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var taken = 0;
+      var iterations = 0;
+      var didFinish = true;
+      var length = sequence.__iterate((function(v, ii, c) {
+        if (taken++ < amount && fn(v, ii, c) !== false) {
+          iterations = ii;
+        } else {
+          didFinish = false;
+          return false;
+        }
+      }), reverse, flipIndices);
+      return didFinish ? length : iterations + 1;
+    };
+    takeSequence.length = this.length && Math.min(this.length, amount);
+    return takeSequence;
+  },
+  takeWhile: function(predicate, thisArg, maintainIndices) {
+    var sequence = this;
+    var takeSequence = sequence.__makeSequence();
+    takeSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var iterations = 0;
+      var didFinish = true;
+      var length = sequence.__iterate((function(v, ii, c) {
+        if (predicate.call(thisArg, v, ii, c) && fn(v, ii, c) !== false) {
+          iterations = ii;
+        } else {
+          didFinish = false;
+          return false;
+        }
+      }), reverse, flipIndices);
+      return maintainIndices ? takeSequence.length : didFinish ? length : iterations + 1;
+    };
+    if (maintainIndices) {
+      takeSequence.length = this.length;
+    }
+    return takeSequence;
+  },
+  skip: function(amount, maintainIndices) {
+    var sequence = this;
+    if (amount === 0) {
+      return sequence;
+    }
+    var skipSequence = sequence.__makeSequence();
+    if (maintainIndices) {
+      skipSequence.length = this.length;
+    }
+    skipSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var reversedIndices = sequence.__reversedIndices ^ flipIndices;
+      var isSkipping = true;
+      var indexOffset = 0;
+      var skipped = 0;
+      var length = sequence.__iterate((function(v, ii, c) {
+        if (isSkipping) {
+          isSkipping = skipped++ < amount;
+          if (!isSkipping) {
+            indexOffset = ii;
+          }
+        }
+        return isSkipping || fn(v, flipIndices || maintainIndices ? ii : ii - indexOffset, c) !== false;
+      }), reverse, flipIndices);
+      return maintainIndices ? length : reversedIndices ? indexOffset + 1 : length - indexOffset;
+    };
+    skipSequence.length = this.length && Math.max(0, this.length - amount);
+    return skipSequence;
+  },
+  skipWhile: function(predicate, thisArg, maintainIndices) {
+    var sequence = this;
+    var skipWhileSequence = sequence.__makeSequence();
+    if (maintainIndices) {
+      skipWhileSequence.length = this.length;
+    }
+    skipWhileSequence.__iterateUncached = function(fn, reverse, flipIndices) {
+      if (reverse) {
+        return this.cacheResult().__iterate(fn, reverse, flipIndices);
+      }
+      var reversedIndices = sequence.__reversedIndices ^ flipIndices;
+      var isSkipping = true;
+      var indexOffset = 0;
+      var length = sequence.__iterate((function(v, ii, c) {
+        if (isSkipping) {
+          isSkipping = predicate.call(thisArg, v, ii, c);
+          if (!isSkipping) {
+            indexOffset = ii;
+          }
+        }
+        return isSkipping || fn(v, flipIndices || maintainIndices ? ii : ii - indexOffset, c) !== false;
+      }), reverse, flipIndices);
+      return maintainIndices ? length : reversedIndices ? indexOffset + 1 : length - indexOffset;
+    };
+    return skipWhileSequence;
+  },
+  groupBy: function(mapper, context, maintainIndices) {
+    var seq = this;
+    var groups = OrderedMap.empty().withMutations((function(map) {
+      seq.forEach((function(value, index, collection) {
+        var groupKey = mapper(value, index, collection);
+        var group = map.get(groupKey, NOT_SET);
+        if (group === NOT_SET) {
+          group = new Array(maintainIndices ? seq.length : 0);
+          map.set(groupKey, group);
+        }
+        maintainIndices ? (group[index] = value) : group.push(value);
+      }));
+    }));
+    return groups.map((function(group) {
+      return Sequence(group);
+    }));
+  },
+  sortBy: function(mapper, comparator, maintainIndices) {
+    var sortedSeq = $traceurRuntime.superCall(this, $IndexedSequence.prototype, "sortBy", [mapper, comparator]);
+    if (!maintainIndices) {
+      sortedSeq = sortedSeq.valueSeq();
+    }
+    sortedSeq.length = this.length;
+    return sortedSeq;
+  },
+  __makeSequence: function() {
+    return makeIndexedSequence(this);
+  }
+}, {}, Sequence);
+var IndexedSequencePrototype = IndexedSequence.prototype;
+IndexedSequencePrototype.__toJS = IndexedSequencePrototype.toArray;
+IndexedSequencePrototype.__toStringMapper = quoteString;
+var ObjectSequence = function ObjectSequence(object) {
+  var keys = Object.keys(object);
+  this._object = object;
+  this._keys = keys;
+  this.length = keys.length;
+};
+($traceurRuntime.createClass)(ObjectSequence, {
+  toObject: function() {
+    return this._object;
+  },
+  get: function(key, notSetValue) {
+    if (notSetValue !== undefined && !this.has(key)) {
+      return notSetValue;
+    }
+    return this._object[key];
+  },
+  has: function(key) {
+    return this._object.hasOwnProperty(key);
+  },
+  __iterate: function(fn, reverse) {
+    var object = this._object;
+    var keys = this._keys;
+    var maxIndex = keys.length - 1;
+    for (var ii = 0; ii <= maxIndex; ii++) {
+      var iteration = reverse ? maxIndex - ii : ii;
+      if (fn(object[keys[iteration]], keys[iteration], object) === false) {
+        break;
+      }
+    }
+    return ii;
+  }
+}, {}, Sequence);
+var ArraySequence = function ArraySequence(array) {
+  this._array = array;
+  this.length = array.length;
+};
+($traceurRuntime.createClass)(ArraySequence, {
+  toArray: function() {
+    return this._array;
+  },
+  __iterate: function(fn, reverse, flipIndices) {
+    var array = this._array;
+    var maxIndex = array.length - 1;
+    var lastIndex = -1;
+    if (reverse) {
+      for (var ii = maxIndex; ii >= 0; ii--) {
+        if (array.hasOwnProperty(ii) && fn(array[ii], flipIndices ? ii : maxIndex - ii, array) === false) {
+          return lastIndex + 1;
+        }
+        lastIndex = ii;
+      }
+      return array.length;
+    } else {
+      var didFinish = array.every((function(value, index) {
+        if (fn(value, flipIndices ? maxIndex - index : index, array) === false) {
+          return false;
+        } else {
+          lastIndex = index;
+          return true;
+        }
+      }));
+      return didFinish ? array.length : lastIndex + 1;
+    }
+  }
+}, {}, IndexedSequence);
+ArraySequence.prototype.get = ObjectSequence.prototype.get;
+ArraySequence.prototype.has = ObjectSequence.prototype.has;
+var SequenceIterator = function SequenceIterator() {};
+($traceurRuntime.createClass)(SequenceIterator, {toString: function() {
+    return '[Iterator]';
+  }}, {});
+var SequenceIteratorPrototype = SequenceIterator.prototype;
+SequenceIteratorPrototype[ITERATOR] = returnThis;
+SequenceIteratorPrototype.inspect = SequenceIteratorPrototype.toSource = function() {
+  return this.toString();
+};
+function makeSequence() {
+  return Object.create(SequencePrototype);
+}
+function makeIndexedSequence(parent) {
+  var newSequence = Object.create(IndexedSequencePrototype);
+  newSequence.__reversedIndices = parent ? parent.__reversedIndices : false;
+  return newSequence;
+}
+function getInDeepSequence(seq, keyPath, notSetValue, pathOffset) {
+  var nested = seq.get ? seq.get(keyPath[pathOffset], NOT_SET) : NOT_SET;
+  if (nested === NOT_SET) {
+    return notSetValue;
+  }
+  if (++pathOffset === keyPath.length) {
+    return nested;
+  }
+  return getInDeepSequence(nested, keyPath, notSetValue, pathOffset);
+}
+function wholeSlice(begin, end, length) {
+  return (begin === 0 || (length != null && begin <= -length)) && (end == null || (length != null && end >= length));
+}
+function resolveBegin(begin, length) {
+  return resolveIndex(begin, length, 0);
+}
+function resolveEnd(end, length) {
+  return resolveIndex(end, length, length);
+}
+function resolveIndex(index, length, defaultIndex) {
+  return index == null ? defaultIndex : index < 0 ? Math.max(0, length + index) : length ? Math.min(length, index) : index;
+}
+function valueMapper(v) {
+  return v;
+}
+function entryMapper(v, k) {
+  return [k, v];
+}
+function returnTrue() {
+  return true;
+}
+function returnThis() {
+  return this;
+}
+function increment(value) {
+  return (value || 0) + 1;
+}
+function filterFactory(sequence, predicate, thisArg, useKeys, maintainIndices) {
+  var filterSequence = sequence.__makeSequence();
+  filterSequence.__iterateUncached = (function(fn, reverse, flipIndices) {
+    var iterations = 0;
+    var length = sequence.__iterate((function(v, k, c) {
+      if (predicate.call(thisArg, v, k, c)) {
+        if (fn(v, useKeys ? k : iterations, c) !== false) {
+          iterations++;
+        } else {
+          return false;
+        }
+      }
+    }), reverse, flipIndices);
+    return maintainIndices ? length : iterations;
+  });
+  return filterSequence;
+}
+function not(predicate) {
+  return function() {
+    return !predicate.apply(this, arguments);
+  };
+}
+function quoteString(value) {
+  return typeof value === 'string' ? JSON.stringify(value) : value;
+}
+function repeatString(string, times) {
+  var repeated = '';
+  while (times) {
+    if (times & 1) {
+      repeated += string;
+    }
+    if ((times >>= 1)) {
+      string += string;
+    }
+  }
+  return repeated;
+}
+function defaultComparator(a, b) {
+  return a > b ? 1 : a < b ? -1 : 0;
+}
+function assertNotInfinite(length) {
+  invariant(length !== Infinity, 'Cannot perform this action with an infinite sequence.');
+}
+function iteratorMapper(iter, fn) {
+  var newIter = new SequenceIterator();
+  newIter.next = (function() {
+    var step = iter.next();
+    if (step.done)
+      return step;
+    step.value = fn(step.value);
+    return step;
+  });
+  return newIter;
+}
+var Cursor = function Cursor(rootData, keyPath, onChange, value) {
+  value = value ? value : rootData.getIn(keyPath);
+  this.length = value instanceof Sequence ? value.length : null;
+  this._rootData = rootData;
+  this._keyPath = keyPath;
+  this._onChange = onChange;
+};
+($traceurRuntime.createClass)(Cursor, {
+  deref: function(notSetValue) {
+    return this._rootData.getIn(this._keyPath, notSetValue);
+  },
+  get: function(key, notSetValue) {
+    if (Array.isArray(key) && key.length === 0) {
+      return this;
+    }
+    var value = this._rootData.getIn(this._keyPath.concat(key), NOT_SET);
+    return value === NOT_SET ? notSetValue : wrappedValue(this, key, value);
+  },
+  set: function(key, value) {
+    return updateCursor(this, (function(m) {
+      return m.set(key, value);
+    }), key);
+  },
+  remove: function(key) {
+    return updateCursor(this, (function(m) {
+      return m.remove(key);
+    }), key);
+  },
+  clear: function() {
+    return updateCursor(this, (function(m) {
+      return m.clear();
+    }));
+  },
+  update: function(keyOrFn, notSetValue, updater) {
+    return arguments.length === 1 ? updateCursor(this, keyOrFn) : updateCursor(this, (function(map) {
+      return map.update(keyOrFn, notSetValue, updater);
+    }), keyOrFn);
+  },
+  withMutations: function(fn) {
+    return updateCursor(this, (function(m) {
+      return (m || Map.empty()).withMutations(fn);
+    }));
+  },
+  cursor: function(subKey) {
+    return Array.isArray(subKey) && subKey.length === 0 ? this : subCursor(this, subKey);
+  },
+  __iterate: function(fn, reverse, flipIndices) {
+    var cursor = this;
+    var deref = cursor.deref();
+    return deref && deref.__iterate ? deref.__iterate((function(value, key, collection) {
+      return fn(wrappedValue(cursor, key, value), key, collection);
+    }), reverse, flipIndices) : 0;
+  }
+}, {}, Sequence);
+Cursor.prototype[DELETE] = Cursor.prototype.remove;
+Cursor.prototype.getIn = Cursor.prototype.get;
+function wrappedValue(cursor, key, value) {
+  return value instanceof Sequence ? subCursor(cursor, key, value) : value;
+}
+function subCursor(cursor, key, value) {
+  return new Cursor(cursor._rootData, cursor._keyPath.concat(key), cursor._onChange, value);
+}
+function updateCursor(cursor, changeFn, changeKey) {
+  var newRootData = cursor._rootData.updateIn(cursor._keyPath, changeKey ? Map.empty() : undefined, changeFn);
+  var keyPath = cursor._keyPath || [];
+  cursor._onChange && cursor._onChange.call(undefined, newRootData, cursor._rootData, changeKey ? keyPath.concat(changeKey) : keyPath);
+  return new Cursor(newRootData, cursor._keyPath, cursor._onChange);
+}
+function is(first, second) {
+  if (first instanceof Cursor) {
+    first = first.deref();
+  }
+  if (second instanceof Cursor) {
+    second = second.deref();
+  }
+  if (first === second) {
+    return first !== 0 || second !== 0 || 1 / first === 1 / second;
+  }
+  if (first !== first) {
+    return second !== second;
+  }
+  if (first instanceof Sequence) {
+    return first.equals(second);
+  }
+  return false;
+}
+var Map = function Map(sequence) {
+  var map = $Map.empty();
+  return sequence ? sequence.constructor === $Map ? sequence : map.merge(sequence) : map;
+};
+var $Map = Map;
+($traceurRuntime.createClass)(Map, {
+  toString: function() {
+    return this.__toString('Map {', '}');
+  },
+  get: function(k, notSetValue) {
+    return this._root ? this._root.get(0, hash(k), k, notSetValue) : notSetValue;
+  },
+  set: function(k, v) {
+    return updateMap(this, k, v);
+  },
+  remove: function(k) {
+    return updateMap(this, k, NOT_SET);
+  },
+  update: function(k, notSetValue, updater) {
+    return arguments.length === 1 ? this.updateIn([], null, k) : this.updateIn([k], notSetValue, updater);
+  },
+  updateIn: function(keyPath, notSetValue, updater) {
+    var $__12;
+    if (!updater) {
+      ($__12 = [notSetValue, updater], updater = $__12[0], notSetValue = $__12[1], $__12);
+    }
+    return updateInDeepMap(this, keyPath, notSetValue, updater, 0);
+  },
+  clear: function() {
+    if (this.length === 0) {
+      return this;
+    }
+    if (this.__ownerID) {
+      this.length = 0;
+      this._root = null;
+      this.__hash = undefined;
+      this.__altered = true;
+      return this;
+    }
+    return $Map.empty();
+  },
+  merge: function() {
+    return mergeIntoMapWith(this, null, arguments);
+  },
+  mergeWith: function(merger) {
+    for (var seqs = [],
+        $__3 = 1; $__3 < arguments.length; $__3++)
+      seqs[$__3 - 1] = arguments[$__3];
+    return mergeIntoMapWith(this, merger, seqs);
+  },
+  mergeDeep: function() {
+    return mergeIntoMapWith(this, deepMerger(null), arguments);
+  },
+  mergeDeepWith: function(merger) {
+    for (var seqs = [],
+        $__4 = 1; $__4 < arguments.length; $__4++)
+      seqs[$__4 - 1] = arguments[$__4];
+    return mergeIntoMapWith(this, deepMerger(merger), seqs);
+  },
+  cursor: function(keyPath, onChange) {
+    if (!onChange && typeof keyPath === 'function') {
+      onChange = keyPath;
+      keyPath = [];
+    } else if (arguments.length === 0) {
+      keyPath = [];
+    } else if (!Array.isArray(keyPath)) {
+      keyPath = [keyPath];
+    }
+    return new Cursor(this, keyPath, onChange);
+  },
+  withMutations: function(fn) {
+    var mutable = this.asMutable();
+    fn(mutable);
+    return mutable.wasAltered() ? mutable.__ensureOwner(this.__ownerID) : this;
+  },
+  asMutable: function() {
+    return this.__ownerID ? this : this.__ensureOwner(new OwnerID());
+  },
+  asImmutable: function() {
+    return this.__ensureOwner();
+  },
+  wasAltered: function() {
+    return this.__altered;
+  },
+  keys: function() {
+    return new MapIterator(this, 0);
+  },
+  values: function() {
+    return new MapIterator(this, 1);
+  },
+  entries: function() {
+    return new MapIterator(this, 2);
+  },
+  __iterator: function(reverse) {
+    return new MapIterator(this, 2, reverse);
+  },
+  __iterate: function(fn, reverse) {
+    var map = this;
+    if (!map._root) {
+      return 0;
+    }
+    var iterations = 0;
+    this._root.iterate((function(entry) {
+      if (fn(entry[1], entry[0], map) === false) {
+        return false;
+      }
+      iterations++;
+    }), reverse);
+    return iterations;
+  },
+  __deepEqual: function(other) {
+    var self = this;
+    return other.every((function(v, k) {
+      return is(self.get(k, NOT_SET), v);
+    }));
+  },
+  __ensureOwner: function(ownerID) {
+    if (ownerID === this.__ownerID) {
+      return this;
+    }
+    if (!ownerID) {
+      this.__ownerID = ownerID;
+      this.__altered = false;
+      return this;
+    }
+    return makeMap(this.length, this._root, ownerID, this.__hash);
+  }
+}, {empty: function() {
+    return EMPTY_MAP || (EMPTY_MAP = makeMap(0));
+  }}, Sequence);
+var MapPrototype = Map.prototype;
+MapPrototype[DELETE] = MapPrototype.remove;
+MapPrototype[ITERATOR] = function() {
+  return this.entries();
+};
+Map.from = Map;
+var BitmapIndexedNode = function BitmapIndexedNode(ownerID, bitmap, nodes) {
+  this.ownerID = ownerID;
+  this.bitmap = bitmap;
+  this.nodes = nodes;
+};
+var $BitmapIndexedNode = BitmapIndexedNode;
+($traceurRuntime.createClass)(BitmapIndexedNode, {
+  get: function(shift, hash, key, notSetValue) {
+    var bit = (1 << ((hash >>> shift) & MASK));
+    var bitmap = this.bitmap;
+    return (bitmap & bit) === 0 ? notSetValue : this.nodes[popCount(bitmap & (bit - 1))].get(shift + SHIFT, hash, key, notSetValue);
+  },
+  update: function(ownerID, shift, hash, key, value, didChangeLength, didAlter) {
+    var hashFrag = (hash >>> shift) & MASK;
+    var bit = 1 << hashFrag;
+    var bitmap = this.bitmap;
+    var exists = (bitmap & bit) !== 0;
+    if (!exists && value === NOT_SET) {
+      return this;
+    }
+    var idx = popCount(bitmap & (bit - 1));
+    var nodes = this.nodes;
+    var node = exists ? nodes[idx] : null;
+    var newNode = updateNode(node, ownerID, shift + SHIFT, hash, key, value, didChangeLength, didAlter);
+    if (newNode === node) {
+      return this;
+    }
+    if (!exists && newNode && nodes.length >= MAX_BITMAP_SIZE) {
+      return expandNodes(ownerID, nodes, bitmap, hashFrag, newNode);
+    }
+    if (exists && !newNode && nodes.length === 2 && isLeafNode(nodes[idx ^ 1])) {
+      return nodes[idx ^ 1];
+    }
+    if (exists && newNode && nodes.length === 1 && isLeafNode(newNode)) {
+      return newNode;
+    }
+    var isEditable = ownerID && ownerID === this.ownerID;
+    var newBitmap = exists ? newNode ? bitmap : bitmap ^ bit : bitmap | bit;
+    var newNodes = exists ? newNode ? setIn(nodes, idx, newNode, isEditable) : spliceOut(nodes, idx, isEditable) : spliceIn(nodes, idx, newNode, isEditable);
+    if (isEditable) {
+      this.bitmap = newBitmap;
+      this.nodes = newNodes;
+      return this;
+    }
+    return new $BitmapIndexedNode(ownerID, newBitmap, newNodes);
+  },
+  iterate: function(fn, reverse) {
+    var nodes = this.nodes;
+    for (var ii = 0,
+        maxIndex = nodes.length - 1; ii <= maxIndex; ii++) {
+      if (nodes[reverse ? maxIndex - ii : ii].iterate(fn, reverse) === false) {
+        return false;
+      }
+    }
+  }
+}, {});
+var ArrayNode = function ArrayNode(ownerID, count, nodes) {
+  this.ownerID = ownerID;
+  this.count = count;
+  this.nodes = nodes;
+};
+var $ArrayNode = ArrayNode;
+($traceurRuntime.createClass)(ArrayNode, {
+  get: function(shift, hash, key, notSetValue) {
+    var idx = (hash >>> shift) & MASK;
+    var node = this.nodes[idx];
+    return node ? node.get(shift + SHIFT, hash, key, notSetValue) : notSetValue;
+  },
+  update: function(ownerID, shift, hash, key, value, didChangeLength, didAlter) {
+    var idx = (hash >>> shift) & MASK;
+    var removed = value === NOT_SET;
+    var nodes = this.nodes;
+    var node = nodes[idx];
+    if (removed && !node) {
+      return this;
+    }
+    var newNode = updateNode(node, ownerID, shift + SHIFT, hash, key, value, didChangeLength, didAlter);
+    if (newNode === node) {
+      return this;
+    }
+    var newCount = this.count;
+    if (!node) {
+      newCount++;
+    } else if (!newNode) {
+      newCount--;
+      if (newCount < MIN_ARRAY_SIZE) {
+        return packNodes(ownerID, nodes, newCount, idx);
+      }
+    }
+    var isEditable = ownerID && ownerID === this.ownerID;
+    var newNodes = setIn(nodes, idx, newNode, isEditable);
+    if (isEditable) {
+      this.count = newCount;
+      this.nodes = newNodes;
+      return this;
+    }
+    return new $ArrayNode(ownerID, newCount, newNodes);
+  },
+  iterate: function(fn, reverse) {
+    var nodes = this.nodes;
+    for (var ii = 0,
+        maxIndex = nodes.length - 1; ii <= maxIndex; ii++) {
+      var node = nodes[reverse ? maxIndex - ii : ii];
+      if (node && node.iterate(fn, reverse) === false) {
+        return false;
+      }
+    }
+  }
+}, {});
+var HashCollisionNode = function HashCollisionNode(ownerID, hash, entries) {
+  this.ownerID = ownerID;
+  this.hash = hash;
+  this.entries = entries;
+};
+var $HashCollisionNode = HashCollisionNode;
+($traceurRuntime.createClass)(HashCollisionNode, {
+  get: function(shift, hash, key, notSetValue) {
+    var entries = this.entries;
+    for (var ii = 0,
+        len = entries.length; ii < len; ii++) {
+      if (is(key, entries[ii][0])) {
+        return entries[ii][1];
+      }
+    }
+    return notSetValue;
+  },
+  update: function(ownerID, shift, hash, key, value, didChangeLength, didAlter) {
+    var removed = value === NOT_SET;
+    if (hash !== this.hash) {
+      if (removed) {
+        return this;
+      }
+      SetRef(didAlter);
+      SetRef(didChangeLength);
+      return mergeIntoNode(this, ownerID, shift, hash, [key, value]);
+    }
+    var entries = this.entries;
+    var idx = 0;
+    for (var len = entries.length; idx < len; idx++) {
+      if (is(key, entries[idx][0])) {
+        break;
+      }
+    }
+    var exists = idx < len;
+    if (removed && !exists) {
+      return this;
+    }
+    SetRef(didAlter);
+    (removed || !exists) && SetRef(didChangeLength);
+    if (removed && len === 2) {
+      return new ValueNode(ownerID, this.hash, entries[idx ^ 1]);
+    }
+    var isEditable = ownerID && ownerID === this.ownerID;
+    var newEntries = isEditable ? entries : arrCopy(entries);
+    if (exists) {
+      if (removed) {
+        idx === len - 1 ? newEntries.pop() : (newEntries[idx] = newEntries.pop());
+      } else {
+        newEntries[idx] = [key, value];
+      }
+    } else {
+      newEntries.push([key, value]);
+    }
+    if (isEditable) {
+      this.entries = newEntries;
+      return this;
+    }
+    return new $HashCollisionNode(ownerID, this.hash, newEntries);
+  },
+  iterate: function(fn, reverse) {
+    var entries = this.entries;
+    for (var ii = 0,
+        maxIndex = entries.length - 1; ii <= maxIndex; ii++) {
+      if (fn(entries[reverse ? maxIndex - ii : ii]) === false) {
+        return false;
+      }
+    }
+  }
+}, {});
+var ValueNode = function ValueNode(ownerID, hash, entry) {
+  this.ownerID = ownerID;
+  this.hash = hash;
+  this.entry = entry;
+};
+var $ValueNode = ValueNode;
+($traceurRuntime.createClass)(ValueNode, {
+  get: function(shift, hash, key, notSetValue) {
+    return is(key, this.entry[0]) ? this.entry[1] : notSetValue;
+  },
+  update: function(ownerID, shift, hash, key, value, didChangeLength, didAlter) {
+    var removed = value === NOT_SET;
+    var keyMatch = is(key, this.entry[0]);
+    if (keyMatch ? value === this.entry[1] : removed) {
+      return this;
+    }
+    SetRef(didAlter);
+    if (removed) {
+      SetRef(didChangeLength);
+      return null;
+    }
+    if (keyMatch) {
+      if (ownerID && ownerID === this.ownerID) {
+        this.entry[1] = value;
+        return this;
+      }
+      return new $ValueNode(ownerID, hash, [key, value]);
+    }
+    SetRef(didChangeLength);
+    return mergeIntoNode(this, ownerID, shift, hash, [key, value]);
+  },
+  iterate: function(fn) {
+    return fn(this.entry);
+  }
+}, {});
+var MapIterator = function MapIterator(map, type, reverse) {
+  this._type = type;
+  this._reverse = reverse;
+  this._stack = map._root && mapIteratorFrame(map._root);
+};
+($traceurRuntime.createClass)(MapIterator, {next: function() {
+    var type = this._type;
+    var stack = this._stack;
+    while (stack) {
+      var node = stack.node;
+      var index = stack.index++;
+      var maxIndex;
+      if (node.entry) {
+        if (index === 0) {
+          return mapIteratorValue(type, node.entry);
+        }
+      } else if (node.entries) {
+        maxIndex = node.entries.length - 1;
+        if (index <= maxIndex) {
+          return mapIteratorValue(type, node.entries[this._reverse ? maxIndex - index : index]);
         }
       } else {
-        startRule = "start";
+        maxIndex = node.nodes.length - 1;
+        if (index <= maxIndex) {
+          var subNode = node.nodes[this._reverse ? maxIndex - index : index];
+          if (subNode) {
+            if (subNode.entry) {
+              return mapIteratorValue(type, subNode.entry);
+            }
+            stack = this._stack = mapIteratorFrame(subNode, stack);
+          }
+          continue;
+        }
       }
-      
-      var pos = 0;
-      var reportFailures = 0;
-      var rightmostFailuresPos = 0;
-      var rightmostFailuresExpected = [];
-      
-      function padLeft(input, padding, length) {
-        var result = input;
-        
-        var padLength = length - input.length;
-        for (var i = 0; i < padLength; i++) {
-          result = padding + result;
-        }
-        
-        return result;
-      }
-      
-      function escape(ch) {
-        var charCode = ch.charCodeAt(0);
-        var escapeChar;
-        var length;
-        
-        if (charCode <= 0xFF) {
-          escapeChar = 'x';
-          length = 2;
-        } else {
-          escapeChar = 'u';
-          length = 4;
-        }
-        
-        return '\\' + escapeChar + padLeft(charCode.toString(16).toUpperCase(), '0', length);
-      }
-      
-      function matchFailed(failure) {
-        if (pos < rightmostFailuresPos) {
-          return;
-        }
-        
-        if (pos > rightmostFailuresPos) {
-          rightmostFailuresPos = pos;
-          rightmostFailuresExpected = [];
-        }
-        
-        rightmostFailuresExpected.push(failure);
-      }
-      
-      function parse_start() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse__();
-        if (result0 !== null) {
-          result1 = parse_item();
-          result1 = result1 !== null ? result1 : "";
-          if (result1 !== null) {
-            result2 = parse__();
-            if (result2 !== null) {
-              result3 = [];
-              result4 = parse_item();
-              while (result4 !== null) {
-                result3.push(result4);
-                result4 = parse_item();
-              }
-              if (result3 !== null) {
-                result0 = [result0, result1, result2, result3];
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, first, rest) {
-            if (rest && rest.length > 0) {
-              return makeNode('array', [first].concat(rest));
-            } else if (first) {
-              return first;
-            } else {
-              return makeNode('empty', null);
-            }
-          })(pos0, result0[1], result0[3]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_item() {
-        var result0;
-        
-        result0 = parse_object();
-        if (result0 === null) {
-          result0 = parse_array();
-          if (result0 === null) {
-            result0 = parse_call();
-            if (result0 === null) {
-              result0 = parse_string();
-              if (result0 === null) {
-                result0 = parse_boolean();
-                if (result0 === null) {
-                  result0 = parse_number();
-                  if (result0 === null) {
-                    result0 = parse_null();
-                    if (result0 === null) {
-                      result0 = parse_identifier();
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        return result0;
-      }
-      
-      function parse_object() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        if (input.charCodeAt(pos) === 123) {
-          result0 = "{";
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("\"{\"");
-          }
-        }
-        if (result0 !== null) {
-          result1 = parse__();
-          if (result1 !== null) {
-            result2 = [];
-            result3 = parse_objectItem();
-            while (result3 !== null) {
-              result2.push(result3);
-              result3 = parse_objectItem();
-            }
-            if (result2 !== null) {
-              if (input.charCodeAt(pos) === 125) {
-                result3 = "}";
-                pos++;
-              } else {
-                result3 = null;
-                if (reportFailures === 0) {
-                  matchFailed("\"}\"");
-                }
-              }
-              if (result3 !== null) {
-                result0 = [result0, result1, result2, result3];
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, props) {
-            return makeNode('object', props);
-          })(pos0, result0[2]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_objectItem() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_keyValueArgument();
-        if (result0 !== null) {
-          result1 = parse__();
-          if (result1 !== null) {
-            if (input.charCodeAt(pos) === 44) {
-              result2 = ",";
-              pos++;
-            } else {
-              result2 = null;
-              if (reportFailures === 0) {
-                matchFailed("\",\"");
-              }
-            }
-            result2 = result2 !== null ? result2 : "";
-            if (result2 !== null) {
-              result3 = parse__();
-              if (result3 !== null) {
-                result0 = [result0, result1, result2, result3];
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, arg) {
-            return arg;
-          })(pos0, result0[0]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_array() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        if (input.charCodeAt(pos) === 91) {
-          result0 = "[";
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("\"[\"");
-          }
-        }
-        if (result0 !== null) {
-          result1 = parse__();
-          if (result1 !== null) {
-            result2 = [];
-            result3 = parse_arrayItem();
-            while (result3 !== null) {
-              result2.push(result3);
-              result3 = parse_arrayItem();
-            }
-            if (result2 !== null) {
-              if (input.charCodeAt(pos) === 93) {
-                result3 = "]";
-                pos++;
-              } else {
-                result3 = null;
-                if (reportFailures === 0) {
-                  matchFailed("\"]\"");
-                }
-              }
-              if (result3 !== null) {
-                result0 = [result0, result1, result2, result3];
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, items) {
-            return makeNode('array', items);
-          })(pos0, result0[2]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_arrayItem() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_item();
-        if (result0 !== null) {
-          result1 = parse__();
-          if (result1 !== null) {
-            if (input.charCodeAt(pos) === 44) {
-              result2 = ",";
-              pos++;
-            } else {
-              result2 = null;
-              if (reportFailures === 0) {
-                matchFailed("\",\"");
-              }
-            }
-            result2 = result2 !== null ? result2 : "";
-            if (result2 !== null) {
-              result3 = parse__();
-              if (result3 !== null) {
-                result0 = [result0, result1, result2, result3];
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, arg) {
-            return arg;
-          })(pos0, result0[0]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_call() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_identifier();
-        if (result0 !== null) {
-          if (input.charCodeAt(pos) === 40) {
-            result1 = "(";
-            pos++;
-          } else {
-            result1 = null;
-            if (reportFailures === 0) {
-              matchFailed("\"(\"");
-            }
-          }
-          if (result1 !== null) {
-            result2 = parse__();
-            if (result2 !== null) {
-              result3 = parse_arguments();
-              result3 = result3 !== null ? result3 : "";
-              if (result3 !== null) {
-                result4 = parse__();
-                if (result4 !== null) {
-                  if (input.charCodeAt(pos) === 41) {
-                    result5 = ")";
-                    pos++;
-                  } else {
-                    result5 = null;
-                    if (reportFailures === 0) {
-                      matchFailed("\")\"");
-                    }
-                  }
-                  if (result5 !== null) {
-                    result0 = [result0, result1, result2, result3, result4, result5];
-                  } else {
-                    result0 = null;
-                    pos = pos1;
-                  }
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, name, keyValueArgs) {
-            var args = [];
-            var keys = null;
-            keyValueArgs = keyValueArgs === '' ? [] : keyValueArgs;
-            keyValueArgs.forEach(function (keyValueArg, i) {
-              if (keyValueArg.key === null) {
-                if (keys) {
-                  args.push(keys);
-                }
-                keys = null;
-                args.push(keyValueArg.value);
-              } else {
-                if (!keys) {
-                  keys = {};
-                }
-                keys[keyValueArg.key] = keyValueArg.value;
-              }
-            });
-            if (keys) {
-              args.push(keys);
-            };
-            return makeNode('call', [name, makeNode('arguments', args)]);
-          })(pos0, result0[0], result0[3]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_identifier() {
-        var result0, result1, result2;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_identifierStart();
-        if (result0 !== null) {
-          result1 = [];
-          result2 = parse_identifierChar();
-          while (result2 !== null) {
-            result1.push(result2);
-            result2 = parse_identifierChar();
-          }
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, first, rest) {
-            return makeNode('name', first + rest.join(''));
-          })(pos0, result0[0], result0[1]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_identifierKey() {
-        var result0, result1, result2;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_identifierStart();
-        if (result0 !== null) {
-          result1 = [];
-          result2 = parse_identifierChar();
-          while (result2 !== null) {
-            result1.push(result2);
-            result2 = parse_identifierChar();
-          }
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, first, rest) {
-            return makeNode('string', first + rest.join(''));
-          })(pos0, result0[0], result0[1]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_identifierStart() {
-        var result0;
-        
-        if (/^[$a-zA-Z_]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[$a-zA-Z_]");
-          }
-        }
-        return result0;
-      }
-      
-      function parse_identifierChar() {
-        var result0;
-        
-        if (/^[$a-zA-Z_0-9]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[$a-zA-Z_0-9]");
-          }
-        }
-        return result0;
-      }
-      
-      function parse_arguments() {
-        var result0, result1, result2, result3, result4, result5;
-        var pos0, pos1, pos2;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_argument();
-        if (result0 !== null) {
-          result1 = [];
-          pos2 = pos;
-          result2 = parse__();
-          if (result2 !== null) {
-            if (input.charCodeAt(pos) === 44) {
-              result3 = ",";
-              pos++;
-            } else {
-              result3 = null;
-              if (reportFailures === 0) {
-                matchFailed("\",\"");
-              }
-            }
-            result3 = result3 !== null ? result3 : "";
-            if (result3 !== null) {
-              result4 = parse__();
-              if (result4 !== null) {
-                result5 = parse_argument();
-                if (result5 !== null) {
-                  result2 = [result2, result3, result4, result5];
-                } else {
-                  result2 = null;
-                  pos = pos2;
-                }
-              } else {
-                result2 = null;
-                pos = pos2;
-              }
-            } else {
-              result2 = null;
-              pos = pos2;
-            }
-          } else {
-            result2 = null;
-            pos = pos2;
-          }
-          while (result2 !== null) {
-            result1.push(result2);
-            pos2 = pos;
-            result2 = parse__();
-            if (result2 !== null) {
-              if (input.charCodeAt(pos) === 44) {
-                result3 = ",";
-                pos++;
-              } else {
-                result3 = null;
-                if (reportFailures === 0) {
-                  matchFailed("\",\"");
-                }
-              }
-              result3 = result3 !== null ? result3 : "";
-              if (result3 !== null) {
-                result4 = parse__();
-                if (result4 !== null) {
-                  result5 = parse_argument();
-                  if (result5 !== null) {
-                    result2 = [result2, result3, result4, result5];
-                  } else {
-                    result2 = null;
-                    pos = pos2;
-                  }
-                } else {
-                  result2 = null;
-                  pos = pos2;
-                }
-              } else {
-                result2 = null;
-                pos = pos2;
-              }
-            } else {
-              result2 = null;
-              pos = pos2;
-            }
-          }
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, first, rest) {
-            var left = [];
-            if (first !== '') {
-              left = [first];
-            }
-            var right = [];
-            rest.forEach(function (arg) {
-              right.push(arg[3]);
-            });
-            return left.concat(right);
-          })(pos0, result0[0], result0[1]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_argument() {
-        var result0;
-        
-        result0 = parse_keyValueArgument();
-        if (result0 === null) {
-          result0 = parse_plainArgument();
-        }
-        return result0;
-      }
-      
-      function parse_plainArgument() {
-        var result0;
-        var pos0;
-        
-        pos0 = pos;
-        result0 = parse_item();
-        if (result0 !== null) {
-          result0 = (function(offset, arg) {
-            return {key: null, value: arg};
-          })(pos0, result0);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_keyValueArgument() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_key();
-        if (result0 !== null) {
-          result1 = parse__();
-          if (result1 !== null) {
-            if (input.charCodeAt(pos) === 58) {
-              result2 = ":";
-              pos++;
-            } else {
-              result2 = null;
-              if (reportFailures === 0) {
-                matchFailed("\":\"");
-              }
-            }
-            if (result2 !== null) {
-              result3 = parse__();
-              if (result3 !== null) {
-                result4 = parse_item();
-                if (result4 !== null) {
-                  result0 = [result0, result1, result2, result3, result4];
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, name, value) {
-            return makeNode('property', [name, value]);
-          })(pos0, result0[0], result0[4]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_key() {
-        var result0;
-        
-        result0 = parse_identifierKey();
-        if (result0 === null) {
-          result0 = parse_string();
-        }
-        return result0;
-      }
-      
-      function parse_boolean() {
-        var result0;
-        var pos0;
-        
-        pos0 = pos;
-        if (input.substr(pos, 4) === "true") {
-          result0 = "true";
-          pos += 4;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("\"true\"");
-          }
-        }
-        if (result0 === null) {
-          if (input.substr(pos, 5) === "false") {
-            result0 = "false";
-            pos += 5;
-          } else {
-            result0 = null;
-            if (reportFailures === 0) {
-              matchFailed("\"false\"");
-            }
-          }
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, isTrue) {
-            return makeNode('boolean', isTrue === 'true' ? true : false);
-          })(pos0, result0);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_null() {
-        var result0;
-        var pos0;
-        
-        pos0 = pos;
-        if (input.substr(pos, 4) === "null") {
-          result0 = "null";
-          pos += 4;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("\"null\"");
-          }
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, name) {
-            return makeNode('null', null);
-          })(pos0, result0);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_string() {
-        var result0, result1, result2;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        if (input.charCodeAt(pos) === 34) {
-          result0 = "\"";
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("\"\\\"\"");
-          }
-        }
-        if (result0 !== null) {
-          if (input.charCodeAt(pos) === 34) {
-            result1 = "\"";
-            pos++;
-          } else {
-            result1 = null;
-            if (reportFailures === 0) {
-              matchFailed("\"\\\"\"");
-            }
-          }
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset) { return makeNode('string', ""); })(pos0);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        if (result0 === null) {
-          pos0 = pos;
-          pos1 = pos;
-          if (input.charCodeAt(pos) === 39) {
-            result0 = "'";
-            pos++;
-          } else {
-            result0 = null;
-            if (reportFailures === 0) {
-              matchFailed("\"'\"");
-            }
-          }
-          if (result0 !== null) {
-            if (input.charCodeAt(pos) === 39) {
-              result1 = "'";
-              pos++;
-            } else {
-              result1 = null;
-              if (reportFailures === 0) {
-                matchFailed("\"'\"");
-              }
-            }
-            if (result1 !== null) {
-              result0 = [result0, result1];
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-          if (result0 !== null) {
-            result0 = (function(offset) { return makeNode('string', ""); })(pos0);
-          }
-          if (result0 === null) {
-            pos = pos0;
-          }
-          if (result0 === null) {
-            pos0 = pos;
-            pos1 = pos;
-            if (input.charCodeAt(pos) === 34) {
-              result0 = "\"";
-              pos++;
-            } else {
-              result0 = null;
-              if (reportFailures === 0) {
-                matchFailed("\"\\\"\"");
-              }
-            }
-            if (result0 !== null) {
-              result1 = parse_dqchars();
-              if (result1 !== null) {
-                if (input.charCodeAt(pos) === 34) {
-                  result2 = "\"";
-                  pos++;
-                } else {
-                  result2 = null;
-                  if (reportFailures === 0) {
-                    matchFailed("\"\\\"\"");
-                  }
-                }
-                if (result2 !== null) {
-                  result0 = [result0, result1, result2];
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-            if (result0 !== null) {
-              result0 = (function(offset, chars) { return makeNode('string', chars); })(pos0, result0[1]);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            if (result0 === null) {
-              pos0 = pos;
-              pos1 = pos;
-              if (input.charCodeAt(pos) === 39) {
-                result0 = "'";
-                pos++;
-              } else {
-                result0 = null;
-                if (reportFailures === 0) {
-                  matchFailed("\"'\"");
-                }
-              }
-              if (result0 !== null) {
-                result1 = parse_sqchars();
-                if (result1 !== null) {
-                  if (input.charCodeAt(pos) === 39) {
-                    result2 = "'";
-                    pos++;
-                  } else {
-                    result2 = null;
-                    if (reportFailures === 0) {
-                      matchFailed("\"'\"");
-                    }
-                  }
-                  if (result2 !== null) {
-                    result0 = [result0, result1, result2];
-                  } else {
-                    result0 = null;
-                    pos = pos1;
-                  }
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-              if (result0 !== null) {
-                result0 = (function(offset, chars) { return makeNode('string', chars); })(pos0, result0[1]);
-              }
-              if (result0 === null) {
-                pos = pos0;
-              }
-            }
-          }
-        }
-        return result0;
-      }
-      
-      function parse_sqchars() {
-        var result0, result1;
-        var pos0;
-        
-        pos0 = pos;
-        result1 = parse_sqchar();
-        if (result1 !== null) {
-          result0 = [];
-          while (result1 !== null) {
-            result0.push(result1);
-            result1 = parse_sqchar();
-          }
-        } else {
-          result0 = null;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, chars) { return chars.join(""); })(pos0, result0);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_dqchars() {
-        var result0, result1;
-        var pos0;
-        
-        pos0 = pos;
-        result1 = parse_dqchar();
-        if (result1 !== null) {
-          result0 = [];
-          while (result1 !== null) {
-            result0.push(result1);
-            result1 = parse_dqchar();
-          }
-        } else {
-          result0 = null;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, chars) { return chars.join(""); })(pos0, result0);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_sqchar() {
-        var result0;
-        
-        if (/^[^'\\\0-\x1F]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[^'\\\\\\0-\\x1F]");
-          }
-        }
-        if (result0 === null) {
-          result0 = parse_char();
-        }
-        return result0;
-      }
-      
-      function parse_dqchar() {
-        var result0;
-        
-        if (/^[^"\\\0-\x1F]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[^\"\\\\\\0-\\x1F]");
-          }
-        }
-        if (result0 === null) {
-          result0 = parse_char();
-        }
-        return result0;
-      }
-      
-      function parse_char() {
-        var result0, result1, result2, result3, result4;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        if (input.substr(pos, 2) === "\\\"") {
-          result0 = "\\\"";
-          pos += 2;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("\"\\\\\\\"\"");
-          }
-        }
-        if (result0 !== null) {
-          result0 = (function(offset) { return '"';  })(pos0);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        if (result0 === null) {
-          pos0 = pos;
-          if (input.substr(pos, 2) === "\\'") {
-            result0 = "\\'";
-            pos += 2;
-          } else {
-            result0 = null;
-            if (reportFailures === 0) {
-              matchFailed("\"\\\\'\"");
-            }
-          }
-          if (result0 !== null) {
-            result0 = (function(offset) { return "'";  })(pos0);
-          }
-          if (result0 === null) {
-            pos = pos0;
-          }
-          if (result0 === null) {
-            pos0 = pos;
-            if (input.substr(pos, 2) === "\\\\") {
-              result0 = "\\\\";
-              pos += 2;
-            } else {
-              result0 = null;
-              if (reportFailures === 0) {
-                matchFailed("\"\\\\\\\\\"");
-              }
-            }
-            if (result0 !== null) {
-              result0 = (function(offset) { return "\\"; })(pos0);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            if (result0 === null) {
-              pos0 = pos;
-              if (input.substr(pos, 2) === "\\/") {
-                result0 = "\\/";
-                pos += 2;
-              } else {
-                result0 = null;
-                if (reportFailures === 0) {
-                  matchFailed("\"\\\\/\"");
-                }
-              }
-              if (result0 !== null) {
-                result0 = (function(offset) { return "/";  })(pos0);
-              }
-              if (result0 === null) {
-                pos = pos0;
-              }
-              if (result0 === null) {
-                pos0 = pos;
-                if (input.substr(pos, 2) === "\\b") {
-                  result0 = "\\b";
-                  pos += 2;
-                } else {
-                  result0 = null;
-                  if (reportFailures === 0) {
-                    matchFailed("\"\\\\b\"");
-                  }
-                }
-                if (result0 !== null) {
-                  result0 = (function(offset) { return "\b"; })(pos0);
-                }
-                if (result0 === null) {
-                  pos = pos0;
-                }
-                if (result0 === null) {
-                  pos0 = pos;
-                  if (input.substr(pos, 2) === "\\f") {
-                    result0 = "\\f";
-                    pos += 2;
-                  } else {
-                    result0 = null;
-                    if (reportFailures === 0) {
-                      matchFailed("\"\\\\f\"");
-                    }
-                  }
-                  if (result0 !== null) {
-                    result0 = (function(offset) { return "\f"; })(pos0);
-                  }
-                  if (result0 === null) {
-                    pos = pos0;
-                  }
-                  if (result0 === null) {
-                    pos0 = pos;
-                    if (input.substr(pos, 2) === "\\n") {
-                      result0 = "\\n";
-                      pos += 2;
-                    } else {
-                      result0 = null;
-                      if (reportFailures === 0) {
-                        matchFailed("\"\\\\n\"");
-                      }
-                    }
-                    if (result0 !== null) {
-                      result0 = (function(offset) { return "\n"; })(pos0);
-                    }
-                    if (result0 === null) {
-                      pos = pos0;
-                    }
-                    if (result0 === null) {
-                      pos0 = pos;
-                      if (input.substr(pos, 2) === "\\r") {
-                        result0 = "\\r";
-                        pos += 2;
-                      } else {
-                        result0 = null;
-                        if (reportFailures === 0) {
-                          matchFailed("\"\\\\r\"");
-                        }
-                      }
-                      if (result0 !== null) {
-                        result0 = (function(offset) { return "\r"; })(pos0);
-                      }
-                      if (result0 === null) {
-                        pos = pos0;
-                      }
-                      if (result0 === null) {
-                        pos0 = pos;
-                        if (input.substr(pos, 2) === "\\t") {
-                          result0 = "\\t";
-                          pos += 2;
-                        } else {
-                          result0 = null;
-                          if (reportFailures === 0) {
-                            matchFailed("\"\\\\t\"");
-                          }
-                        }
-                        if (result0 !== null) {
-                          result0 = (function(offset) { return "\t"; })(pos0);
-                        }
-                        if (result0 === null) {
-                          pos = pos0;
-                        }
-                        if (result0 === null) {
-                          pos0 = pos;
-                          pos1 = pos;
-                          if (input.substr(pos, 2) === "\\u") {
-                            result0 = "\\u";
-                            pos += 2;
-                          } else {
-                            result0 = null;
-                            if (reportFailures === 0) {
-                              matchFailed("\"\\\\u\"");
-                            }
-                          }
-                          if (result0 !== null) {
-                            result1 = parse_hexDigit();
-                            if (result1 !== null) {
-                              result2 = parse_hexDigit();
-                              if (result2 !== null) {
-                                result3 = parse_hexDigit();
-                                if (result3 !== null) {
-                                  result4 = parse_hexDigit();
-                                  if (result4 !== null) {
-                                    result0 = [result0, result1, result2, result3, result4];
-                                  } else {
-                                    result0 = null;
-                                    pos = pos1;
-                                  }
-                                } else {
-                                  result0 = null;
-                                  pos = pos1;
-                                }
-                              } else {
-                                result0 = null;
-                                pos = pos1;
-                              }
-                            } else {
-                              result0 = null;
-                              pos = pos1;
-                            }
-                          } else {
-                            result0 = null;
-                            pos = pos1;
-                          }
-                          if (result0 !== null) {
-                            result0 = (function(offset, h1, h2, h3, h4) {
-                                return String.fromCharCode(parseInt("0x" + h1 + h2 + h3 + h4));
-                              })(pos0, result0[1], result0[2], result0[3], result0[4]);
-                          }
-                          if (result0 === null) {
-                            pos = pos0;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        return result0;
-      }
-      
-      function parse_number() {
-        var result0, result1, result2, result3;
-        var pos0, pos1;
-        
-        reportFailures++;
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_int();
-        if (result0 !== null) {
-          result1 = parse_frac();
-          if (result1 !== null) {
-            result2 = parse_exp();
-            if (result2 !== null) {
-              result3 = parse__();
-              if (result3 !== null) {
-                result0 = [result0, result1, result2, result3];
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, int_, frac, exp) { return makeNode('float', parseFloat(int_ + frac + exp)); })(pos0, result0[0], result0[1], result0[2]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        if (result0 === null) {
-          pos0 = pos;
-          pos1 = pos;
-          result0 = parse_int();
-          if (result0 !== null) {
-            result1 = parse_frac();
-            if (result1 !== null) {
-              result2 = parse__();
-              if (result2 !== null) {
-                result0 = [result0, result1, result2];
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-          if (result0 !== null) {
-            result0 = (function(offset, int_, frac) { return makeNode('float', parseFloat(int_ + frac));       })(pos0, result0[0], result0[1]);
-          }
-          if (result0 === null) {
-            pos = pos0;
-          }
-          if (result0 === null) {
-            pos0 = pos;
-            pos1 = pos;
-            result0 = parse_int();
-            if (result0 !== null) {
-              result1 = parse_exp();
-              if (result1 !== null) {
-                result2 = parse__();
-                if (result2 !== null) {
-                  result0 = [result0, result1, result2];
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-            if (result0 !== null) {
-              result0 = (function(offset, int_, exp) { return makeNode('integer', parseFloat(int_ + exp));        })(pos0, result0[0], result0[1]);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            if (result0 === null) {
-              pos0 = pos;
-              pos1 = pos;
-              result0 = parse_int();
-              if (result0 !== null) {
-                result1 = parse__();
-                if (result1 !== null) {
-                  result0 = [result0, result1];
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-              if (result0 !== null) {
-                result0 = (function(offset, int_) { return makeNode('integer', parseFloat(int_));              })(pos0, result0[0]);
-              }
-              if (result0 === null) {
-                pos = pos0;
-              }
-            }
-          }
-        }
-        reportFailures--;
-        if (reportFailures === 0 && result0 === null) {
-          matchFailed("number");
-        }
-        return result0;
-      }
-      
-      function parse_int() {
-        var result0, result1, result2;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_digit19();
-        if (result0 !== null) {
-          result1 = parse_digits();
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, digit19, digits) { return digit19 + digits;       })(pos0, result0[0], result0[1]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        if (result0 === null) {
-          result0 = parse_digit();
-          if (result0 === null) {
-            pos0 = pos;
-            pos1 = pos;
-            if (input.charCodeAt(pos) === 45) {
-              result0 = "-";
-              pos++;
-            } else {
-              result0 = null;
-              if (reportFailures === 0) {
-                matchFailed("\"-\"");
-              }
-            }
-            if (result0 !== null) {
-              result1 = parse_digit19();
-              if (result1 !== null) {
-                result2 = parse_digits();
-                if (result2 !== null) {
-                  result0 = [result0, result1, result2];
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-            } else {
-              result0 = null;
-              pos = pos1;
-            }
-            if (result0 !== null) {
-              result0 = (function(offset, digit19, digits) { return "-" + digit19 + digits; })(pos0, result0[1], result0[2]);
-            }
-            if (result0 === null) {
-              pos = pos0;
-            }
-            if (result0 === null) {
-              pos0 = pos;
-              pos1 = pos;
-              if (input.charCodeAt(pos) === 45) {
-                result0 = "-";
-                pos++;
-              } else {
-                result0 = null;
-                if (reportFailures === 0) {
-                  matchFailed("\"-\"");
-                }
-              }
-              if (result0 !== null) {
-                result1 = parse_digit();
-                if (result1 !== null) {
-                  result0 = [result0, result1];
-                } else {
-                  result0 = null;
-                  pos = pos1;
-                }
-              } else {
-                result0 = null;
-                pos = pos1;
-              }
-              if (result0 !== null) {
-                result0 = (function(offset, digit) { return "-" + digit;            })(pos0, result0[1]);
-              }
-              if (result0 === null) {
-                pos = pos0;
-              }
-            }
-          }
-        }
-        return result0;
-      }
-      
-      function parse_frac() {
-        var result0, result1;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        if (input.charCodeAt(pos) === 46) {
-          result0 = ".";
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("\".\"");
-          }
-        }
-        if (result0 !== null) {
-          result1 = parse_digits();
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, digits) { return "." + digits; })(pos0, result0[1]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_exp() {
-        var result0, result1;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        result0 = parse_e();
-        if (result0 !== null) {
-          result1 = parse_digits();
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, e, digits) { return e + digits; })(pos0, result0[0], result0[1]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_digits() {
-        var result0, result1;
-        var pos0;
-        
-        pos0 = pos;
-        result1 = parse_digit();
-        if (result1 !== null) {
-          result0 = [];
-          while (result1 !== null) {
-            result0.push(result1);
-            result1 = parse_digit();
-          }
-        } else {
-          result0 = null;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, digits) { return digits.join(""); })(pos0, result0);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_e() {
-        var result0, result1;
-        var pos0, pos1;
-        
-        pos0 = pos;
-        pos1 = pos;
-        if (/^[eE]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[eE]");
-          }
-        }
-        if (result0 !== null) {
-          if (/^[+\-]/.test(input.charAt(pos))) {
-            result1 = input.charAt(pos);
-            pos++;
-          } else {
-            result1 = null;
-            if (reportFailures === 0) {
-              matchFailed("[+\\-]");
-            }
-          }
-          result1 = result1 !== null ? result1 : "";
-          if (result1 !== null) {
-            result0 = [result0, result1];
-          } else {
-            result0 = null;
-            pos = pos1;
-          }
-        } else {
-          result0 = null;
-          pos = pos1;
-        }
-        if (result0 !== null) {
-          result0 = (function(offset, e, sign) { return e + sign; })(pos0, result0[0], result0[1]);
-        }
-        if (result0 === null) {
-          pos = pos0;
-        }
-        return result0;
-      }
-      
-      function parse_digit() {
-        var result0;
-        
-        if (/^[0-9]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[0-9]");
-          }
-        }
-        return result0;
-      }
-      
-      function parse_digit19() {
-        var result0;
-        
-        if (/^[1-9]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[1-9]");
-          }
-        }
-        return result0;
-      }
-      
-      function parse_hexDigit() {
-        var result0;
-        
-        if (/^[0-9a-fA-F]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[0-9a-fA-F]");
-          }
-        }
-        return result0;
-      }
-      
-      function parse__() {
-        var result0, result1;
-        
-        result0 = [];
-        result1 = parse_whitespace();
-        while (result1 !== null) {
-          result0.push(result1);
-          result1 = parse_whitespace();
-        }
-        return result0;
-      }
-      
-      function parse_whitespace() {
-        var result0;
-        
-        if (/^[ \t\n\r]/.test(input.charAt(pos))) {
-          result0 = input.charAt(pos);
-          pos++;
-        } else {
-          result0 = null;
-          if (reportFailures === 0) {
-            matchFailed("[ \\t\\n\\r]");
-          }
-        }
-        return result0;
-      }
-      
-      
-      function cleanupExpected(expected) {
-        expected.sort();
-        
-        var lastExpected = null;
-        var cleanExpected = [];
-        for (var i = 0; i < expected.length; i++) {
-          if (expected[i] !== lastExpected) {
-            cleanExpected.push(expected[i]);
-            lastExpected = expected[i];
-          }
-        }
-        return cleanExpected;
-      }
-      
-      function computeErrorPosition() {
-        /*
-         * The first idea was to use |String.split| to break the input up to the
-         * error position along newlines and derive the line and column from
-         * there. However IE's |split| implementation is so broken that it was
-         * enough to prevent it.
-         */
-        
-        var line = 1;
-        var column = 1;
-        var seenCR = false;
-        
-        for (var i = 0; i < Math.max(pos, rightmostFailuresPos); i++) {
-          var ch = input.charAt(i);
-          if (ch === "\n") {
-            if (!seenCR) { line++; }
-            column = 1;
-            seenCR = false;
-          } else if (ch === "\r" || ch === "\u2028" || ch === "\u2029") {
-            line++;
-            column = 1;
-            seenCR = true;
-          } else {
-            column++;
-            seenCR = false;
-          }
-        }
-        
-        return { line: line, column: column };
-      }
-      
-      
-        var makeNode = function (type, value) {
-          if (Array.isArray(value)) {
-            return {type: type, nodes: value};
-          } else {
-            return {type: type, value: value};
-          }
-        }
-      
-      
-      var result = parseFunctions[startRule]();
-      
-      /*
-       * The parser is now in one of the following three states:
-       *
-       * 1. The parser successfully parsed the whole input.
-       *
-       *    - |result !== null|
-       *    - |pos === input.length|
-       *    - |rightmostFailuresExpected| may or may not contain something
-       *
-       * 2. The parser successfully parsed only a part of the input.
-       *
-       *    - |result !== null|
-       *    - |pos < input.length|
-       *    - |rightmostFailuresExpected| may or may not contain something
-       *
-       * 3. The parser did not successfully parse any part of the input.
-       *
-       *   - |result === null|
-       *   - |pos === 0|
-       *   - |rightmostFailuresExpected| contains at least one failure
-       *
-       * All code following this comment (including called functions) must
-       * handle these states.
-       */
-      if (result === null || pos !== input.length) {
-        var offset = Math.max(pos, rightmostFailuresPos);
-        var found = offset < input.length ? input.charAt(offset) : null;
-        var errorPosition = computeErrorPosition();
-        
-        throw new this.SyntaxError(
-          cleanupExpected(rightmostFailuresExpected),
-          found,
-          offset,
-          errorPosition.line,
-          errorPosition.column
-        );
-      }
-      
-      return result;
-    },
-    
-    /* Returns the parser source code. */
-    toSource: function() { return this._source; }
-  };
-  
-  /* Thrown when a parser encounters a syntax error. */
-  
-  result.SyntaxError = function(expected, found, offset, line, column) {
-    function buildMessage(expected, found) {
-      var expectedHumanized, foundHumanized;
-      
-      switch (expected.length) {
-        case 0:
-          expectedHumanized = "end of input";
-          break;
-        case 1:
-          expectedHumanized = expected[0];
-          break;
-        default:
-          expectedHumanized = expected.slice(0, expected.length - 1).join(", ")
-            + " or "
-            + expected[expected.length - 1];
-      }
-      
-      foundHumanized = found ? quote(found) : "end of input";
-      
-      return "Expected " + expectedHumanized + " but " + foundHumanized + " found.";
+      stack = this._stack = this._stack.__prev;
     }
-    
-    this.name = "SyntaxError";
-    this.expected = expected;
-    this.found = found;
-    this.message = buildMessage(expected, found);
-    this.offset = offset;
-    this.line = line;
-    this.column = column;
+    return iteratorDone();
+  }}, {}, SequenceIterator);
+function mapIteratorValue(type, entry) {
+  return iteratorValue(type === 0 || type === 1 ? entry[type] : [entry[0], entry[1]]);
+}
+function mapIteratorFrame(node, prev) {
+  return {
+    node: node,
+    index: 0,
+    __prev: prev
   };
-  
-  result.SyntaxError.prototype = Error.prototype;
-  
-  return result;
-})()
-},{}],59:[function(require,module,exports){
-var parser = require('./generated/funql-parser');
-
-// node type hierarchy
-
-// node
-//   list
-//     call
-//     array
-//     object
-//     property
-//     arguments
-//   item
-//     value
-//       boolean
-//       number
-//         integer
-//         float
-//       string
-//       null
-//       empty
-//     name
-
-var typeHierarchy = {
-  node: ['list', 'item'],
-  list: ['call', 'array', 'object', 'property', 'arguments'],
-  item: ['value', 'name'],
-  value: ['boolean', 'number', 'string', 'null', 'empty'],
-  number: ['integer', 'float']
-};
-
-var parentTypes = {};
-
-Object.keys(typeHierarchy).forEach(function (type) {
-  typeHierarchy[type].forEach(function (childType) {
-    parentTypes[childType] = type;
+}
+function makeMap(length, root, ownerID, hash) {
+  var map = Object.create(MapPrototype);
+  map.length = length;
+  map._root = root;
+  map.__ownerID = ownerID;
+  map.__hash = hash;
+  map.__altered = false;
+  return map;
+}
+function updateMap(map, k, v) {
+  var didChangeLength = MakeRef(CHANGE_LENGTH);
+  var didAlter = MakeRef(DID_ALTER);
+  var newRoot = updateNode(map._root, map.__ownerID, 0, hash(k), k, v, didChangeLength, didAlter);
+  if (!didAlter.value) {
+    return map;
+  }
+  var newLength = map.length + (didChangeLength.value ? v === NOT_SET ? -1 : 1 : 0);
+  if (map.__ownerID) {
+    map.length = newLength;
+    map._root = newRoot;
+    map.__hash = undefined;
+    map.__altered = true;
+    return map;
+  }
+  return newRoot ? makeMap(newLength, newRoot) : Map.empty();
+}
+function updateNode(node, ownerID, shift, hash, key, value, didChangeLength, didAlter) {
+  if (!node) {
+    if (value === NOT_SET) {
+      return node;
+    }
+    SetRef(didAlter);
+    SetRef(didChangeLength);
+    return new ValueNode(ownerID, hash, [key, value]);
+  }
+  return node.update(ownerID, shift, hash, key, value, didChangeLength, didAlter);
+}
+function isLeafNode(node) {
+  return node.constructor === ValueNode || node.constructor === HashCollisionNode;
+}
+function mergeIntoNode(node, ownerID, shift, hash, entry) {
+  if (node.hash === hash) {
+    return new HashCollisionNode(ownerID, hash, [node.entry, entry]);
+  }
+  var idx1 = (node.hash >>> shift) & MASK;
+  var idx2 = (hash >>> shift) & MASK;
+  var newNode;
+  var nodes = idx1 === idx2 ? [mergeIntoNode(node, ownerID, shift + SHIFT, hash, entry)] : ((newNode = new ValueNode(ownerID, hash, entry)), idx1 < idx2 ? [node, newNode] : [newNode, node]);
+  return new BitmapIndexedNode(ownerID, (1 << idx1) | (1 << idx2), nodes);
+}
+function packNodes(ownerID, nodes, count, excluding) {
+  var bitmap = 0;
+  var packedII = 0;
+  var packedNodes = new Array(count);
+  for (var ii = 0,
+      bit = 1,
+      len = nodes.length; ii < len; ii++, bit <<= 1) {
+    var node = nodes[ii];
+    if (node != null && ii !== excluding) {
+      bitmap |= bit;
+      packedNodes[packedII++] = node;
+    }
+  }
+  return new BitmapIndexedNode(ownerID, bitmap, packedNodes);
+}
+function expandNodes(ownerID, nodes, bitmap, including, node) {
+  var count = 0;
+  var expandedNodes = new Array(SIZE);
+  for (var ii = 0; bitmap !== 0; ii++, bitmap >>>= 1) {
+    expandedNodes[ii] = bitmap & 1 ? nodes[count++] : null;
+  }
+  expandedNodes[including] = node;
+  return new ArrayNode(ownerID, count + 1, expandedNodes);
+}
+function mergeIntoMapWith(map, merger, iterables) {
+  var seqs = [];
+  for (var ii = 0; ii < iterables.length; ii++) {
+    var seq = iterables[ii];
+    seq && seqs.push(Array.isArray(seq) ? Sequence(seq).fromEntrySeq() : Sequence(seq));
+  }
+  return mergeIntoCollectionWith(map, merger, seqs);
+}
+function deepMerger(merger) {
+  return (function(existing, value) {
+    return existing && existing.mergeDeepWith ? existing.mergeDeepWith(merger, value) : merger ? merger(existing, value) : value;
   });
-});
-
-var trim = function (str) {
-  return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-};
-
-var makeCompiler = function (_handlers) {
-  var handlers = {};
-  Object.keys(_handlers).forEach(function (originalKey) {
-    originalKey.split(',').map(function (splitKey) {
-      return trim(splitKey);
-    }).forEach(function (trimKey) {
-      handlers[trimKey] = _handlers[originalKey];
+}
+function mergeIntoCollectionWith(collection, merger, seqs) {
+  if (seqs.length === 0) {
+    return collection;
+  }
+  return collection.withMutations((function(collection) {
+    var mergeIntoMap = merger ? (function(value, key) {
+      var existing = collection.get(key, NOT_SET);
+      collection.set(key, existing === NOT_SET ? value : merger(existing, value));
+    }) : (function(value, key) {
+      collection.set(key, value);
     });
-  });
-  ['node', 'list', 'item', 'value', 'number'].forEach(function (parentType) {
-    if (handlers[parentType]) {
-      typeHierarchy[parentType].forEach(function (childType) {
-        if (!handlers[childType]) {
-          handlers[childType] = handlers[parentType];
-        }
+    for (var ii = 0; ii < seqs.length; ii++) {
+      seqs[ii].forEach(mergeIntoMap);
+    }
+  }));
+}
+function updateInDeepMap(collection, keyPath, notSetValue, updater, pathOffset) {
+  var pathLen = keyPath.length;
+  if (pathOffset === pathLen) {
+    return updater(collection);
+  }
+  invariant(collection.set, 'updateIn with invalid keyPath');
+  var notSet = pathOffset === pathLen - 1 ? notSetValue : Map.empty();
+  var key = keyPath[pathOffset];
+  var existing = collection.get(key, notSet);
+  var value = updateInDeepMap(existing, keyPath, notSetValue, updater, pathOffset + 1);
+  return value === existing ? collection : collection.set(key, value);
+}
+function popCount(x) {
+  x = x - ((x >> 1) & 0x55555555);
+  x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+  x = (x + (x >> 4)) & 0x0f0f0f0f;
+  x = x + (x >> 8);
+  x = x + (x >> 16);
+  return x & 0x7f;
+}
+function setIn(array, idx, val, canEdit) {
+  var newArray = canEdit ? array : arrCopy(array);
+  newArray[idx] = val;
+  return newArray;
+}
+function spliceIn(array, idx, val, canEdit) {
+  var newLen = array.length + 1;
+  if (canEdit && idx + 1 === newLen) {
+    array[idx] = val;
+    return array;
+  }
+  var newArray = new Array(newLen);
+  var after = 0;
+  for (var ii = 0; ii < newLen; ii++) {
+    if (ii === idx) {
+      newArray[ii] = val;
+      after = -1;
+    } else {
+      newArray[ii] = array[ii + after];
+    }
+  }
+  return newArray;
+}
+function spliceOut(array, idx, canEdit) {
+  var newLen = array.length - 1;
+  if (canEdit && idx === newLen) {
+    array.pop();
+    return array;
+  }
+  var newArray = new Array(newLen);
+  var after = 0;
+  for (var ii = 0; ii < newLen; ii++) {
+    if (ii === idx) {
+      after = 1;
+    }
+    newArray[ii] = array[ii + after];
+  }
+  return newArray;
+}
+var MAX_BITMAP_SIZE = SIZE / 2;
+var MIN_ARRAY_SIZE = SIZE / 4;
+var EMPTY_MAP;
+var Vector = function Vector() {
+  for (var values = [],
+      $__5 = 0; $__5 < arguments.length; $__5++)
+    values[$__5] = arguments[$__5];
+  return $Vector.from(values);
+};
+var $Vector = Vector;
+($traceurRuntime.createClass)(Vector, {
+  toString: function() {
+    return this.__toString('Vector [', ']');
+  },
+  get: function(index, notSetValue) {
+    index = rawIndex(index, this._origin);
+    if (index >= this._size) {
+      return notSetValue;
+    }
+    var node = vectorNodeFor(this, index);
+    var maskedIndex = index & MASK;
+    return node && (notSetValue === undefined || node.array.hasOwnProperty(maskedIndex)) ? node.array[maskedIndex] : notSetValue;
+  },
+  first: function() {
+    return this.get(0);
+  },
+  last: function() {
+    return this.get(this.length ? this.length - 1 : 0);
+  },
+  set: function(index, value) {
+    return updateVector(this, index, value);
+  },
+  remove: function(index) {
+    return updateVector(this, index, NOT_SET);
+  },
+  clear: function() {
+    if (this.length === 0) {
+      return this;
+    }
+    if (this.__ownerID) {
+      this.length = this._origin = this._size = 0;
+      this._level = SHIFT;
+      this._root = this._tail = null;
+      this.__hash = undefined;
+      this.__altered = true;
+      return this;
+    }
+    return $Vector.empty();
+  },
+  push: function() {
+    var values = arguments;
+    var oldLength = this.length;
+    return this.withMutations((function(vect) {
+      setVectorBounds(vect, 0, oldLength + values.length);
+      for (var ii = 0; ii < values.length; ii++) {
+        vect.set(oldLength + ii, values[ii]);
+      }
+    }));
+  },
+  pop: function() {
+    return setVectorBounds(this, 0, -1);
+  },
+  unshift: function() {
+    var values = arguments;
+    return this.withMutations((function(vect) {
+      setVectorBounds(vect, -values.length);
+      for (var ii = 0; ii < values.length; ii++) {
+        vect.set(ii, values[ii]);
+      }
+    }));
+  },
+  shift: function() {
+    return setVectorBounds(this, 1);
+  },
+  merge: function() {
+    return mergeIntoVectorWith(this, null, arguments);
+  },
+  mergeWith: function(merger) {
+    for (var seqs = [],
+        $__6 = 1; $__6 < arguments.length; $__6++)
+      seqs[$__6 - 1] = arguments[$__6];
+    return mergeIntoVectorWith(this, merger, seqs);
+  },
+  mergeDeep: function() {
+    return mergeIntoVectorWith(this, deepMerger(null), arguments);
+  },
+  mergeDeepWith: function(merger) {
+    for (var seqs = [],
+        $__7 = 1; $__7 < arguments.length; $__7++)
+      seqs[$__7 - 1] = arguments[$__7];
+    return mergeIntoVectorWith(this, deepMerger(merger), seqs);
+  },
+  setLength: function(length) {
+    return setVectorBounds(this, 0, length);
+  },
+  slice: function(begin, end, maintainIndices) {
+    var sliceSequence = $traceurRuntime.superCall(this, $Vector.prototype, "slice", [begin, end, maintainIndices]);
+    if (!maintainIndices && sliceSequence !== this) {
+      var vector = this;
+      var length = vector.length;
+      sliceSequence.toVector = (function() {
+        return setVectorBounds(vector, begin < 0 ? Math.max(0, length + begin) : length ? Math.min(length, begin) : begin, end == null ? length : end < 0 ? Math.max(0, length + end) : length ? Math.min(length, end) : end);
       });
     }
-  });
-  var hasWrapHandler = false;
-  if (handlers.wrap_node) {
-    hasWrapHandler = true;
-  }
-  var compileNodes = function (context, canWrap, nodes, extendContext) {
-    return nodes.map(function (node) {
-      return compileNode(context, canWrap, node, extendContext);
+    return sliceSequence;
+  },
+  keys: function(sparse) {
+    return new VectorIterator(this, 0, sparse);
+  },
+  values: function(sparse) {
+    return new VectorIterator(this, 1, sparse);
+  },
+  entries: function(sparse) {
+    return new VectorIterator(this, 2, sparse);
+  },
+  __iterator: function(reverse, flipIndices, sparse) {
+    return new VectorIterator(this, 2, sparse, reverse, flipIndices);
+  },
+  __iterate: function(fn, reverse, flipIndices) {
+    var vector = this;
+    var lastIndex = 0;
+    var maxIndex = vector.length - 1;
+    flipIndices ^= reverse;
+    var eachFn = (function(value, ii) {
+      if (fn(value, flipIndices ? maxIndex - ii : ii, vector) === false) {
+        return false;
+      } else {
+        lastIndex = ii;
+        return true;
+      }
     });
-  };
-  var compileNode = function (context, canWrap, node, extendContext) {
-    if (Array.isArray(node)) {
-      return compileNodes(context, canWrap, node, extendContext);
+    var didComplete;
+    var tailOffset = getTailOffset(this._size);
+    if (reverse) {
+      didComplete = iterateVNode(this._tail, 0, tailOffset - this._origin, this._size - this._origin, eachFn, reverse) && iterateVNode(this._root, this._level, -this._origin, tailOffset - this._origin, eachFn, reverse);
+    } else {
+      didComplete = iterateVNode(this._root, this._level, -this._origin, tailOffset - this._origin, eachFn, reverse) && iterateVNode(this._tail, 0, tailOffset - this._origin, this._size - this._origin, eachFn, reverse);
     }
-    var suffix = '';
-    if (node.type === 'name') {
-      suffix = '_' + node.value;
-    } else if (node.type === 'call') {
-      if (node.nodes[0].type === 'name') {
-        suffix = '_' + node.nodes[0].value;
+    return (didComplete ? maxIndex : reverse ? maxIndex - lastIndex : lastIndex) + 1;
+  },
+  __deepEquals: function(other) {
+    var iterator = this.entries(true);
+    return other.every((function(v, i) {
+      var entry = iterator.next().value;
+      return entry && entry[0] === i && is(entry[1], v);
+    }));
+  },
+  __ensureOwner: function(ownerID) {
+    if (ownerID === this.__ownerID) {
+      return this;
+    }
+    if (!ownerID) {
+      this.__ownerID = ownerID;
+      return this;
+    }
+    return makeVector(this._origin, this._size, this._level, this._root, this._tail, ownerID, this.__hash);
+  }
+}, {
+  empty: function() {
+    return EMPTY_VECT || (EMPTY_VECT = makeVector(0, 0, SHIFT));
+  },
+  from: function(sequence) {
+    if (!sequence || sequence.length === 0) {
+      return $Vector.empty();
+    }
+    if (sequence.constructor === $Vector) {
+      return sequence;
+    }
+    var isArray = Array.isArray(sequence);
+    if (sequence.length > 0 && sequence.length < SIZE) {
+      return makeVector(0, sequence.length, SHIFT, null, new VNode(isArray ? arrCopy(sequence) : Sequence(sequence).toArray()));
+    }
+    if (!isArray) {
+      sequence = Sequence(sequence);
+      if (!(sequence instanceof IndexedSequence)) {
+        sequence = sequence.valueSeq();
       }
     }
-    context = Object.create(context);
-    extendContext = extendContext || {};
-    Object.keys(extendContext).forEach(function (key) {
-      context[key] = extendContext[key];
-    });
-    var type = node.type;
-    if (node.type === 'wrap_root') {
-      node = node.nodes[0];
-    } else if (canWrap && hasWrapHandler) {
-      type = 'wrap_node';
-      canWrap = false;
-    } else if (!canWrap) {
-      canWrap = true;
-    }
-    if (handlers[type + suffix]) {
-      return handlers[type + suffix](node, compileNode.bind(null, context, canWrap), context);
-    } else if (handlers[type]) {
-      return handlers[type](node, compileNode.bind(null, context, canWrap), context);
-    } else if (parentTypes[type] && handlers[parentTypes[type]]) {
-      return handlers[parentTypes[type]](node, compileNode.bind(null, context, canWrap), context);
-    } else {
-      throw new Error('no handler for node type: ' + node.type);
-    }
-  };
-
-  return function (source, context) {
-    var ast;
-    if (typeof source === 'string') {
-      ast = parser.parse(source);
-    } else {
-      ast = source;
-    }
-    context = context || {};
-    if (handlers.wrap_root) {
-      ast = {
-        type: 'wrap_root',
-        nodes: [ast]
-      };
-    }
-    return compileNode(context, true, ast, null);
-  };
+    return $Vector.empty().merge(sequence);
+  }
+}, IndexedSequence);
+var VectorPrototype = Vector.prototype;
+VectorPrototype[DELETE] = VectorPrototype.remove;
+VectorPrototype[ITERATOR] = VectorPrototype.values;
+VectorPrototype.update = MapPrototype.update;
+VectorPrototype.updateIn = MapPrototype.updateIn;
+VectorPrototype.cursor = MapPrototype.cursor;
+VectorPrototype.withMutations = MapPrototype.withMutations;
+VectorPrototype.asMutable = MapPrototype.asMutable;
+VectorPrototype.asImmutable = MapPrototype.asImmutable;
+VectorPrototype.wasAltered = MapPrototype.wasAltered;
+var VNode = function VNode(array, ownerID) {
+  this.array = array;
+  this.ownerID = ownerID;
 };
-
-var node = function (type, value) {
-  if (Array.isArray(value)) {
-    return {type: type, nodes: value};
+var $VNode = VNode;
+($traceurRuntime.createClass)(VNode, {
+  removeBefore: function(ownerID, level, index) {
+    if (index === level ? 1 << level : 0 || this.array.length === 0) {
+      return this;
+    }
+    var originIndex = (index >>> level) & MASK;
+    if (originIndex >= this.array.length) {
+      return new $VNode([], ownerID);
+    }
+    var removingFirst = originIndex === 0;
+    var newChild;
+    if (level > 0) {
+      var oldChild = this.array[originIndex];
+      newChild = oldChild && oldChild.removeBefore(ownerID, level - SHIFT, index);
+      if (newChild === oldChild && removingFirst) {
+        return this;
+      }
+    }
+    if (removingFirst && !newChild) {
+      return this;
+    }
+    var editable = editableVNode(this, ownerID);
+    if (!removingFirst) {
+      for (var ii = 0; ii < originIndex; ii++) {
+        delete editable.array[ii];
+      }
+    }
+    if (newChild) {
+      editable.array[originIndex] = newChild;
+    }
+    return editable;
+  },
+  removeAfter: function(ownerID, level, index) {
+    if (index === level ? 1 << level : 0 || this.array.length === 0) {
+      return this;
+    }
+    var sizeIndex = ((index - 1) >>> level) & MASK;
+    if (sizeIndex >= this.array.length) {
+      return this;
+    }
+    var removingLast = sizeIndex === this.array.length - 1;
+    var newChild;
+    if (level > 0) {
+      var oldChild = this.array[sizeIndex];
+      newChild = oldChild && oldChild.removeAfter(ownerID, level - SHIFT, index);
+      if (newChild === oldChild && removingLast) {
+        return this;
+      }
+    }
+    if (removingLast && !newChild) {
+      return this;
+    }
+    var editable = editableVNode(this, ownerID);
+    if (!removingLast) {
+      editable.array.length = sizeIndex + 1;
+    }
+    if (newChild) {
+      editable.array[sizeIndex] = newChild;
+    }
+    return editable;
+  }
+}, {});
+function iterateVNode(node, level, offset, max, fn, reverse) {
+  if (node) {
+    var ii;
+    var array = node.array;
+    var maxII = array.length - 1;
+    if (level === 0) {
+      for (ii = 0; ii <= maxII; ii++) {
+        var rawIndex = reverse ? maxII - ii : ii;
+        if (array.hasOwnProperty(rawIndex)) {
+          var index = rawIndex + offset;
+          if (index >= 0 && index < max && fn(array[rawIndex], index) === false) {
+            return false;
+          }
+        }
+      }
+    } else {
+      var step = 1 << level;
+      var newLevel = level - SHIFT;
+      for (ii = 0; ii <= maxII; ii++) {
+        var levelIndex = reverse ? maxII - ii : ii;
+        var newOffset = offset + levelIndex * step;
+        if (newOffset < max && newOffset + step > 0) {
+          var nextNode = array[levelIndex];
+          if (nextNode && !iterateVNode(nextNode, newLevel, newOffset, max, fn, reverse)) {
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return true;
+}
+var VectorIterator = function VectorIterator(vector, type, sparse, reverse, flipIndices) {
+  this._type = type;
+  this._sparse = !!sparse;
+  this._reverse = !!reverse;
+  this._flipIndices = !!(flipIndices ^ reverse);
+  this._maxIndex = vector.length - 1;
+  var tailOffset = getTailOffset(vector._size);
+  var rootStack = vectIteratorFrame(vector._root && vector._root.array, vector._level, -vector._origin, tailOffset - vector._origin - 1);
+  var tailStack = vectIteratorFrame(vector._tail && vector._tail.array, 0, tailOffset - vector._origin, vector._size - vector._origin - 1);
+  this._stack = reverse ? tailStack : rootStack;
+  this._stack.__prev = reverse ? rootStack : tailStack;
+};
+($traceurRuntime.createClass)(VectorIterator, {next: function() {
+    var sparse = this._sparse;
+    var stack = this._stack;
+    while (stack) {
+      var array = stack.array;
+      var rawIndex = stack.index++;
+      if (this._reverse) {
+        rawIndex = MASK - rawIndex;
+        if (rawIndex > stack.rawMax) {
+          rawIndex = stack.rawMax;
+          stack.index = SIZE - rawIndex;
+        }
+      }
+      if (rawIndex >= 0 && rawIndex < SIZE && rawIndex <= stack.rawMax) {
+        var value = array && array[rawIndex];
+        if (stack.level === 0) {
+          if (!sparse || value != null || (array && rawIndex < array.length && array.hasOwnProperty(rawIndex))) {
+            var type = this._type;
+            var index;
+            if (type !== 1) {
+              index = stack.offset + (rawIndex << stack.level);
+              if (this._flipIndices) {
+                index = this._maxIndex - index;
+              }
+            }
+            return iteratorValue(type === 0 ? index : type === 1 ? value : [index, value]);
+          }
+        } else if (!sparse || value != null) {
+          this._stack = stack = vectIteratorFrame(value && value.array, stack.level - SHIFT, stack.offset + (rawIndex << stack.level), stack.max, stack);
+        }
+        continue;
+      }
+      stack = this._stack = this._stack.__prev;
+    }
+    return iteratorDone();
+  }}, {}, SequenceIterator);
+function vectIteratorFrame(array, level, offset, max, prevFrame) {
+  return {
+    array: array,
+    level: level,
+    offset: offset,
+    max: max,
+    rawMax: ((max - offset) >> level),
+    index: 0,
+    __prev: prevFrame
+  };
+}
+function makeVector(origin, size, level, root, tail, ownerID, hash) {
+  var vect = Object.create(VectorPrototype);
+  vect.length = size - origin;
+  vect._origin = origin;
+  vect._size = size;
+  vect._level = level;
+  vect._root = root;
+  vect._tail = tail;
+  vect.__ownerID = ownerID;
+  vect.__hash = hash;
+  vect.__altered = false;
+  return vect;
+}
+function updateVector(vector, index, value) {
+  if (index >= vector.length) {
+    return value === NOT_SET ? vector : vector.withMutations((function(vect) {
+      setVectorBounds(vect, 0, index + 1).set(index, value);
+    }));
+  }
+  index = rawIndex(index, vector._origin);
+  var newTail = vector._tail;
+  var newRoot = vector._root;
+  var didAlter = MakeRef(DID_ALTER);
+  if (index >= getTailOffset(vector._size)) {
+    newTail = updateVNode(newTail, vector.__ownerID, 0, index, value, didAlter);
   } else {
-    return {type: type, value: value};
+    newRoot = updateVNode(newRoot, vector.__ownerID, vector._level, index, value, didAlter);
   }
-};
-
-var sourceCompile = makeCompiler(require('./lib/compilers/source'));
-var replaceCompile = makeCompiler(require('./lib/compilers/replace'));
-
-module.exports = {
-  parse: parser.parse.bind(parser),
-  compiler: makeCompiler,
-  node: node,
-  source: sourceCompile,
-  build: replaceCompile,
-  compilers: {
-    source: sourceCompile,
-    replace: replaceCompile
+  if (!didAlter.value) {
+    return vector;
   }
-};
-},{"./generated/funql-parser":58,"./lib/compilers/replace":60,"./lib/compilers/source":61}],60:[function(require,module,exports){
-var sourceRules = require('./source');
-
-var replaceRules = {
-  name: function (node, compile, context) {
-    if (context[node.value]) {
-      return JSON.stringify(context[node.value]);
-    } else {
-      return node.value;
+  if (vector.__ownerID) {
+    vector._root = newRoot;
+    vector._tail = newTail;
+    vector.__hash = undefined;
+    vector.__altered = true;
+    return vector;
+  }
+  return makeVector(vector._origin, vector._size, vector._level, newRoot, newTail);
+}
+function updateVNode(node, ownerID, level, index, value, didAlter) {
+  var removed = value === NOT_SET;
+  var newNode;
+  var idx = (index >>> level) & MASK;
+  var nodeHas = node && idx < node.array.length && node.array.hasOwnProperty(idx);
+  if (removed && !nodeHas) {
+    return node;
+  }
+  if (level > 0) {
+    var lowerNode = node && node.array[idx];
+    var newLowerNode = updateVNode(lowerNode, ownerID, level - SHIFT, index, value, didAlter);
+    if (newLowerNode === lowerNode) {
+      return node;
+    }
+    newNode = editableVNode(node, ownerID);
+    newNode.array[idx] = newLowerNode;
+    return newNode;
+  }
+  if (!removed && nodeHas && node.array[idx] === value) {
+    return node;
+  }
+  SetRef(didAlter);
+  newNode = editableVNode(node, ownerID);
+  removed ? (delete newNode.array[idx]) : (newNode.array[idx] = value);
+  return newNode;
+}
+function editableVNode(node, ownerID) {
+  if (ownerID && node && ownerID === node.ownerID) {
+    return node;
+  }
+  return new VNode(node ? node.array.slice() : [], ownerID);
+}
+function vectorNodeFor(vector, rawIndex) {
+  if (rawIndex >= getTailOffset(vector._size)) {
+    return vector._tail;
+  }
+  if (rawIndex < 1 << (vector._level + SHIFT)) {
+    var node = vector._root;
+    var level = vector._level;
+    while (node && level > 0) {
+      node = node.array[(rawIndex >>> level) & MASK];
+      level -= SHIFT;
+    }
+    return node;
+  }
+}
+function setVectorBounds(vector, begin, end) {
+  var owner = vector.__ownerID || new OwnerID();
+  var oldOrigin = vector._origin;
+  var oldSize = vector._size;
+  var newOrigin = oldOrigin + begin;
+  var newSize = end == null ? oldSize : end < 0 ? oldSize + end : oldOrigin + end;
+  if (newOrigin === oldOrigin && newSize === oldSize) {
+    return vector;
+  }
+  if (newOrigin >= newSize) {
+    return vector.clear();
+  }
+  var newLevel = vector._level;
+  var newRoot = vector._root;
+  var offsetShift = 0;
+  while (newOrigin + offsetShift < 0) {
+    newRoot = new VNode(newRoot && newRoot.array.length ? [null, newRoot] : [], owner);
+    newLevel += SHIFT;
+    offsetShift += 1 << newLevel;
+  }
+  if (offsetShift) {
+    newOrigin += offsetShift;
+    oldOrigin += offsetShift;
+    newSize += offsetShift;
+    oldSize += offsetShift;
+  }
+  var oldTailOffset = getTailOffset(oldSize);
+  var newTailOffset = getTailOffset(newSize);
+  while (newTailOffset >= 1 << (newLevel + SHIFT)) {
+    newRoot = new VNode(newRoot && newRoot.array.length ? [newRoot] : [], owner);
+    newLevel += SHIFT;
+  }
+  var oldTail = vector._tail;
+  var newTail = newTailOffset < oldTailOffset ? vectorNodeFor(vector, newSize - 1) : newTailOffset > oldTailOffset ? new VNode([], owner) : oldTail;
+  if (oldTail && newTailOffset > oldTailOffset && newOrigin < oldSize && oldTail.array.length) {
+    newRoot = editableVNode(newRoot, owner);
+    var node = newRoot;
+    for (var level = newLevel; level > SHIFT; level -= SHIFT) {
+      var idx = (oldTailOffset >>> level) & MASK;
+      node = node.array[idx] = editableVNode(node.array[idx], owner);
+    }
+    node.array[(oldTailOffset >>> SHIFT) & MASK] = oldTail;
+  }
+  if (newSize < oldSize) {
+    newTail = newTail && newTail.removeAfter(owner, 0, newSize);
+  }
+  if (newOrigin >= newTailOffset) {
+    newOrigin -= newTailOffset;
+    newSize -= newTailOffset;
+    newLevel = SHIFT;
+    newRoot = null;
+    newTail = newTail && newTail.removeBefore(owner, 0, newOrigin);
+  } else if (newOrigin > oldOrigin || newTailOffset < oldTailOffset) {
+    var beginIndex,
+        endIndex;
+    offsetShift = 0;
+    do {
+      beginIndex = ((newOrigin) >>> newLevel) & MASK;
+      endIndex = ((newTailOffset - 1) >>> newLevel) & MASK;
+      if (beginIndex === endIndex) {
+        if (beginIndex) {
+          offsetShift += (1 << newLevel) * beginIndex;
+        }
+        newLevel -= SHIFT;
+        newRoot = newRoot && newRoot.array[beginIndex];
+      }
+    } while (newRoot && beginIndex === endIndex);
+    if (newRoot && newOrigin > oldOrigin) {
+      newRoot = newRoot && newRoot.removeBefore(owner, newLevel, newOrigin - offsetShift);
+    }
+    if (newRoot && newTailOffset < oldTailOffset) {
+      newRoot = newRoot && newRoot.removeAfter(owner, newLevel, newTailOffset - offsetShift);
+    }
+    if (offsetShift) {
+      newOrigin -= offsetShift;
+      newSize -= offsetShift;
     }
   }
+  if (vector.__ownerID) {
+    vector.length = newSize - newOrigin;
+    vector._origin = newOrigin;
+    vector._size = newSize;
+    vector._level = newLevel;
+    vector._root = newRoot;
+    vector._tail = newTail;
+    vector.__hash = undefined;
+    vector.__altered = true;
+    return vector;
+  }
+  return makeVector(newOrigin, newSize, newLevel, newRoot, newTail);
+}
+function mergeIntoVectorWith(vector, merger, iterables) {
+  var seqs = [];
+  for (var ii = 0; ii < iterables.length; ii++) {
+    var seq = iterables[ii];
+    seq && seqs.push(Sequence(seq));
+  }
+  var maxLength = Math.max.apply(null, seqs.map((function(s) {
+    return s.length || 0;
+  })));
+  if (maxLength > vector.length) {
+    vector = vector.setLength(maxLength);
+  }
+  return mergeIntoCollectionWith(vector, merger, seqs);
+}
+function rawIndex(index, origin) {
+  invariant(index >= 0, 'Index out of bounds');
+  return index + origin;
+}
+function getTailOffset(size) {
+  return size < SIZE ? 0 : (((size - 1) >>> SHIFT) << SHIFT);
+}
+var EMPTY_VECT;
+var Set = function Set() {
+  for (var values = [],
+      $__8 = 0; $__8 < arguments.length; $__8++)
+    values[$__8] = arguments[$__8];
+  return $Set.from(values);
+};
+var $Set = Set;
+($traceurRuntime.createClass)(Set, {
+  toString: function() {
+    return this.__toString('Set {', '}');
+  },
+  has: function(value) {
+    return this._map.has(value);
+  },
+  get: function(value, notSetValue) {
+    return this.has(value) ? value : notSetValue;
+  },
+  add: function(value) {
+    var newMap = this._map.set(value, null);
+    if (this.__ownerID) {
+      this.length = newMap.length;
+      this._map = newMap;
+      return this;
+    }
+    return newMap === this._map ? this : makeSet(newMap);
+  },
+  remove: function(value) {
+    var newMap = this._map.remove(value);
+    if (this.__ownerID) {
+      this.length = newMap.length;
+      this._map = newMap;
+      return this;
+    }
+    return newMap === this._map ? this : newMap.length === 0 ? $Set.empty() : makeSet(newMap);
+  },
+  clear: function() {
+    if (this.length === 0) {
+      return this;
+    }
+    if (this.__ownerID) {
+      this.length = 0;
+      this._map.clear();
+      return this;
+    }
+    return $Set.empty();
+  },
+  union: function() {
+    var seqs = arguments;
+    if (seqs.length === 0) {
+      return this;
+    }
+    return this.withMutations((function(set) {
+      for (var ii = 0; ii < seqs.length; ii++) {
+        Sequence(seqs[ii]).forEach((function(value) {
+          return set.add(value);
+        }));
+      }
+    }));
+  },
+  intersect: function() {
+    for (var seqs = [],
+        $__9 = 0; $__9 < arguments.length; $__9++)
+      seqs[$__9] = arguments[$__9];
+    if (seqs.length === 0) {
+      return this;
+    }
+    seqs = seqs.map((function(seq) {
+      return Sequence(seq);
+    }));
+    var originalSet = this;
+    return this.withMutations((function(set) {
+      originalSet.forEach((function(value) {
+        if (!seqs.every((function(seq) {
+          return seq.contains(value);
+        }))) {
+          set.remove(value);
+        }
+      }));
+    }));
+  },
+  subtract: function() {
+    for (var seqs = [],
+        $__10 = 0; $__10 < arguments.length; $__10++)
+      seqs[$__10] = arguments[$__10];
+    if (seqs.length === 0) {
+      return this;
+    }
+    seqs = seqs.map((function(seq) {
+      return Sequence(seq);
+    }));
+    var originalSet = this;
+    return this.withMutations((function(set) {
+      originalSet.forEach((function(value) {
+        if (seqs.some((function(seq) {
+          return seq.contains(value);
+        }))) {
+          set.remove(value);
+        }
+      }));
+    }));
+  },
+  isSubset: function(seq) {
+    seq = Sequence(seq);
+    return this.every((function(value) {
+      return seq.contains(value);
+    }));
+  },
+  isSuperset: function(seq) {
+    var set = this;
+    seq = Sequence(seq);
+    return seq.every((function(value) {
+      return set.contains(value);
+    }));
+  },
+  wasAltered: function() {
+    return this._map.wasAltered();
+  },
+  values: function() {
+    return this._map.keys();
+  },
+  entries: function() {
+    return iteratorMapper(this.values(), (function(key) {
+      return [key, key];
+    }));
+  },
+  hashCode: function() {
+    return this._map.hashCode();
+  },
+  equals: function(other) {
+    return this._map.equals(other._map);
+  },
+  __iterate: function(fn, reverse) {
+    var collection = this;
+    return this._map.__iterate((function(_, k) {
+      return fn(k, k, collection);
+    }), reverse);
+  },
+  __ensureOwner: function(ownerID) {
+    if (ownerID === this.__ownerID) {
+      return this;
+    }
+    var newMap = this._map.__ensureOwner(ownerID);
+    if (!ownerID) {
+      this.__ownerID = ownerID;
+      this._map = newMap;
+      return this;
+    }
+    return makeSet(newMap, ownerID);
+  }
+}, {
+  empty: function() {
+    return EMPTY_SET || (EMPTY_SET = makeSet(Map.empty()));
+  },
+  from: function(sequence) {
+    var set = $Set.empty();
+    return sequence ? sequence.constructor === $Set ? sequence : set.union(sequence) : set;
+  },
+  fromKeys: function(sequence) {
+    return $Set.from(Sequence(sequence).flip());
+  }
+}, Sequence);
+var SetPrototype = Set.prototype;
+SetPrototype[DELETE] = SetPrototype.remove;
+SetPrototype[ITERATOR] = SetPrototype.keys = SetPrototype.values;
+SetPrototype.contains = SetPrototype.has;
+SetPrototype.mergeDeep = SetPrototype.merge = SetPrototype.union;
+SetPrototype.mergeDeepWith = SetPrototype.mergeWith = function(merger) {
+  for (var seqs = [],
+      $__11 = 1; $__11 < arguments.length; $__11++)
+    seqs[$__11 - 1] = arguments[$__11];
+  return this.merge.apply(this, seqs);
+};
+SetPrototype.withMutations = MapPrototype.withMutations;
+SetPrototype.asMutable = MapPrototype.asMutable;
+SetPrototype.asImmutable = MapPrototype.asImmutable;
+SetPrototype.__toJS = IndexedSequencePrototype.__toJS;
+SetPrototype.__toStringMapper = IndexedSequencePrototype.__toStringMapper;
+function makeSet(map, ownerID) {
+  var set = Object.create(SetPrototype);
+  set.length = map ? map.length : 0;
+  set._map = map;
+  set.__ownerID = ownerID;
+  return set;
+}
+var EMPTY_SET;
+var OrderedMap = function OrderedMap(sequence) {
+  var map = $OrderedMap.empty();
+  return sequence ? sequence.constructor === $OrderedMap ? sequence : map.merge(sequence) : map;
+};
+var $OrderedMap = OrderedMap;
+($traceurRuntime.createClass)(OrderedMap, {
+  toString: function() {
+    return this.__toString('OrderedMap {', '}');
+  },
+  get: function(k, notSetValue) {
+    var index = this._map.get(k);
+    return index != null ? this._vector.get(index)[1] : notSetValue;
+  },
+  clear: function() {
+    if (this.length === 0) {
+      return this;
+    }
+    if (this.__ownerID) {
+      this.length = 0;
+      this._map.clear();
+      this._vector.clear();
+      return this;
+    }
+    return $OrderedMap.empty();
+  },
+  set: function(k, v) {
+    return updateOrderedMap(this, k, v);
+  },
+  remove: function(k) {
+    return updateOrderedMap(this, k, NOT_SET);
+  },
+  wasAltered: function() {
+    return this._map.wasAltered() || this._vector.wasAltered();
+  },
+  keys: function() {
+    return iteratorMapper(this.entries(), (function(entry) {
+      return entry[0];
+    }));
+  },
+  values: function() {
+    return iteratorMapper(this.entries(), (function(entry) {
+      return entry[1];
+    }));
+  },
+  entries: function() {
+    return this._vector.values(true);
+  },
+  __iterate: function(fn, reverse) {
+    return this._vector.fromEntrySeq().__iterate(fn, reverse);
+  },
+  __deepEqual: function(other) {
+    var iterator = this.entries();
+    return other.every((function(v, k) {
+      var entry = iterator.next().value;
+      return entry && is(entry[0], k) && is(entry[1], v);
+    }));
+  },
+  __ensureOwner: function(ownerID) {
+    if (ownerID === this.__ownerID) {
+      return this;
+    }
+    var newMap = this._map.__ensureOwner(ownerID);
+    var newVector = this._vector.__ensureOwner(ownerID);
+    if (!ownerID) {
+      this.__ownerID = ownerID;
+      this._map = newMap;
+      this._vector = newVector;
+      return this;
+    }
+    return makeOrderedMap(newMap, newVector, ownerID, this.__hash);
+  }
+}, {empty: function() {
+    return EMPTY_ORDERED_MAP || (EMPTY_ORDERED_MAP = makeOrderedMap(Map.empty(), Vector.empty()));
+  }}, Map);
+OrderedMap.from = OrderedMap;
+OrderedMap.prototype[DELETE] = OrderedMap.prototype.remove;
+function makeOrderedMap(map, vector, ownerID, hash) {
+  var omap = Object.create(OrderedMap.prototype);
+  omap.length = map ? map.length : 0;
+  omap._map = map;
+  omap._vector = vector;
+  omap.__ownerID = ownerID;
+  omap.__hash = hash;
+  return omap;
+}
+function updateOrderedMap(omap, k, v) {
+  var map = omap._map;
+  var vector = omap._vector;
+  var i = map.get(k);
+  var has = i !== undefined;
+  var removed = v === NOT_SET;
+  if ((!has && removed) || (has && v === vector.get(i)[1])) {
+    return omap;
+  }
+  if (!has) {
+    i = vector.length;
+  }
+  var newMap = removed ? map.remove(k) : has ? map : map.set(k, i);
+  var newVector = removed ? vector.remove(i) : vector.set(i, [k, v]);
+  if (omap.__ownerID) {
+    omap.length = newMap.length;
+    omap._map = newMap;
+    omap._vector = newVector;
+    omap.__hash = undefined;
+    return omap;
+  }
+  return makeOrderedMap(newMap, newVector);
+}
+var EMPTY_ORDERED_MAP;
+var Record = function Record(defaultValues, name) {
+  var RecordType = function(values) {
+    if (!(this instanceof RecordType)) {
+      return new RecordType(values);
+    }
+    this._map = Map(values);
+  };
+  defaultValues = Sequence(defaultValues);
+  var RecordTypePrototype = RecordType.prototype = Object.create(RecordPrototype);
+  RecordTypePrototype.constructor = RecordType;
+  RecordTypePrototype._name = name;
+  RecordTypePrototype._defaultValues = defaultValues;
+  var keys = Object.keys(defaultValues);
+  RecordType.prototype.length = keys.length;
+  if (Object.defineProperty) {
+    defaultValues.forEach((function(_, key) {
+      Object.defineProperty(RecordType.prototype, key, {
+        get: function() {
+          return this.get(key);
+        },
+        set: function(value) {
+          invariant(this.__ownerID, 'Cannot set on an immutable record.');
+          this.set(key, value);
+        }
+      });
+    }));
+  }
+  return RecordType;
+};
+var $Record = Record;
+($traceurRuntime.createClass)(Record, {
+  toString: function() {
+    return this.__toString((this._name || 'Record') + ' {', '}');
+  },
+  has: function(k) {
+    return this._defaultValues.has(k);
+  },
+  get: function(k, notSetValue) {
+    if (notSetValue !== undefined && !this.has(k)) {
+      return notSetValue;
+    }
+    return this._map.get(k, this._defaultValues.get(k));
+  },
+  clear: function() {
+    if (this.__ownerID) {
+      this._map.clear();
+      return this;
+    }
+    var Record = Object.getPrototypeOf(this).constructor;
+    return $Record._empty || ($Record._empty = makeRecord(this, Map.empty()));
+  },
+  set: function(k, v) {
+    if (k == null || !this.has(k)) {
+      return this;
+    }
+    var newMap = this._map.set(k, v);
+    if (this.__ownerID || newMap === this._map) {
+      return this;
+    }
+    return makeRecord(this, newMap);
+  },
+  remove: function(k) {
+    if (k == null || !this.has(k)) {
+      return this;
+    }
+    var newMap = this._map.remove(k);
+    if (this.__ownerID || newMap === this._map) {
+      return this;
+    }
+    return makeRecord(this, newMap);
+  },
+  keys: function() {
+    return this._map.keys();
+  },
+  values: function() {
+    return this._map.values();
+  },
+  entries: function() {
+    return this._map.entries();
+  },
+  wasAltered: function() {
+    return this._map.wasAltered();
+  },
+  __iterate: function(fn, reverse) {
+    var record = this;
+    return this._defaultValues.map((function(_, k) {
+      return record.get(k);
+    })).__iterate(fn, reverse);
+  },
+  __ensureOwner: function(ownerID) {
+    if (ownerID === this.__ownerID) {
+      return this;
+    }
+    var newMap = this._map && this._map.__ensureOwner(ownerID);
+    if (!ownerID) {
+      this.__ownerID = ownerID;
+      this._map = newMap;
+      return this;
+    }
+    return makeRecord(this, newMap, ownerID);
+  }
+}, {}, Sequence);
+var RecordPrototype = Record.prototype;
+RecordPrototype[DELETE] = RecordPrototype.remove;
+RecordPrototype[ITERATOR] = MapPrototype[ITERATOR];
+RecordPrototype.merge = MapPrototype.merge;
+RecordPrototype.mergeWith = MapPrototype.mergeWith;
+RecordPrototype.mergeDeep = MapPrototype.mergeDeep;
+RecordPrototype.mergeDeepWith = MapPrototype.mergeDeepWith;
+RecordPrototype.update = MapPrototype.update;
+RecordPrototype.updateIn = MapPrototype.updateIn;
+RecordPrototype.cursor = MapPrototype.cursor;
+RecordPrototype.withMutations = MapPrototype.withMutations;
+RecordPrototype.asMutable = MapPrototype.asMutable;
+RecordPrototype.asImmutable = MapPrototype.asImmutable;
+RecordPrototype.__deepEqual = MapPrototype.__deepEqual;
+function makeRecord(likeRecord, map, ownerID) {
+  var record = Object.create(Object.getPrototypeOf(likeRecord));
+  record._map = map;
+  record.__ownerID = ownerID;
+  return record;
+}
+var Range = function Range(start, end, step) {
+  if (!(this instanceof $Range)) {
+    return new $Range(start, end, step);
+  }
+  invariant(step !== 0, 'Cannot step a Range by 0');
+  start = start || 0;
+  if (end == null) {
+    end = Infinity;
+  }
+  if (start === end && __EMPTY_RANGE) {
+    return __EMPTY_RANGE;
+  }
+  step = step == null ? 1 : Math.abs(step);
+  if (end < start) {
+    step = -step;
+  }
+  this._start = start;
+  this._end = end;
+  this._step = step;
+  this.length = Math.max(0, Math.ceil((end - start) / step - 1) + 1);
+};
+var $Range = Range;
+($traceurRuntime.createClass)(Range, {
+  toString: function() {
+    if (this.length === 0) {
+      return 'Range []';
+    }
+    return 'Range [ ' + this._start + '...' + this._end + (this._step > 1 ? ' by ' + this._step : '') + ' ]';
+  },
+  has: function(index) {
+    invariant(index >= 0, 'Index out of bounds');
+    return index < this.length;
+  },
+  get: function(index, notSetValue) {
+    invariant(index >= 0, 'Index out of bounds');
+    return this.length === Infinity || index < this.length ? this._start + index * this._step : notSetValue;
+  },
+  contains: function(searchValue) {
+    var possibleIndex = (searchValue - this._start) / this._step;
+    return possibleIndex >= 0 && possibleIndex < this.length && possibleIndex === Math.floor(possibleIndex);
+  },
+  slice: function(begin, end, maintainIndices) {
+    if (wholeSlice(begin, end, this.length)) {
+      return this;
+    }
+    if (maintainIndices) {
+      return $traceurRuntime.superCall(this, $Range.prototype, "slice", [begin, end, maintainIndices]);
+    }
+    begin = resolveBegin(begin, this.length);
+    end = resolveEnd(end, this.length);
+    if (end <= begin) {
+      return __EMPTY_RANGE;
+    }
+    return new $Range(this.get(begin, this._end), this.get(end, this._end), this._step);
+  },
+  indexOf: function(searchValue) {
+    var offsetValue = searchValue - this._start;
+    if (offsetValue % this._step === 0) {
+      var index = offsetValue / this._step;
+      if (index >= 0 && index < this.length) {
+        return index;
+      }
+    }
+    return -1;
+  },
+  lastIndexOf: function(searchValue) {
+    return this.indexOf(searchValue);
+  },
+  take: function(amount) {
+    return this.slice(0, amount);
+  },
+  skip: function(amount, maintainIndices) {
+    return maintainIndices ? $traceurRuntime.superCall(this, $Range.prototype, "skip", [amount]) : this.slice(amount);
+  },
+  __iterate: function(fn, reverse, flipIndices) {
+    var reversedIndices = reverse ^ flipIndices;
+    var maxIndex = this.length - 1;
+    var step = this._step;
+    var value = reverse ? this._start + maxIndex * step : this._start;
+    for (var ii = 0; ii <= maxIndex; ii++) {
+      if (fn(value, reversedIndices ? maxIndex - ii : ii, this) === false) {
+        break;
+      }
+      value += reverse ? -step : step;
+    }
+    return reversedIndices ? this.length : ii;
+  },
+  __deepEquals: function(other) {
+    return this._start === other._start && this._end === other._end && this._step === other._step;
+  }
+}, {}, IndexedSequence);
+var RangePrototype = Range.prototype;
+RangePrototype.__toJS = RangePrototype.toArray;
+RangePrototype.first = VectorPrototype.first;
+RangePrototype.last = VectorPrototype.last;
+var __EMPTY_RANGE = Range(0, 0);
+var Repeat = function Repeat(value, times) {
+  if (times === 0 && EMPTY_REPEAT) {
+    return EMPTY_REPEAT;
+  }
+  if (!(this instanceof $Repeat)) {
+    return new $Repeat(value, times);
+  }
+  this._value = value;
+  this.length = times == null ? Infinity : Math.max(0, times);
+};
+var $Repeat = Repeat;
+($traceurRuntime.createClass)(Repeat, {
+  toString: function() {
+    if (this.length === 0) {
+      return 'Repeat []';
+    }
+    return 'Repeat [ ' + this._value + ' ' + this.length + ' times ]';
+  },
+  get: function(index, notSetValue) {
+    invariant(index >= 0, 'Index out of bounds');
+    return this.length === Infinity || index < this.length ? this._value : notSetValue;
+  },
+  first: function() {
+    return this._value;
+  },
+  contains: function(searchValue) {
+    return is(this._value, searchValue);
+  },
+  slice: function(begin, end, maintainIndices) {
+    if (maintainIndices) {
+      return $traceurRuntime.superCall(this, $Repeat.prototype, "slice", [begin, end, maintainIndices]);
+    }
+    var length = this.length;
+    begin = begin < 0 ? Math.max(0, length + begin) : Math.min(length, begin);
+    end = end == null ? length : end > 0 ? Math.min(length, end) : Math.max(0, length + end);
+    return end > begin ? new $Repeat(this._value, end - begin) : EMPTY_REPEAT;
+  },
+  reverse: function(maintainIndices) {
+    return maintainIndices ? $traceurRuntime.superCall(this, $Repeat.prototype, "reverse", [maintainIndices]) : this;
+  },
+  indexOf: function(searchValue) {
+    if (is(this._value, searchValue)) {
+      return 0;
+    }
+    return -1;
+  },
+  lastIndexOf: function(searchValue) {
+    if (is(this._value, searchValue)) {
+      return this.length;
+    }
+    return -1;
+  },
+  __iterate: function(fn, reverse, flipIndices) {
+    var reversedIndices = reverse ^ flipIndices;
+    invariant(!reversedIndices || this.length < Infinity, 'Cannot access end of infinite range.');
+    var maxIndex = this.length - 1;
+    for (var ii = 0; ii <= maxIndex; ii++) {
+      if (fn(this._value, reversedIndices ? maxIndex - ii : ii, this) === false) {
+        break;
+      }
+    }
+    return reversedIndices ? this.length : ii;
+  },
+  __deepEquals: function(other) {
+    return is(this._value, other._value);
+  }
+}, {}, IndexedSequence);
+var RepeatPrototype = Repeat.prototype;
+RepeatPrototype.last = RepeatPrototype.first;
+RepeatPrototype.has = RangePrototype.has;
+RepeatPrototype.take = RangePrototype.take;
+RepeatPrototype.skip = RangePrototype.skip;
+RepeatPrototype.__toJS = RangePrototype.__toJS;
+var EMPTY_REPEAT = new Repeat(undefined, 0);
+function fromJS(json, converter) {
+  if (converter) {
+    return _fromJSWith(converter, json, '', {'': json});
+  }
+  return _fromJSDefault(json);
+}
+function _fromJSWith(converter, json, key, parentJSON) {
+  if (json && (Array.isArray(json) || json.constructor === Object)) {
+    return converter.call(parentJSON, key, Sequence(json).map((function(v, k) {
+      return _fromJSWith(converter, v, k, json);
+    })));
+  }
+  return json;
+}
+function _fromJSDefault(json) {
+  if (json) {
+    if (Array.isArray(json)) {
+      return Sequence(json).map(_fromJSDefault).toVector();
+    }
+    if (json.constructor === Object) {
+      return Sequence(json).map(_fromJSDefault).toMap();
+    }
+  }
+  return json;
+}
+var Immutable = {
+  Sequence: Sequence,
+  Map: Map,
+  Vector: Vector,
+  Set: Set,
+  OrderedMap: OrderedMap,
+  Record: Record,
+  Range: Range,
+  Repeat: Repeat,
+  is: is,
+  fromJS: fromJS
 };
 
-Object.keys(sourceRules).forEach(function (key) {
-  if (!replaceRules[key]) {
-    replaceRules[key] = sourceRules[key];
-  }
-});
+  return Immutable;
+}
+typeof exports === 'object' ? module.exports = universalModule() :
+  typeof define === 'function' && define.amd ? define(universalModule) :
+    Immutable = universalModule();
 
-module.exports = replaceRules;
-},{"./source":61}],61:[function(require,module,exports){
-module.exports = {
-  call: function (node, compile) {
-    return compile(node.nodes[0]) + compile(node.nodes[1]);
-  },
-  name: function (node, compile) {
-    return node.value;
-  },
-  arguments: function (node, compile) {
-    return '(' + compile(node.nodes).join(',') + ')';
-  },
-  empty: function () {
-    return '';
-  },
-  value: function (node, compile) {
-    return JSON.stringify(node.value);
-  },
-  array: function (node, compile) {
-    return '[' + compile(node.nodes).join(' ') + ']';
-  },
-  object: function (node, compile) {
-    return '{' + compile(node.nodes).join(' ') + '}';
-  },
-  property: function (node, compile) {
-    return compile(node.nodes[0]) + ':' + compile(node.nodes[1]);
-  }
-};
-},{}],62:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 module.exports = require('./lib/ObjectPath.js').ObjectPath;
 
-},{"./lib/ObjectPath.js":63}],63:[function(require,module,exports){
+},{"./lib/ObjectPath.js":53}],53:[function(require,module,exports){
 'use strict';
 
 ;!function(undefined) {
@@ -6098,10 +7322,10 @@ module.exports = require('./lib/ObjectPath.js').ObjectPath;
 		window.ObjectPath = ObjectPath;
 	}
 }();
-},{}],64:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 module.exports = require('./lib/ReactWithAddons');
 
-},{"./lib/ReactWithAddons":146}],65:[function(require,module,exports){
+},{"./lib/ReactWithAddons":136}],55:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -6135,7 +7359,7 @@ var AutoFocusMixin = {
 
 module.exports = AutoFocusMixin;
 
-},{"./focusNode":177}],66:[function(require,module,exports){
+},{"./focusNode":167}],56:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -6254,7 +7478,7 @@ var CSSCore = {
 module.exports = CSSCore;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],67:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],57:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -6377,7 +7601,7 @@ var CSSProperty = {
 
 module.exports = CSSProperty;
 
-},{}],68:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -6476,7 +7700,7 @@ var CSSPropertyOperations = {
 
 module.exports = CSSPropertyOperations;
 
-},{"./CSSProperty":67,"./dangerousStyleValue":172,"./escapeTextForBrowser":175,"./hyphenate":187,"./memoizeStringOnly":197}],69:[function(require,module,exports){
+},{"./CSSProperty":57,"./dangerousStyleValue":162,"./escapeTextForBrowser":165,"./hyphenate":177,"./memoizeStringOnly":187}],59:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -6865,7 +8089,7 @@ var ChangeEventPlugin = {
 
 module.exports = ChangeEventPlugin;
 
-},{"./EventConstants":79,"./EventPluginHub":81,"./EventPropagators":84,"./ExecutionEnvironment":85,"./ReactUpdates":145,"./SyntheticEvent":153,"./isEventSupported":190,"./isTextInputElement":192,"./keyOf":196}],70:[function(require,module,exports){
+},{"./EventConstants":69,"./EventPluginHub":71,"./EventPropagators":74,"./ExecutionEnvironment":75,"./ReactUpdates":135,"./SyntheticEvent":143,"./isEventSupported":180,"./isTextInputElement":182,"./keyOf":186}],60:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -6897,7 +8121,7 @@ var ClientReactRootIndex = {
 
 module.exports = ClientReactRootIndex;
 
-},{}],71:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -7159,7 +8383,7 @@ var CompositionEventPlugin = {
 
 module.exports = CompositionEventPlugin;
 
-},{"./EventConstants":79,"./EventPropagators":84,"./ExecutionEnvironment":85,"./ReactInputSelection":120,"./SyntheticCompositionEvent":151,"./getTextContentAccessor":185,"./keyOf":196}],72:[function(require,module,exports){
+},{"./EventConstants":69,"./EventPropagators":74,"./ExecutionEnvironment":75,"./ReactInputSelection":110,"./SyntheticCompositionEvent":141,"./getTextContentAccessor":175,"./keyOf":186}],62:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -7332,7 +8556,7 @@ var DOMChildrenOperations = {
 
 module.exports = DOMChildrenOperations;
 
-},{"./Danger":75,"./ReactMultiChildUpdateTypes":127,"./getTextContentAccessor":185}],73:[function(require,module,exports){
+},{"./Danger":65,"./ReactMultiChildUpdateTypes":117,"./getTextContentAccessor":175}],63:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -7606,7 +8830,7 @@ var DOMProperty = {
 module.exports = DOMProperty;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],74:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],64:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -7791,7 +9015,7 @@ var DOMPropertyOperations = {
 module.exports = DOMPropertyOperations;
 
 }).call(this,require("FWaASH"))
-},{"./DOMProperty":73,"./escapeTextForBrowser":175,"./memoizeStringOnly":197,"./warning":212,"FWaASH":56}],75:[function(require,module,exports){
+},{"./DOMProperty":63,"./escapeTextForBrowser":165,"./memoizeStringOnly":187,"./warning":202,"FWaASH":49}],65:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -7982,7 +9206,7 @@ var Danger = {
 module.exports = Danger;
 
 }).call(this,require("FWaASH"))
-},{"./ExecutionEnvironment":85,"./createNodesFromMarkup":169,"./emptyFunction":173,"./getMarkupWrap":182,"./invariant":189,"FWaASH":56}],76:[function(require,module,exports){
+},{"./ExecutionEnvironment":75,"./createNodesFromMarkup":159,"./emptyFunction":163,"./getMarkupWrap":172,"./invariant":179,"FWaASH":49}],66:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -8180,7 +9404,7 @@ var DefaultDOMPropertyConfig = {
 
 module.exports = DefaultDOMPropertyConfig;
 
-},{"./DOMProperty":73}],77:[function(require,module,exports){
+},{"./DOMProperty":63}],67:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -8226,7 +9450,7 @@ var DefaultEventPluginOrder = [
 
 module.exports = DefaultEventPluginOrder;
 
-},{"./keyOf":196}],78:[function(require,module,exports){
+},{"./keyOf":186}],68:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -8373,7 +9597,7 @@ var EnterLeaveEventPlugin = {
 
 module.exports = EnterLeaveEventPlugin;
 
-},{"./EventConstants":79,"./EventPropagators":84,"./ReactMount":124,"./SyntheticMouseEvent":156,"./keyOf":196}],79:[function(require,module,exports){
+},{"./EventConstants":69,"./EventPropagators":74,"./ReactMount":114,"./SyntheticMouseEvent":146,"./keyOf":186}],69:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -8451,7 +9675,7 @@ var EventConstants = {
 
 module.exports = EventConstants;
 
-},{"./keyMirror":195}],80:[function(require,module,exports){
+},{"./keyMirror":185}],70:[function(require,module,exports){
 (function (process){
 /**
  * @providesModule EventListener
@@ -8524,7 +9748,7 @@ var EventListener = {
 module.exports = EventListener;
 
 }).call(this,require("FWaASH"))
-},{"./emptyFunction":173,"FWaASH":56}],81:[function(require,module,exports){
+},{"./emptyFunction":163,"FWaASH":49}],71:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -8823,7 +10047,7 @@ var EventPluginHub = {
 module.exports = EventPluginHub;
 
 }).call(this,require("FWaASH"))
-},{"./EventPluginRegistry":82,"./EventPluginUtils":83,"./ExecutionEnvironment":85,"./accumulate":162,"./forEachAccumulated":178,"./invariant":189,"./isEventSupported":190,"./monitorCodeUse":202,"FWaASH":56}],82:[function(require,module,exports){
+},{"./EventPluginRegistry":72,"./EventPluginUtils":73,"./ExecutionEnvironment":75,"./accumulate":152,"./forEachAccumulated":168,"./invariant":179,"./isEventSupported":180,"./monitorCodeUse":192,"FWaASH":49}],72:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -9108,7 +10332,7 @@ var EventPluginRegistry = {
 module.exports = EventPluginRegistry;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],83:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],73:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -9326,7 +10550,7 @@ var EventPluginUtils = {
 module.exports = EventPluginUtils;
 
 }).call(this,require("FWaASH"))
-},{"./EventConstants":79,"./invariant":189,"FWaASH":56}],84:[function(require,module,exports){
+},{"./EventConstants":69,"./invariant":179,"FWaASH":49}],74:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -9473,7 +10697,7 @@ var EventPropagators = {
 module.exports = EventPropagators;
 
 }).call(this,require("FWaASH"))
-},{"./EventConstants":79,"./EventPluginHub":81,"./accumulate":162,"./forEachAccumulated":178,"FWaASH":56}],85:[function(require,module,exports){
+},{"./EventConstants":69,"./EventPluginHub":71,"./accumulate":152,"./forEachAccumulated":168,"FWaASH":49}],75:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -9519,7 +10743,7 @@ var ExecutionEnvironment = {
 
 module.exports = ExecutionEnvironment;
 
-},{}],86:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -9567,7 +10791,7 @@ var LinkedStateMixin = {
 
 module.exports = LinkedStateMixin;
 
-},{"./ReactLink":122,"./ReactStateSetters":139}],87:[function(require,module,exports){
+},{"./ReactLink":112,"./ReactStateSetters":129}],77:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -9731,7 +10955,7 @@ var LinkedValueUtils = {
 module.exports = LinkedValueUtils;
 
 }).call(this,require("FWaASH"))
-},{"./ReactPropTypes":133,"./invariant":189,"./warning":212,"FWaASH":56}],88:[function(require,module,exports){
+},{"./ReactPropTypes":123,"./invariant":179,"./warning":202,"FWaASH":49}],78:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -9796,7 +11020,7 @@ var MobileSafariClickEventPlugin = {
 
 module.exports = MobileSafariClickEventPlugin;
 
-},{"./EventConstants":79,"./emptyFunction":173}],89:[function(require,module,exports){
+},{"./EventConstants":69,"./emptyFunction":163}],79:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -9919,7 +11143,7 @@ var PooledClass = {
 module.exports = PooledClass;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],90:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],80:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10020,7 +11244,7 @@ React.version = '0.10.0';
 module.exports = React;
 
 }).call(this,require("FWaASH"))
-},{"./DOMPropertyOperations":74,"./EventPluginUtils":83,"./ExecutionEnvironment":85,"./ReactChildren":94,"./ReactComponent":95,"./ReactCompositeComponent":97,"./ReactContext":98,"./ReactCurrentOwner":99,"./ReactDOM":100,"./ReactDOMComponent":102,"./ReactDefaultInjection":112,"./ReactInstanceHandles":121,"./ReactMount":124,"./ReactMultiChild":126,"./ReactPerf":129,"./ReactPropTypes":133,"./ReactServerRendering":137,"./ReactTextComponent":141,"./onlyChild":205,"FWaASH":56}],91:[function(require,module,exports){
+},{"./DOMPropertyOperations":64,"./EventPluginUtils":73,"./ExecutionEnvironment":75,"./ReactChildren":84,"./ReactComponent":85,"./ReactCompositeComponent":87,"./ReactContext":88,"./ReactCurrentOwner":89,"./ReactDOM":90,"./ReactDOMComponent":92,"./ReactDefaultInjection":102,"./ReactInstanceHandles":111,"./ReactMount":114,"./ReactMultiChild":116,"./ReactPerf":119,"./ReactPropTypes":123,"./ReactServerRendering":127,"./ReactTextComponent":131,"./onlyChild":195,"FWaASH":49}],81:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10066,7 +11290,7 @@ var ReactBrowserComponentMixin = {
 module.exports = ReactBrowserComponentMixin;
 
 }).call(this,require("FWaASH"))
-},{"./ReactMount":124,"./invariant":189,"FWaASH":56}],92:[function(require,module,exports){
+},{"./ReactMount":114,"./invariant":179,"FWaASH":49}],82:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -10133,7 +11357,7 @@ var ReactCSSTransitionGroup = React.createClass({
 
 module.exports = ReactCSSTransitionGroup;
 
-},{"./React":90,"./ReactCSSTransitionGroupChild":93,"./ReactTransitionGroup":144}],93:[function(require,module,exports){
+},{"./React":80,"./ReactCSSTransitionGroupChild":83,"./ReactTransitionGroup":134}],83:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10275,7 +11499,7 @@ var ReactCSSTransitionGroupChild = React.createClass({
 module.exports = ReactCSSTransitionGroupChild;
 
 }).call(this,require("FWaASH"))
-},{"./CSSCore":66,"./React":90,"./ReactTransitionEvents":143,"./onlyChild":205,"FWaASH":56}],94:[function(require,module,exports){
+},{"./CSSCore":56,"./React":80,"./ReactTransitionEvents":133,"./onlyChild":195,"FWaASH":49}],84:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10411,7 +11635,7 @@ var ReactChildren = {
 module.exports = ReactChildren;
 
 }).call(this,require("FWaASH"))
-},{"./PooledClass":89,"./invariant":189,"./traverseAllChildren":210,"FWaASH":56}],95:[function(require,module,exports){
+},{"./PooledClass":79,"./invariant":179,"./traverseAllChildren":200,"FWaASH":49}],85:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -11010,7 +12234,7 @@ var ReactComponent = {
 module.exports = ReactComponent;
 
 }).call(this,require("FWaASH"))
-},{"./ReactCurrentOwner":99,"./ReactOwner":128,"./ReactUpdates":145,"./invariant":189,"./keyMirror":195,"./merge":198,"./monitorCodeUse":202,"FWaASH":56}],96:[function(require,module,exports){
+},{"./ReactCurrentOwner":89,"./ReactOwner":118,"./ReactUpdates":135,"./invariant":179,"./keyMirror":185,"./merge":188,"./monitorCodeUse":192,"FWaASH":49}],86:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -11138,7 +12362,7 @@ var ReactComponentBrowserEnvironment = {
 module.exports = ReactComponentBrowserEnvironment;
 
 }).call(this,require("FWaASH"))
-},{"./ReactDOMIDOperations":104,"./ReactMarkupChecksum":123,"./ReactMount":124,"./ReactPerf":129,"./ReactReconcileTransaction":135,"./getReactRootElementInContainer":184,"./invariant":189,"FWaASH":56}],97:[function(require,module,exports){
+},{"./ReactDOMIDOperations":94,"./ReactMarkupChecksum":113,"./ReactMount":114,"./ReactPerf":119,"./ReactReconcileTransaction":125,"./getReactRootElementInContainer":174,"./invariant":179,"FWaASH":49}],87:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -12729,7 +13953,7 @@ var ReactCompositeComponent = {
 module.exports = ReactCompositeComponent;
 
 }).call(this,require("FWaASH"))
-},{"./ReactComponent":95,"./ReactContext":98,"./ReactCurrentOwner":99,"./ReactErrorUtils":115,"./ReactOwner":128,"./ReactPerf":129,"./ReactPropTransferer":130,"./ReactPropTypeLocationNames":131,"./ReactPropTypeLocations":132,"./ReactUpdates":145,"./instantiateReactComponent":188,"./invariant":189,"./keyMirror":195,"./merge":198,"./mixInto":201,"./monitorCodeUse":202,"./objMap":203,"./shouldUpdateReactComponent":208,"./warning":212,"FWaASH":56}],98:[function(require,module,exports){
+},{"./ReactComponent":85,"./ReactContext":88,"./ReactCurrentOwner":89,"./ReactErrorUtils":105,"./ReactOwner":118,"./ReactPerf":119,"./ReactPropTransferer":120,"./ReactPropTypeLocationNames":121,"./ReactPropTypeLocations":122,"./ReactUpdates":135,"./instantiateReactComponent":178,"./invariant":179,"./keyMirror":185,"./merge":188,"./mixInto":191,"./monitorCodeUse":192,"./objMap":193,"./shouldUpdateReactComponent":198,"./warning":202,"FWaASH":49}],88:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -12798,7 +14022,7 @@ var ReactContext = {
 
 module.exports = ReactContext;
 
-},{"./merge":198}],99:[function(require,module,exports){
+},{"./merge":188}],89:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -12839,7 +14063,7 @@ var ReactCurrentOwner = {
 
 module.exports = ReactCurrentOwner;
 
-},{}],100:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -13048,7 +14272,7 @@ ReactDOM.injection = injection;
 
 module.exports = ReactDOM;
 
-},{"./ReactDOMComponent":102,"./mergeInto":200,"./objMapKeyVal":204}],101:[function(require,module,exports){
+},{"./ReactDOMComponent":92,"./mergeInto":190,"./objMapKeyVal":194}],91:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -13119,7 +14343,7 @@ var ReactDOMButton = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMButton;
 
-},{"./AutoFocusMixin":65,"./ReactBrowserComponentMixin":91,"./ReactCompositeComponent":97,"./ReactDOM":100,"./keyMirror":195}],102:[function(require,module,exports){
+},{"./AutoFocusMixin":55,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./keyMirror":185}],92:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -13539,7 +14763,7 @@ mixInto(ReactDOMComponent, ReactBrowserComponentMixin);
 module.exports = ReactDOMComponent;
 
 }).call(this,require("FWaASH"))
-},{"./CSSPropertyOperations":68,"./DOMProperty":73,"./DOMPropertyOperations":74,"./ReactBrowserComponentMixin":91,"./ReactComponent":95,"./ReactEventEmitter":116,"./ReactMount":124,"./ReactMultiChild":126,"./ReactPerf":129,"./escapeTextForBrowser":175,"./invariant":189,"./keyOf":196,"./merge":198,"./mixInto":201,"FWaASH":56}],103:[function(require,module,exports){
+},{"./CSSPropertyOperations":58,"./DOMProperty":63,"./DOMPropertyOperations":64,"./ReactBrowserComponentMixin":81,"./ReactComponent":85,"./ReactEventEmitter":106,"./ReactMount":114,"./ReactMultiChild":116,"./ReactPerf":119,"./escapeTextForBrowser":165,"./invariant":179,"./keyOf":186,"./merge":188,"./mixInto":191,"FWaASH":49}],93:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -13603,7 +14827,7 @@ var ReactDOMForm = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMForm;
 
-},{"./EventConstants":79,"./ReactBrowserComponentMixin":91,"./ReactCompositeComponent":97,"./ReactDOM":100,"./ReactEventEmitter":116}],104:[function(require,module,exports){
+},{"./EventConstants":69,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./ReactEventEmitter":106}],94:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -13825,7 +15049,7 @@ var ReactDOMIDOperations = {
 module.exports = ReactDOMIDOperations;
 
 }).call(this,require("FWaASH"))
-},{"./CSSPropertyOperations":68,"./DOMChildrenOperations":72,"./DOMPropertyOperations":74,"./ReactMount":124,"./ReactPerf":129,"./invariant":189,"FWaASH":56}],105:[function(require,module,exports){
+},{"./CSSPropertyOperations":58,"./DOMChildrenOperations":62,"./DOMPropertyOperations":64,"./ReactMount":114,"./ReactPerf":119,"./invariant":179,"FWaASH":49}],95:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -13888,7 +15112,7 @@ var ReactDOMImg = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMImg;
 
-},{"./EventConstants":79,"./ReactBrowserComponentMixin":91,"./ReactCompositeComponent":97,"./ReactDOM":100,"./ReactEventEmitter":116}],106:[function(require,module,exports){
+},{"./EventConstants":69,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./ReactEventEmitter":106}],96:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -14074,7 +15298,7 @@ var ReactDOMInput = ReactCompositeComponent.createClass({
 module.exports = ReactDOMInput;
 
 }).call(this,require("FWaASH"))
-},{"./AutoFocusMixin":65,"./DOMPropertyOperations":74,"./LinkedValueUtils":87,"./ReactBrowserComponentMixin":91,"./ReactCompositeComponent":97,"./ReactDOM":100,"./ReactMount":124,"./invariant":189,"./merge":198,"FWaASH":56}],107:[function(require,module,exports){
+},{"./AutoFocusMixin":55,"./DOMPropertyOperations":64,"./LinkedValueUtils":77,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./ReactMount":114,"./invariant":179,"./merge":188,"FWaASH":49}],97:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -14133,7 +15357,7 @@ var ReactDOMOption = ReactCompositeComponent.createClass({
 module.exports = ReactDOMOption;
 
 }).call(this,require("FWaASH"))
-},{"./ReactBrowserComponentMixin":91,"./ReactCompositeComponent":97,"./ReactDOM":100,"./warning":212,"FWaASH":56}],108:[function(require,module,exports){
+},{"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./warning":202,"FWaASH":49}],98:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -14317,7 +15541,7 @@ var ReactDOMSelect = ReactCompositeComponent.createClass({
 module.exports = ReactDOMSelect;
 
 }).call(this,require("FWaASH"))
-},{"./AutoFocusMixin":65,"./LinkedValueUtils":87,"./ReactBrowserComponentMixin":91,"./ReactCompositeComponent":97,"./ReactDOM":100,"./invariant":189,"./merge":198,"FWaASH":56}],109:[function(require,module,exports){
+},{"./AutoFocusMixin":55,"./LinkedValueUtils":77,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./invariant":179,"./merge":188,"FWaASH":49}],99:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -14508,7 +15732,7 @@ var ReactDOMSelection = {
 
 module.exports = ReactDOMSelection;
 
-},{"./getNodeForCharacterOffset":183,"./getTextContentAccessor":185}],110:[function(require,module,exports){
+},{"./getNodeForCharacterOffset":173,"./getTextContentAccessor":175}],100:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -14656,7 +15880,7 @@ var ReactDOMTextarea = ReactCompositeComponent.createClass({
 module.exports = ReactDOMTextarea;
 
 }).call(this,require("FWaASH"))
-},{"./AutoFocusMixin":65,"./DOMPropertyOperations":74,"./LinkedValueUtils":87,"./ReactBrowserComponentMixin":91,"./ReactCompositeComponent":97,"./ReactDOM":100,"./invariant":189,"./merge":198,"./warning":212,"FWaASH":56}],111:[function(require,module,exports){
+},{"./AutoFocusMixin":55,"./DOMPropertyOperations":64,"./LinkedValueUtils":77,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./invariant":179,"./merge":188,"./warning":202,"FWaASH":49}],101:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -14733,7 +15957,7 @@ var ReactDefaultBatchingStrategy = {
 
 module.exports = ReactDefaultBatchingStrategy;
 
-},{"./ReactUpdates":145,"./Transaction":160,"./emptyFunction":173,"./mixInto":201}],112:[function(require,module,exports){
+},{"./ReactUpdates":135,"./Transaction":150,"./emptyFunction":163,"./mixInto":191}],102:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -14862,7 +16086,7 @@ module.exports = {
 };
 
 }).call(this,require("FWaASH"))
-},{"./ChangeEventPlugin":69,"./ClientReactRootIndex":70,"./CompositionEventPlugin":71,"./DefaultDOMPropertyConfig":76,"./DefaultEventPluginOrder":77,"./EnterLeaveEventPlugin":78,"./ExecutionEnvironment":85,"./MobileSafariClickEventPlugin":88,"./ReactBrowserComponentMixin":91,"./ReactComponentBrowserEnvironment":96,"./ReactDOM":100,"./ReactDOMButton":101,"./ReactDOMForm":103,"./ReactDOMImg":105,"./ReactDOMInput":106,"./ReactDOMOption":107,"./ReactDOMSelect":108,"./ReactDOMTextarea":110,"./ReactDefaultBatchingStrategy":111,"./ReactDefaultPerf":113,"./ReactEventTopLevelCallback":118,"./ReactInjection":119,"./ReactInstanceHandles":121,"./ReactMount":124,"./SelectEventPlugin":147,"./ServerReactRootIndex":148,"./SimpleEventPlugin":149,"./createFullPageComponent":168,"FWaASH":56}],113:[function(require,module,exports){
+},{"./ChangeEventPlugin":59,"./ClientReactRootIndex":60,"./CompositionEventPlugin":61,"./DefaultDOMPropertyConfig":66,"./DefaultEventPluginOrder":67,"./EnterLeaveEventPlugin":68,"./ExecutionEnvironment":75,"./MobileSafariClickEventPlugin":78,"./ReactBrowserComponentMixin":81,"./ReactComponentBrowserEnvironment":86,"./ReactDOM":90,"./ReactDOMButton":91,"./ReactDOMForm":93,"./ReactDOMImg":95,"./ReactDOMInput":96,"./ReactDOMOption":97,"./ReactDOMSelect":98,"./ReactDOMTextarea":100,"./ReactDefaultBatchingStrategy":101,"./ReactDefaultPerf":103,"./ReactEventTopLevelCallback":108,"./ReactInjection":109,"./ReactInstanceHandles":111,"./ReactMount":114,"./SelectEventPlugin":137,"./ServerReactRootIndex":138,"./SimpleEventPlugin":139,"./createFullPageComponent":158,"FWaASH":49}],103:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15108,7 +16332,7 @@ var ReactDefaultPerf = {
 
 module.exports = ReactDefaultPerf;
 
-},{"./DOMProperty":73,"./ReactDefaultPerfAnalysis":114,"./ReactMount":124,"./ReactPerf":129,"./performanceNow":206}],114:[function(require,module,exports){
+},{"./DOMProperty":63,"./ReactDefaultPerfAnalysis":104,"./ReactMount":114,"./ReactPerf":119,"./performanceNow":196}],104:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15309,7 +16533,7 @@ var ReactDefaultPerfAnalysis = {
 
 module.exports = ReactDefaultPerfAnalysis;
 
-},{"./merge":198}],115:[function(require,module,exports){
+},{"./merge":188}],105:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15348,7 +16572,7 @@ var ReactErrorUtils = {
 
 module.exports = ReactErrorUtils;
 
-},{}],116:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -15691,7 +16915,7 @@ var ReactEventEmitter = merge(ReactEventEmitterMixin, {
 module.exports = ReactEventEmitter;
 
 }).call(this,require("FWaASH"))
-},{"./EventConstants":79,"./EventListener":80,"./EventPluginHub":81,"./EventPluginRegistry":82,"./ExecutionEnvironment":85,"./ReactEventEmitterMixin":117,"./ViewportMetrics":161,"./invariant":189,"./isEventSupported":190,"./merge":198,"FWaASH":56}],117:[function(require,module,exports){
+},{"./EventConstants":69,"./EventListener":70,"./EventPluginHub":71,"./EventPluginRegistry":72,"./ExecutionEnvironment":75,"./ReactEventEmitterMixin":107,"./ViewportMetrics":151,"./invariant":179,"./isEventSupported":180,"./merge":188,"FWaASH":49}],107:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15750,7 +16974,7 @@ var ReactEventEmitterMixin = {
 
 module.exports = ReactEventEmitterMixin;
 
-},{"./EventPluginHub":81,"./ReactUpdates":145}],118:[function(require,module,exports){
+},{"./EventPluginHub":71,"./ReactUpdates":135}],108:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15901,7 +17125,7 @@ var ReactEventTopLevelCallback = {
 
 module.exports = ReactEventTopLevelCallback;
 
-},{"./PooledClass":89,"./ReactEventEmitter":116,"./ReactInstanceHandles":121,"./ReactMount":124,"./getEventTarget":181,"./mixInto":201}],119:[function(require,module,exports){
+},{"./PooledClass":79,"./ReactEventEmitter":106,"./ReactInstanceHandles":111,"./ReactMount":114,"./getEventTarget":171,"./mixInto":191}],109:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15946,7 +17170,7 @@ var ReactInjection = {
 
 module.exports = ReactInjection;
 
-},{"./DOMProperty":73,"./EventPluginHub":81,"./ReactComponent":95,"./ReactCompositeComponent":97,"./ReactDOM":100,"./ReactEventEmitter":116,"./ReactPerf":129,"./ReactRootIndex":136,"./ReactUpdates":145}],120:[function(require,module,exports){
+},{"./DOMProperty":63,"./EventPluginHub":71,"./ReactComponent":85,"./ReactCompositeComponent":87,"./ReactDOM":90,"./ReactEventEmitter":106,"./ReactPerf":119,"./ReactRootIndex":126,"./ReactUpdates":135}],110:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -16089,7 +17313,7 @@ var ReactInputSelection = {
 
 module.exports = ReactInputSelection;
 
-},{"./ReactDOMSelection":109,"./containsNode":165,"./focusNode":177,"./getActiveElement":179}],121:[function(require,module,exports){
+},{"./ReactDOMSelection":99,"./containsNode":155,"./focusNode":167,"./getActiveElement":169}],111:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -16431,7 +17655,7 @@ var ReactInstanceHandles = {
 module.exports = ReactInstanceHandles;
 
 }).call(this,require("FWaASH"))
-},{"./ReactRootIndex":136,"./invariant":189,"FWaASH":56}],122:[function(require,module,exports){
+},{"./ReactRootIndex":126,"./invariant":179,"FWaASH":49}],112:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -16487,7 +17711,7 @@ function ReactLink(value, requestChange) {
 
 module.exports = ReactLink;
 
-},{}],123:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -16542,7 +17766,7 @@ var ReactMarkupChecksum = {
 
 module.exports = ReactMarkupChecksum;
 
-},{"./adler32":163}],124:[function(require,module,exports){
+},{"./adler32":153}],114:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -17195,7 +18419,7 @@ var ReactMount = {
 module.exports = ReactMount;
 
 }).call(this,require("FWaASH"))
-},{"./DOMProperty":73,"./ReactEventEmitter":116,"./ReactInstanceHandles":121,"./ReactPerf":129,"./containsNode":165,"./getReactRootElementInContainer":184,"./instantiateReactComponent":188,"./invariant":189,"./shouldUpdateReactComponent":208,"FWaASH":56}],125:[function(require,module,exports){
+},{"./DOMProperty":63,"./ReactEventEmitter":106,"./ReactInstanceHandles":111,"./ReactPerf":119,"./containsNode":155,"./getReactRootElementInContainer":174,"./instantiateReactComponent":178,"./invariant":179,"./shouldUpdateReactComponent":198,"FWaASH":49}],115:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -17292,7 +18516,7 @@ PooledClass.addPoolingTo(ReactMountReady);
 
 module.exports = ReactMountReady;
 
-},{"./PooledClass":89,"./mixInto":201}],126:[function(require,module,exports){
+},{"./PooledClass":79,"./mixInto":191}],116:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -17726,7 +18950,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 
-},{"./ReactComponent":95,"./ReactMultiChildUpdateTypes":127,"./flattenChildren":176,"./instantiateReactComponent":188,"./shouldUpdateReactComponent":208}],127:[function(require,module,exports){
+},{"./ReactComponent":85,"./ReactMultiChildUpdateTypes":117,"./flattenChildren":166,"./instantiateReactComponent":178,"./shouldUpdateReactComponent":198}],117:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -17766,7 +18990,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 
 module.exports = ReactMultiChildUpdateTypes;
 
-},{"./keyMirror":195}],128:[function(require,module,exports){
+},{"./keyMirror":185}],118:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -17929,7 +19153,7 @@ var ReactOwner = {
 module.exports = ReactOwner;
 
 }).call(this,require("FWaASH"))
-},{"./emptyObject":174,"./invariant":189,"FWaASH":56}],129:[function(require,module,exports){
+},{"./emptyObject":164,"./invariant":179,"FWaASH":49}],119:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -18018,7 +19242,7 @@ function _noMeasure(objName, fnName, func) {
 module.exports = ReactPerf;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":56}],130:[function(require,module,exports){
+},{"FWaASH":49}],120:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -18169,7 +19393,7 @@ var ReactPropTransferer = {
 module.exports = ReactPropTransferer;
 
 }).call(this,require("FWaASH"))
-},{"./emptyFunction":173,"./invariant":189,"./joinClasses":194,"./merge":198,"FWaASH":56}],131:[function(require,module,exports){
+},{"./emptyFunction":163,"./invariant":179,"./joinClasses":184,"./merge":188,"FWaASH":49}],121:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -18204,7 +19428,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = ReactPropTypeLocationNames;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":56}],132:[function(require,module,exports){
+},{"FWaASH":49}],122:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -18235,7 +19459,7 @@ var ReactPropTypeLocations = keyMirror({
 
 module.exports = ReactPropTypeLocations;
 
-},{"./keyMirror":195}],133:[function(require,module,exports){
+},{"./keyMirror":185}],123:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -18598,7 +19822,7 @@ function createChainableTypeChecker(validate) {
 module.exports = Props;
 
 }).call(this,require("FWaASH"))
-},{"./ReactComponent":95,"./ReactPropTypeLocationNames":131,"./createObjectFrom":170,"./warning":212,"FWaASH":56}],134:[function(require,module,exports){
+},{"./ReactComponent":85,"./ReactPropTypeLocationNames":121,"./createObjectFrom":160,"./warning":202,"FWaASH":49}],124:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -18661,7 +19885,7 @@ PooledClass.addPoolingTo(ReactPutListenerQueue);
 
 module.exports = ReactPutListenerQueue;
 
-},{"./PooledClass":89,"./ReactEventEmitter":116,"./mixInto":201}],135:[function(require,module,exports){
+},{"./PooledClass":79,"./ReactEventEmitter":106,"./mixInto":191}],125:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -18845,7 +20069,7 @@ PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
 
-},{"./PooledClass":89,"./ReactEventEmitter":116,"./ReactInputSelection":120,"./ReactMountReady":125,"./ReactPutListenerQueue":134,"./Transaction":160,"./mixInto":201}],136:[function(require,module,exports){
+},{"./PooledClass":79,"./ReactEventEmitter":106,"./ReactInputSelection":110,"./ReactMountReady":115,"./ReactPutListenerQueue":124,"./Transaction":150,"./mixInto":191}],126:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -18883,7 +20107,7 @@ var ReactRootIndex = {
 
 module.exports = ReactRootIndex;
 
-},{}],137:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -18976,7 +20200,7 @@ module.exports = {
 };
 
 }).call(this,require("FWaASH"))
-},{"./ReactComponent":95,"./ReactInstanceHandles":121,"./ReactMarkupChecksum":123,"./ReactServerRenderingTransaction":138,"./instantiateReactComponent":188,"./invariant":189,"FWaASH":56}],138:[function(require,module,exports){
+},{"./ReactComponent":85,"./ReactInstanceHandles":111,"./ReactMarkupChecksum":113,"./ReactServerRenderingTransaction":128,"./instantiateReactComponent":178,"./invariant":179,"FWaASH":49}],128:[function(require,module,exports){
 /**
  * Copyright 2014 Facebook, Inc.
  *
@@ -19094,7 +20318,7 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 
-},{"./PooledClass":89,"./ReactMountReady":125,"./ReactPutListenerQueue":134,"./Transaction":160,"./emptyFunction":173,"./mixInto":201}],139:[function(require,module,exports){
+},{"./PooledClass":79,"./ReactMountReady":115,"./ReactPutListenerQueue":124,"./Transaction":150,"./emptyFunction":163,"./mixInto":191}],129:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -19207,7 +20431,7 @@ ReactStateSetters.Mixin = {
 
 module.exports = ReactStateSetters;
 
-},{}],140:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -19603,7 +20827,7 @@ for (eventType in topLevelTypes) {
 
 module.exports = ReactTestUtils;
 
-},{"./EventConstants":79,"./EventPluginHub":81,"./EventPropagators":84,"./React":90,"./ReactComponent":95,"./ReactDOM":100,"./ReactEventEmitter":116,"./ReactMount":124,"./ReactTextComponent":141,"./ReactUpdates":145,"./SyntheticEvent":153,"./copyProperties":166,"./mergeInto":200}],141:[function(require,module,exports){
+},{"./EventConstants":69,"./EventPluginHub":71,"./EventPropagators":74,"./React":80,"./ReactComponent":85,"./ReactDOM":90,"./ReactEventEmitter":106,"./ReactMount":114,"./ReactTextComponent":131,"./ReactUpdates":135,"./SyntheticEvent":143,"./copyProperties":156,"./mergeInto":190}],131:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -19726,7 +20950,7 @@ ReactTextComponent.prototype.type = ReactTextComponent;
 
 module.exports = ReactTextComponent;
 
-},{"./DOMPropertyOperations":74,"./ReactBrowserComponentMixin":91,"./ReactComponent":95,"./escapeTextForBrowser":175,"./mixInto":201}],142:[function(require,module,exports){
+},{"./DOMPropertyOperations":64,"./ReactBrowserComponentMixin":81,"./ReactComponent":85,"./escapeTextForBrowser":165,"./mixInto":191}],132:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -19834,7 +21058,7 @@ var ReactTransitionChildMapping = {
 
 module.exports = ReactTransitionChildMapping;
 
-},{"./ReactChildren":94}],143:[function(require,module,exports){
+},{"./ReactChildren":84}],133:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -19933,7 +21157,7 @@ var ReactTransitionEvents = {
 
 module.exports = ReactTransitionEvents;
 
-},{"./ExecutionEnvironment":85}],144:[function(require,module,exports){
+},{"./ExecutionEnvironment":75}],134:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -20122,7 +21346,7 @@ var ReactTransitionGroup = React.createClass({
 
 module.exports = ReactTransitionGroup;
 
-},{"./React":90,"./ReactTransitionChildMapping":142,"./cloneWithProps":164,"./emptyFunction":173,"./merge":198}],145:[function(require,module,exports){
+},{"./React":80,"./ReactTransitionChildMapping":132,"./cloneWithProps":154,"./emptyFunction":163,"./merge":188}],135:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -20274,7 +21498,7 @@ var ReactUpdates = {
 module.exports = ReactUpdates;
 
 }).call(this,require("FWaASH"))
-},{"./ReactPerf":129,"./invariant":189,"FWaASH":56}],146:[function(require,module,exports){
+},{"./ReactPerf":119,"./invariant":179,"FWaASH":49}],136:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -20331,7 +21555,7 @@ module.exports = React;
 
 
 }).call(this,require("FWaASH"))
-},{"./LinkedStateMixin":86,"./React":90,"./ReactCSSTransitionGroup":92,"./ReactTestUtils":140,"./ReactTransitionGroup":144,"./cloneWithProps":164,"./cx":171,"./update":211,"FWaASH":56}],147:[function(require,module,exports){
+},{"./LinkedStateMixin":76,"./React":80,"./ReactCSSTransitionGroup":82,"./ReactTestUtils":130,"./ReactTransitionGroup":134,"./cloneWithProps":154,"./cx":161,"./update":201,"FWaASH":49}],137:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -20533,7 +21757,7 @@ var SelectEventPlugin = {
 
 module.exports = SelectEventPlugin;
 
-},{"./EventConstants":79,"./EventPropagators":84,"./ReactInputSelection":120,"./SyntheticEvent":153,"./getActiveElement":179,"./isTextInputElement":192,"./keyOf":196,"./shallowEqual":207}],148:[function(require,module,exports){
+},{"./EventConstants":69,"./EventPropagators":74,"./ReactInputSelection":110,"./SyntheticEvent":143,"./getActiveElement":169,"./isTextInputElement":182,"./keyOf":186,"./shallowEqual":197}],138:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -20571,7 +21795,7 @@ var ServerReactRootIndex = {
 
 module.exports = ServerReactRootIndex;
 
-},{}],149:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -20988,7 +22212,7 @@ var SimpleEventPlugin = {
 module.exports = SimpleEventPlugin;
 
 }).call(this,require("FWaASH"))
-},{"./EventConstants":79,"./EventPluginUtils":83,"./EventPropagators":84,"./SyntheticClipboardEvent":150,"./SyntheticDragEvent":152,"./SyntheticEvent":153,"./SyntheticFocusEvent":154,"./SyntheticKeyboardEvent":155,"./SyntheticMouseEvent":156,"./SyntheticTouchEvent":157,"./SyntheticUIEvent":158,"./SyntheticWheelEvent":159,"./invariant":189,"./keyOf":196,"FWaASH":56}],150:[function(require,module,exports){
+},{"./EventConstants":69,"./EventPluginUtils":73,"./EventPropagators":74,"./SyntheticClipboardEvent":140,"./SyntheticDragEvent":142,"./SyntheticEvent":143,"./SyntheticFocusEvent":144,"./SyntheticKeyboardEvent":145,"./SyntheticMouseEvent":146,"./SyntheticTouchEvent":147,"./SyntheticUIEvent":148,"./SyntheticWheelEvent":149,"./invariant":179,"./keyOf":186,"FWaASH":49}],140:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21041,7 +22265,7 @@ SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 module.exports = SyntheticClipboardEvent;
 
 
-},{"./SyntheticEvent":153}],151:[function(require,module,exports){
+},{"./SyntheticEvent":143}],141:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21094,7 +22318,7 @@ SyntheticEvent.augmentClass(
 module.exports = SyntheticCompositionEvent;
 
 
-},{"./SyntheticEvent":153}],152:[function(require,module,exports){
+},{"./SyntheticEvent":143}],142:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21140,7 +22364,7 @@ SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
 
-},{"./SyntheticMouseEvent":156}],153:[function(require,module,exports){
+},{"./SyntheticMouseEvent":146}],143:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21306,7 +22530,7 @@ PooledClass.addPoolingTo(SyntheticEvent, PooledClass.threeArgumentPooler);
 
 module.exports = SyntheticEvent;
 
-},{"./PooledClass":89,"./emptyFunction":173,"./getEventTarget":181,"./merge":198,"./mergeInto":200}],154:[function(require,module,exports){
+},{"./PooledClass":79,"./emptyFunction":163,"./getEventTarget":171,"./merge":188,"./mergeInto":190}],144:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21352,7 +22576,7 @@ SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
 
-},{"./SyntheticUIEvent":158}],155:[function(require,module,exports){
+},{"./SyntheticUIEvent":148}],145:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21412,7 +22636,7 @@ SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
 
-},{"./SyntheticUIEvent":158,"./getEventKey":180}],156:[function(require,module,exports){
+},{"./SyntheticUIEvent":148,"./getEventKey":170}],146:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21499,7 +22723,7 @@ SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
 
-},{"./SyntheticUIEvent":158,"./ViewportMetrics":161}],157:[function(require,module,exports){
+},{"./SyntheticUIEvent":148,"./ViewportMetrics":151}],147:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21551,7 +22775,7 @@ SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
 
-},{"./SyntheticUIEvent":158}],158:[function(require,module,exports){
+},{"./SyntheticUIEvent":148}],148:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21598,7 +22822,7 @@ SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
 
-},{"./SyntheticEvent":153}],159:[function(require,module,exports){
+},{"./SyntheticEvent":143}],149:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21666,7 +22890,7 @@ SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
 
-},{"./SyntheticMouseEvent":156}],160:[function(require,module,exports){
+},{"./SyntheticMouseEvent":146}],150:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -21946,7 +23170,7 @@ var Transaction = {
 module.exports = Transaction;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],161:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],151:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21985,7 +23209,7 @@ var ViewportMetrics = {
 
 module.exports = ViewportMetrics;
 
-},{"./getUnboundedScrollPosition":186}],162:[function(require,module,exports){
+},{"./getUnboundedScrollPosition":176}],152:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22043,7 +23267,7 @@ function accumulate(current, next) {
 module.exports = accumulate;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],163:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],153:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22084,7 +23308,7 @@ function adler32(data) {
 
 module.exports = adler32;
 
-},{}],164:[function(require,module,exports){
+},{}],154:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22147,7 +23371,7 @@ function cloneWithProps(child, props) {
 module.exports = cloneWithProps;
 
 }).call(this,require("FWaASH"))
-},{"./ReactPropTransferer":130,"./keyOf":196,"./warning":212,"FWaASH":56}],165:[function(require,module,exports){
+},{"./ReactPropTransferer":120,"./keyOf":186,"./warning":202,"FWaASH":49}],155:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22198,7 +23422,7 @@ function containsNode(outerNode, innerNode) {
 
 module.exports = containsNode;
 
-},{"./isTextNode":193}],166:[function(require,module,exports){
+},{"./isTextNode":183}],156:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22256,7 +23480,7 @@ function copyProperties(obj, a, b, c, d, e, f) {
 module.exports = copyProperties;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":56}],167:[function(require,module,exports){
+},{"FWaASH":49}],157:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22349,7 +23573,7 @@ function createArrayFrom(obj) {
 
 module.exports = createArrayFrom;
 
-},{"./toArray":209}],168:[function(require,module,exports){
+},{"./toArray":199}],158:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22416,7 +23640,7 @@ function createFullPageComponent(componentClass) {
 module.exports = createFullPageComponent;
 
 }).call(this,require("FWaASH"))
-},{"./ReactCompositeComponent":97,"./invariant":189,"FWaASH":56}],169:[function(require,module,exports){
+},{"./ReactCompositeComponent":87,"./invariant":179,"FWaASH":49}],159:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22513,7 +23737,7 @@ function createNodesFromMarkup(markup, handleScript) {
 module.exports = createNodesFromMarkup;
 
 }).call(this,require("FWaASH"))
-},{"./ExecutionEnvironment":85,"./createArrayFrom":167,"./getMarkupWrap":182,"./invariant":189,"FWaASH":56}],170:[function(require,module,exports){
+},{"./ExecutionEnvironment":75,"./createArrayFrom":157,"./getMarkupWrap":172,"./invariant":179,"FWaASH":49}],160:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22578,7 +23802,7 @@ function createObjectFrom(keys, values /* = true */) {
 module.exports = createObjectFrom;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":56}],171:[function(require,module,exports){
+},{"FWaASH":49}],161:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22624,7 +23848,7 @@ function cx(classNames) {
 
 module.exports = cx;
 
-},{}],172:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22683,7 +23907,7 @@ function dangerousStyleValue(styleName, value) {
 
 module.exports = dangerousStyleValue;
 
-},{"./CSSProperty":67}],173:[function(require,module,exports){
+},{"./CSSProperty":57}],163:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22728,7 +23952,7 @@ copyProperties(emptyFunction, {
 
 module.exports = emptyFunction;
 
-},{"./copyProperties":166}],174:[function(require,module,exports){
+},{"./copyProperties":156}],164:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22759,7 +23983,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = emptyObject;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":56}],175:[function(require,module,exports){
+},{"FWaASH":49}],165:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22808,7 +24032,7 @@ function escapeTextForBrowser(text) {
 
 module.exports = escapeTextForBrowser;
 
-},{}],176:[function(require,module,exports){
+},{}],166:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22869,7 +24093,7 @@ function flattenChildren(children) {
 module.exports = flattenChildren;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"./traverseAllChildren":210,"FWaASH":56}],177:[function(require,module,exports){
+},{"./invariant":179,"./traverseAllChildren":200,"FWaASH":49}],167:[function(require,module,exports){
 /**
  * Copyright 2014 Facebook, Inc.
  *
@@ -22904,7 +24128,7 @@ function focusNode(node) {
 
 module.exports = focusNode;
 
-},{}],178:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22942,7 +24166,7 @@ var forEachAccumulated = function(arr, cb, scope) {
 
 module.exports = forEachAccumulated;
 
-},{}],179:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22978,7 +24202,7 @@ function getActiveElement() /*?DOMElement*/ {
 
 module.exports = getActiveElement;
 
-},{}],180:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23065,7 +24289,7 @@ function getEventKey(nativeEvent) {
 
 module.exports = getEventKey;
 
-},{}],181:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23103,7 +24327,7 @@ function getEventTarget(nativeEvent) {
 
 module.exports = getEventTarget;
 
-},{}],182:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23225,7 +24449,7 @@ function getMarkupWrap(nodeName) {
 module.exports = getMarkupWrap;
 
 }).call(this,require("FWaASH"))
-},{"./ExecutionEnvironment":85,"./invariant":189,"FWaASH":56}],183:[function(require,module,exports){
+},{"./ExecutionEnvironment":75,"./invariant":179,"FWaASH":49}],173:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23307,7 +24531,7 @@ function getNodeForCharacterOffset(root, offset) {
 
 module.exports = getNodeForCharacterOffset;
 
-},{}],184:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23349,7 +24573,7 @@ function getReactRootElementInContainer(container) {
 
 module.exports = getReactRootElementInContainer;
 
-},{}],185:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23393,7 +24617,7 @@ function getTextContentAccessor() {
 
 module.exports = getTextContentAccessor;
 
-},{"./ExecutionEnvironment":85}],186:[function(require,module,exports){
+},{"./ExecutionEnvironment":75}],176:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23440,7 +24664,7 @@ function getUnboundedScrollPosition(scrollable) {
 
 module.exports = getUnboundedScrollPosition;
 
-},{}],187:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23477,7 +24701,7 @@ function hyphenate(string) {
 
 module.exports = hyphenate;
 
-},{}],188:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23551,7 +24775,7 @@ function instantiateReactComponent(descriptor) {
 module.exports = instantiateReactComponent;
 
 }).call(this,require("FWaASH"))
-},{"./warning":212,"FWaASH":56}],189:[function(require,module,exports){
+},{"./warning":202,"FWaASH":49}],179:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23617,7 +24841,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = invariant;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":56}],190:[function(require,module,exports){
+},{"FWaASH":49}],180:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23689,7 +24913,7 @@ function isEventSupported(eventNameSuffix, capture) {
 
 module.exports = isEventSupported;
 
-},{"./ExecutionEnvironment":85}],191:[function(require,module,exports){
+},{"./ExecutionEnvironment":75}],181:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23724,7 +24948,7 @@ function isNode(object) {
 
 module.exports = isNode;
 
-},{}],192:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23775,7 +24999,7 @@ function isTextInputElement(elem) {
 
 module.exports = isTextInputElement;
 
-},{}],193:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23807,7 +25031,7 @@ function isTextNode(object) {
 
 module.exports = isTextNode;
 
-},{"./isNode":191}],194:[function(require,module,exports){
+},{"./isNode":181}],184:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23853,7 +25077,7 @@ function joinClasses(className/*, ... */) {
 
 module.exports = joinClasses;
 
-},{}],195:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23915,7 +25139,7 @@ var keyMirror = function(obj) {
 module.exports = keyMirror;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],196:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],186:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23958,7 +25182,7 @@ var keyOf = function(oneKeyObj) {
 
 module.exports = keyOf;
 
-},{}],197:[function(require,module,exports){
+},{}],187:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23999,7 +25223,7 @@ function memoizeStringOnly(callback) {
 
 module.exports = memoizeStringOnly;
 
-},{}],198:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24038,7 +25262,7 @@ var merge = function(one, two) {
 
 module.exports = merge;
 
-},{"./mergeInto":200}],199:[function(require,module,exports){
+},{"./mergeInto":190}],189:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -24178,7 +25402,7 @@ var mergeHelpers = {
 module.exports = mergeHelpers;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"./keyMirror":195,"FWaASH":56}],200:[function(require,module,exports){
+},{"./invariant":179,"./keyMirror":185,"FWaASH":49}],190:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24225,7 +25449,7 @@ function mergeInto(one, two) {
 
 module.exports = mergeInto;
 
-},{"./mergeHelpers":199}],201:[function(require,module,exports){
+},{"./mergeHelpers":189}],191:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24261,7 +25485,7 @@ var mixInto = function(constructor, methodBag) {
 
 module.exports = mixInto;
 
-},{}],202:[function(require,module,exports){
+},{}],192:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014 Facebook, Inc.
@@ -24302,7 +25526,7 @@ function monitorCodeUse(eventName, data) {
 module.exports = monitorCodeUse;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],203:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],193:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24351,7 +25575,7 @@ function objMap(obj, func, context) {
 
 module.exports = objMap;
 
-},{}],204:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24400,7 +25624,7 @@ function objMapKeyVal(obj, func, context) {
 
 module.exports = objMapKeyVal;
 
-},{}],205:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -24447,7 +25671,7 @@ function onlyChild(children) {
 module.exports = onlyChild;
 
 }).call(this,require("FWaASH"))
-},{"./ReactComponent":95,"./invariant":189,"FWaASH":56}],206:[function(require,module,exports){
+},{"./ReactComponent":85,"./invariant":179,"FWaASH":49}],196:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24491,7 +25715,7 @@ var performanceNow = performance.now.bind(performance);
 
 module.exports = performanceNow;
 
-},{"./ExecutionEnvironment":85}],207:[function(require,module,exports){
+},{"./ExecutionEnvironment":75}],197:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24542,7 +25766,7 @@ function shallowEqual(objA, objB) {
 
 module.exports = shallowEqual;
 
-},{}],208:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -24607,7 +25831,7 @@ function shouldUpdateReactComponent(prevComponentInstance, nextDescriptor) {
 module.exports = shouldUpdateReactComponent;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":56}],209:[function(require,module,exports){
+},{"FWaASH":49}],199:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014 Facebook, Inc.
@@ -24686,7 +25910,7 @@ function toArray(obj) {
 module.exports = toArray;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":189,"FWaASH":56}],210:[function(require,module,exports){
+},{"./invariant":179,"FWaASH":49}],200:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -24880,7 +26104,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 module.exports = traverseAllChildren;
 
 }).call(this,require("FWaASH"))
-},{"./ReactInstanceHandles":121,"./ReactTextComponent":141,"./invariant":189,"FWaASH":56}],211:[function(require,module,exports){
+},{"./ReactInstanceHandles":111,"./ReactTextComponent":131,"./invariant":179,"FWaASH":49}],201:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -25043,7 +26267,7 @@ function update(value, spec) {
 module.exports = update;
 
 }).call(this,require("FWaASH"))
-},{"./copyProperties":166,"./invariant":189,"./keyOf":196,"FWaASH":56}],212:[function(require,module,exports){
+},{"./copyProperties":156,"./invariant":179,"./keyOf":186,"FWaASH":49}],202:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014 Facebook, Inc.
@@ -25095,10 +26319,815 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = warning;
 
 }).call(this,require("FWaASH"))
-},{"./emptyFunction":173,"FWaASH":56}],213:[function(require,module,exports){
+},{"./emptyFunction":163,"FWaASH":49}],203:[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":90}],214:[function(require,module,exports){
+},{"./lib/React":80}],204:[function(require,module,exports){
+'use strict';
+
+/**
+ * Representation of a single EventEmitter function.
+ *
+ * @param {Function} fn Event handler to be called.
+ * @param {Mixed} context Context for function execution.
+ * @param {Boolean} once Only emit once
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal EventEmitter interface that is molded against the Node.js
+ * EventEmitter interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() { /* Nothing to set */ }
+
+/**
+ * Holds the assigned EventEmitters by name.
+ *
+ * @type {Object}
+ * @private
+ */
+EventEmitter.prototype._events = undefined;
+
+/**
+ * Return a list of assigned event listeners.
+ *
+ * @param {String} event The events that should be listed.
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event) {
+  if (!this._events || !this._events[event]) return [];
+
+  for (var i = 0, l = this._events[event].length, ee = []; i < l; i++) {
+    ee.push(this._events[event][i].fn);
+  }
+
+  return ee;
+};
+
+/**
+ * Emit an event to all registered event listeners.
+ *
+ * @param {String} event The name of the event.
+ * @returns {Boolean} Indication if we've emitted an event.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  if (!this._events || !this._events[event]) return false;
+
+  var listeners = this._events[event]
+    , length = listeners.length
+    , len = arguments.length
+    , ee = listeners[0]
+    , args
+    , i, j;
+
+  if (1 === length) {
+    if (ee.once) this.removeListener(event, ee.fn, true);
+
+    switch (len) {
+      case 1: return ee.fn.call(ee.context), true;
+      case 2: return ee.fn.call(ee.context, a1), true;
+      case 3: return ee.fn.call(ee.context, a1, a2), true;
+      case 4: return ee.fn.call(ee.context, a1, a2, a3), true;
+      case 5: return ee.fn.call(ee.context, a1, a2, a3, a4), true;
+      case 6: return ee.fn.call(ee.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    ee.fn.apply(ee.context, args);
+  } else {
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Register a new EventListener for the given event.
+ *
+ * @param {String} event Name of the event.
+ * @param {Functon} fn Callback function.
+ * @param {Mixed} context The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  if (!this._events) this._events = {};
+  if (!this._events[event]) this._events[event] = [];
+  this._events[event].push(new EE( fn, context || this ));
+
+  return this;
+};
+
+/**
+ * Add an EventListener that's only called once.
+ *
+ * @param {String} event Name of the event.
+ * @param {Function} fn Callback function.
+ * @param {Mixed} context The context of the function.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  if (!this._events) this._events = {};
+  if (!this._events[event]) this._events[event] = [];
+  this._events[event].push(new EE(fn, context || this, true ));
+
+  return this;
+};
+
+/**
+ * Remove event listeners.
+ *
+ * @param {String} event The event we want to remove.
+ * @param {Function} fn The listener that we need to find.
+ * @param {Boolean} once Only remove once listeners.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, once) {
+  if (!this._events || !this._events[event]) return this;
+
+  var listeners = this._events[event]
+    , events = [];
+
+  if (fn) for (var i = 0, length = listeners.length; i < length; i++) {
+    if (listeners[i].fn !== fn && listeners[i].once !== once) {
+      events.push(listeners[i]);
+    }
+  }
+
+  //
+  // Reset the array, or remove it completely if we have no more listeners.
+  //
+  if (events.length) this._events[event] = events;
+  else this._events[event] = null;
+
+  return this;
+};
+
+/**
+ * Remove all listeners or only the listeners for the specified event.
+ *
+ * @param {String} event The event want to remove all listeners for.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  if (!this._events) return this;
+
+  if (event) this._events[event] = null;
+  else this._events = {};
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the module.
+//
+EventEmitter.EventEmitter = EventEmitter;
+EventEmitter.EventEmitter2 = EventEmitter;
+EventEmitter.EventEmitter3 = EventEmitter;
+
+if ('object' === typeof module && module.exports) {
+  module.exports = EventEmitter;
+}
+
+},{}],205:[function(require,module,exports){
+exports.createdStores = [];
+
+exports.createdActions = [];
+
+exports.reset = function() {
+    while(exports.createdStores.length) {
+        exports.createdStores.pop();
+    }
+    while(exports.createdActions.length) {
+        exports.createdActions.pop();
+    }
+};
+
+},{}],206:[function(require,module,exports){
+var _ = require('./utils'),
+    slice = Array.prototype.slice;
+
+/**
+ * A module of methods related to listening.
+ */
+module.exports = {
+
+    /**
+     * An internal utility function used by `validateListening`
+     *
+     * @param {Action|Store} listenable The listenable we want to search for
+     * @returns {Boolean} The result of a recursive search among `this.subscriptions`
+     */
+    hasListener: function(listenable) {
+        var i = 0,
+            listener;
+        for (;i < (this.subscriptions||[]).length; ++i) {
+            listener = this.subscriptions[i].listenable;
+            if ((listener === listenable && !listenable._isAction) || listener.hasListener && listener.hasListener(listenable)) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+    /**
+     * A convenience method that listens to all listenables in the given object.
+     *
+     * @param {Object} listenables An object of listenables. Keys will be used as callback method names.
+     */
+    listenToMany: function(listenables){
+        for(var key in listenables){
+            var cbname = _.callbackName(key),
+                localname = this[cbname] ? cbname : this[key] ? key : undefined;
+            if (localname){
+                this.listenTo(listenables[key],localname,this[cbname+"Default"]||this[localname+"Default"]||localname);
+            }
+        }
+    },
+
+    /**
+     * Checks if the current context can listen to the supplied listenable
+     *
+     * @param {Action|Store} listenable An Action or Store that should be
+     *  listened to.
+     * @returns {String|Undefined} An error message, or undefined if there was no problem.
+     */
+    validateListening: function(listenable){
+        if (listenable === this) {
+            return "Listener is not able to listen to itself";
+        }
+        if (!_.isFunction(listenable.listen)) {
+            return listenable + " is missing a listen method";
+        }
+        if (this.hasListener(listenable)) {
+            return "Listener cannot listen to this listenable because of circular loop";
+        }
+    },
+
+    /**
+     * Sets up a subscription to the given listenable for the context object
+     *
+     * @param {Action|Store} listenable An Action or Store that should be
+     *  listened to.
+     * @param {Function|String} callback The callback to register as event handler
+     * @param {Function|String} defaultCallback The callback to register as default handler
+     * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
+     */
+    listenTo: function(listenable, callback, defaultCallback) {
+        var err = this.validateListening(listenable),
+            self = this;
+        if (err){
+            throw Error(err);
+        }
+        this.fetchDefaultData(listenable, defaultCallback);
+        if (!this.subscriptions) { this.subscriptions = [];}
+        var desub = listenable.listen(this[callback]||callback, this),
+            unsubscriber = function (dontupdatearr) {
+                desub();
+                if (!dontupdatearr) {
+                    self.subscriptions.splice(self.subscriptions.indexOf(listenable), 1);
+                }
+            },
+            subscriptionobj = {
+                stop: unsubscriber,
+                listenable: listenable
+            };
+        this.subscriptions.push(subscriptionobj);
+        return subscriptionobj;
+    },
+
+    /**
+     * Stops listening to a single listenable
+     *
+     * @param {Action|Store} listenable The action or store we no longer want to listen to
+     * @param {Boolean} dontupdatearr If true, we don't remove the subscription object from this.subscriptions
+     * @returns {Boolean} True if a subscription was found and removed, otherwise false.
+     */
+    stopListeningTo: function(listenable, dontupdatearr){
+        for(var i=0; i<(this.subscriptions||[]).length;i++){
+            if (this.subscriptions[i].listenable === listenable){
+                this.subscriptions[i].stop(dontupdatearr);
+                return true;
+            }
+        }
+        return false;
+    },
+
+    /**
+     * Stops all subscriptions and empties subscriptions array
+     *
+     */
+    stopListeningToAll: function(){
+        (this.subscriptions||[]).forEach(function(subscription) {
+            subscription.stop(true);
+        });
+        this.subscriptions = [];
+    },
+
+    /**
+     * Used in `listenTo`. Fetches initial data from a publisher if it has a `getDefaultData` method.
+     * @param {Action|Store} listenable The publisher we want to get default data from
+     * @param {Function|String} defaultCallback The method to receive the data
+     */
+    fetchDefaultData: function (listenable, defaultCallback) {
+        defaultCallback = (defaultCallback && this[defaultCallback]) || defaultCallback;
+        var me = this;
+        if (_.isFunction(defaultCallback) && _.isFunction(listenable.getDefaultData)) {
+            data = listenable.getDefaultData();
+            if (data && _.isFunction(data.then)) {
+                data.then(function() {
+                    defaultCallback.apply(me, arguments);
+                });
+            } else {
+                defaultCallback.call(this, data);
+            }
+        }
+    },
+
+    /**
+     * The callback will be called once all listenables have triggered at least once.
+     * @param {...Publishers} publishers Publishers that should be tracked.
+     * @param {Function|String} callback The method to call when all publishers have emitted
+     */
+    listenToAggregate: function(/* listenables... , callback */){
+        var listenables = slice.call(arguments),
+            callback = listenables.pop(),
+            numberOfListenables = listenables.length,
+            listener = this,
+            listenablesEmitted,
+            args;
+        for (var i = 0; i < numberOfListenables; i++) {
+            this.listenTo(listenables[i],newListener(i));
+        }
+        reset();
+
+        // ---- internal aggregation functions ----
+
+        function reset() {
+            listenablesEmitted = new Array(numberOfListenables);
+            args = new Array(numberOfListenables);
+        }
+
+        function newListener(i) {
+            return function() {
+                listenablesEmitted[i] = true;
+                // Reflux users should not need to care about Array and arguments
+                // differences. This makes sure that they get the expected Array
+                // interface
+                args[i] = slice.call(arguments);
+                emitWhenAllListenablesEmitted();
+            };
+        }
+
+        function emitWhenAllListenablesEmitted() {
+            if (didAllListenablesEmit()) {
+                (listener[callback]||callback).apply(listener,args);
+                reset();
+            }
+        }
+
+        function didAllListenablesEmit() {
+            // reduce cannot be used because it only iterates over *present*
+            // elements in the array. Initially the Array doesn't contain
+            // elements. For this reason the usage of reduce would always indicate
+            // that all listenables emitted.
+            for (var i = 0; i < numberOfListenables; i++) {
+                if (!listenablesEmitted[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+};
+
+
+},{"./utils":216}],207:[function(require,module,exports){
+var _ = require('./utils'),
+    ListenerMethods = require('./ListenerMethods');
+
+/**
+ * A module meant to be consumed as a mixin by a React component. Supplies the methods from
+ * `ListenerMethods` mixin and takes care of teardown of subscriptions.
+ */
+module.exports = _.extend({
+
+    /**
+     * Cleans up all listener previously registered.
+     */
+    componentWillUnmount: ListenerMethods.stopListeningToAll
+
+}, ListenerMethods);
+
+},{"./ListenerMethods":206,"./utils":216}],208:[function(require,module,exports){
+var _ = require('./utils');
+
+/**
+ * A module of methods for object that you want to be able to listen to.
+ * This module is consumed by `createStore` and `createAction`
+ */
+module.exports = {
+
+    /**
+     * Hook used by the publisher that is invoked before emitting
+     * and before `shouldEmit`. The arguments are the ones that the action
+     * is invoked with. If this function returns something other than
+     * undefined, that will be passed on as arguments for shouldEmit and
+     * emission.
+     */
+    preEmit: function() {},
+
+    /**
+     * Hook used by the publisher after `preEmit` to determine if the
+     * event should be emitted with given arguments. This may be overridden
+     * in your application, default implementation always returns true.
+     *
+     * @returns {Boolean} true if event should be emitted
+     */
+    shouldEmit: function() { return true; },
+
+    /**
+     * Subscribes the given callback for action triggered
+     *
+     * @param {Function} callback The callback to register as event handler
+     * @param {Mixed} [optional] bindContext The context to bind the callback with
+     * @returns {Function} Callback that unsubscribes the registered event handler
+     */
+    listen: function(callback, bindContext) {
+        var eventHandler = function(args) {
+            callback.apply(bindContext, args);
+        }, me = this;
+        this.emitter.addListener(this.eventLabel, eventHandler);
+        return function() {
+            me.emitter.removeListener(me.eventLabel, eventHandler);
+        };
+    },
+
+    /**
+     * Publishes an event using `this.emitter` (if `shouldEmit` agrees)
+     */
+    trigger: function() {
+        var args = arguments,
+            pre = this.preEmit.apply(this, args);
+        args = pre === undefined ? args : _.isArguments(pre) ? pre : [].concat(pre);
+        if (this.shouldEmit.apply(this, args)) {
+            this.emitter.emit(this.eventLabel, args);
+        }
+    },
+
+    /**
+     * Tries to publish the event on the next tick
+     */
+    triggerAsync: function(){
+        var args = arguments,me = this;
+        _.nextTick(function() {
+            me.trigger.apply(me, args);
+        });
+    }
+};
+
+},{"./utils":216}],209:[function(require,module,exports){
+var createStore = require('./createStore');
+
+/**
+ * Track a set of Actions and Stores. Use Reflux.all if you need to handle
+ * data coming in parallel.
+ *
+ * @param {...Publishers} publishers Publishers that should be
+ *  tracked.
+ * @returns {Store} A store which listens to the provided Publishers.
+ *  The store will emit once all of the provided publishers have emitted at
+ *  least once.
+ */
+module.exports = function(/* listenables... */) {
+    var listenables = Array.prototype.slice.call(arguments);
+    return createStore({
+        init: function(){
+            this.listenToAggregate.apply(this,listenables.concat("trigger"));
+        }
+    });
+};
+
+},{"./createStore":212}],210:[function(require,module,exports){
+var Reflux = require('../src'),
+    _ = require('./utils');
+
+module.exports = function(listenable,key){
+    return {
+        componentDidMount: function(){
+            for(var m in Reflux.ListenerMethods){
+                if (this[m] !== Reflux.ListenerMethods[m]){
+                    if (this[m]){
+                        throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
+                    }
+                    this[m] = Reflux.ListenerMethods[m];
+                }
+            }
+            var me = this, cb = (key === undefined ? this.setState : function(v){me.setState(_.object([key],[v]));});
+            this.listenTo(listenable,cb,cb);
+        },
+        componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
+    };
+};
+
+},{"../src":213,"./utils":216}],211:[function(require,module,exports){
+var _ = require('./utils'),
+    Reflux = require('../src'),
+    Keep = require('./Keep');
+
+/**
+ * Creates an action functor object. It is mixed in with functions
+ * from the `PublisherMethods` mixin. `preEmit` and `shouldEmit` may
+ * be overridden in the definition object.
+ *
+ * @param {Object} definition The action object definition
+ */
+module.exports = function(definition) {
+
+    definition = definition || {};
+
+    var context = _.extend({
+        eventLabel: "action",
+        emitter: new _.EventEmitter(),
+        _isAction: true
+    },definition,Reflux.PublisherMethods,{
+        preEmit: definition.preEmit || Reflux.PublisherMethods.preEmit,
+        shouldEmit: definition.shouldEmit || Reflux.PublisherMethods.shouldEmit
+    });
+
+    var functor = function() {
+        functor.triggerAsync.apply(functor, arguments);
+    };
+
+    _.extend(functor,context);
+
+    Keep.createdActions.push(functor);
+
+    return functor;
+
+};
+
+},{"../src":213,"./Keep":205,"./utils":216}],212:[function(require,module,exports){
+var _ = require('./utils'),
+    Reflux = require('../src'),
+    Keep = require('./Keep');
+
+/**
+ * Creates an event emitting Data Store. It is mixed in with functions
+ * from the `ListenerMethods` and `PublisherMethods` mixins. `preEmit`
+ * and `shouldEmit` may be overridden in the definition object.
+ *
+ * @param {Object} definition The data store object definition
+ * @returns {Store} A data store instance
+ */
+module.exports = function(definition) {
+
+    definition = definition || {};
+
+    function Store() {
+        var i=0, arr;
+        this.subscriptions = [];
+        this.emitter = new _.EventEmitter();
+        this.eventLabel = "change";
+        if (this.init && _.isFunction(this.init)) {
+            this.init();
+        }
+        if (this.listenables){
+            arr = [].concat(this.listenables);
+            for(;i < arr.length;i++){
+                this.listenToMany(arr[i]);
+            }
+        }
+    }
+
+    _.extend(Store.prototype, definition, Reflux.ListenerMethods, Reflux.PublisherMethods, {
+        preEmit: definition.preEmit || Reflux.PublisherMethods.preEmit,
+        shouldEmit: definition.shouldEmit || Reflux.PublisherMethods.shouldEmit
+    });
+
+    var store = new Store();
+    Keep.createdStores.push(store);
+
+    return store;
+};
+
+},{"../src":213,"./Keep":205,"./utils":216}],213:[function(require,module,exports){
+exports.ListenerMethods = require('./ListenerMethods');
+
+exports.PublisherMethods = require('./PublisherMethods');
+
+exports.createAction = require('./createAction');
+
+exports.createStore = require('./createStore');
+
+exports.connect = require('./connect');
+
+exports.ListenerMixin = require('./ListenerMixin');
+
+exports.listenTo = require('./listenTo');
+
+exports.listenToMany = require('./listenToMany');
+
+exports.all = require('./all');
+
+/**
+ * Convenience function for creating a set of actions
+ *
+ * @param actionNames the names for the actions to be created
+ * @returns an object with actions of corresponding action names
+ */
+exports.createActions = function(actionNames) {
+    var i = 0, actions = {};
+    for (; i < actionNames.length; i++) {
+        actions[actionNames[i]] = exports.createAction();
+    }
+    return actions;
+};
+
+/**
+ * Sets the eventmitter that Reflux uses
+ */
+exports.setEventEmitter = function(ctx) {
+    var _ = require('./utils');
+    _.EventEmitter = ctx;
+};
+
+/**
+ * Sets the method used for deferring actions and stores
+ */
+exports.nextTick = function(nextTick) {
+    var _ = require('./utils');
+    _.nextTick = nextTick;
+};
+
+/**
+ * Provides the set of created actions and stores for introspection
+ */
+exports.__keep = require('./Keep');
+
+},{"./Keep":205,"./ListenerMethods":206,"./ListenerMixin":207,"./PublisherMethods":208,"./all":209,"./connect":210,"./createAction":211,"./createStore":212,"./listenTo":214,"./listenToMany":215,"./utils":216}],214:[function(require,module,exports){
+var Reflux = require('../src');
+
+
+/**
+ * A mixin factory for a React component. Meant as a more convenient way of using the `ListenerMixin`,
+ * without having to manually set listeners in the `componentDidMount` method.
+ *
+ * @param {Action|Store} listenable An Action or Store that should be
+ *  listened to.
+ * @param {Function|String} callback The callback to register as event handler
+ * @param {Function|String} defaultCallback The callback to register as default handler
+ * @returns {Object} An object to be used as a mixin, which sets up the listener for the given listenable.
+ */
+module.exports = function(listenable,callback,initial){
+    return {
+        /**
+         * Set up the mixin before the initial rendering occurs. Import methods from `ListenerMethods`
+         * and then make the call to `listenTo` with the arguments provided to the factory function
+         */
+        componentDidMount: function() {
+            for(var m in Reflux.ListenerMethods){
+                if (this[m] !== Reflux.ListenerMethods[m]){
+                    if (this[m]){
+                        throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
+                    }
+                    this[m] = Reflux.ListenerMethods[m];
+                }
+            }
+            this.listenTo(listenable,callback,initial);
+        },
+        /**
+         * Cleans up all listener previously registered.
+         */
+        componentWillUnmount: Reflux.ListenerMethods.stopListeningToAll
+    };
+};
+
+},{"../src":213}],215:[function(require,module,exports){
+var Reflux = require('../src');
+
+/**
+ * A mixin factory for a React component. Meant as a more convenient way of using the `listenerMixin`,
+ * without having to manually set listeners in the `componentDidMount` method. This version is used
+ * to automatically set up a `listenToMany` call.
+ *
+ * @param {Object} listenables An object of listenables
+ * @returns {Object} An object to be used as a mixin, which sets up the listeners for the given listenables.
+ */
+module.exports = function(listenables){
+    return {
+        /**
+         * Set up the mixin before the initial rendering occurs. Import methods from `ListenerMethods`
+         * and then make the call to `listenTo` with the arguments provided to the factory function
+         */
+        componentDidMount: function() {
+            for(var m in Reflux.ListenerMethods){
+                if (this[m] !== Reflux.ListenerMethods[m]){
+                    if (this[m]){
+                        throw "Can't have other property '"+m+"' when using Reflux.listenToMany!";
+                    }
+                    this[m] = Reflux.ListenerMethods[m];
+                }
+            }
+            this.listenToMany(listenables);
+        },
+        /**
+         * Cleans up all listener previously registered.
+         */
+        componentWillUnmount: Reflux.ListenerMethods.stopListeningToAll
+    };
+};
+
+},{"../src":213}],216:[function(require,module,exports){
+/*
+ * isObject, extend, isFunction, isArguments are taken from undescore/lodash in
+ * order to remove the dependency
+ */
+var isObject = exports.isObject = function(obj) {
+    var type = typeof obj;
+    return type === 'function' || type === 'object' && !!obj;
+};
+
+exports.extend = function(obj) {
+    if (!isObject(obj)) {
+        return obj;
+    }
+    var source, prop;
+    for (var i = 1, length = arguments.length; i < length; i++) {
+        source = arguments[i];
+        for (prop in source) {
+            obj[prop] = source[prop];
+        }
+    }
+    return obj;
+};
+
+exports.isFunction = function(value) {
+    return typeof value === 'function';
+};
+
+exports.EventEmitter = require('eventemitter3');
+
+exports.nextTick = function(callback) {
+    setTimeout(callback, 0);
+};
+
+exports.callbackName = function(string){
+    return "on"+string.charAt(0).toUpperCase()+string.slice(1);
+};
+
+exports.object = function(keys,vals){
+    var o={}, i=0;
+    for(;i<keys.length;i++){
+        o[keys[i]] = vals[i];
+    }
+    return o;
+};
+
+exports.isArguments = function(value) {
+    return value && typeof value == 'object' && typeof value.length == 'number' &&
+      (toString.call(value) === '[object Arguments]' || (hasOwnProperty.call(value, 'callee' && !propertyIsEnumerable.call(value, 'callee')))) || false;
+};
+},{"eventemitter3":204}],217:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
