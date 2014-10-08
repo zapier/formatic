@@ -18,16 +18,14 @@
   <script src="./lib/formatic.js"></script>
   <script>
     var formatic = require('formatic').create('default', 'bootstrap');
-    var form = formatic([
 
+    var form = formatic([
       {
         label: 'Short Name',
         type: 'object',
         key: 'name',
-        fields: ['firstName', 'lastName', 'nameType', 'silly'],
-        match: [
-          {key: 'type', value: 'short'}
-        ]
+        fields: ['firstName', 'lastName', {extends: 'nameType', value: 'short'}, 'silly'],
+        match: {type: 'short'}
       },
       {
         label: 'Home Address',
@@ -88,9 +86,11 @@
       {
         template: true,
         type: 'string',
+        id: 'silly',
         key: 'silly',
+        choices: [],
         eval: {
-          value: '{x:"y" z:"foo"}'
+          choices: "colors"
         }
       },
       {
@@ -112,7 +112,7 @@
         key: 'country',
         choices: [],
         eval: {
-          choices: {lookup: ['locations']}
+          choices: "lookup( 'locations' )"
         }
       },
       {
@@ -122,7 +122,7 @@
         key: 'state',
         choices: {},
         eval: {
-          choices: {lookup: ['locations', '=country']}
+          choices: "lookup( 'locations' country)"
         }
       },
       {
@@ -132,7 +132,7 @@
         key: 'city',
         choices: [],
         eval: {
-          choices: {lookup: ['locations', '=country', '=state']}
+          choices: "lookup( 'locations' country state)"
         }
       },
       {
@@ -140,10 +140,8 @@
         label: 'Full Name',
         type: 'object',
         key: 'fullName',
-        fields: ['firstName', 'middleName', 'lastName', 'nameType', 'city'],
-        match: [
-          {key: 'type', value: 'full'}
-        ]
+        fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, , 'city'],
+        match: {type: 'full'}
       },
       {
         template: true,

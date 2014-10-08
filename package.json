@@ -34,7 +34,7 @@
   "dependencies": {
     "component-emitter": "^1.1.2",
     "envify": "^1.2.1",
-    "funql": "0.0.10",
+    "funql": "0.0.15",
     "immutable": "^2.0.17",
     "objectpath": "^1.0.5",
     "react": "^0.10.0",

@@ -3,13 +3,13 @@
 
 describe('types', function() {
 
-  var React = require('react/addons');
-  var TestUtils = React.addons.TestUtils;
-
-  var mounted = function (component) {
-    var rendered = TestUtils.renderIntoDocument(component);
-    return rendered;
-  };
+  // var React = require('react/addons');
+  // var TestUtils = React.addons.TestUtils;
+  //
+  // var mounted = function (component) {
+  //   var rendered = TestUtils.renderIntoDocument(component);
+  //   return rendered;
+  // };
 
   // var testWithFormatic = function (formatic) {
   //
