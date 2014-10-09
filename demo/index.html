@@ -85,12 +85,12 @@
       },
       {
         template: true,
-        type: 'string',
+        type: 'array',
+        label: 'Silly',
         id: 'silly',
-        key: 'silly',
         choices: [],
         eval: {
-          choices: "colors"
+          choices: "if( aliases filter( map( slice(aliases 0 __index) fn([alias] get(alias 'first')) ) fn([alias] alias) ) )"
         }
       },
       {

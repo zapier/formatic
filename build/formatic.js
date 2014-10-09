@@ -1409,6 +1409,15 @@ module.exports = function (formatic) {
     return formatic.fromJS(formatic.valueFieldDef(value));
   };
 
+  formatic.humanize = function(property) {
+    property = property.replace(/\{\{/g, '');
+    property = property.replace(/\}\}/g, '');
+    return property.replace(/_/g, ' ')
+      .replace(/(\w+)/g, function(match) {
+        return match.charAt(0).toUpperCase() + match.slice(1);
+      });
+  };
+
   // formatic.createFormState = function (formDef, templateMap) {
   //   var formState = formatic.fromJS(formDef);
   //   var compiled = formatic.createModifiedFieldFromFormState(formState);
@@ -2423,7 +2432,15 @@ module.exports = function (formatic, plugin) {
       },
 
       onSetFormValue: function (value) {
-        this.updateValue(formatic.fromJS(formatic.wrapValue(value)));
+        var formState = formatic.eval(form, this.dynamicFormState, null, this.meta);
+        var cleanValue = formatic.fromJS(formatic.valueOfFieldState(formState));
+        value = cleanValue.mergeDeep(value);
+        if (value.toJS) {
+          value = value.toJS();
+        }
+        value = formatic.wrapValue(value);
+        value = formatic.fromJS(value);
+        this.updateValue(value);
       },
 
       onSetValue: function (field, value) {
@@ -2868,6 +2885,9 @@ module.exports = function (formatic, plugin) {
               var item = formatic.itemForValueState(fieldState, childValueState, context);
               item = item.set('key', key);
               item = item.set('viewKey', childValueState.get('viewKey'));
+              if (!item.get('label')) {
+                item = item.set('label', formatic.humanize(key));
+              }
               fieldState.updateIn(['fields'], function (fields) {
                 return fields.push(formatic.evalField(form, item, valueState, meta, nextContext));
               });
