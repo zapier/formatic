@@ -467,7 +467,7 @@ module.exports = function (formatic) {
     var fatValue = formatic.wrapValue(value);
     fatValue.viewKey = nextViewKey;
     return valueState.updateIn(path, function (values) {
-      return values.push(Immutable.fromJS(fatValue));
+      return values.push(formatic.fromJS(fatValue));
     });
   };
 
@@ -596,7 +596,7 @@ module.exports = function (formatic) {
         obj[key].viewKey = i;
       });
       return {
-        nextViewKey: value.length,
+        nextViewKey: Object.keys(value).length,
         value: obj
       };
     } else {
@@ -924,7 +924,7 @@ module.exports = function (formatic) {
 
     var nextContext = formatic.evalContext(fieldState, valueState, context);
 
-    fieldState = fieldState.set('_valuePath', Immutable.fromJS(nextContext.valuePath));
+    fieldState = fieldState.set('_valuePath', formatic.fromJS(nextContext.valuePath));
 
     if (fieldState.has('key')) {
       valueState = formatic.getInValueState(fieldState.get('key'), valueState);
@@ -944,12 +944,21 @@ module.exports = function (formatic) {
     }
 
     if (typePlugin.evalField) {
-      return typePlugin.evalField(form, fieldState, valueState, meta, context, nextContext);
+      var maybeFieldState = typePlugin.evalField(form, fieldState, valueState, meta, context, nextContext);
+      if (maybeFieldState) {
+        return maybeFieldState;
+      }
     }
 
     if (fieldState.get('fields')) {
-      return fieldState.set('fields', fieldState.get('fields').map(function (childState) {
-        return formatic.evalField(form, childState, valueState, meta, nextContext);
+      return fieldState.set('fields', fieldState.get('fields').map(function (childState, i) {
+        var child = formatic.evalField(form, childState, valueState, meta, nextContext);
+        if (child.has('key')) {
+          child = child.set('viewKey', child.get('key'));
+        } else {
+          child = child.set('viewKey', 'auto_' + i);
+        }
+        return child;
       }).toVector());
     } else {
 
@@ -977,18 +986,56 @@ module.exports = function (formatic) {
 
   formatic.itemForValueState = function (fieldState, valueState, context) {
     var value = formatic.unwrapValueState(valueState);
-    var items = fieldState.get('items').toArray();
+    var items = fieldState.get('items');
     var item;
     if (items) {
+      items = items.toArray();
       item = _.find(items, function (item) {
         return formatic.itemMatchesValue(item, value);
       });
     }
     if (!item) {
-      // TODO: create item from value
-      throw new Error('Could not find matching item schema for value: ' + JSON.stringify(value));
+      var fieldDef = formatic.fieldDefFromValue(value);
+      return formatic.fromJS(fieldDef);
     }
     return item;
+  };
+
+  formatic.fieldDefFromValue = function (value) {
+    var fieldDef = {
+      type: 'json'
+    };
+    if (_.isString(value)) {
+      fieldDef = {
+        type: 'string'
+      };
+    } else if (_.isArray(value)) {
+      var arrayItemFields = value.map(function (value, i) {
+        var childDef = formatic.fieldDefFromValue(value);
+        childDef.key = i;
+        return childDef;
+      });
+      fieldDef = {
+        type: 'array',
+        fields: arrayItemFields
+      };
+    } else if (_.isObject(value)) {
+      var objectItemFields = Object.keys(value).map(function (key) {
+        var childDef = formatic.fieldDefFromValue(value[key]);
+        childDef.key = key;
+        childDef.label = formatic.humanize(key);
+        return childDef;
+      });
+      fieldDef = {
+        type: 'object',
+        fields: objectItemFields
+      };
+    } else if (_.isNull(value)) {
+      fieldDef = {
+        type: 'null'
+      };
+    }
+    return fieldDef;
   };
 
   formatic.normalizeField = function (fieldState) {
@@ -1006,7 +1053,7 @@ module.exports = function (formatic) {
           var evalRule = evalRules.get(evalKey);
           var result = formatic.runFieldRule(form, evalRule, fieldState, valueState, meta, context, nextContext);
           if (result) {
-            fieldState.set(evalKey, Immutable.fromJS(result));
+            fieldState.set(evalKey, formatic.fromJS(result));
           }
         });
       }
@@ -1228,11 +1275,11 @@ module.exports = function (formatic) {
     form._hasDirtyValue = true;
 
     var compiledForm = formatic.compileFormSource(formSource);
-    form._dynamicFormState = Immutable.fromJS(compiledForm);
+    form._dynamicFormState = formatic.fromJS(compiledForm);
 
     form._formState = form.eval();
     var fatValue = formatic.wrapValue(formatic.valueOfFieldState(form._formState));
-    form._currentValue = Immutable.fromJS(fatValue);
+    form._currentValue = formatic.fromJS(fatValue);
 
     // console.log(formDef)
     //
@@ -1359,7 +1406,7 @@ module.exports = function (formatic) {
   };
 
   formatic.valueFieldState = function (value) {
-    return Immutable.fromJS(formatic.valueFieldDef(value));
+    return formatic.fromJS(formatic.valueFieldDef(value));
   };
 
   // formatic.createFormState = function (formDef, templateMap) {
@@ -2372,11 +2419,11 @@ module.exports = function (formatic, plugin) {
       },
 
       onReplaceForm: function (dynamicFormDef) {
-        this.updateForm(Immutable.fromJS(dynamicFormDef));
+        this.updateForm(formatic.fromJS(dynamicFormDef));
       },
 
       onSetFormValue: function (value) {
-        this.updateValue(Immutable.fromJS(formatic.wrapValue(value)));
+        this.updateValue(formatic.fromJS(formatic.wrapValue(value)));
       },
 
       onSetValue: function (field, value) {
@@ -2541,7 +2588,7 @@ module.exports = function (formatic, plugin) {
           _.extend(childDef, identities[i]);
         }
         field.updateIn(['fields'], function (fields) {
-          var childState = Immutable.fromJS(childDef);
+          var childState = formatic.fromJS(childDef);
           childState = formatic.setFieldValue(childState, value, templateMap);
           return fields.push(childState);
         });
@@ -2805,7 +2852,13 @@ module.exports = function (formatic, plugin) {
               unusedKeys = _.without(unusedKeys, child.get('key'));
             }
             fieldState.updateIn(['fields', i], function () {
-              return formatic.evalField(form, child, valueState, meta, nextContext);
+              var newChild = formatic.evalField(form, child, valueState, meta, nextContext);
+              if (child.has('key')) {
+                newChild = newChild.set('viewKey', child.get('key'));
+              } else {
+                newChild = newChild.set('viewKey', 'auto_' + i);
+              }
+              return newChild;
             });
           });
 
@@ -2828,13 +2881,19 @@ module.exports = function (formatic, plugin) {
       }
     }
 
-    if (fieldState.get('fields')) {
-      return fieldState.set('fields', fieldState.get('fields').map(function (childState) {
-        return formatic.evalField(form, childState, valueState, meta, nextContext);
-      }).toVector());
-    }
+    // if (fieldState.get('fields')) {
+    //   return fieldState.set('fields', fieldState.get('fields').map(function (childState, i) {
+    //     childState = formatic.evalField(form, childState, valueState, meta, nextContext);
+    //     if (child.has('key')) {
+    //       child = child.set('viewKey', child.get('key'));
+    //     } else {
+    //       child = child.set('viewKey', 'auto_' + i);
+    //     }
+    //     return childState;
+    //   }).toVector());
+    // }
 
-    return fieldState;
+    // return fieldState;
 
   };
 };
@@ -3113,8 +3172,8 @@ module.exports = function (formatic, plugin) {
         field: field
       },
         R.div({className: this.props.className, ref: 'choices'},
-          this.props.field.choices.map(function (choice) {
-            return R.span({className: 'field-choice'},
+          this.props.field.choices.map(function (choice, i) {
+            return R.span({key: i, className: 'field-choice'},
               R.span({style: {whiteSpace: 'nowrap'}},
                 R.input({
                   name: field.key,
@@ -3196,7 +3255,7 @@ module.exports = function (formatic, plugin) {
       },
         R.fieldset({className: this.props.className},
           this.props.fields.map(function (field) {
-            return this.props.form.component(field, {key: field.id});
+            return this.props.form.component(field, {key: field.viewKey});
           }.bind(this))
         )
       );
