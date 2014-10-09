@@ -215,6 +215,7 @@ var Formatic = function () {
 var defaultFormatic = Formatic();
 
 defaultFormatic.registerPlugins(
+  ['core-field', require('./plugins/core-field')],
   ['core-fn', require('./plugins/core-fn')],
   ['core-data', require('./plugins/core-data')],
   ['core-type', require('./plugins/core-type')],
@@ -233,6 +234,7 @@ defaultFormatic.registerPlugins(
   ['types.data', require('./types/data')],
   ['types.null', require('./types/null')],
   ['types.string', require('./types/string')],
+  ['types.number', require('./types/number')],
   ['types.object', require('./types/object')],
   ['types.array', require('./types/array')],
   ['types.json', require('./types/json')],
@@ -331,7 +333,7 @@ defaultFormatic.plugin('default');
 
 module.exports = defaultFormatic;
 
-},{"./plugins/bootstrap":4,"./plugins/core":11,"./plugins/core-data":5,"./plugins/core-fn":6,"./plugins/core-loader":7,"./plugins/core-type":8,"./plugins/core-types":9,"./plugins/core-view":10,"./plugins/default":12,"./plugins/ensure-default":13,"./plugins/ensure-fields":14,"./plugins/ensure-path":15,"./plugins/normalize-choices":16,"./plugins/prop-aliases":17,"./stores/form":18,"./stores/meta":19,"./types/array":20,"./types/boolean":21,"./types/data":22,"./types/json":23,"./types/null":24,"./types/object":25,"./types/string":26,"./types/wrapper":27,"./utils":28,"./views/add-item":29,"./views/checkbox-list":30,"./views/field":31,"./views/fieldset":32,"./views/formatic":33,"./views/help":34,"./views/item-choices":35,"./views/json":36,"./views/label":37,"./views/list":42,"./views/list-control":38,"./views/list-item":41,"./views/list-item-control":39,"./views/list-item-value":40,"./views/move-item-back":43,"./views/move-item-forward":44,"./views/remove-item":45,"./views/select":46,"./views/text":47,"./views/textarea":48,"underscore":217}],4:[function(require,module,exports){
+},{"./plugins/bootstrap":4,"./plugins/core":12,"./plugins/core-data":5,"./plugins/core-field":6,"./plugins/core-fn":7,"./plugins/core-loader":8,"./plugins/core-type":9,"./plugins/core-types":10,"./plugins/core-view":11,"./plugins/default":13,"./plugins/ensure-default":14,"./plugins/ensure-fields":15,"./plugins/ensure-path":16,"./plugins/normalize-choices":17,"./plugins/prop-aliases":18,"./stores/form":19,"./stores/meta":20,"./types/array":21,"./types/boolean":22,"./types/data":23,"./types/json":24,"./types/null":25,"./types/number":26,"./types/object":27,"./types/string":28,"./types/wrapper":29,"./utils":30,"./views/add-item":31,"./views/checkbox-list":32,"./views/field":33,"./views/fieldset":34,"./views/formatic":35,"./views/help":36,"./views/item-choices":37,"./views/json":38,"./views/label":39,"./views/list":44,"./views/list-control":40,"./views/list-item":43,"./views/list-item-control":41,"./views/list-item-value":42,"./views/move-item-back":45,"./views/move-item-forward":46,"./views/remove-item":47,"./views/select":48,"./views/text":49,"./views/textarea":50,"underscore":225}],4:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic) {
@@ -405,6 +407,7 @@ var _ = require('underscore');
 var Emitter = require('component-emitter');
 var objectpath = require('objectpath');
 var Immutable = require('immutable');
+var funql = require('funql');
 
 module.exports = function (formatic) {
 
@@ -424,57 +427,108 @@ module.exports = function (formatic) {
     return path;
   };
 
-  formatic.setValueOfField = function (formState, field, value) {
-    var path = formatic.formStatePath(field);
-    return formState.updateIn(path.concat('value'), function () {
-      return formatic.fromJS(value);
+  formatic.ensureValuePath = function (formState, field) {
+
+  };
+
+  formatic.setValueOfField = function (valueState, field, value) {
+    var path = field.valueStatePath().concat('value');
+    return valueState.updateIn(path, function () {
+      return formatic.wrapValue(value).value;
     });
   };
 
-  formatic.appendField = function (formState, field, item, templateMap) {
-    var path = formatic.formStatePath(field);
-    var childDef = formatic.createFieldDef(item, templateMap);
-    childDef.id = formatic.newId(field, childDef);
-    return formState.updateIn(path.concat('fields'), function (fields) {
-      return fields.push(formatic.fromJS(childDef));
+  formatic.incrementViewKey = function (valueState, path) {
+    var wrappedValue = valueState.getIn(path);
+    var viewKey = wrappedValue.get('nextViewKey');
+    viewKey++;
+    return valueState.updateIn(path, function (wrappedValue) {
+      return wrappedValue.set('nextViewKey', viewKey);
     });
   };
 
-  formatic.removeField = function (formState, field, index) {
-    var path = formatic.formStatePath(field);
-    return formState.updateIn(path.concat('fields'), function (fields) {
-      return fields.splice(index, 1);
+  formatic.nextViewKey = function (valueState, path) {
+    var wrappedValue = valueState.getIn(path);
+    return wrappedValue.get('nextViewKey');
+  };
+
+  formatic.appendField = function (valueState, field, itemIndex) {
+    var wrapperPath = field.valueStatePath();
+    var nextViewKey = formatic.nextViewKey(valueState, wrapperPath);
+    valueState = formatic.incrementViewKey(valueState, wrapperPath);
+    var path = wrapperPath.concat('value');
+    var item = field.itemState(itemIndex);
+    var fieldStates = field.parentFieldStates();
+    fieldStates = fieldStates.concat(field._fieldState);
+    var context = formatic.buildEvalContext(fieldStates);
+    item = item.set('key', 0);
+    var fieldState = formatic.evalField(field._form, item, null, {}, context);
+    var value = formatic.valueOfFieldState(fieldState);
+    var fatValue = formatic.wrapValue(value);
+    fatValue.viewKey = nextViewKey;
+    return valueState.updateIn(path, function (values) {
+      return values.push(Immutable.fromJS(fatValue));
     });
   };
 
-  formatic.moveField = function (formState, field, fromKeyOrIndex, toKeyOrIndex) {
+  formatic.removeField = function (valueState, field, index) {
 
-    var path = formatic.formStatePath(field);
+    var path = field.valueStatePath().concat('value');
+    return valueState.updateIn(path, function (values) {
+      return values.splice(index, 1).toVector();
+    });
+  };
+
+  formatic.moveField = function (valueState, field, fromKeyOrIndex, toKeyOrIndex) {
+
+    var path = field.valueStatePath().concat('value');
 
     if (_.isNumber(fromKeyOrIndex) && _.isNumber(toKeyOrIndex)) {
       var fromIndex = fromKeyOrIndex;
       var toIndex = toKeyOrIndex;
 
-      var fields = formState.get('fields');
+      var values = valueState.getIn(path);
 
-      if (fields) {
-        if (fromIndex !== toIndex &&
-          fromIndex >= 0 && fromIndex < fields.length &&
-          toIndex >= 0 && toIndex < fields.length
-        ) {
-          return formState.updateIn(path.concat('fields'), function (fields) {
-            var removedField = fields.get(fromIndex);
-            fields = fields.splice(fromIndex, 1);
-            fields = fields.splice(toIndex, 0, removedField);
-            return fields;
-          });
-        }
+      if (fromIndex !== toIndex &&
+        fromIndex >= 0 && fromIndex < values.length &&
+        toIndex >= 0 && toIndex < values.length
+      ) {
+        return valueState.updateIn(path, function (values) {
+          var removedValue = values.get(fromIndex);
+          values = values.splice(fromIndex, 1).toVector();
+          values = values.splice(toIndex, 0, removedValue).toVector();
+          return values;
+        });
       }
     }
 
+
+    // var path = formatic.formStatePath(field);
+    //
+    // if (_.isNumber(fromKeyOrIndex) && _.isNumber(toKeyOrIndex)) {
+    //   var fromIndex = fromKeyOrIndex;
+    //   var toIndex = toKeyOrIndex;
+    //
+    //   var fields = formState.get('fields');
+    //
+    //   if (fields) {
+    //     if (fromIndex !== toIndex &&
+    //       fromIndex >= 0 && fromIndex < fields.length &&
+    //       toIndex >= 0 && toIndex < fields.length
+    //     ) {
+    //       return formState.updateIn(path.concat('fields'), function (fields) {
+    //         var removedField = fields.get(fromIndex);
+    //         fields = fields.splice(fromIndex, 1);
+    //         fields = fields.splice(toIndex, 0, removedField);
+    //         return fields;
+    //       });
+    //     }
+    //   }
+    // }
+
     // TODO: move keys
 
-    return formState;
+    return valueState;
   };
 
   formatic.formToJS = function (form) {
@@ -485,25 +539,89 @@ module.exports = function (formatic) {
   };
 
   formatic.getFormValue = function (form) {
-    var jsForm = formatic.formToJS(form);
-    return formatic.getFieldValue(jsForm);
-  };
-
-  formatic.getFieldValue = function (field) {
-
-    var typePlugin = formatic.type(field.type);
-
-    if (typePlugin.getFieldValue) {
-      return typePlugin.getFieldValue(field);
-    }
-
-    if (typeof field.value !== 'undefined') {
-      return field.value;
-    }
-    if (typeof field.default === 'undefined') {
+    if (form._currentValue === undefined || form._currentValue === null) {
       return null;
     }
-    return field.default;
+    return formatic.unwrapValue(form._currentValue.toJS());
+  };
+
+  formatic.valueOfFieldState = function (fieldState) {
+
+    var typePlugin = formatic.type(fieldState.get('type'));
+
+    if (typePlugin.getFieldValue) {
+      return typePlugin.getFieldValue(fieldState);
+    }
+
+    if (fieldState.has('value')) {
+      return fieldState.get('value');
+    }
+    if (!fieldState.has('default')) {
+      return null;
+    }
+    return fieldState.get('default');
+  };
+
+  formatic.getFieldValue = function (fieldState) {
+
+    var typePlugin = formatic.type(fieldState.get('type'));
+
+    if (typePlugin.getFieldValue) {
+      return typePlugin.getFieldValue(fieldState);
+    }
+
+    if (fieldState.has('value')) {
+      return formatic.toJS(fieldState.get('value'));
+    }
+    if (!fieldState.has('default')) {
+      return null;
+    }
+    return formatic.toJS(fieldState.get('default'));
+  };
+
+  formatic.wrapValue = function (value) {
+    if (_.isArray(value)) {
+      return {
+        nextViewKey: value.length,
+        value: value.map(function (child, i) {
+          var fatValue = formatic.wrapValue(child);
+          fatValue.viewKey = i;
+          return fatValue;
+        })
+      };
+    } else if (_.isObject(value)) {
+      var obj = {};
+      Object.keys(value).forEach(function (key, i) {
+        obj[key] = formatic.wrapValue(value[key]);
+        obj[key].viewKey = i;
+      });
+      return {
+        nextViewKey: value.length,
+        value: obj
+      };
+    } else {
+      return {
+        value: value
+      };
+    }
+  };
+
+  formatic.unwrapValue = function (wrappedValue) {
+    var value = wrappedValue.value;
+    if (_.isArray(value)) {
+      return value.map(function (child) {
+
+        return formatic.unwrapValue(child);
+      });
+    } else if (_.isObject(value)) {
+      var obj = {};
+      _.each(value, function (child, key) {
+        obj[key] = formatic.unwrapValue(child);
+      });
+      return obj;
+    } else {
+      return value;
+    }
   };
 
   // formatic.modifyFormValue = function (form, value) {
@@ -656,7 +774,11 @@ module.exports = function (formatic) {
 
           var evalExpr = field.get('eval').get(propKey);
 
-          if (evalExpr.get('lookup')) {
+          if (_.isString(evalExpr)) {
+            var fn = funql.toFunction(evalExpr);
+            var fnResult = fn();
+            field.set(propKey, fnResult);
+          } else if (evalExpr.get('lookup')) {
             var lookup = evalExpr.get('lookup');
             if (lookup.toArray) {
               lookup = lookup.toJS();
@@ -683,300 +805,381 @@ module.exports = function (formatic) {
     });
   };
 
-  // var sources = {};
-  //
-  // formatic.form.wrap('init', function (next) {
-  //   return next();
-  // });
-  //
-  // formatic.source = function (key, fn) {
-  //   if (typeof fn === 'undefined') {
-  //     return sources[key];
-  //   }
-  //   sources[key] = fn;
-  // };
-  //
-  // formatic.form.val = function (value) {
-  //   if (typeof value === 'undefined') {
-  //     return this.getValue();
-  //   }
-  //   return this.setValue(value);
-  // };
-  //
-  // formatic.form.valAt = function (key, value) {
-  //   if (typeof value === 'undefined') {
-  //     return this.getValAt(key);
-  //   } else {
-  //     return this.setValAt(key, value);
-  //   }
-  // };
-  //
-  // formatic.form.getValAt = function (key) {
-  //   var value;
-  //   if (this.has('value')) {
-  //     value = this.get('value');
-  //   }
-  //   if (this.has('default')) {
-  //     value = this.get('default');
-  //   }
-  //   if (value && value.get) {
-  //     return formatic.toJS(value.get(key));
-  //   }
-  //   return null;
-  // };
-  //
-  // formatic.form.setValAt = function (key, subValue) {
-  //   this._cursor.withMutations(function (field) {
-  //     var value = field.get('value');
-  //     if (!value) {
-  //       value = field.get('default');
-  //     }
-  //     if (value) {
-  //       field.set('value', value);
-  //     }
-  //     if (!value) {
-  //       if (typeof key === 'number') {
-  //         field.set('value', Immutable.fromJS([]));
-  //       } else {
-  //         field.set('value', Immutable.fromJS({}));
-  //       }
-  //     }
-  //     value.set(key, subValue);
-  //   });
-  // };
-  //
-  // formatic.form.hasValAt = function (key) {
-  //   var value;
-  //   if (this.has('value')) {
-  //     value = this.get('value');
-  //   }
-  //   if (this.has('default')) {
-  //     value = this.get('default');
-  //   }
-  //   if (value && value.has) {
-  //     return value.has(key);
-  //   }
-  //   return false;
-  // };
-  //
-  // formatic.form.getValue = function () {
-  //   if (this.typePlugin().getValue) {
-  //     return formatic.toJS(this.typePlugin().getValue(this));
-  //   }
-  //   return formatic.toJS(this.getData());
-  // };
-  //
-  // formatic.form.getData = function () {
-  //   if (this.has('value')) {
-  //     return this.get('value');
-  //   }
-  //   if (!this.has('default')) {
-  //     return null;
-  //   }
-  //   return this.get('default');
-  // };
-  //
-  // formatic.form.setValue = function (value) {
-  //   if (_.isObject(value)) {
-  //     if (value.deref && _.isFunction(value.deref)) {
-  //       value = value.deref();
-  //     }
-  //     if (value.toJS && _.isFunction(value.toJS)) {
-  //       value = value.toJS();
-  //     }
-  //   }
-  //   if (this.typePlugin().setValue) {
-  //     this.modify(function (form) {
-  //       this.typePlugin().setValue(form, value);
-  //     }.bind(this));
-  //     return this;
-  //   }
-  //   return this.setData(value);
-  // };
-  //
-  // formatic.form.modifyValue = function (fn) {
-  //   var newData = this.get('value').withMutations(function (data) {
-  //     fn(data);
-  //   });
-  //   this.set('value', newData);
-  // };
-  //
-  // formatic.form.setData = function (data) {
-  //   this.set('value', data);
-  // };
-  //
-  // // formatic.buildMutableField = function (fieldDef, templateMap) {
-  // //   if (!fieldDef.type) {
-  // //     throw new Error('Field must specify type.');
-  // //   }
-  // //   var type = formatic.type(fieldDef.type);
-  // //   var field = _.extend({
-  // //     fields: [],
-  // //     default: typeof type.default === 'undefined' ? null : type.default
-  // //   }, fieldDef, formatic.getValidProps(fieldDef), type.getValidProps ? type.getValidProps(fieldDef) : {});
-  // //   field.fields = field.fields.map(function (templateId) {
-  // //     if (!templateMap[templateId]) {
-  // //       throw new Error('Field ' + field.id + ' tried to reference unknown template: ' + templateId);
-  // //     }
-  // //     return formatic.buildMutableField(templateMap[templateId], templateMap);
-  // //   });
-  // //   return field;
-  // // };
-  //
-  // formatic.modifyField = function (/*root, current*/) {
-  //
-  // };
-  //
-  // formatic.inflateField = function (root, parent, templateName) {
-  //
-  //   var templateMap = parent.child('_templates');
-  //
-  //   if (templateMap) {
-  //     var map = templateMap.getData();
-  //     if (map.has(templateName)) {
-  //       return map.get(templateName).deref();
-  //     }
-  //   }
-  //
-  //   parent = parent.parent();
-  //
-  //   if (parent) {
-  //     return formatic.inflateField(root, parent, templateName);
-  //   }
-  //
-  //   throw new Error('Template ' + templateName + ' not found.');
-  // };
-  //
-  // formatic.hasDep = function (root, current, dep) {
-  //   var depField = root.find(dep, current);
-  //   var depValue = depField.val();
-  //   if (depValue) {
-  //     if (_.isArray(depValue)) {
-  //       return depValue.length > 0;
-  //     }
-  //     return true;
-  //   }
-  // };
-  //
-  // formatic.walkEval = function (root, current) {
-  //   current = current || root;
-  //
-  //   var type = current.get('type');
-  //
-  //   if (!type) {
-  //     throw new Error('Field must specify type.');
-  //   }
-  //
-  //   var typePlugin = formatic.type(type);
-  //
-  //   if (!typePlugin) {
-  //     throw new Error('Field must have a valid type.');
-  //   }
-  //
-  //   var defaultValue = current.get('default');
-  //
-  //   if (typeof defaultValue === 'undefined') {
-  //     defaultValue = typeof typePlugin.default === 'undefined' ? null : typePlugin.default;
-  //     current.set('default', Immutable.fromJS(defaultValue));
-  //   }
-  //
-  //   var fields = current.get('fields');
-  //
-  //   if (!fields) {
-  //     current.set('fields', []);
-  //     fields = current.get('fields');
-  //   }
-  //
-  //   fields.forEach(function (field, i) {
-  //     if (_.isString(field)) {
-  //       var inflated = formatic.inflateField(root, current, field);
-  //       inflated = inflated.set('id', formatic.newId(current, current.childFromCursor(inflated, field)));
-  //       fields.set(i, inflated);
-  //     }
-  //   });
-  //
-  //   if (current.get('_value')) {
-  //     var _value = formatic.toJS(current.get('_value'));
-  //     current._cursor.remove('_value');
-  //     current.val(_value);
-  //   }
-  //
-  //   var dataDeps = current.deref('data');
-  //
-  //   if (dataDeps) {
-  //     dataDeps.keySeq().forEach(function (propKey) {
-  //       var dataKey = dataDeps.get(propKey);
-  //       var dataField = current.find(dataKey, current);
-  //       if (dataField) {
-  //         var propValue = dataField.val();
-  //         current.set(propKey, propValue);
-  //       }
-  //     });
-  //   }
-  //
-  //   var showDeps = current.deref('when');
-  //
-  //   if (showDeps) {
-  //     showDeps = showDeps.toArray();
-  //     current.set('hidden', true);
-  //     if (_.every(showDeps, function (dep) {
-  //       return formatic.hasDep(root, current, dep);
-  //     })) {
-  //       current.set('hidden', false);
-  //     }
-  //   }
-  //
-  //   formatic.modifyField(root, current);
-  //
-  //   if (typePlugin.modifyField) {
-  //     typePlugin.modifyField(root, current);
-  //   }
-  //
-  //   if (fields && fields.length > 0) {
-  //     current.each(function (child) {
-  //       formatic.walkEval(root, child);
-  //     });
-  //   }
-  //
-  //   var items = current.get('items');
-  //
-  //   // Need to inflate first level so we have any match rules.
-  //   if (items && items.count() > 0) {
-  //     items.forEach(function (field, i) {
-  //       if (_.isString(field)) {
-  //         var inflated = formatic.inflateField(root, current, field);
-  //         items.set(i, inflated);
-  //       }
-  //     });
-  //   }
-  // };
-  //
-  // formatic.eval = function (form) {
-  //   return form.modify(function (form) {
-  //     formatic.walkEval(form);
-  //   });
-  // };
-  //
-  // formatic.form.eval = function () {
-  //   return formatic.eval(this);
-  // };
+  formatic.form.eval = function (meta) {
+    var result = formatic.eval(this, this._dynamicFormState, this._currentValue, meta);
+    return result;
+  };
+
+  formatic.eval = function (form, fieldState, valueState, meta) {
+    return formatic.evalField(form, fieldState, valueState, meta || {});
+  };
+
+  formatic.getInValueState = function (key, valueState) {
+    if (!valueState) {
+      return null;
+    }
+    var value = valueState.get('value');
+    if (!value.get) {
+      return null;
+    }
+    return value.get(key);
+  };
+
+  formatic.findTemplate = function (key, fieldState, parents) {
+    var templates = fieldState.get('templates');
+    var template;
+    if (templates) {
+      template = _.find(templates.toArray(), function (template) {
+        return template.get('id') === key || template.get('key') === key;
+      });
+      if (template) {
+        return template.remove('template');
+      }
+    }
+    var fields = fieldState.get('fields');
+    if (fields) {
+      template = _.find(fields.toArray(), function (template) {
+        return template.get('id') === key || template.get('key') === key;
+      });
+      if (template) {
+        return template;
+      }
+    }
+    if (parents.length > 0) {
+      return formatic.findTemplate(key, parents[parents.length - 1], parents.slice(0, parents.length - 1));
+    }
+    return null;
+  };
+
+  formatic.resolveField = function (fieldState, parents) {
+    var ext = fieldState.get('extends');
+    if (!ext) {
+      return fieldState;
+    }
+    ext = ext.toArray();
+    var templates = ext.map(function (key) {
+      return formatic.findTemplate(key, fieldState, parents);
+    });
+    fieldState = fieldState.remove('extends');
+    var template = templates.reverse().reduce(function (prev, curr) {
+      return prev.merge(curr);
+    });
+    return template.merge(fieldState);
+  };
+
+  formatic.buildEvalContext = function (fieldStates) {
+    return fieldStates.reduce(function (prev, curr) {
+      return formatic.evalContext(curr, null, prev);
+    }, formatic.evalContext());
+  };
+
+  formatic.evalContext = function (fieldState, valueState, parentContext) {
+    var context;
+    if (!parentContext) {
+      context = {
+        parents: [],
+        valuePath: [],
+        vars: {}
+      };
+      if (valueState && valueState instanceof Immutable.Map) {
+        _.extend(context.vars, formatic.unwrapValueState(valueState));
+      }
+      return context;
+    }
+    context = _.extend({}, parentContext);
+    _.each(context, function (value, key) {
+      if (_.isArray(value)) {
+        context[key] = value.slice(0);
+      } else if (_.isObject(value)) {
+        context[key] = _.extend({}, value);
+      }
+    });
+
+    if (fieldState.has('key')) {
+      context.valuePath.push(fieldState.get('key'));
+    }
+
+    context.parents.push(fieldState);
+
+    if (valueState && valueState instanceof Immutable.Map) {
+      _.extend(context.vars, formatic.unwrapValueState(valueState));
+    }
+
+    return context;
+  };
+
+  formatic.unwrapValueState = function (valueState) {
+    return formatic.unwrapValue(formatic.toJS(valueState));
+  };
+
+  formatic.evalField = function (form, fieldState, valueState, meta, context) {
+    // expand field if necessary
+
+    context = context || formatic.evalContext(fieldState, valueState, context);
+
+    fieldState = formatic.resolveField(fieldState, context.parents);
+
+    var type = fieldState.get('type');
+    var typePlugin = formatic.type(type);
+
+    var nextContext = formatic.evalContext(fieldState, valueState, context);
+
+    fieldState = fieldState.set('_valuePath', Immutable.fromJS(nextContext.valuePath));
+
+    if (fieldState.has('key')) {
+      valueState = formatic.getInValueState(fieldState.get('key'), valueState);
+    }
+
+    fieldState = formatic.runField(form, fieldState, valueState, meta, context, nextContext);
+
+    fieldState = formatic.normalizeField(fieldState);
+    if (typePlugin.normalizeField) {
+      fieldState = typePlugin.normalizeField(fieldState);
+    }
+
+    if (fieldState.get('items')) {
+      fieldState = fieldState.set('items', fieldState.get('items').map(function (itemState) {
+        return formatic.resolveField(itemState, context.parents);
+      }).toVector());
+    }
+
+    if (typePlugin.evalField) {
+      return typePlugin.evalField(form, fieldState, valueState, meta, context, nextContext);
+    }
+
+    if (fieldState.get('fields')) {
+      return fieldState.set('fields', fieldState.get('fields').map(function (childState) {
+        return formatic.evalField(form, childState, valueState, meta, nextContext);
+      }).toVector());
+    } else {
+
+      if (fieldState.has('key') && valueState) {
+        return fieldState.set('value', formatic.unwrapValueState(valueState));
+      } else {
+        return fieldState;
+      }
+    }
+  };
+
+  formatic.itemMatchesValue = function (item, value) {
+    var match = item.get('match');
+    if (!match) {
+      return true;
+    }
+    if (match.toJS) {
+      var matchValue = match.toJS();
+      return _.every(_.keys(matchValue), function (key) {
+        return _.isEqual(matchValue[key], value[key]);
+      });
+    }
+    return false;
+  };
+
+  formatic.itemForValueState = function (fieldState, valueState, context) {
+    var value = formatic.unwrapValueState(valueState);
+    var items = fieldState.get('items').toArray();
+    var item;
+    if (items) {
+      item = _.find(items, function (item) {
+        return formatic.itemMatchesValue(item, value);
+      });
+    }
+    if (!item) {
+      // TODO: create item from value
+      throw new Error('Could not find matching item schema for value: ' + JSON.stringify(value));
+    }
+    return item;
+  };
+
+  formatic.normalizeField = function (fieldState) {
+    return fieldState;
+  };
+
+  formatic.runField = function (form, fieldState, valueState, meta, context, nextContext) {
+    if (!fieldState.get('eval')) {
+      return fieldState;
+    }
+    return fieldState.withMutations(function (fieldState) {
+      var evalRules = fieldState.get('eval');
+      if (evalRules instanceof Immutable.Map) {
+        evalRules.keySeq().forEach(function (evalKey) {
+          var evalRule = evalRules.get(evalKey);
+          var result = formatic.runFieldRule(form, evalRule, fieldState, valueState, meta, context, nextContext);
+          if (result) {
+            fieldState.set(evalKey, Immutable.fromJS(result));
+          }
+        });
+      }
+    });
+  };
+
+  formatic.runFieldRule = function (form, rule, fieldState, valueState, meta, context, nextContext) {
+    if (_.isString(rule)) {
+      try {
+        var lookup = function () {
+          var args = _.toArray(arguments);
+          if (args.length === _.compact(args).length) {
+            var metaKey = args.join('::');
+            if (meta[metaKey]) {
+              return meta[metaKey];
+            } else {
+              form.pushNeedsKey(metaKey);
+            }
+          }
+        };
+        // TODO: some caching here!!!
+        var fn = funql.toFunction(rule, {lookup: lookup});
+        var result = fn(nextContext.vars);
+        return result;
+      } catch (e) {
+        console.log('Problem evaluating: ' + e);
+      }
+    }
+  };
 };
 
-},{"component-emitter":50,"immutable":51,"objectpath":52,"underscore":217}],6:[function(require,module,exports){
+},{"component-emitter":52,"funql":54,"immutable":59,"objectpath":60,"underscore":225}],6:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 var Immutable = require('immutable');
 //var Emitter = require('component-emitter');
 var Reflux = require('reflux');
+var utils = require('../utils');
 
 module.exports = function (formatic) {
 
-  formatic.form.wrap('init', function (next, formDef) {
+  var Field = function () {
+    this.init.apply(this, arguments);
+  };
 
-    formatic.initForm(this, formDef);
+  formatic.field = function (a, b, c, d, e, f) {
+    return new Field(a, b, c, d, e, f);
+  };
+
+  Field.prototype = formatic.field;
+
+  utils.wrappable(Field.prototype);
+
+  Field.prototype.init = function () {};
+
+  formatic.field.wrap('init', function (next, form, fieldState, parents, path) {
+    var field = this;
+
+    fieldState = fieldState || form._formState;
+    parents = parents || [];
+    path = path || '';
+
+    var props = fieldState.remove('fields').toJS();
+    _.extend(field, props);
+
+    field._form = form;
+    field._fieldState = fieldState;
+    field._parents = parents;
+    field._path = path;
 
     return next();
+  });
+
+  formatic.field.equals = function (otherField) {
+    var field = this;
+    if (
+      field._form === otherField._form &&
+      field._fieldState === otherField._fieldState &&
+      field._path === otherField._path
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  formatic.field.fields = function () {
+    var field = this;
+
+    if (!field._fields) {
+      if (!field._fieldState.get('fields')) {
+        field._fields = [];
+      } else {
+        var pathPrefix = field._path;
+
+        if (pathPrefix) {
+          pathPrefix += '/';
+        }
+
+        field._fields = field._fieldState.get('fields').toArray().map(function (child, i) {
+          return formatic.field(field._form, child, field._parents.concat(field), pathPrefix + i);
+        });
+      }
+    }
+
+    return field._fields;
+  };
+
+  formatic.field.val = function (value) {
+    var field = this;
+    field._form._formActions.setValue(field, value);
+  };
+
+  formatic.field.valueStatePath = function () {
+    var field = this;
+    return _.flatten(field._valuePath.map(function (key) {
+      return ['value', key];
+    }));
+  };
+
+  formatic.field.itemState = function (index) {
+    return this._fieldState.get('items').get(index);
+  };
+
+  formatic.field.parentFieldStates = function () {
+    return this._parents.map(function (parent) {
+      return parent._fieldState;
+    });
+  };
+
+  formatic.field.append = function (itemIndex) {
+    var field = this;
+    field._form._formActions.append(field, itemIndex);
+  };
+
+  formatic.field.remove = function (index) {
+    var field = this;
+    field._form._formActions.remove(field, index);
+  };
+
+  formatic.field.move = function (fromIndex, toIndex) {
+    var field = this;
+    field._form._formActions.move(field, fromIndex, toIndex);
+  };
+
+  formatic.form.field = function () {
+    if (!this._field || this._field._fieldState !== this._formState) {
+      this._field = formatic.field(this);
+    }
+
+    return this._field;
+  };
+
+};
+
+},{"../utils":30,"immutable":59,"reflux":221,"underscore":225}],7:[function(require,module,exports){
+'use strict';
+
+var _ = require('underscore');
+var Immutable = require('immutable');
+//var Emitter = require('component-emitter');
+var Reflux = require('reflux');
+var utils = require('../utils');
+
+module.exports = function (formatic) {
+
+  formatic.form.wrap('init', function (next, formSource) {
+
+    formatic.initForm(this, formSource);
+
+    next();
+
+    formatic.loadNeededMetadata(this);
   });
 
   var converter = function (key, sequence) {
@@ -991,26 +1194,55 @@ module.exports = function (formatic) {
     return Immutable.fromJS(obj, converter);
   };
 
-  formatic.onFormStoreChanged = function (form, data) {
+  formatic.toJS = function (obj) {
+    if (obj.toJS && _.isFunction(obj.toJS)) {
+      return obj.toJS();
+    }
+    return obj;
+  };
 
-    form._formState = data;
+  formatic.onFormStoreChanged = function (form, result) {
+
     form._hasDirtyValue = true;
 
-    formatic.loadNeededData(form);
+    form._currentValue = result.value;
+    form._dynamicFormState = result.dynamicFormState;
+
+    form._formState = form.eval(result.meta);
+
+    form._fieldState = form._formState;
+
+    formatic.loadNeededMetadata(form);
 
     formatic.render(form);
   };
 
-  formatic.initForm = function (form, formDef) {
+  formatic.initForm = function (form, formSource) {
+
+    form._needsKeys = [];
+    form._fnCache = {};
+
+    form._form = form;
+    form._parents = [];
 
     form._hasDirtyValue = true;
 
-    formDef = formatic.fillInFormDefIds(formDef);
-    formDef = formatic.createFormDefTree(formDef);
-    formDef = _.extend({}, formDef);
-    var templateMap = formDef._templates || {};
-    delete formDef._templates;
-    form._formState = formatic.createFormState(formDef, templateMap);
+    var compiledForm = formatic.compileFormSource(formSource);
+    form._dynamicFormState = Immutable.fromJS(compiledForm);
+
+    form._formState = form.eval();
+    var fatValue = formatic.wrapValue(formatic.valueOfFieldState(form._formState));
+    form._currentValue = Immutable.fromJS(fatValue);
+
+    // console.log(formDef)
+    //
+    //
+    // formDef = formatic.fillInFormDefIds(formDef);
+    // formDef = formatic.createFormDefTree(formDef);
+    // formDef = _.extend({}, formDef);
+    // var templateMap = formDef._templates || {};
+    // delete formDef._templates;
+    // form._formState = formatic.createFormState(formDef, templateMap);
 
     //form._templateMap = templateMap;
 
@@ -1018,484 +1250,138 @@ module.exports = function (formatic) {
 
     form._metaStore = formatic.plugin('stores.meta').create(form._metaActions);
 
-    form._formActions = Reflux.createActions(['setFormValue', 'setValue', 'append', 'move', 'remove', 'undo']);
+    form._formActions = Reflux.createActions(['replaceForm', 'setFormValue', 'setValue', 'append', 'move', 'remove', 'undo']);
 
-    form._formStore = formatic.plugin('stores.form').create(form._formActions, form._formState, form._metaStore);
+    form._formStore = formatic.plugin('stores.form').create(form._formActions, form._metaStore, form);
+
     form._formStore.listen(function (data) {
       formatic.onFormStoreChanged(form, data);
     });
 
-    form._metaActions.setItem('_templateMap', templateMap);
+    //form._metaActions.setItem('_templateMap', templateMap);
   };
 
-  formatic.createFormState = function (formDef, templateMap) {
-    var formState = formatic.fromJS(formDef);
-    var compiled = formatic.createModifiedFieldFromFormState(formState);
-    var inflated = formatic.inflateItems(compiled, templateMap);
-    return formatic.fromJS(inflated);
+  formatic.compileFormSource = function (formSource) {
+    return formatic.compileFieldSource(formSource);
   };
 
-  formatic.fillInFormDefIds = function (formDef) {
-    var lastId = '';
-    var typeIndexes = {};
-    var map = {};
-    var fieldDefs = formDef;
-    var isArray = true;
-    if (!_.isArray(fieldDefs)) {
-      isArray = false;
-      fieldDefs = [fieldDefs];
-    }
-    fieldDefs = fieldDefs.map(function (fieldDef) {
-      return _.extend({}, fieldDef);
-    });
-    fieldDefs.forEach(function (fieldDef) {
-
-      if (!fieldDef.type) {
-        throw new Error('Field definitions must have types: ' + JSON.stringify(fieldDef));
-      }
-
-      if (!formatic.type(fieldDef.type)) {
-        throw new Error('Unknown type for field definition: ' + fieldDef.type);
-      }
-
-      var id = formatic.idOfFieldDef(fieldDef);
-      if (id) {
-        if (map[id]) {
-          throw new Error('Field ids must be unique. id: ' + id);
-        }
-        lastId = id;
-        typeIndexes = {};
-      } else {
-        // Making a best guess at an id that will stay the same.
-        if (!(fieldDef.type in typeIndexes)) {
-          typeIndexes[fieldDef.type] = -1;
-        }
-        typeIndexes[fieldDef.type]++;
-        id = '__' + lastId + '__' + fieldDef.type + '__' + typeIndexes[fieldDef.type];
-      }
-      fieldDef.id = id;
-      map[id] = fieldDef;
-    });
-
-    if (!isArray) {
-      fieldDefs = fieldDefs[0];
-    }
-
-    return fieldDefs;
-  };
-
-  formatic.idOfFieldDef = function (fieldDef) {
-    return fieldDef.id || fieldDef.key || null;
-  };
-
-  formatic.createFormDefTree = function (formDef) {
-    formDef = formatic.createRootFormDef(formDef);
-    formDef = formatic.inflateFormDefTemplates(formDef);
-    return formDef;
-  };
-
-  formatic.createRootFormDef = function (formDef) {
-    if (_.isArray(formDef)) {
-
-      var fieldDefs = formDef;
-
-      var templates = fieldDefs.filter(function (fieldDef) {
-        return fieldDef.template === true;
-      });
-
-      var concretes = fieldDefs.filter(function (fieldDef) {
-        return fieldDef.template !== true;
-      });
-
-      var root = _.find(concretes, function (fieldDef) {
-        return fieldDef.key === '.';
-      });
-
-      if (root) {
-        concretes = concretes.filter(function (fieldDef) {
-          return fieldDef.key !== '.';
-        });
-      }
-
-      var templateMap = {};
-
-      concretes.forEach(function (template) {
-        if (template.key) {
-          templateMap[template.key] = template;
-        }
-        if (template.id) {
-          templateMap[template.id] = template;
-        }
-      });
-
-      templates.forEach(function (template) {
-        if (template.key) {
-          templateMap[template.key] = template;
-        }
-        if (template.id) {
-          templateMap[template.id] = template;
-        }
-      });
-
-      concretes.forEach(function (concrete, i) {
-        if (_.isString(concrete)) {
-          if (templateMap[concrete]) {
-            concretes[i] = templateMap[concrete];
-          } else {
-            throw new Error('Template not found: ', concrete);
-          }
-        }
-      });
-
-      if (root && concretes.length === 0) {
-        return formatic.addTemplateData(root, templateMap);
-      } else {
-        var concreteKeys = concretes.map(function (concrete) {
-          return concrete.id;
-        });
-        if (root) {
-          return formatic.addTemplateData({
-            id: '.',
-            type: 'wrapper',
-            fields: [root].concat(concreteKeys)
-          }, templateMap);
-        } else {
-          return formatic.addTemplateData({
-            id: '.',
-            type: 'object',
-            fields: concreteKeys
-          }, templateMap);
-        }
-      }
-
-    } else if (_.isObject(formDef)) {
-      return formDef;
-    }
-  };
-
-  formatic.addTemplateData = function (formDef, templateMap) {
-    formDef = _.extend({}, formDef);
-    formDef._templates = templateMap;
-    return formDef;
-  };
-
-  // formatic.findFormDefTemplate = function (templateName, parents) {
-  //   if (parents.length > 0) {
-  //     var parent = parents[parents.length - 1];
-  //     var templateFieldDef = _.find(parent.fields, function (fieldDef) {
-  //       return fieldDef.id === '_templates';
-  //     });
-  //     if (templateFieldDef) {
-  //       if (templateFieldDef.value[templateName]) {
-  //         return templateFieldDef.value[templateName];
-  //       }
-  //     }
-  //   }
-  //   return null;
-  // };
-
-  formatic.createFieldDef = function (fieldDef, templates) {
-    fieldDef = JSON.parse(JSON.stringify(fieldDef));
-    fieldDef = formatic.inflateFormDefTemplates(fieldDef, templates);
-    formatic.modifyField(fieldDef);
-    fieldDef = formatic.inflateItems(fieldDef, templates);
-    return fieldDef;
-  };
-
-  formatic.inflateFormDefTemplates = function (fieldDef, templateMap) {
-    templateMap = templateMap || fieldDef._templates || {};
-    fieldDef = _.extend({}, fieldDef);
-    if (fieldDef.fields) {
-      fieldDef.fields = fieldDef.fields.map(function (childDef) {
-        return childDef;
-      });
-      fieldDef.fields.forEach(function (childDef, i) {
-        if (_.isString(childDef)) {
-          if (templateMap[childDef]) {
-            var template = templateMap[childDef];
-            childDef = _.extend({}, template);
-          } else {
-            throw new Error('Template not found: ' + childDef);
-          }
-        }
-        fieldDef.fields[i] = formatic.inflateFormDefTemplates(childDef, templateMap);
-      });
-    }
-    return fieldDef;
-  };
-
-  formatic.createModifiedFieldFromFormState = function (formState) {
-    var field = formState.toJS();
-    formatic.modifyField(field);
-    return field;
-  };
-
-  formatic.modifyField = function (field, parent, i) {
-    var typePlugin = formatic.type(field.type);
-    if (typePlugin.modifyField) {
-      typePlugin.modifyField(field, parent, i);
-    }
-    if (field.fields) {
-      field.fields.forEach(function (child, i) {
-        formatic.modifyField(child, field, i);
-      });
-    }
-  };
-
-  formatic.inflateItems = function (field, templateMap) {
-    if (field.fields || field.items) {
-      field = _.extend({}, field);
-      if (field.items) {
-        field.items = field.items.map(function (item) {
-          if (_.isString(item)) {
-            if (!templateMap[item]) {
-              throw new Error('No template found for item: ', item);
-            }
-            return templateMap[item];
-          }
-        });
-      }
-      if (field.fields) {
-        field.fields = field.fields.map(function (child) {
-          return formatic.inflateItems(child, templateMap);
-        });
-      }
-    }
-
-    return field;
-  };
-
-  formatic.childIdMap = function (field) {
-    var idMap = {};
-    if (field.get && _.isFunction(field.get)) {
-      field.get('fields').forEach(function (child) {
-        idMap[child.get('id')] = true;
-      });
-    } else {
-      field.fields.forEach(function (child) {
-        idMap[child.id] = true;
-      });
-    }
-    return idMap;
-  };
-
-  formatic.newId = function (field, child) {
-    var idMap = formatic.childIdMap(field);
-    if (child.id && !idMap[child.id]) {
-      return child.id;
-    }
-    if (child.key && !idMap[child.key]) {
-      return child.key;
-    }
-    var childId = child.id || child.key || '__auto';
-    childId += '__';
-    var i = 0;
-    var newId = childId + i;
-    while (idMap[newId]) {
-      i++;
-      newId = childId + i;
-    }
-    return newId;
-  };
-
-  formatic.fieldDefFromValue = function (value, items, templateMap) {
-    if (items && items.count() > 0) {
-      var template = _.find(items.toArray(), function (template) {
-        var imValue = formatic.fromJS(value);
-        return formatic.matchValueToTemplate(imValue, template);
-      });
-      if (template) {
-        return formatic.createFieldDef(template.toJS(), templateMap);
-      }
-    }
-    var fieldDef = {
-      type: 'json'
-    };
-    if (_.isString(value)) {
-      fieldDef = {
-        type: 'string'
+  formatic.compileFieldSource = function (fieldSource) {
+    if (!fieldSource) {
+      return {
+        type: 'empty'
       };
-    } else if (_.isArray(value)) {
-      var arrayItemFields = value.map(function (value, i) {
-        var childDef = formatic.fieldDefFromValue(value);
-        childDef.key = i;
-        return childDef;
+    }
+    if (_.isArray(fieldSource)) {
+      fieldSource = {
+        type: 'object',
+        fields: fieldSource
+      };
+    }
+    if (_.isString(fieldSource)) {
+      fieldSource = {
+        extends: [fieldSource]
+      };
+    }
+    fieldSource = _.extend({}, fieldSource);
+    if (fieldSource.extends && !_.isArray(fieldSource.extends)) {
+      fieldSource.extends = [fieldSource.extends];
+    }
+    if (fieldSource.fields && !_.isArray(fieldSource.fields)) {
+      throw new Error('Fields must be an array.');
+    }
+    if (fieldSource.fields) {
+      fieldSource.fields = fieldSource.fields.map(function (child) {
+        return formatic.compileFieldSource(child);
       });
-      fieldDef = {
+      fieldSource.templates = fieldSource.fields.filter(function (child) {
+        return child.template;
+      });
+      fieldSource.fields = fieldSource.fields.filter(function (child) {
+        return !child.template;
+      });
+    }
+    if (fieldSource.items) {
+      fieldSource.items = fieldSource.items.map(function (item) {
+        if (_.isString(item)) {
+          return {
+            extends: [item]
+          };
+        }
+        return item;
+      });
+    }
+    return fieldSource;
+  };
+
+  formatic.valueFieldDef = function (value) {
+    if (_.isArray(value)) {
+      return {
+        _nextViewKey: value.length,
         type: 'array',
-        fields: arrayItemFields
+        fields: value.map(function (child, i) {
+          child = formatic.valueFieldDef(child);
+          child._viewKey = i;
+          return child;
+        })
       };
     } else if (_.isObject(value)) {
-      var objectItemFields = Object.keys(value).map(function (key) {
-        var childDef = formatic.fieldDefFromValue(value[key]);
-        childDef.key = key;
-        childDef.label = formatic.humanize(key);
-        return childDef;
-      });
-      fieldDef = {
+      return {
+        _nextViewKey: value.length,
         type: 'object',
-        fields: objectItemFields
+        fields: _.keys(value).map(function (key, i) {
+          var child = formatic.valueFieldDef(value[key]);
+          child._viewKey = i;
+          child.key = key;
+          return child;
+        })
       };
-    } else if (_.isNull(value)) {
-      fieldDef = {
-        type: 'null'
+    } else if (_.isString(value)) {
+      return {
+        type: 'string',
+        value: value
+      };
+    } else if (_.isNumber(value)) {
+      return {
+        type: 'number',
+        value: value
+      };
+    } else if (_.isBoolean(value)) {
+      return {
+        type: 'boolean',
+        value: value
+      };
+    } else if (value === null) {
+      return {
+        type: 'null',
+        value: null
       };
     }
-    return formatic.createFieldDef(fieldDef, {});
   };
 
-  formatic.humanize = function(property) {
-    property = property.replace(/\{\{/g, '');
-    property = property.replace(/\}\}/g, '');
-    return property.replace(/_/g, ' ')
-      .replace(/(\w+)/g, function(match) {
-        return match.charAt(0).toUpperCase() + match.slice(1);
-      });
+  formatic.valueFieldState = function (value) {
+    return Immutable.fromJS(formatic.valueFieldDef(value));
   };
 
-  var equals = formatic.equals = function (a, b) {
-    if (a && a.equals && a.equals(b)) {
-      return true;
-    } else if (b && b.equals && b.equals(a)) {
-      return true;
-    } else if (_.isEqual(a, b)) {
-      return true;
-    }
-  };
-
-  formatic.matchValueToRule = function (value, rule) {
-    if (rule.get('key')) {
-      var key = rule.get('key');
-      if (!(value.has(key))) {
-        return false;
-      }
-      if (rule.has('value')) {
-        if (!equals(value.get(key), rule.get('value'))) {
-          return false;
-        }
-      }
-      if (rule.has('notValue')) {
-        if (equals(value.get(key), rule.get('notValue'))) {
-          return false;
-        }
-      }
-    }
-    if (rule.get('notKey') && value.has(rule.get('notKey'))) {
-      return false;
-    }
-    return true;
-  };
-
-  formatic.matchValueToTemplate = function (value, template) {
-    var match = template.get('match');
-    if (!match) {
-      return true;
-    } else {
-      return _.every(match.toArray(), function (rule) {
-        return formatic.matchValueToRule(value, rule);
-      });
-    }
-  };
-
-  // formatic.compileFields = function (fields) {
-  //   return fields.map(function (field) {
-  //     return formatic.compileField(field);
-  //   });
-  // };
-
-  // formatic.compileFormDef = function (formDef) {
-  //   return formatic.compileField(formDef);
+  // formatic.createFormState = function (formDef, templateMap) {
+  //   var formState = formatic.fromJS(formDef);
+  //   var compiled = formatic.createModifiedFieldFromFormState(formState);
+  //   var inflated = formatic.inflateItems(compiled, templateMap);
+  //   return formatic.fromJS(inflated);
   // };
   //
-  // formatic.compileField = function (field) {
-  //   var typePlugin = formatic.type(field.type);
-  //   if (typePlugin.compileField) {
-  //     field = typePlugin.compileField(field);
-  //   }
-  //   if (field.fields) {
-  //     field = _.extend({}, field);
-  //     field.fields = formatic.compileFields(field.fields);
-  //   }
-  //   return field;
-  // };
-  //
-  // formatic.compileFields = function (fields) {
-  //   return fields.map(function (field) {
-  //     return formatic.compileField(field);
-  //   });
-  // };
-
-// (cursor, viewRules) -> (viewComponentDesc)
-//
-// (viewComponentDesc) -> (liveViewComponent)
-//
-// (formState, formChangeHandler) -> (cursor)
-//
-// (formDef) -> (formState)
-//
-// (formState) -> (ref)
-//
-// (viewComponentFactory) -> (viewComponentDesc)
-//
-//
-// (data, formState) -> (formState)
-//
-//
-// (id, params) -> (dataPromise)
-//
-//
-// (formState) -> (data requirements)
-//
-// (formState, action) -> (formState)
-
-  // formatic.form.wrap('init', function (next, fieldDefs) {
-  //   if (!fieldDefs) {
-  //     fieldDefs = [];
-  //   }
-  //   if (fieldDefs._cursor) {
-  //     this._cursor = fieldDefs._cursor;
-  //     this._parents = fieldDefs._parents;
-  //     //this._path = fieldDefs._path;
-  //     this._root = fieldDefs._root;
-  //   } else {
-  //     this._parents = [];
-  //     //this._path = [];
-  //     this._root = this;
-  //     var inEval = false;
-  //     // Parent form is just a reference to underlying data which is immutable.
-  //     // Keep reference updated, rather than requiring external bookkeeping.
-  //     var changeRef = function (field) {
-  //       console.log('changing...')
-  //       this._field = field;
-  //       this._cursor = field.cursor(changeRef);
-  //       if (!inEval) {
-  //         inEval = true;
-  //         this.eval();
-  //       } else {
-  //         inEval = false;
-  //         this.render();
-  //       }
-  //       console.log('the end???')
-  //     }.bind(this);
-  //
-  //     changeRef(formatic.buildFields(fieldDefs));
-  //   }
-  //   // this._parent = null;
-  //   // this._children = [];
-  //   // this._childMap = {};
-  //   // this.fields(fieldDefs);
-  //   // this._emitter = new Emitter();
-  //   return next();
-  // });
-  //
-  // formatic.idOfFieldDef = function (fieldDef) {
-  //   return fieldDef.id || fieldDef.key || null;
-  // };
-  //
-  // formatic.buildFieldIds = function (fieldDefs) {
+  // formatic.fillInFormDefIds = function (formDef) {
   //   var lastId = '';
   //   var typeIndexes = {};
   //   var map = {};
+  //   var fieldDefs = formDef;
+  //   var isArray = true;
+  //   if (!_.isArray(fieldDefs)) {
+  //     isArray = false;
+  //     fieldDefs = [fieldDefs];
+  //   }
+  //   fieldDefs = fieldDefs.map(function (fieldDef) {
+  //     return _.extend({}, fieldDef);
+  //   });
   //   fieldDefs.forEach(function (fieldDef) {
   //
   //     if (!fieldDef.type) {
@@ -1524,10 +1410,28 @@ module.exports = function (formatic) {
   //     fieldDef.id = id;
   //     map[id] = fieldDef;
   //   });
+  //
+  //   if (!isArray) {
+  //     fieldDefs = fieldDefs[0];
+  //   }
+  //
+  //   return fieldDefs;
   // };
   //
-  // formatic.buildFields = function (fieldDefs) {
-  //   if (_.isArray(fieldDefs)) {
+  // formatic.idOfFieldDef = function (fieldDef) {
+  //   return fieldDef.id || fieldDef.key || null;
+  // };
+  //
+  // formatic.createFormDefTree = function (formDef) {
+  //   formDef = formatic.createRootFormDef(formDef);
+  //   formDef = formatic.inflateFormDefTemplates(formDef);
+  //   return formDef;
+  // };
+  //
+  // formatic.createRootFormDef = function (formDef) {
+  //   if (_.isArray(formDef)) {
+  //
+  //     var fieldDefs = formDef;
   //
   //     var templates = fieldDefs.filter(function (fieldDef) {
   //       return fieldDef.template === true;
@@ -1577,22 +1481,20 @@ module.exports = function (formatic) {
   //       }
   //     });
   //
-  //     formatic.buildFieldIds(concretes);
-  //
   //     if (root && concretes.length === 0) {
-  //       return formatic.buildField(root, templateMap);
+  //       return formatic.addTemplateData(root, templateMap);
   //     } else {
   //       var concreteKeys = concretes.map(function (concrete) {
   //         return concrete.id;
   //       });
   //       if (root) {
-  //         return formatic.buildField({
+  //         return formatic.addTemplateData({
   //           id: '.',
   //           type: 'wrapper',
   //           fields: [root].concat(concreteKeys)
   //         }, templateMap);
   //       } else {
-  //         return formatic.buildField({
+  //         return formatic.addTemplateData({
   //           id: '.',
   //           type: 'object',
   //           fields: concreteKeys
@@ -1600,39 +1502,111 @@ module.exports = function (formatic) {
   //       }
   //     }
   //
-  //   } else if (_.isObject(fieldDefs)) {
-  //     var fieldDef = fieldDefs;
-  //     return formatic.buildField(fieldDef);
+  //   } else if (_.isObject(formDef)) {
+  //     return formDef;
   //   }
   // };
   //
-  // formatic.buildField = function (fieldDef, templateMap) {
+  // formatic.addTemplateData = function (formDef, templateMap) {
+  //   formDef = _.extend({}, formDef);
+  //   formDef._templates = templateMap;
+  //   return formDef;
+  // };
   //
+  // formatic.createFieldDef = function (fieldDef, templates) {
+  //   fieldDef = JSON.parse(JSON.stringify(fieldDef));
+  //   fieldDef = formatic.inflateFormDefTemplates(fieldDef, templates);
+  //   formatic.modifyField(fieldDef);
+  //   fieldDef = formatic.inflateItems(fieldDef, templates);
+  //   return fieldDef;
+  // };
+  //
+  // formatic.inflateFormDefTemplates = function (fieldDef, templateMap) {
+  //   templateMap = templateMap || fieldDef._templates || {};
   //   fieldDef = _.extend({}, fieldDef);
-  //   if (templateMap) {
-  //     fieldDef.fields = fieldDef.fields.concat({
-  //       type: 'data',
-  //       id: '_templates',
-  //       value: templateMap
+  //   if (fieldDef.fields) {
+  //     fieldDef.fields = fieldDef.fields.map(function (childDef) {
+  //       return childDef;
+  //     });
+  //     fieldDef.fields.forEach(function (childDef, i) {
+  //       if (_.isString(childDef)) {
+  //         if (templateMap[childDef]) {
+  //           var template = templateMap[childDef];
+  //           childDef = _.extend({}, template);
+  //         } else {
+  //           throw new Error('Template not found: ' + childDef);
+  //         }
+  //       }
+  //       fieldDef.fields[i] = formatic.inflateFormDefTemplates(childDef, templateMap);
   //     });
   //   }
+  //   return fieldDef;
+  // };
   //
-  //   var field = Immutable.fromJS(fieldDef);
+  // formatic.createModifiedFieldFromFormState = function (formState) {
+  //   var field = formState.toJS();
+  //   formatic.modifyField(field);
   //   return field;
   // };
   //
-  // formatic.newId = function (field, child) {
+  // formatic.modifyField = function (field, parent, i) {
+  //   var typePlugin = formatic.type(field.type);
+  //   if (typePlugin.modifyField) {
+  //     typePlugin.modifyField(field, parent, i);
+  //   }
+  //   if (field.fields) {
+  //     field.fields.forEach(function (child, i) {
+  //       formatic.modifyField(child, field, i);
+  //     });
+  //   }
+  // };
+  //
+  // formatic.inflateItems = function (field, templateMap) {
+  //   if (field.fields || field.items) {
+  //     field = _.extend({}, field);
+  //     if (field.items) {
+  //       field.items = field.items.map(function (item) {
+  //         if (_.isString(item)) {
+  //           if (!templateMap[item]) {
+  //             throw new Error('No template found for item: ', item);
+  //           }
+  //           return templateMap[item];
+  //         }
+  //       });
+  //     }
+  //     if (field.fields) {
+  //       field.fields = field.fields.map(function (child) {
+  //         return formatic.inflateItems(child, templateMap);
+  //       });
+  //     }
+  //   }
+  //
+  //   return field;
+  // };
+  //
+  // formatic.childIdMap = function (field) {
   //   var idMap = {};
-  //   field.each(function (child) {
-  //     idMap[child.id()] = true;
-  //   });
-  //   if (child.id() && !idMap[child.id()]) {
-  //     return child.id();
+  //   if (field.get && _.isFunction(field.get)) {
+  //     field.get('fields').forEach(function (child) {
+  //       idMap[child.get('id')] = true;
+  //     });
+  //   } else {
+  //     field.fields.forEach(function (child) {
+  //       idMap[child.id] = true;
+  //     });
   //   }
-  //   if (child.key() && !idMap[child.key()]) {
-  //     return child.key();
+  //   return idMap;
+  // };
+  //
+  // formatic.newId = function (field, child) {
+  //   var idMap = formatic.childIdMap(field);
+  //   if (child.id && !idMap[child.id]) {
+  //     return child.id;
   //   }
-  //   var childId = child.id() || child.key() || '__auto';
+  //   if (child.key && !idMap[child.key]) {
+  //     return child.key;
+  //   }
+  //   var childId = child.id || child.key || '__auto';
   //   childId += '__';
   //   var i = 0;
   //   var newId = childId + i;
@@ -1643,267 +1617,107 @@ module.exports = function (formatic) {
   //   return newId;
   // };
   //
-  // formatic.form.append = function (fieldDef) {
-  //   this.modify(function (field) {
-  //     var fields = field.get('fields');
-  //     var nextIndex = fields.count();
-  //     fields.set(nextIndex, Immutable.fromJS(fieldDef));
-  //     var child = this.childFromCursor(fields.get(nextIndex), field);
-  //     child.set('id', formatic.newId(field, child));
-  //     //formatic.walkEval(field._root, child);
-  //   }.bind(this));
-  // };
-  //
-  // formatic.form.remove = function (keyOrIndex) {
-  //   if (_.isNumber(keyOrIndex)) {
-  //     var index = keyOrIndex;
-  //     var fields = this.deref('fields');
-  //     if (fields.length > index) {
-  //       fields = fields.splice(index, 1).toVector();
-  //       this.set('fields', fields);
+  // formatic.fieldDefFromValue = function (value, items, templateMap) {
+  //   if (items && items.count() > 0) {
+  //     var template = _.find(items.toArray(), function (template) {
+  //       var imValue = formatic.fromJS(value);
+  //       return formatic.matchValueToTemplate(imValue, template);
+  //     });
+  //     if (template) {
+  //       return formatic.createFieldDef(template.toJS(), templateMap);
   //     }
   //   }
-  // };
-  //
-  // formatic.form.move = function (fromKeyOrIndex, toKeyOrIndex) {
-  //   if (_.isNumber(fromKeyOrIndex) && _.isNumber(toKeyOrIndex)) {
-  //     var fromIndex = fromKeyOrIndex;
-  //     var toIndex = toKeyOrIndex;
-  //
-  //     var fields = this.deref('fields');
-  //
-  //     if (fromIndex !== toIndex &&
-  //       fromIndex >= 0 && fromIndex < fields.length &&
-  //       toIndex >= 0 && toIndex < fields.length
-  //     ) {
-  //       var removedField = fields.get(fromIndex);
-  //       fields = fields.splice(fromIndex, 1).toVector();
-  //       fields = fields.splice(toIndex, 0, removedField).toVector();
-  //       this.set('fields', fields);
-  //     }
-  //   }
-  // };
-  //
-  // formatic.fieldDefFromValue = function (value) {
+  //   var fieldDef = {
+  //     type: 'json'
+  //   };
   //   if (_.isString(value)) {
-  //     return {
-  //       type: 'string',
-  //       default: value
+  //     fieldDef = {
+  //       type: 'string'
   //     };
   //   } else if (_.isArray(value)) {
   //     var arrayItemFields = value.map(function (value, i) {
-  //       var fieldDef = formatic.fieldDefFromValue(value);
-  //       fieldDef.key = i;
-  //       return fieldDef;
+  //       var childDef = formatic.fieldDefFromValue(value);
+  //       childDef.key = i;
+  //       return childDef;
   //     });
-  //     return {
+  //     fieldDef = {
   //       type: 'array',
   //       fields: arrayItemFields
   //     };
   //   } else if (_.isObject(value)) {
   //     var objectItemFields = Object.keys(value).map(function (key) {
-  //       var fieldDef = formatic.fieldDefFromValue(value[key]);
-  //       fieldDef.key = key;
-  //       fieldDef.label = formatic.humanize(key);
-  //       return fieldDef;
+  //       var childDef = formatic.fieldDefFromValue(value[key]);
+  //       childDef.key = key;
+  //       childDef.label = formatic.humanize(key);
+  //       return childDef;
   //     });
-  //     return {
+  //     fieldDef = {
   //       type: 'object',
   //       fields: objectItemFields
   //     };
   //   } else if (_.isNull(value)) {
-  //     return {
+  //     fieldDef = {
   //       type: 'null'
   //     };
   //   }
+  //   return formatic.createFieldDef(fieldDef, {});
   // };
   //
-
-  //
-  // formatic.form.fieldDefFromValue = function (value) {
-  //   var items = this.get('items');
-  //   if (items && items.count() > 0) {
-  //     var template = _.find(items.toArray(), function (template) {
-  //       var imValue = Immutable.fromJS(value);
-  //       return formatic.matchValueToTemplate(imValue, template);
+  // formatic.humanize = function(property) {
+  //   property = property.replace(/\{\{/g, '');
+  //   property = property.replace(/\}\}/g, '');
+  //   return property.replace(/_/g, ' ')
+  //     .replace(/(\w+)/g, function(match) {
+  //       return match.charAt(0).toUpperCase() + match.slice(1);
   //     });
-  //     if (template) {
-  //       return template.deref().toJS();
+  // };
+  //
+  // var equals = formatic.equals = function (a, b) {
+  //   if (a && a.equals && a.equals(b)) {
+  //     return true;
+  //   } else if (b && b.equals && b.equals(a)) {
+  //     return true;
+  //   } else if (_.isEqual(a, b)) {
+  //     return true;
+  //   }
+  // };
+  //
+  // formatic.matchValueToRule = function (value, rule) {
+  //   if (rule.get('key')) {
+  //     var key = rule.get('key');
+  //     if (!(value.has(key))) {
+  //       return false;
+  //     }
+  //     if (rule.has('value')) {
+  //       if (!equals(value.get(key), rule.get('value'))) {
+  //         return false;
+  //       }
+  //     }
+  //     if (rule.has('notValue')) {
+  //       if (equals(value.get(key), rule.get('notValue'))) {
+  //         return false;
+  //       }
   //     }
   //   }
-  //   return formatic.fieldDefFromValue(value);
-  // };
-  //
-  // formatic.addFormProperty = function (name) {
-  //   formatic.form[name] = function (value) {
-  //     if (typeof value === 'undefined') {
-  //       return this.get(name);
-  //     }
-  //     return this.set(name, value);
-  //   };
-  // };
-  //
-  // formatic.addFormProperty('type');
-  // formatic.addFormProperty('key');
-  // formatic.addFormProperty('id');
-  // formatic.addFormProperty('hidden');
-  // formatic.addFormProperty('choices');
-  // formatic.addFormProperty('default');
-  // formatic.addFormProperty('label');
-  // formatic.addFormProperty('helpText');
-  //
-  // formatic.form.typePlugin = function () {
-  //   return formatic.type(this.type());
-  // };
-  //
-  // formatic.form.childFromCursor = function (cursor, newParent) {
-  //   if (!newParent) {
-  //     newParent = this;
+  //   if (rule.get('notKey') && value.has(rule.get('notKey'))) {
+  //     return false;
   //   }
-  //   return formatic({
-  //     _cursor: cursor,
-  //     _parents: this._parents.slice(0, this._parents.length - 1).concat(newParent),
-  //     //_path: this._path.concat(index),
-  //     _root: this._root
-  //   });
+  //   return true;
   // };
   //
-  // formatic.form.cloneFromCursor = function (cursor) {
-  //   return formatic({
-  //     _cursor: cursor,
-  //     //_path: this._path,
-  //     _parents: this._parents,
-  //     _root: this._root
-  //   });
-  // };
-  //
-  // formatic.form.children = function () {
-  //   if (!this.has('fields')) {
-  //     return Immutable.Vector();
-  //   }
-  //   return this.get('fields').filter(function (field) {
-  //     return field.cursor;
-  //   }).map(function (fieldCursor) {
-  //     return this.childFromCursor(fieldCursor);
-  //   }.bind(this));
-  // };
-  //
-  // formatic.form.child = function (key) {
-  //   var children = this.children().toArray();
-  //   var matchingField = _.find(children, function (child) {
-  //     return child.id() === key || child.key() === key;
-  //   });
-  //   return matchingField;
-  // };
-  //
-  // formatic.form.each = function () {
-  //   var children = this.children();
-  //   return children.forEach.apply(children, arguments);
-  // };
-  //
-  // formatic.form.hasKey = function () {
-  //   return this.get('key') ? true : false;
-  // };
-  //
-  // formatic.form.modify = function (fn) {
-  //   var newCursor = this._cursor.withMutations(function (field) {
-  //     var cursor = field.cursor();
-  //     fn(this.cloneFromCursor(cursor));
-  //   }.bind(this));
-  //   return this.cloneFromCursor(newCursor);
-  // };
-  //
-  // formatic.form.parent = function () {
-  //   if (this._parents.length === 0) {
-  //     return null;
-  //   }
-  //   return this._parents[this._parents.length - 1];
-  // };
-  //
-  // formatic.form.index = function () {
-  //   if (this._path.length > 0) {
-  //     return this._path[this._path.length - 1];
-  //   }
-  //   return 0;
-  // };
-  //
-  // formatic.form.has = function (key) {
-  //   return this._cursor.has(key);
-  // };
-  //
-  // formatic.form.get = function (key) {
-  //   return this._cursor.get(key);
-  // };
-  //
-  // formatic.toJS = function (value) {
-  //   if (value && value.cursor) {
-  //     return value.deref().toJS();
-  //   }
-  //   return value;
-  // };
-  //
-  // formatic.form.getJS = function (key) {
-  //   return formatic.toJS(this._cursor.get(key));
-  // };
-  //
-  // formatic.form.set = function (key, value) {
-  //   if (value && value.cursor) {
-  //     return this._cursor.set(key, value);
+  // formatic.matchValueToTemplate = function (value, template) {
+  //   var match = template.get('match');
+  //   if (!match) {
+  //     return true;
   //   } else {
-  //     return this._cursor.set(key, Immutable.fromJS(value));
-  //   }
-  // };
-  //
-  // formatic.form.deref = function (key) {
-  //   if (key) {
-  //     return this._cursor.deref().get(key);
-  //   }
-  //   return this._cursor.deref();
-  // };
-  //
-  // formatic.form.find = function (key, upFrom) {
-  //   /*eslint no-loop-func:0*/
-  //
-  //   // start by looking at self
-  //   var fields = [this];
-  //
-  //   while (fields.length > 0) {
-  //     var matchingField = _.find(fields, function (field) {
-  //       return field.id() === key || field.key() === key;
+  //     return _.every(match.toArray(), function (rule) {
+  //       return formatic.matchValueToRule(value, rule);
   //     });
-  //     if (matchingField) {
-  //       return matchingField;
-  //     }
-  //     // keep going into children (breadth first)
-  //     fields = _.flatten(fields.map(function (field) {
-  //       return field.children().toArray();
-  //     }));
-  //
-  //     // just an efficiency thing; don't dig back into same child
-  //     if (upFrom) {
-  //       fields = fields.filter(function (field) {
-  //         return !(field._cursor.equals(upFrom._cursor));
-  //       });
-  //       upFrom = null;
-  //     }
   //   }
-  //
-  //   var parent = this.parent();
-  //
-  //   if (parent) {
-  //     return parent.find(key, this);
-  //   }
-  //
-  //   return null;
   // };
-  //
-  // formatic.form.findChild = function (fn) {
-  //   return _.find(this.children(), fn);
-  // };
-  //
 };
 
-},{"immutable":51,"reflux":213,"underscore":217}],7:[function(require,module,exports){
+},{"../utils":30,"immutable":59,"reflux":221,"underscore":225}],8:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -1920,31 +1734,43 @@ module.exports = function (formatic) {
     return next();
   });
 
-  formatic.needKeys = function (data, keys) {
-    keys = keys || [];
-    if (data) {
-      if (data.get('needLookupKey')) {
-        keys.push(data.get('needLookupKey'));
-      }
-      if (data.get('fields')) {
-        data.get('fields').forEach(function (field) {
-          formatic.needKeys(field, keys);
-        });
-      }
+  formatic.form.pushNeedsKey = function (key) {
+    if (this._needsKeys.indexOf(key) < 0) {
+      this._needsKeys.push(key);
     }
-    return _.unique(keys);
   };
 
-  formatic.loadNeededData = function (form) {
+  formatic.form.nextNeedsKey = function () {
+    return this._needsKeys.shift();
+  };
 
-    var keys = formatic.needKeys(form._formState);
 
-    keys.forEach(function (key) {
+  // formatic.needKeys = function (data, keys) {
+  //   keys = keys || [];
+  //   if (data) {
+  //     if (data.get('needLookupKey')) {
+  //       keys.push(data.get('needLookupKey'));
+  //     }
+  //     if (data.get('fields')) {
+  //       data.get('fields').forEach(function (field) {
+  //         formatic.needKeys(field, keys);
+  //       });
+  //     }
+  //   }
+  //   return _.unique(keys);
+  // };
+
+  formatic.loadNeededMetadata = function (form) {
+
+    var key = form.nextNeedsKey();
+
+    while (key) {
       if (!form._isLoading[key]) {
         form._isLoading[key] = true;
         formatic.loadAsyncFromSource(form, key);
       }
-    });
+      key = form.nextNeedsKey();
+    }
   };
 
   formatic.loadAsyncFromSource = function (form, key, waitTime) {
@@ -2031,7 +1857,7 @@ module.exports = function (formatic) {
   };
 };
 
-},{"component-emitter":50,"immutable":51,"objectpath":52,"underscore":217}],8:[function(require,module,exports){
+},{"component-emitter":52,"immutable":59,"objectpath":60,"underscore":225}],9:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2062,7 +1888,7 @@ module.exports = function (formatic) {
   };
 };
 
-},{"underscore":217}],9:[function(require,module,exports){
+},{"underscore":225}],10:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2076,7 +1902,7 @@ module.exports = function (formatic) {
   });
 };
 
-},{"underscore":217}],10:[function(require,module,exports){
+},{"underscore":225}],11:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2196,41 +2022,37 @@ module.exports = function (formatic) {
   // };
 
   formatic.renderFormToNode = function (form, node) {
-    var field = formatic.createModifiedFieldFromFormState(form._formState);
-    var component = formatic.component(form, field);
+    //var field = formatic.createModifiedFieldFromFormState(form._formState);
+    var component = formatic.component(form);
     React.renderComponent(formatic.view('formatic')({}, component), node);
   };
 
   formatic.component = function (form, field, props) {
 
     if (!field) {
-      field = formatic.createModifiedFieldFromFormState(form._formState);
+      field = form.field();
+      //field = formatic.createModifiedFieldFromFormState(form._formState);
     }
 
     props = _.extend({}, props);
 
     var view = formatic.viewForField(field);
 
-    var fields = [];
-
     var typePlugin = formatic.type(field.type);
 
-    if (field.fields) {
-      fields = field.fields;
-      fields = fields.map(function (field) {
-          var childTypePlugin = formatic.type(field.type);
-          if (childTypePlugin.visibleField) {
-            return childTypePlugin.visibleField(field);
-          }
-          return field;
-        }).filter(function (field) {
-          return field && !field.hidden && !typePlugin.hidden;
-        });
-    }
+    var fields = field.fields().map(function (field) {
+      var childTypePlugin = formatic.type(field.type);
+      if (childTypePlugin.visibleField) {
+        return childTypePlugin.visibleField(field);
+      }
+      return field;
+    }).filter(function (field) {
+      return field && !field.hidden && !typePlugin.hidden;
+    });
 
     props.field = field;
     props.fields = fields;
-    props.actions = form._formActions;
+    //props.actions = form._formActions;
     props.form = form;
 
     return view(props);
@@ -2288,11 +2110,12 @@ module.exports = function (formatic) {
   // };
 };
 
-},{"react":203,"underscore":217}],11:[function(require,module,exports){
+},{"react":211,"underscore":225}],12:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic) {
 
+  formatic.plugin('core-field');
   formatic.plugin('core-fn');
   formatic.plugin('core-data');
   formatic.plugin('core-type');
@@ -2301,14 +2124,14 @@ module.exports = function (formatic) {
   formatic.plugin('core-loader');
 };
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic) {
 
   formatic.plugin('core');
-  formatic.plugin('ensure-path');
-  formatic.plugin('prop-aliases');
+  // formatic.plugin('ensure-path');
+  // formatic.plugin('prop-aliases');
   formatic.plugin('ensure-default');
   formatic.plugin('ensure-fields');
   formatic.plugin('normalize-choices');
@@ -2334,55 +2157,76 @@ module.exports = function (formatic) {
   formatic.route('boolean', 'select');
 };
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 
 module.exports = function (formatic) {
 
-  formatic.wrap('modifyField', function (next, field) {
+  formatic.wrap('normalizeField', function (next, fieldState) {
 
-    var typePlugin = formatic.type(field.type);
+    var typePlugin = formatic.type(fieldState.get('type'));
 
-    if (typeof field.default === 'undefined') {
+    if (!fieldState.has('default')) {
       if (typeof typePlugin.default !== 'undefined') {
-        field.default = typePlugin.default;
+        fieldState = fieldState.set('default', formatic.fromJS(typePlugin.default));
       } else {
-        field.default = null;
+        fieldState = fieldState.set('default', null);
       }
     }
 
-    if (typeof field.value === 'undefined') {
-      field.value = field.default;
+    if (!fieldState.has('value')) {
+      fieldState = fieldState.set('value', fieldState.get('default'));
     }
 
-    return next();
+    return next(fieldState);
   });
+  //
+  // formatic.wrap('modifyField', function (next, field) {
+  //
+  //   var typePlugin = formatic.type(field.type);
+  //
+  //   if (typeof field.default === 'undefined') {
+  //     if (typeof typePlugin.default !== 'undefined') {
+  //       field.default = typePlugin.default;
+  //     } else {
+  //       field.default = null;
+  //     }
+  //   }
+  //
+  //   if (typeof field.value === 'undefined') {
+  //     field.value = field.default;
+  //   }
+  //
+  //   return next();
+  // });
 };
 
-},{"underscore":217}],14:[function(require,module,exports){
+},{"underscore":225}],15:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
 
 module.exports = function (formatic) {
 
-  formatic.wrap('modifyField', function (next, field) {
+  formatic.wrap('normalizeField', function (next, fieldState) {
 
-    var typePlugin = formatic.type(field.type);
+    var typePlugin = formatic.type(fieldState.get('type'));
 
-    if (typeof typePlugin.hasFields) {
-      if (!field.fields) {
-        field.fields = [];
+    if (typePlugin.hasFields) {
+      if (!_.isFunction(typePlugin.hasFields) || typePlugin.hasFields(fieldState)) {
+        if (!fieldState.get('fields')) {
+          fieldState = fieldState.set('fields', formatic.fromJS([]));
+        }
       }
     }
 
-    return next();
+    return next(fieldState);
   });
 };
 
-},{"underscore":217}],15:[function(require,module,exports){
+},{"underscore":225}],16:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2401,49 +2245,86 @@ module.exports = function (formatic) {
   });
 };
 
-},{"underscore":217}],16:[function(require,module,exports){
+},{"underscore":225}],17:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
+var Immutable = require('immutable');
 
 module.exports = function (formatic) {
 
-  formatic.wrap('modifyField', function (next, field) {
+  formatic.wrap('normalizeField', function (next, fieldState) {
 
-    if (field.choices) {
+    if (fieldState.get('choices')) {
 
-      var choices = field.choices;
+      var choices = fieldState.get('choices');
 
       if (_.isString(choices)) {
-        choices = choices.split(',');
+        choices = formatic.fromJS(choices.split(','));
       }
 
-      if (!_.isArray(choices) && _.isObject(choices)) {
-        choices = Object.keys(choices).map(function (key) {
-          return {
+      if (choices instanceof Immutable.Map) {
+        choices = choices.keySeq().map(function (key) {
+          return formatic.fromJS({
             value: key,
-            label: choices[key]
-          };
-        });
+            label: choices.get(key)
+          });
+        }).toVector();
       }
 
-      choices.forEach(function (choice, i) {
-        if (_.isString(choice)) {
-          choices[i] = {
-            value: choice,
-            label: choice
-          };
-        }
+      choices = choices.withMutations(function (choices) {
+        choices.forEach(function (choice, i) {
+          if (_.isString(choice)) {
+            choices.set(i, formatic.fromJS({
+              value: choice,
+              label: choice
+            }));
+          }
+        });
       });
 
-      field.choices = choices;
+      return next(fieldState.set('choices', choices));
     }
 
     return next();
   });
+
+  // formatic.wrap('modifyField', function (next, field) {
+  //
+  //   if (field.choices) {
+  //
+  //     var choices = field.choices;
+  //
+  //     if (_.isString(choices)) {
+  //       choices = choices.split(',');
+  //     }
+  //
+  //     if (!_.isArray(choices) && _.isObject(choices)) {
+  //       choices = Object.keys(choices).map(function (key) {
+  //         return {
+  //           value: key,
+  //           label: choices[key]
+  //         };
+  //       });
+  //     }
+  //
+  //     choices.forEach(function (choice, i) {
+  //       if (_.isString(choice)) {
+  //         choices[i] = {
+  //           value: choice,
+  //           label: choice
+  //         };
+  //       }
+  //     });
+  //
+  //     field.choices = choices;
+  //   }
+  //
+  //   return next();
+  // });
 };
 
-},{"underscore":217}],17:[function(require,module,exports){
+},{"immutable":59,"underscore":225}],18:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2467,51 +2348,55 @@ module.exports = function (formatic) {
   });
 };
 
-},{"underscore":217}],18:[function(require,module,exports){
+},{"underscore":225}],19:[function(require,module,exports){
 'use strict';
 
 var Reflux = require('reflux');
+var Immutable = require('immutable');
 
 module.exports = function (formatic, plugin) {
 
-  plugin.create = function (actions, formState, metaStore) {
+  plugin.create = function (actions, metaStore, form) {
 
     return Reflux.createStore({
 
       init: function () {
-        //this.history = [];
-        this.formState = formState;
-        this.templateMap = {};
-        this.metaData = {};
+        this.form = form;
+        this.rootValue = form._currentValue;
+        this.staticFormState = form._formState;
+        this.dynamicFormState = form._dynamicFormState;
+        this.meta = {};
 
         this.listenToMany(actions);
         this.listenTo(metaStore, this.onMetaStoreChanged);
       },
 
+      onReplaceForm: function (dynamicFormDef) {
+        this.updateForm(Immutable.fromJS(dynamicFormDef));
+      },
+
       onSetFormValue: function (value) {
-        this.update(formatic.setFieldValue(this.formState, value, this.templateMap));
+        this.updateValue(Immutable.fromJS(formatic.wrapValue(value)));
       },
 
       onSetValue: function (field, value) {
-        this.update(formatic.setValueOfField(this.formState, field, value));
+        this.updateValue(formatic.setValueOfField(this.rootValue, field, value));
       },
 
-      onAppend: function (field, item) {
-        this.update(formatic.appendField(this.formState, field, item, this.templateMap));
+      onAppend: function (field, itemIndex) {
+        this.updateValue(formatic.appendField(this.rootValue, field, itemIndex));
       },
 
       onRemove: function (field, index) {
-        this.update(formatic.removeField(this.formState, field, index));
+        this.updateValue(formatic.removeField(this.rootValue, field, index));
       },
 
       onMove: function (field, fromIndex, toIndex) {
-        this.update(formatic.moveField(this.formState, field, fromIndex, toIndex));
+        this.updateValue(formatic.moveField(this.rootValue, field, fromIndex, toIndex));
       },
 
       onMetaStoreChanged: function (data) {
-        // Later, may want to trigger on this. For now, just assuming one set.
-        this.templateMap = data._templateMap;
-        this.metaData = data;
+        this.meta = data;
 
         this.update();
       },
@@ -2524,24 +2409,50 @@ module.exports = function (formatic, plugin) {
       },
 
       getDefaultData: function () {
-        return this.formState;
+        return {
+          dynamicFormState: this.dynamicFormState,
+          value: this.rootValue,
+          meta: this.meta
+        };
       },
 
-      update: function (formState) {
-        formState = formState || this.formState;
-        var newFormState = formatic.updateData(formState, this.metaData);
-        if (!newFormState.equals(this.formState)) {
-          //this.history.push(this.formState);
-          this.formState = newFormState;
-          this.trigger(this.formState);
-        }
+      updateForm: function (dynamicFormState) {
+        this.update(
+          dynamicFormState,
+          this.rootValue
+        );
+      },
+
+      updateValue: function (value) {
+        this.update(
+          this.dynamicFormState,
+          value
+        );
+      },
+
+      update: function (dynamicFormState, value) {
+        this.dynamicFormState = dynamicFormState || this.dynamicFormState;
+        this.rootValue = value || this.rootValue;
+
+        this.trigger({
+          dynamicFormState: this.dynamicFormState,
+          value: this.rootValue,
+          meta: this.meta
+        });
+        // formState = formState || this.formState;
+        // var newFormState = formatic.updateData(formState, this.metaData);
+        // if (!newFormState.equals(this.formState)) {
+        //   //this.history.push(this.formState);
+        //   this.formState = newFormState;
+        //   this.trigger(this.formState);
+        // }
       }
 
     });
   };
 };
 
-},{"reflux":213}],19:[function(require,module,exports){
+},{"immutable":59,"reflux":221}],20:[function(require,module,exports){
 'use strict';
 
 var Reflux = require('reflux');
@@ -2571,7 +2482,7 @@ module.exports = function (formatic, plugin) {
   };
 };
 
-},{"reflux":213}],20:[function(require,module,exports){
+},{"reflux":221}],21:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2581,16 +2492,18 @@ module.exports = function (formatic, plugin) {
 
   plugin.default = [];
 
-  plugin.hasFields = true;
+  plugin.hasFields = function (fieldState) {
+    return !fieldState.get('choices');
+  };
 
-  plugin.getFieldValue = function (field) {
-    var array = [];
-
-    if (!field.fields || (field.fields.length === 0 && typeof field.value !== 'undefined')) {
-      return field.value;
+  plugin.getFieldValue = function (fieldState) {
+    if (!fieldState.has('fields')) {
+      return formatic.toJS(fieldState.get('value') || plugin.default);
     }
 
-    field.fields.forEach(function (child) {
+    var array = [];
+
+    fieldState.get('fields').forEach(function (child) {
       array.push(formatic.getFieldValue(child));
     });
 
@@ -2636,63 +2549,58 @@ module.exports = function (formatic, plugin) {
     });
   };
 
-  plugin.setValue = function (field, values) {
-    var children = field.children().toArray();
+  plugin.evalField = function (form, fieldState, valueState, meta, context, nextContext) {
 
-    var identities = children.map(function (child) {
-      var identity = {};
-      if (child.id()) {
-        identity.id = child.id();
-        identity.key = child.key();
+    if (valueState) {
+      var value = valueState.get('value');
+      if (value instanceof Immutable.Vector) {
+
+        var fields = Immutable.Vector();
+        fields = fields.withMutations(function (fields) {
+          value.forEach(function (childValueState, i) {
+            var item = formatic.itemForValueState(fieldState, childValueState, context);
+            item = item.set('key', i);
+            item = item.set('viewKey', childValueState.get('viewKey'));
+            fields.push(formatic.evalField(form, item, valueState, meta, nextContext));
+          });
+        });
+        fieldState = fieldState.set('fields', fields);
       }
-      return identity;
-    });
+    }
 
-    field.get('fields').clear();
-
-    values.forEach(function (value, i) {
-      var fieldDef = field.fieldDefFromValue(value);
-      if (identities[i]) {
-        _.extend(fieldDef, identities[i]);
-      }
-      fieldDef._value = value;
-      field.append(fieldDef);
-    });
-
-    field.children().forEach(function (child, i) {
-      //console.log(child._cursor.deref().toJS());
-      //child.val(values[i]);
-      //console.log(child._cursor.deref().toJS());
-    });
-
-    // if (children.count() < values.length) {
-    //   for (var i = children.count(); i < values.length; i++) {
-    //     var fieldDef = formatic.fieldDefFromValue(values[i]);
-    //     field.append(fieldDef);
-    //   }
-    // }
+    return fieldState;
   };
 };
 
-},{"immutable":51,"underscore":217}],21:[function(require,module,exports){
+},{"immutable":59,"underscore":225}],22:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic, plugin) {
 
   plugin.default = false;
 
-  plugin.modifyField = function (field) {
-    if (!field.choices) {
-      field.choices = [
+  // plugin.modifyField = function (field) {
+  //   if (!field.choices) {
+  //     field.choices = [
+  //       {value: 'true', label: 'Yes'},
+  //       {value: 'false', label: 'No'}
+  //     ];
+  //   }
+  // };
+
+  plugin.normalizeField = function (fieldState) {
+    if (!fieldState.get('choices')) {
+      return fieldState.set('choices', formatic.fromJS([
         {value: 'true', label: 'Yes'},
         {value: 'false', label: 'No'}
-      ];
+      ]));
     }
+    return fieldState;
   };
 
   plugin.getFieldValue = function (field) {
 
-    var value = field.value;
+    var value = field.get('value');
 
     if (!value) {
       return false;
@@ -2726,7 +2634,7 @@ module.exports = function (formatic, plugin) {
   };
 };
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic, plugin) {
@@ -2748,7 +2656,7 @@ module.exports = function (formatic, plugin) {
   };
 };
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic, plugin) {
@@ -2756,7 +2664,7 @@ module.exports = function (formatic, plugin) {
   plugin.default = {};
 };
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict';
 
 module.exports = function (formatic, plugin) {
@@ -2774,7 +2682,24 @@ module.exports = function (formatic, plugin) {
   };
 };
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
+'use strict';
+
+module.exports = function (formatic, plugin) {
+
+  plugin.default = 0;
+
+  plugin.getValue = function (field) {
+
+    try {
+      return parseInt(field.get('value'));
+    } catch (e) {
+      return 0;
+    }
+  };
+};
+
+},{}],27:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2786,13 +2711,19 @@ module.exports = function (formatic, plugin) {
 
   plugin.hasFields = true;
 
-  plugin.getFieldValue = function (field) {
+  plugin.getFieldValue = function (fieldState) {
     var obj = {};
-    field.fields.forEach(function (child) {
-      if (child.key) {
-        obj[child.key] = formatic.getFieldValue(child);
+
+    // if (!fieldState.has('fields') || (fieldState.get('fields').length === 0 && !fieldState.has('value'))) {
+    //   return formatic.toJS(fieldState.get('value'));
+    // }
+
+    fieldState.get('fields').forEach(function (child) {
+      if (child.get('key')) {
+        obj[child.get('key')] = formatic.getFieldValue(child);
       }
     });
+
     return obj;
   };
 
@@ -2831,9 +2762,84 @@ module.exports = function (formatic, plugin) {
       }
     });
   };
+
+  // plugin.evalField = function (form, fieldState, valueState, meta, context, nextContext) {
+  //
+  //   if (valueState) {
+  //     var value = valueState.get('value');
+  //     if (value instanceof Immutable.Vector) {
+  //
+  //       var fields = Immutable.Vector();
+  //       fields = fields.withMutations(function (fields) {
+  //         value.forEach(function (childValueState, i) {
+  //           var item = formatic.itemForValueState(fieldState, childValueState, context);
+  //           item = item.set('key', i);
+  //           item = item.set('viewKey', childValueState.get('viewKey'));
+  //           fields.push(formatic.evalField(form, item, valueState, meta, nextContext));
+  //         });
+  //       });
+  //       fieldState = fieldState.set('fields', fields);
+  //     }
+  //   }
+  //
+  //   return fieldState;
+  // };
+
+  plugin.evalField = function (form, fieldState, valueState, meta, context, nextContext) {
+
+    if (!fieldState.get('fields')) {
+      fieldState = fieldState.set('fields', Immutable.Vector([]));
+    }
+
+    if (valueState) {
+      var value = valueState.get('value');
+      if (value instanceof Immutable.Map) {
+
+        var unusedKeys = value.keySeq().toArray();
+
+        fieldState = fieldState.withMutations(function (fieldState) {
+
+          fieldState.get('fields').forEach(function (child, i) {
+            child = formatic.resolveField(child, nextContext.parents);
+            if (child.has('key')) {
+              unusedKeys = _.without(unusedKeys, child.get('key'));
+            }
+            fieldState.updateIn(['fields', i], function () {
+              return formatic.evalField(form, child, valueState, meta, nextContext);
+            });
+          });
+
+          if (unusedKeys.length > 0) {
+            unusedKeys.forEach(function (key) {
+              var childValueState = value.get(key);
+              var item = formatic.itemForValueState(fieldState, childValueState, context);
+              item = item.set('key', key);
+              item = item.set('viewKey', childValueState.get('viewKey'));
+              fieldState.updateIn(['fields'], function (fields) {
+                return fields.push(formatic.evalField(form, item, valueState, meta, nextContext));
+              });
+            });
+          }
+
+        });
+
+        return fieldState;
+
+      }
+    }
+
+    if (fieldState.get('fields')) {
+      return fieldState.set('fields', fieldState.get('fields').map(function (childState) {
+        return formatic.evalField(form, childState, valueState, meta, nextContext);
+      }).toVector());
+    }
+
+    return fieldState;
+
+  };
 };
 
-},{"immutable":51,"underscore":217}],26:[function(require,module,exports){
+},{"immutable":59,"underscore":225}],28:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2876,7 +2882,7 @@ module.exports = function (formatic, plugin) {
   };
 };
 
-},{"immutable":51,"underscore":217}],27:[function(require,module,exports){
+},{"immutable":59,"underscore":225}],29:[function(require,module,exports){
 'use strict';
 
 var _ = require('underscore');
@@ -2919,7 +2925,7 @@ module.exports = function (formatic, plugin) {
   };
 };
 
-},{"underscore":217}],28:[function(require,module,exports){
+},{"underscore":225}],30:[function(require,module,exports){
 'use strict';
 
 var utils = {};
@@ -3047,7 +3053,7 @@ utils.parseTextWithTags = function (value) {
 
 module.exports = utils;
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3071,7 +3077,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],30:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],32:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -3096,7 +3102,7 @@ module.exports = function (formatic, plugin) {
       }).filter(function (value) {
         return value;
       });
-      this.props.actions.setValue(this.props.field, values);
+      this.props.field.val(values);
     },
 
     render: function () {
@@ -3131,7 +3137,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react":203,"underscore":217}],31:[function(require,module,exports){
+},{"react":211,"underscore":225}],33:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3165,7 +3171,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],32:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],34:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3198,7 +3204,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],33:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],35:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3218,7 +3224,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],34:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],36:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3247,7 +3253,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54}],35:[function(require,module,exports){
+},{"react/addons":62}],37:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3286,7 +3292,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],36:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],38:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -3325,7 +3331,7 @@ module.exports = function (formatic, plugin) {
       var isValid = this.isValidValue(event.target.value);
 
       if (isValid) {
-        this.props.actions.setValue(this.props.field, JSON.parse(event.target.value));
+        this.props.field.val(JSON.parse(event.target.value));
       }
 
       this.setState({
@@ -3352,7 +3358,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react":203,"underscore":217}],37:[function(require,module,exports){
+},{"react":211,"underscore":225}],39:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3402,7 +3408,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],38:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],40:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3453,7 +3459,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],39:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],41:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -3494,7 +3500,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react":203,"underscore":217}],40:[function(require,module,exports){
+},{"react":211,"underscore":225}],42:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -3568,7 +3574,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react":203,"underscore":217}],41:[function(require,module,exports){
+},{"react":211,"underscore":225}],43:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -3629,6 +3635,7 @@ module.exports = function (formatic, plugin) {
 
     render: function () {
       var field = this.props.field;
+
       //var parent = this.props.parent;
       //var item = field.field;
       //var form = this.props.form;
@@ -3658,7 +3665,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react":203,"underscore":217}],42:[function(require,module,exports){
+},{"react":211,"underscore":225}],44:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3716,8 +3723,7 @@ module.exports = function (formatic, plugin) {
     // },
     //
     onAppend: function (itemIndex) {
-      var fieldDef = this.props.field.items[itemIndex];
-      this.props.actions.append(this.props.field, fieldDef);
+      this.props.field.append(itemIndex);
     //   var field = this.props.field;
     //   var item = null;
     //   if (this.refs.typeSelect) {
@@ -3758,11 +3764,11 @@ module.exports = function (formatic, plugin) {
     // },
     //
     onRemove: function (i) {
-      this.props.actions.remove(this.props.field, i);
+      this.props.field.remove(i);
     },
     //
     onMove: function (fromIndex, toIndex) {
-      this.props.actions.move(this.props.field, fromIndex, toIndex);
+      this.props.field.move(fromIndex, toIndex);
     },
 
     render: function () {
@@ -3779,7 +3785,7 @@ module.exports = function (formatic, plugin) {
           React.addons.CSSTransitionGroup({transitionName: 'reveal'},
             fields.map(function (child, i) {
               return formatic.view('list-item')({
-                key: child.id,
+                key: child.viewKey,
                 form: this.props.form,
                 field: child,
                 parent: field,
@@ -3797,7 +3803,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],43:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],45:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3821,7 +3827,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],44:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],46:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3845,7 +3851,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],45:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],47:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3869,7 +3875,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],46:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],48:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3887,7 +3893,7 @@ module.exports = function (formatic, plugin) {
     },
 
     onChange: function (event) {
-      this.props.actions.setValue(this.props.field, event.target.value);
+      this.props.field.val(event.target.value);
     },
 
     render: function () {
@@ -3914,6 +3920,8 @@ module.exports = function (formatic, plugin) {
         }
       }
 
+
+
       return formatic.view('field')({
         field: field
       }, R.select({
@@ -3932,7 +3940,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],47:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],49:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3951,7 +3959,7 @@ module.exports = function (formatic, plugin) {
 
     onChange: function (event) {
       var newValue = event.target.value;
-      this.props.actions.setValue(this.props.field, newValue);
+      this.props.field.val(newValue);
     },
 
     render: function () {
@@ -3971,7 +3979,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],48:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],50:[function(require,module,exports){
 'use strict';
 
 var React = require('react/addons');
@@ -3991,7 +3999,7 @@ module.exports = function (formatic, plugin) {
 
     onChange: function (event) {
       var newValue = event.target.value;
-      this.props.actions.setValue(this.props.field, newValue);
+      this.props.field.val(newValue);
     },
 
     render: function () {
@@ -4010,7 +4018,7 @@ module.exports = function (formatic, plugin) {
   });
 };
 
-},{"react/addons":54,"underscore":217}],49:[function(require,module,exports){
+},{"react/addons":62,"underscore":225}],51:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -4075,7 +4083,7 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -4241,7 +4249,2333 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
+module.exports = (function(){
+  /*
+   * Generated by PEG.js 0.7.0.
+   *
+   * http://pegjs.majda.cz/
+   */
+  
+  function quote(s) {
+    /*
+     * ECMA-262, 5th ed., 7.8.4: All characters may appear literally in a
+     * string literal except for the closing quote character, backslash,
+     * carriage return, line separator, paragraph separator, and line feed.
+     * Any character may appear in the form of an escape sequence.
+     *
+     * For portability, we also escape escape all control and non-ASCII
+     * characters. Note that "\0" and "\v" escape sequences are not used
+     * because JSHint does not like the first and IE the second.
+     */
+     return '"' + s
+      .replace(/\\/g, '\\\\')  // backslash
+      .replace(/"/g, '\\"')    // closing quote character
+      .replace(/\x08/g, '\\b') // backspace
+      .replace(/\t/g, '\\t')   // horizontal tab
+      .replace(/\n/g, '\\n')   // line feed
+      .replace(/\f/g, '\\f')   // form feed
+      .replace(/\r/g, '\\r')   // carriage return
+      .replace(/[\x00-\x07\x0B\x0E-\x1F\x80-\uFFFF]/g, escape)
+      + '"';
+  }
+  
+  var result = {
+    /*
+     * Parses the input with a generated parser. If the parsing is successfull,
+     * returns a value explicitly or implicitly specified by the grammar from
+     * which the parser was generated (see |PEG.buildParser|). If the parsing is
+     * unsuccessful, throws |PEG.parser.SyntaxError| describing the error.
+     */
+    parse: function(input, startRule) {
+      var parseFunctions = {
+        "start": parse_start,
+        "item": parse_item,
+        "object": parse_object,
+        "objectItem": parse_objectItem,
+        "array": parse_array,
+        "arrayItem": parse_arrayItem,
+        "call": parse_call,
+        "identifier": parse_identifier,
+        "identifierKey": parse_identifierKey,
+        "identifierStart": parse_identifierStart,
+        "identifierChar": parse_identifierChar,
+        "arguments": parse_arguments,
+        "argument": parse_argument,
+        "plainArgument": parse_plainArgument,
+        "keyValueArgument": parse_keyValueArgument,
+        "key": parse_key,
+        "boolean": parse_boolean,
+        "null": parse_null,
+        "string": parse_string,
+        "sqchars": parse_sqchars,
+        "dqchars": parse_dqchars,
+        "sqchar": parse_sqchar,
+        "dqchar": parse_dqchar,
+        "char": parse_char,
+        "number": parse_number,
+        "int": parse_int,
+        "frac": parse_frac,
+        "exp": parse_exp,
+        "digits": parse_digits,
+        "e": parse_e,
+        "digit": parse_digit,
+        "digit19": parse_digit19,
+        "hexDigit": parse_hexDigit,
+        "_": parse__,
+        "whitespace": parse_whitespace
+      };
+      
+      if (startRule !== undefined) {
+        if (parseFunctions[startRule] === undefined) {
+          throw new Error("Invalid rule name: " + quote(startRule) + ".");
+        }
+      } else {
+        startRule = "start";
+      }
+      
+      var pos = 0;
+      var reportFailures = 0;
+      var rightmostFailuresPos = 0;
+      var rightmostFailuresExpected = [];
+      
+      function padLeft(input, padding, length) {
+        var result = input;
+        
+        var padLength = length - input.length;
+        for (var i = 0; i < padLength; i++) {
+          result = padding + result;
+        }
+        
+        return result;
+      }
+      
+      function escape(ch) {
+        var charCode = ch.charCodeAt(0);
+        var escapeChar;
+        var length;
+        
+        if (charCode <= 0xFF) {
+          escapeChar = 'x';
+          length = 2;
+        } else {
+          escapeChar = 'u';
+          length = 4;
+        }
+        
+        return '\\' + escapeChar + padLeft(charCode.toString(16).toUpperCase(), '0', length);
+      }
+      
+      function matchFailed(failure) {
+        if (pos < rightmostFailuresPos) {
+          return;
+        }
+        
+        if (pos > rightmostFailuresPos) {
+          rightmostFailuresPos = pos;
+          rightmostFailuresExpected = [];
+        }
+        
+        rightmostFailuresExpected.push(failure);
+      }
+      
+      function parse_start() {
+        var result0, result1, result2, result3, result4;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse__();
+        if (result0 !== null) {
+          result1 = parse_item();
+          result1 = result1 !== null ? result1 : "";
+          if (result1 !== null) {
+            result2 = parse__();
+            if (result2 !== null) {
+              result3 = [];
+              result4 = parse_item();
+              while (result4 !== null) {
+                result3.push(result4);
+                result4 = parse_item();
+              }
+              if (result3 !== null) {
+                result0 = [result0, result1, result2, result3];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, first, rest) {
+            if (rest && rest.length > 0) {
+              return makeNode('array', [first].concat(rest));
+            } else if (first) {
+              return first;
+            } else {
+              return makeNode('empty', null);
+            }
+          })(pos0, result0[1], result0[3]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_item() {
+        var result0;
+        
+        result0 = parse_object();
+        if (result0 === null) {
+          result0 = parse_array();
+          if (result0 === null) {
+            result0 = parse_call();
+            if (result0 === null) {
+              result0 = parse_string();
+              if (result0 === null) {
+                result0 = parse_boolean();
+                if (result0 === null) {
+                  result0 = parse_number();
+                  if (result0 === null) {
+                    result0 = parse_null();
+                    if (result0 === null) {
+                      result0 = parse_identifier();
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_object() {
+        var result0, result1, result2, result3;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        if (input.charCodeAt(pos) === 123) {
+          result0 = "{";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"{\"");
+          }
+        }
+        if (result0 !== null) {
+          result1 = parse__();
+          if (result1 !== null) {
+            result2 = [];
+            result3 = parse_objectItem();
+            while (result3 !== null) {
+              result2.push(result3);
+              result3 = parse_objectItem();
+            }
+            if (result2 !== null) {
+              if (input.charCodeAt(pos) === 125) {
+                result3 = "}";
+                pos++;
+              } else {
+                result3 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"}\"");
+                }
+              }
+              if (result3 !== null) {
+                result0 = [result0, result1, result2, result3];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, props) {
+            return makeNode('object', props);
+          })(pos0, result0[2]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_objectItem() {
+        var result0, result1, result2, result3;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_keyValueArgument();
+        if (result0 !== null) {
+          result1 = parse__();
+          if (result1 !== null) {
+            if (input.charCodeAt(pos) === 44) {
+              result2 = ",";
+              pos++;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\",\"");
+              }
+            }
+            result2 = result2 !== null ? result2 : "";
+            if (result2 !== null) {
+              result3 = parse__();
+              if (result3 !== null) {
+                result0 = [result0, result1, result2, result3];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, arg) {
+            return arg;
+          })(pos0, result0[0]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_array() {
+        var result0, result1, result2, result3;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        if (input.charCodeAt(pos) === 91) {
+          result0 = "[";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"[\"");
+          }
+        }
+        if (result0 !== null) {
+          result1 = parse__();
+          if (result1 !== null) {
+            result2 = [];
+            result3 = parse_arrayItem();
+            while (result3 !== null) {
+              result2.push(result3);
+              result3 = parse_arrayItem();
+            }
+            if (result2 !== null) {
+              if (input.charCodeAt(pos) === 93) {
+                result3 = "]";
+                pos++;
+              } else {
+                result3 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"]\"");
+                }
+              }
+              if (result3 !== null) {
+                result0 = [result0, result1, result2, result3];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, items) {
+            return makeNode('array', items);
+          })(pos0, result0[2]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_arrayItem() {
+        var result0, result1, result2, result3;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_item();
+        if (result0 !== null) {
+          result1 = parse__();
+          if (result1 !== null) {
+            if (input.charCodeAt(pos) === 44) {
+              result2 = ",";
+              pos++;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\",\"");
+              }
+            }
+            result2 = result2 !== null ? result2 : "";
+            if (result2 !== null) {
+              result3 = parse__();
+              if (result3 !== null) {
+                result0 = [result0, result1, result2, result3];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, arg) {
+            return arg;
+          })(pos0, result0[0]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_call() {
+        var result0, result1, result2, result3, result4, result5;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_identifier();
+        if (result0 !== null) {
+          if (input.charCodeAt(pos) === 40) {
+            result1 = "(";
+            pos++;
+          } else {
+            result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"(\"");
+            }
+          }
+          if (result1 !== null) {
+            result2 = parse__();
+            if (result2 !== null) {
+              result3 = parse_arguments();
+              result3 = result3 !== null ? result3 : "";
+              if (result3 !== null) {
+                result4 = parse__();
+                if (result4 !== null) {
+                  if (input.charCodeAt(pos) === 41) {
+                    result5 = ")";
+                    pos++;
+                  } else {
+                    result5 = null;
+                    if (reportFailures === 0) {
+                      matchFailed("\")\"");
+                    }
+                  }
+                  if (result5 !== null) {
+                    result0 = [result0, result1, result2, result3, result4, result5];
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, name, keyValueArgs) {
+            var args = [];
+            var keys = null;
+            keyValueArgs = keyValueArgs === '' ? [] : keyValueArgs;
+            keyValueArgs.forEach(function (keyValueArg, i) {
+              if (keyValueArg.key === null) {
+                if (keys) {
+                  args.push(keys);
+                }
+                keys = null;
+                args.push(keyValueArg.value);
+              } else {
+                if (!keys) {
+                  keys = {};
+                }
+                keys[keyValueArg.key] = keyValueArg.value;
+              }
+            });
+            if (keys) {
+              args.push(keys);
+            };
+            return makeNode('call', [name, makeNode('arguments', args)]);
+          })(pos0, result0[0], result0[3]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_identifier() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_identifierStart();
+        if (result0 !== null) {
+          result1 = [];
+          result2 = parse_identifierChar();
+          while (result2 !== null) {
+            result1.push(result2);
+            result2 = parse_identifierChar();
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, first, rest) {
+            return makeNode('name', first + rest.join(''));
+          })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_identifierKey() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_identifierStart();
+        if (result0 !== null) {
+          result1 = [];
+          result2 = parse_identifierChar();
+          while (result2 !== null) {
+            result1.push(result2);
+            result2 = parse_identifierChar();
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, first, rest) {
+            return makeNode('string', first + rest.join(''));
+          })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_identifierStart() {
+        var result0;
+        
+        if (/^[$a-zA-Z_]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[$a-zA-Z_]");
+          }
+        }
+        return result0;
+      }
+      
+      function parse_identifierChar() {
+        var result0;
+        
+        if (/^[$a-zA-Z_0-9]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[$a-zA-Z_0-9]");
+          }
+        }
+        return result0;
+      }
+      
+      function parse_arguments() {
+        var result0, result1, result2, result3, result4, result5;
+        var pos0, pos1, pos2;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_argument();
+        if (result0 !== null) {
+          result1 = [];
+          pos2 = pos;
+          result2 = parse__();
+          if (result2 !== null) {
+            if (input.charCodeAt(pos) === 44) {
+              result3 = ",";
+              pos++;
+            } else {
+              result3 = null;
+              if (reportFailures === 0) {
+                matchFailed("\",\"");
+              }
+            }
+            result3 = result3 !== null ? result3 : "";
+            if (result3 !== null) {
+              result4 = parse__();
+              if (result4 !== null) {
+                result5 = parse_argument();
+                if (result5 !== null) {
+                  result2 = [result2, result3, result4, result5];
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          } else {
+            result2 = null;
+            pos = pos2;
+          }
+          while (result2 !== null) {
+            result1.push(result2);
+            pos2 = pos;
+            result2 = parse__();
+            if (result2 !== null) {
+              if (input.charCodeAt(pos) === 44) {
+                result3 = ",";
+                pos++;
+              } else {
+                result3 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\",\"");
+                }
+              }
+              result3 = result3 !== null ? result3 : "";
+              if (result3 !== null) {
+                result4 = parse__();
+                if (result4 !== null) {
+                  result5 = parse_argument();
+                  if (result5 !== null) {
+                    result2 = [result2, result3, result4, result5];
+                  } else {
+                    result2 = null;
+                    pos = pos2;
+                  }
+                } else {
+                  result2 = null;
+                  pos = pos2;
+                }
+              } else {
+                result2 = null;
+                pos = pos2;
+              }
+            } else {
+              result2 = null;
+              pos = pos2;
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, first, rest) {
+            var left = [];
+            if (first !== '') {
+              left = [first];
+            }
+            var right = [];
+            rest.forEach(function (arg) {
+              right.push(arg[3]);
+            });
+            return left.concat(right);
+          })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_argument() {
+        var result0;
+        
+        result0 = parse_keyValueArgument();
+        if (result0 === null) {
+          result0 = parse_plainArgument();
+        }
+        return result0;
+      }
+      
+      function parse_plainArgument() {
+        var result0;
+        var pos0;
+        
+        pos0 = pos;
+        result0 = parse_item();
+        if (result0 !== null) {
+          result0 = (function(offset, arg) {
+            return {key: null, value: arg};
+          })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_keyValueArgument() {
+        var result0, result1, result2, result3, result4;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_key();
+        if (result0 !== null) {
+          result1 = parse__();
+          if (result1 !== null) {
+            if (input.charCodeAt(pos) === 58) {
+              result2 = ":";
+              pos++;
+            } else {
+              result2 = null;
+              if (reportFailures === 0) {
+                matchFailed("\":\"");
+              }
+            }
+            if (result2 !== null) {
+              result3 = parse__();
+              if (result3 !== null) {
+                result4 = parse_item();
+                if (result4 !== null) {
+                  result0 = [result0, result1, result2, result3, result4];
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, name, value) {
+            return makeNode('property', [name, value]);
+          })(pos0, result0[0], result0[4]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_key() {
+        var result0;
+        
+        result0 = parse_identifierKey();
+        if (result0 === null) {
+          result0 = parse_string();
+        }
+        return result0;
+      }
+      
+      function parse_boolean() {
+        var result0;
+        var pos0;
+        
+        pos0 = pos;
+        if (input.substr(pos, 4) === "true") {
+          result0 = "true";
+          pos += 4;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"true\"");
+          }
+        }
+        if (result0 === null) {
+          if (input.substr(pos, 5) === "false") {
+            result0 = "false";
+            pos += 5;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"false\"");
+            }
+          }
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, isTrue) {
+            return makeNode('boolean', isTrue === 'true' ? true : false);
+          })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_null() {
+        var result0;
+        var pos0;
+        
+        pos0 = pos;
+        if (input.substr(pos, 4) === "null") {
+          result0 = "null";
+          pos += 4;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"null\"");
+          }
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, name) {
+            return makeNode('null', null);
+          })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_string() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        if (input.charCodeAt(pos) === 34) {
+          result0 = "\"";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"\\\"\"");
+          }
+        }
+        if (result0 !== null) {
+          if (input.charCodeAt(pos) === 34) {
+            result1 = "\"";
+            pos++;
+          } else {
+            result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"\\\"\"");
+            }
+          }
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset) { return makeNode('string', ""); })(pos0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        if (result0 === null) {
+          pos0 = pos;
+          pos1 = pos;
+          if (input.charCodeAt(pos) === 39) {
+            result0 = "'";
+            pos++;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"'\"");
+            }
+          }
+          if (result0 !== null) {
+            if (input.charCodeAt(pos) === 39) {
+              result1 = "'";
+              pos++;
+            } else {
+              result1 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"'\"");
+              }
+            }
+            if (result1 !== null) {
+              result0 = [result0, result1];
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+          if (result0 !== null) {
+            result0 = (function(offset) { return makeNode('string', ""); })(pos0);
+          }
+          if (result0 === null) {
+            pos = pos0;
+          }
+          if (result0 === null) {
+            pos0 = pos;
+            pos1 = pos;
+            if (input.charCodeAt(pos) === 34) {
+              result0 = "\"";
+              pos++;
+            } else {
+              result0 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"\\\"\"");
+              }
+            }
+            if (result0 !== null) {
+              result1 = parse_dqchars();
+              if (result1 !== null) {
+                if (input.charCodeAt(pos) === 34) {
+                  result2 = "\"";
+                  pos++;
+                } else {
+                  result2 = null;
+                  if (reportFailures === 0) {
+                    matchFailed("\"\\\"\"");
+                  }
+                }
+                if (result2 !== null) {
+                  result0 = [result0, result1, result2];
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+            if (result0 !== null) {
+              result0 = (function(offset, chars) { return makeNode('string', chars); })(pos0, result0[1]);
+            }
+            if (result0 === null) {
+              pos = pos0;
+            }
+            if (result0 === null) {
+              pos0 = pos;
+              pos1 = pos;
+              if (input.charCodeAt(pos) === 39) {
+                result0 = "'";
+                pos++;
+              } else {
+                result0 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"'\"");
+                }
+              }
+              if (result0 !== null) {
+                result1 = parse_sqchars();
+                if (result1 !== null) {
+                  if (input.charCodeAt(pos) === 39) {
+                    result2 = "'";
+                    pos++;
+                  } else {
+                    result2 = null;
+                    if (reportFailures === 0) {
+                      matchFailed("\"'\"");
+                    }
+                  }
+                  if (result2 !== null) {
+                    result0 = [result0, result1, result2];
+                  } else {
+                    result0 = null;
+                    pos = pos1;
+                  }
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+              if (result0 !== null) {
+                result0 = (function(offset, chars) { return makeNode('string', chars); })(pos0, result0[1]);
+              }
+              if (result0 === null) {
+                pos = pos0;
+              }
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_sqchars() {
+        var result0, result1;
+        var pos0;
+        
+        pos0 = pos;
+        result1 = parse_sqchar();
+        if (result1 !== null) {
+          result0 = [];
+          while (result1 !== null) {
+            result0.push(result1);
+            result1 = parse_sqchar();
+          }
+        } else {
+          result0 = null;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, chars) { return chars.join(""); })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_dqchars() {
+        var result0, result1;
+        var pos0;
+        
+        pos0 = pos;
+        result1 = parse_dqchar();
+        if (result1 !== null) {
+          result0 = [];
+          while (result1 !== null) {
+            result0.push(result1);
+            result1 = parse_dqchar();
+          }
+        } else {
+          result0 = null;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, chars) { return chars.join(""); })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_sqchar() {
+        var result0;
+        
+        if (/^[^'\\\0-\x1F]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[^'\\\\\\0-\\x1F]");
+          }
+        }
+        if (result0 === null) {
+          result0 = parse_char();
+        }
+        return result0;
+      }
+      
+      function parse_dqchar() {
+        var result0;
+        
+        if (/^[^"\\\0-\x1F]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[^\"\\\\\\0-\\x1F]");
+          }
+        }
+        if (result0 === null) {
+          result0 = parse_char();
+        }
+        return result0;
+      }
+      
+      function parse_char() {
+        var result0, result1, result2, result3, result4;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        if (input.substr(pos, 2) === "\\\"") {
+          result0 = "\\\"";
+          pos += 2;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\"\\\\\\\"\"");
+          }
+        }
+        if (result0 !== null) {
+          result0 = (function(offset) { return '"';  })(pos0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        if (result0 === null) {
+          pos0 = pos;
+          if (input.substr(pos, 2) === "\\'") {
+            result0 = "\\'";
+            pos += 2;
+          } else {
+            result0 = null;
+            if (reportFailures === 0) {
+              matchFailed("\"\\\\'\"");
+            }
+          }
+          if (result0 !== null) {
+            result0 = (function(offset) { return "'";  })(pos0);
+          }
+          if (result0 === null) {
+            pos = pos0;
+          }
+          if (result0 === null) {
+            pos0 = pos;
+            if (input.substr(pos, 2) === "\\\\") {
+              result0 = "\\\\";
+              pos += 2;
+            } else {
+              result0 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"\\\\\\\\\"");
+              }
+            }
+            if (result0 !== null) {
+              result0 = (function(offset) { return "\\"; })(pos0);
+            }
+            if (result0 === null) {
+              pos = pos0;
+            }
+            if (result0 === null) {
+              pos0 = pos;
+              if (input.substr(pos, 2) === "\\/") {
+                result0 = "\\/";
+                pos += 2;
+              } else {
+                result0 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"\\\\/\"");
+                }
+              }
+              if (result0 !== null) {
+                result0 = (function(offset) { return "/";  })(pos0);
+              }
+              if (result0 === null) {
+                pos = pos0;
+              }
+              if (result0 === null) {
+                pos0 = pos;
+                if (input.substr(pos, 2) === "\\b") {
+                  result0 = "\\b";
+                  pos += 2;
+                } else {
+                  result0 = null;
+                  if (reportFailures === 0) {
+                    matchFailed("\"\\\\b\"");
+                  }
+                }
+                if (result0 !== null) {
+                  result0 = (function(offset) { return "\b"; })(pos0);
+                }
+                if (result0 === null) {
+                  pos = pos0;
+                }
+                if (result0 === null) {
+                  pos0 = pos;
+                  if (input.substr(pos, 2) === "\\f") {
+                    result0 = "\\f";
+                    pos += 2;
+                  } else {
+                    result0 = null;
+                    if (reportFailures === 0) {
+                      matchFailed("\"\\\\f\"");
+                    }
+                  }
+                  if (result0 !== null) {
+                    result0 = (function(offset) { return "\f"; })(pos0);
+                  }
+                  if (result0 === null) {
+                    pos = pos0;
+                  }
+                  if (result0 === null) {
+                    pos0 = pos;
+                    if (input.substr(pos, 2) === "\\n") {
+                      result0 = "\\n";
+                      pos += 2;
+                    } else {
+                      result0 = null;
+                      if (reportFailures === 0) {
+                        matchFailed("\"\\\\n\"");
+                      }
+                    }
+                    if (result0 !== null) {
+                      result0 = (function(offset) { return "\n"; })(pos0);
+                    }
+                    if (result0 === null) {
+                      pos = pos0;
+                    }
+                    if (result0 === null) {
+                      pos0 = pos;
+                      if (input.substr(pos, 2) === "\\r") {
+                        result0 = "\\r";
+                        pos += 2;
+                      } else {
+                        result0 = null;
+                        if (reportFailures === 0) {
+                          matchFailed("\"\\\\r\"");
+                        }
+                      }
+                      if (result0 !== null) {
+                        result0 = (function(offset) { return "\r"; })(pos0);
+                      }
+                      if (result0 === null) {
+                        pos = pos0;
+                      }
+                      if (result0 === null) {
+                        pos0 = pos;
+                        if (input.substr(pos, 2) === "\\t") {
+                          result0 = "\\t";
+                          pos += 2;
+                        } else {
+                          result0 = null;
+                          if (reportFailures === 0) {
+                            matchFailed("\"\\\\t\"");
+                          }
+                        }
+                        if (result0 !== null) {
+                          result0 = (function(offset) { return "\t"; })(pos0);
+                        }
+                        if (result0 === null) {
+                          pos = pos0;
+                        }
+                        if (result0 === null) {
+                          pos0 = pos;
+                          pos1 = pos;
+                          if (input.substr(pos, 2) === "\\u") {
+                            result0 = "\\u";
+                            pos += 2;
+                          } else {
+                            result0 = null;
+                            if (reportFailures === 0) {
+                              matchFailed("\"\\\\u\"");
+                            }
+                          }
+                          if (result0 !== null) {
+                            result1 = parse_hexDigit();
+                            if (result1 !== null) {
+                              result2 = parse_hexDigit();
+                              if (result2 !== null) {
+                                result3 = parse_hexDigit();
+                                if (result3 !== null) {
+                                  result4 = parse_hexDigit();
+                                  if (result4 !== null) {
+                                    result0 = [result0, result1, result2, result3, result4];
+                                  } else {
+                                    result0 = null;
+                                    pos = pos1;
+                                  }
+                                } else {
+                                  result0 = null;
+                                  pos = pos1;
+                                }
+                              } else {
+                                result0 = null;
+                                pos = pos1;
+                              }
+                            } else {
+                              result0 = null;
+                              pos = pos1;
+                            }
+                          } else {
+                            result0 = null;
+                            pos = pos1;
+                          }
+                          if (result0 !== null) {
+                            result0 = (function(offset, h1, h2, h3, h4) {
+                                return String.fromCharCode(parseInt("0x" + h1 + h2 + h3 + h4));
+                              })(pos0, result0[1], result0[2], result0[3], result0[4]);
+                          }
+                          if (result0 === null) {
+                            pos = pos0;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_number() {
+        var result0, result1, result2, result3;
+        var pos0, pos1;
+        
+        reportFailures++;
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_int();
+        if (result0 !== null) {
+          result1 = parse_frac();
+          if (result1 !== null) {
+            result2 = parse_exp();
+            if (result2 !== null) {
+              result3 = parse__();
+              if (result3 !== null) {
+                result0 = [result0, result1, result2, result3];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, int_, frac, exp) { return makeNode('float', parseFloat(int_ + frac + exp)); })(pos0, result0[0], result0[1], result0[2]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        if (result0 === null) {
+          pos0 = pos;
+          pos1 = pos;
+          result0 = parse_int();
+          if (result0 !== null) {
+            result1 = parse_frac();
+            if (result1 !== null) {
+              result2 = parse__();
+              if (result2 !== null) {
+                result0 = [result0, result1, result2];
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+          if (result0 !== null) {
+            result0 = (function(offset, int_, frac) { return makeNode('float', parseFloat(int_ + frac));       })(pos0, result0[0], result0[1]);
+          }
+          if (result0 === null) {
+            pos = pos0;
+          }
+          if (result0 === null) {
+            pos0 = pos;
+            pos1 = pos;
+            result0 = parse_int();
+            if (result0 !== null) {
+              result1 = parse_exp();
+              if (result1 !== null) {
+                result2 = parse__();
+                if (result2 !== null) {
+                  result0 = [result0, result1, result2];
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+            if (result0 !== null) {
+              result0 = (function(offset, int_, exp) { return makeNode('integer', parseFloat(int_ + exp));        })(pos0, result0[0], result0[1]);
+            }
+            if (result0 === null) {
+              pos = pos0;
+            }
+            if (result0 === null) {
+              pos0 = pos;
+              pos1 = pos;
+              result0 = parse_int();
+              if (result0 !== null) {
+                result1 = parse__();
+                if (result1 !== null) {
+                  result0 = [result0, result1];
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+              if (result0 !== null) {
+                result0 = (function(offset, int_) { return makeNode('integer', parseFloat(int_));              })(pos0, result0[0]);
+              }
+              if (result0 === null) {
+                pos = pos0;
+              }
+            }
+          }
+        }
+        reportFailures--;
+        if (reportFailures === 0 && result0 === null) {
+          matchFailed("number");
+        }
+        return result0;
+      }
+      
+      function parse_int() {
+        var result0, result1, result2;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_digit19();
+        if (result0 !== null) {
+          result1 = parse_digits();
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, digit19, digits) { return digit19 + digits;       })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        if (result0 === null) {
+          result0 = parse_digit();
+          if (result0 === null) {
+            pos0 = pos;
+            pos1 = pos;
+            if (input.charCodeAt(pos) === 45) {
+              result0 = "-";
+              pos++;
+            } else {
+              result0 = null;
+              if (reportFailures === 0) {
+                matchFailed("\"-\"");
+              }
+            }
+            if (result0 !== null) {
+              result1 = parse_digit19();
+              if (result1 !== null) {
+                result2 = parse_digits();
+                if (result2 !== null) {
+                  result0 = [result0, result1, result2];
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+            } else {
+              result0 = null;
+              pos = pos1;
+            }
+            if (result0 !== null) {
+              result0 = (function(offset, digit19, digits) { return "-" + digit19 + digits; })(pos0, result0[1], result0[2]);
+            }
+            if (result0 === null) {
+              pos = pos0;
+            }
+            if (result0 === null) {
+              pos0 = pos;
+              pos1 = pos;
+              if (input.charCodeAt(pos) === 45) {
+                result0 = "-";
+                pos++;
+              } else {
+                result0 = null;
+                if (reportFailures === 0) {
+                  matchFailed("\"-\"");
+                }
+              }
+              if (result0 !== null) {
+                result1 = parse_digit();
+                if (result1 !== null) {
+                  result0 = [result0, result1];
+                } else {
+                  result0 = null;
+                  pos = pos1;
+                }
+              } else {
+                result0 = null;
+                pos = pos1;
+              }
+              if (result0 !== null) {
+                result0 = (function(offset, digit) { return "-" + digit;            })(pos0, result0[1]);
+              }
+              if (result0 === null) {
+                pos = pos0;
+              }
+            }
+          }
+        }
+        return result0;
+      }
+      
+      function parse_frac() {
+        var result0, result1;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        if (input.charCodeAt(pos) === 46) {
+          result0 = ".";
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("\".\"");
+          }
+        }
+        if (result0 !== null) {
+          result1 = parse_digits();
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, digits) { return "." + digits; })(pos0, result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_exp() {
+        var result0, result1;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        result0 = parse_e();
+        if (result0 !== null) {
+          result1 = parse_digits();
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, e, digits) { return e + digits; })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_digits() {
+        var result0, result1;
+        var pos0;
+        
+        pos0 = pos;
+        result1 = parse_digit();
+        if (result1 !== null) {
+          result0 = [];
+          while (result1 !== null) {
+            result0.push(result1);
+            result1 = parse_digit();
+          }
+        } else {
+          result0 = null;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, digits) { return digits.join(""); })(pos0, result0);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_e() {
+        var result0, result1;
+        var pos0, pos1;
+        
+        pos0 = pos;
+        pos1 = pos;
+        if (/^[eE]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[eE]");
+          }
+        }
+        if (result0 !== null) {
+          if (/^[+\-]/.test(input.charAt(pos))) {
+            result1 = input.charAt(pos);
+            pos++;
+          } else {
+            result1 = null;
+            if (reportFailures === 0) {
+              matchFailed("[+\\-]");
+            }
+          }
+          result1 = result1 !== null ? result1 : "";
+          if (result1 !== null) {
+            result0 = [result0, result1];
+          } else {
+            result0 = null;
+            pos = pos1;
+          }
+        } else {
+          result0 = null;
+          pos = pos1;
+        }
+        if (result0 !== null) {
+          result0 = (function(offset, e, sign) { return e + sign; })(pos0, result0[0], result0[1]);
+        }
+        if (result0 === null) {
+          pos = pos0;
+        }
+        return result0;
+      }
+      
+      function parse_digit() {
+        var result0;
+        
+        if (/^[0-9]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[0-9]");
+          }
+        }
+        return result0;
+      }
+      
+      function parse_digit19() {
+        var result0;
+        
+        if (/^[1-9]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[1-9]");
+          }
+        }
+        return result0;
+      }
+      
+      function parse_hexDigit() {
+        var result0;
+        
+        if (/^[0-9a-fA-F]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[0-9a-fA-F]");
+          }
+        }
+        return result0;
+      }
+      
+      function parse__() {
+        var result0, result1;
+        
+        result0 = [];
+        result1 = parse_whitespace();
+        while (result1 !== null) {
+          result0.push(result1);
+          result1 = parse_whitespace();
+        }
+        return result0;
+      }
+      
+      function parse_whitespace() {
+        var result0;
+        
+        if (/^[ \t\n\r]/.test(input.charAt(pos))) {
+          result0 = input.charAt(pos);
+          pos++;
+        } else {
+          result0 = null;
+          if (reportFailures === 0) {
+            matchFailed("[ \\t\\n\\r]");
+          }
+        }
+        return result0;
+      }
+      
+      
+      function cleanupExpected(expected) {
+        expected.sort();
+        
+        var lastExpected = null;
+        var cleanExpected = [];
+        for (var i = 0; i < expected.length; i++) {
+          if (expected[i] !== lastExpected) {
+            cleanExpected.push(expected[i]);
+            lastExpected = expected[i];
+          }
+        }
+        return cleanExpected;
+      }
+      
+      function computeErrorPosition() {
+        /*
+         * The first idea was to use |String.split| to break the input up to the
+         * error position along newlines and derive the line and column from
+         * there. However IE's |split| implementation is so broken that it was
+         * enough to prevent it.
+         */
+        
+        var line = 1;
+        var column = 1;
+        var seenCR = false;
+        
+        for (var i = 0; i < Math.max(pos, rightmostFailuresPos); i++) {
+          var ch = input.charAt(i);
+          if (ch === "\n") {
+            if (!seenCR) { line++; }
+            column = 1;
+            seenCR = false;
+          } else if (ch === "\r" || ch === "\u2028" || ch === "\u2029") {
+            line++;
+            column = 1;
+            seenCR = true;
+          } else {
+            column++;
+            seenCR = false;
+          }
+        }
+        
+        return { line: line, column: column };
+      }
+      
+      
+        var makeNode = function (type, value) {
+          if (Array.isArray(value)) {
+            return {type: type, nodes: value};
+          } else {
+            return {type: type, value: value};
+          }
+        }
+      
+      
+      var result = parseFunctions[startRule]();
+      
+      /*
+       * The parser is now in one of the following three states:
+       *
+       * 1. The parser successfully parsed the whole input.
+       *
+       *    - |result !== null|
+       *    - |pos === input.length|
+       *    - |rightmostFailuresExpected| may or may not contain something
+       *
+       * 2. The parser successfully parsed only a part of the input.
+       *
+       *    - |result !== null|
+       *    - |pos < input.length|
+       *    - |rightmostFailuresExpected| may or may not contain something
+       *
+       * 3. The parser did not successfully parse any part of the input.
+       *
+       *   - |result === null|
+       *   - |pos === 0|
+       *   - |rightmostFailuresExpected| contains at least one failure
+       *
+       * All code following this comment (including called functions) must
+       * handle these states.
+       */
+      if (result === null || pos !== input.length) {
+        var offset = Math.max(pos, rightmostFailuresPos);
+        var found = offset < input.length ? input.charAt(offset) : null;
+        var errorPosition = computeErrorPosition();
+        
+        throw new this.SyntaxError(
+          cleanupExpected(rightmostFailuresExpected),
+          found,
+          offset,
+          errorPosition.line,
+          errorPosition.column
+        );
+      }
+      
+      return result;
+    },
+    
+    /* Returns the parser source code. */
+    toSource: function() { return this._source; }
+  };
+  
+  /* Thrown when a parser encounters a syntax error. */
+  
+  result.SyntaxError = function(expected, found, offset, line, column) {
+    function buildMessage(expected, found) {
+      var expectedHumanized, foundHumanized;
+      
+      switch (expected.length) {
+        case 0:
+          expectedHumanized = "end of input";
+          break;
+        case 1:
+          expectedHumanized = expected[0];
+          break;
+        default:
+          expectedHumanized = expected.slice(0, expected.length - 1).join(", ")
+            + " or "
+            + expected[expected.length - 1];
+      }
+      
+      foundHumanized = found ? quote(found) : "end of input";
+      
+      return "Expected " + expectedHumanized + " but " + foundHumanized + " found.";
+    }
+    
+    this.name = "SyntaxError";
+    this.expected = expected;
+    this.found = found;
+    this.message = buildMessage(expected, found);
+    this.offset = offset;
+    this.line = line;
+    this.column = column;
+  };
+  
+  result.SyntaxError.prototype = Error.prototype;
+  
+  return result;
+})()
+},{}],54:[function(require,module,exports){
+var parser = require('./generated/funql-parser');
+
+// node type hierarchy
+
+// node
+//   list
+//     call
+//     array
+//     object
+//     property
+//     arguments
+//   item
+//     value
+//       boolean
+//       number
+//         integer
+//         float
+//       string
+//       null
+//       empty
+//     name
+
+var typeHierarchy = {
+  node: ['list', 'item'],
+  list: ['call', 'array', 'object', 'property', 'arguments'],
+  item: ['value', 'name'],
+  value: ['boolean', 'number', 'string', 'null', 'empty'],
+  number: ['integer', 'float']
+};
+
+var parentTypes = {};
+
+Object.keys(typeHierarchy).forEach(function (type) {
+  typeHierarchy[type].forEach(function (childType) {
+    parentTypes[childType] = type;
+  });
+});
+
+var trim = function (str) {
+  return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+};
+
+var makeCompiler = function (_handlers) {
+  var handlers = {};
+  Object.keys(_handlers).forEach(function (originalKey) {
+    originalKey.split(',').map(function (splitKey) {
+      return trim(splitKey);
+    }).forEach(function (trimKey) {
+      handlers[trimKey] = _handlers[originalKey];
+    });
+  });
+  ['node', 'list', 'item', 'value', 'number'].forEach(function (parentType) {
+    if (handlers[parentType]) {
+      typeHierarchy[parentType].forEach(function (childType) {
+        if (!handlers[childType]) {
+          handlers[childType] = handlers[parentType];
+        }
+      });
+    }
+  });
+  var hasWrapHandler = false;
+  if (handlers.wrap_node) {
+    hasWrapHandler = true;
+  }
+  var compileNodes = function (context, canWrap, nodes, extendContext) {
+    return nodes.map(function (node) {
+      return compileNode(context, canWrap, node, extendContext);
+    });
+  };
+  var compileNode = function (context, canWrap, node, extendContext) {
+    if (Array.isArray(node)) {
+      return compileNodes(context, canWrap, node, extendContext);
+    }
+    var suffix = '';
+    if (node.type === 'name') {
+      suffix = '_' + node.value;
+    } else if (node.type === 'call') {
+      if (node.nodes[0].type === 'name') {
+        suffix = '_' + node.nodes[0].value;
+      }
+    }
+    context = Object.create(context);
+    extendContext = extendContext || {};
+    Object.keys(extendContext).forEach(function (key) {
+      context[key] = extendContext[key];
+    });
+    var type = node.type;
+    if (node.type === 'wrap_root') {
+      node = node.nodes[0];
+    } else if (canWrap && hasWrapHandler) {
+      type = 'wrap_node';
+      canWrap = false;
+    } else if (!canWrap) {
+      canWrap = true;
+    }
+    if (handlers[type + suffix]) {
+      return handlers[type + suffix](node, compileNode.bind(null, context, canWrap), context);
+    } else if (handlers[type]) {
+      return handlers[type](node, compileNode.bind(null, context, canWrap), context);
+    } else if (parentTypes[type] && handlers[parentTypes[type]]) {
+      return handlers[parentTypes[type]](node, compileNode.bind(null, context, canWrap), context);
+    } else {
+      throw new Error('no handler for node type: ' + node.type);
+    }
+  };
+
+  return function (source, context) {
+    var ast;
+    if (typeof source === 'string') {
+      ast = parser.parse(source);
+    } else {
+      ast = source;
+    }
+    context = context || {};
+    if (handlers.wrap_root) {
+      ast = {
+        type: 'wrap_root',
+        nodes: [ast]
+      };
+    }
+    return compileNode(context, true, ast, null);
+  };
+};
+
+var node = function (type, value) {
+  if (Array.isArray(value)) {
+    return {type: type, nodes: value};
+  } else {
+    return {type: type, value: value};
+  }
+};
+
+var sourceCompile = makeCompiler(require('./lib/compilers/source'));
+var replaceCompile = makeCompiler(require('./lib/compilers/replace'));
+var javascriptCompile = makeCompiler(require('./lib/compilers/javascript'));
+
+module.exports = {
+  parse: parser.parse.bind(parser),
+  compiler: makeCompiler,
+  node: node,
+  source: sourceCompile,
+  build: replaceCompile,
+  toFunction: require('./lib/to-function')(javascriptCompile),
+  compilers: {
+    source: sourceCompile,
+    replace: replaceCompile,
+    javascript: javascriptCompile
+  }
+};
+
+},{"./generated/funql-parser":53,"./lib/compilers/javascript":55,"./lib/compilers/replace":56,"./lib/compilers/source":57,"./lib/to-function":58}],55:[function(require,module,exports){
+var binaryFunctions = {
+  'or': '||',
+  'and': '&&'
+};
+
+var specialFunctions = {
+  'if': function (args, compile) {
+    var conditional = 'null';
+    var thenExpr = 'null';
+    var elseExpr = 'null';
+    if (args.length >= 1) {
+      conditional = compile(args[0]);
+      thenExpr = conditional;
+    }
+    if (args.length >= 2) {
+      thenExpr = compile(args[1]);
+    }
+    if (args.length >= 3) {
+      elseExpr = compile(args[2]);
+    }
+    return '(' + conditional + ' ? ' + thenExpr + ' : ' + elseExpr + ')';
+  },
+  'fn': function (args, compile) {
+    if (args.length > 0) {
+      var paramsNode = args[0];
+      if (paramsNode.type === 'array') {
+        params = compile(paramsNode.nodes, {isFnParams: true});
+      }
+    }
+    var body = '';
+    if (args.length > 1) {
+      body = compile(args[1], {fnParams: params});
+    }
+    return '(function (' + params.join(',') + ') {return ' + body + '})';
+  }
+};
+
+var globalNames = {
+  'null': true,
+  'true': true,
+  'false': true
+};
+
+module.exports = {
+  call: function (node, compile) {
+    var callee = compile(node.nodes[0], {isCallee: true});
+    if (binaryFunctions[callee]) {
+      var args = node.nodes[1].nodes;
+      return '(' + compile(args).join(' ' + binaryFunctions[callee] + ' ') + ')';
+    } else if (specialFunctions[callee]) {
+      return specialFunctions[callee](node.nodes[1].nodes, compile);
+    }
+    return callee + compile(node.nodes[1]);
+  },
+  name: function (node, compile, context) {
+    var name = node.value;
+    if (context.isFnParams) {
+      return name;
+    } else if (context.isCallee) {
+      if (binaryFunctions[name] || specialFunctions[name]) {
+        return name;
+      } else {
+        return 'functions.' + name;
+      }
+    } else if (context.fnParams && context.fnParams.indexOf(name) >= 0) {
+      return name;
+    } else {
+      return 'context.' + name;
+    }
+    if (globalNames[name] || binaryFunctions[name]) {
+      return name;
+    }
+  },
+  arguments: function (node, compile) {
+    return '(' + compile(node.nodes).join(',') + ')';
+  },
+  empty: function () {
+    return '';
+  },
+  value: function (node, compile) {
+    return JSON.stringify(node.value);
+  },
+  array: function (node, compile) {
+    return '[' + compile(node.nodes).join(', ') + ']';
+  },
+  object: function (node, compile) {
+    return '{' + compile(node.nodes).join(', ') + '}';
+  },
+  property: function (node, compile) {
+    return compile(node.nodes[0]) + ':' + compile(node.nodes[1]);
+  }
+};
+
+},{}],56:[function(require,module,exports){
+var sourceRules = require('./source');
+
+var replaceRules = {
+  name: function (node, compile, context) {
+    if (context[node.value]) {
+      return JSON.stringify(context[node.value]);
+    } else {
+      return node.value;
+    }
+  }
+};
+
+Object.keys(sourceRules).forEach(function (key) {
+  if (!replaceRules[key]) {
+    replaceRules[key] = sourceRules[key];
+  }
+});
+
+module.exports = replaceRules;
+},{"./source":57}],57:[function(require,module,exports){
+module.exports = {
+  call: function (node, compile) {
+    return compile(node.nodes[0]) + compile(node.nodes[1]);
+  },
+  name: function (node, compile) {
+    return node.value;
+  },
+  arguments: function (node, compile) {
+    return '(' + compile(node.nodes).join(',') + ')';
+  },
+  empty: function () {
+    return '';
+  },
+  value: function (node, compile) {
+    return JSON.stringify(node.value);
+  },
+  array: function (node, compile) {
+    return '[' + compile(node.nodes).join(' ') + ']';
+  },
+  object: function (node, compile) {
+    return '{' + compile(node.nodes).join(' ') + '}';
+  },
+  property: function (node, compile) {
+    return compile(node.nodes[0]) + ':' + compile(node.nodes[1]);
+  }
+};
+},{}],58:[function(require,module,exports){
+var toArray = function (arguments) {
+  return Array.prototype.slice.call(arguments, 0);
+};
+
+var methodFunction = function (name) {
+  return function (obj) {
+    var args = toArray(arguments).slice(1);
+    return obj[name].apply(obj, args);
+  };
+};
+
+var propFunction = function (name) {
+  return function (obj) {
+    return obj[name];
+  };
+};
+
+var globalFnMap = {
+  abs: Math.abs,
+  max: Math.max,
+  min: Math.min,
+  round: Math.round,
+  pow: Math.pow,
+  sqrt: Math.sqrt,
+
+  slice: methodFunction('slice'),
+  concat: methodFunction('concat'),
+  indexOf: methodFunction('indexOf'),
+  lastIndexOf: methodFunction('lastIndexOf'),
+  replace: methodFunction('replace'),
+  split: methodFunction('split'),
+  substr: methodFunction('substr'),
+  substring: methodFunction('substring'),
+  toLowerCase: methodFunction('toLowerCase'),
+  toUpperCase: methodFunction('toUpperCase'),
+  trim: methodFunction('trim'),
+  trimLeft: methodFunction('trimLeft'),
+  trimRight: methodFunction('trimRight'),
+  join: methodFunction('join'),
+  reverse: methodFunction('reverse'),
+  filter: methodFunction('filter'),
+  map: methodFunction('map'),
+  reduce: methodFunction('reduce'),
+
+  length: propFunction('length'),
+
+  sum: function () {
+    var sum = 0;
+    for (var i = 0; i < arguments.length; i++) {
+      sum += arguments[i];
+    }
+    return sum;
+  },
+
+  get: function (obj, keys) {
+    if (arguments.length === 0) {
+      return undefined;
+    }
+    keys = keys || [];
+    if (!Array.isArray(keys)) {
+      keys = [keys];
+    }
+    if (keys.length === 0) {
+      return obj;
+    }
+    var key = keys[0];
+    if (obj[key]) {
+      return globalFnMap.get(obj[key], keys.slice(1));
+    }
+  }
+};
+
+toFunction = function (javascriptCompile, source, fnMap) {
+  fnMap = fnMap || {};
+  var fullFnMap = {};
+  Object.keys(globalFnMap).forEach(function (key) {
+    fullFnMap[key] = globalFnMap[key];
+  });
+  Object.keys(fnMap).forEach(function (key) {
+    var fn = fnMap[key];
+    if (typeof fn === 'function') {
+      fullFnMap[key] = fn;
+    }
+  });
+  var expression = javascriptCompile(source);
+  return new Function('functions', 'context', 'context = context || {}; return ' + expression).bind(null, fullFnMap);
+};
+
+module.exports = function (javascriptCompile) {
+  return toFunction.bind(null, javascriptCompile);
+};
+
+},{}],59:[function(require,module,exports){
 /**
  *  Copyright (c) 2014, Facebook, Inc.
  *  All rights reserved.
@@ -7216,10 +9550,10 @@ typeof exports === 'object' ? module.exports = universalModule() :
   typeof define === 'function' && define.amd ? define(universalModule) :
     Immutable = universalModule();
 
-},{}],52:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 module.exports = require('./lib/ObjectPath.js').ObjectPath;
 
-},{"./lib/ObjectPath.js":53}],53:[function(require,module,exports){
+},{"./lib/ObjectPath.js":61}],61:[function(require,module,exports){
 'use strict';
 
 ;!function(undefined) {
@@ -7322,10 +9656,10 @@ module.exports = require('./lib/ObjectPath.js').ObjectPath;
 		window.ObjectPath = ObjectPath;
 	}
 }();
-},{}],54:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 module.exports = require('./lib/ReactWithAddons');
 
-},{"./lib/ReactWithAddons":136}],55:[function(require,module,exports){
+},{"./lib/ReactWithAddons":144}],63:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -7359,7 +9693,7 @@ var AutoFocusMixin = {
 
 module.exports = AutoFocusMixin;
 
-},{"./focusNode":167}],56:[function(require,module,exports){
+},{"./focusNode":175}],64:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -7478,7 +9812,7 @@ var CSSCore = {
 module.exports = CSSCore;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],57:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],65:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -7601,7 +9935,7 @@ var CSSProperty = {
 
 module.exports = CSSProperty;
 
-},{}],58:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -7700,7 +10034,7 @@ var CSSPropertyOperations = {
 
 module.exports = CSSPropertyOperations;
 
-},{"./CSSProperty":57,"./dangerousStyleValue":162,"./escapeTextForBrowser":165,"./hyphenate":177,"./memoizeStringOnly":187}],59:[function(require,module,exports){
+},{"./CSSProperty":65,"./dangerousStyleValue":170,"./escapeTextForBrowser":173,"./hyphenate":185,"./memoizeStringOnly":195}],67:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -8089,7 +10423,7 @@ var ChangeEventPlugin = {
 
 module.exports = ChangeEventPlugin;
 
-},{"./EventConstants":69,"./EventPluginHub":71,"./EventPropagators":74,"./ExecutionEnvironment":75,"./ReactUpdates":135,"./SyntheticEvent":143,"./isEventSupported":180,"./isTextInputElement":182,"./keyOf":186}],60:[function(require,module,exports){
+},{"./EventConstants":77,"./EventPluginHub":79,"./EventPropagators":82,"./ExecutionEnvironment":83,"./ReactUpdates":143,"./SyntheticEvent":151,"./isEventSupported":188,"./isTextInputElement":190,"./keyOf":194}],68:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -8121,7 +10455,7 @@ var ClientReactRootIndex = {
 
 module.exports = ClientReactRootIndex;
 
-},{}],61:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -8383,7 +10717,7 @@ var CompositionEventPlugin = {
 
 module.exports = CompositionEventPlugin;
 
-},{"./EventConstants":69,"./EventPropagators":74,"./ExecutionEnvironment":75,"./ReactInputSelection":110,"./SyntheticCompositionEvent":141,"./getTextContentAccessor":175,"./keyOf":186}],62:[function(require,module,exports){
+},{"./EventConstants":77,"./EventPropagators":82,"./ExecutionEnvironment":83,"./ReactInputSelection":118,"./SyntheticCompositionEvent":149,"./getTextContentAccessor":183,"./keyOf":194}],70:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -8556,7 +10890,7 @@ var DOMChildrenOperations = {
 
 module.exports = DOMChildrenOperations;
 
-},{"./Danger":65,"./ReactMultiChildUpdateTypes":117,"./getTextContentAccessor":175}],63:[function(require,module,exports){
+},{"./Danger":73,"./ReactMultiChildUpdateTypes":125,"./getTextContentAccessor":183}],71:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -8830,7 +11164,7 @@ var DOMProperty = {
 module.exports = DOMProperty;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],64:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],72:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -9015,7 +11349,7 @@ var DOMPropertyOperations = {
 module.exports = DOMPropertyOperations;
 
 }).call(this,require("FWaASH"))
-},{"./DOMProperty":63,"./escapeTextForBrowser":165,"./memoizeStringOnly":187,"./warning":202,"FWaASH":49}],65:[function(require,module,exports){
+},{"./DOMProperty":71,"./escapeTextForBrowser":173,"./memoizeStringOnly":195,"./warning":210,"FWaASH":51}],73:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -9206,7 +11540,7 @@ var Danger = {
 module.exports = Danger;
 
 }).call(this,require("FWaASH"))
-},{"./ExecutionEnvironment":75,"./createNodesFromMarkup":159,"./emptyFunction":163,"./getMarkupWrap":172,"./invariant":179,"FWaASH":49}],66:[function(require,module,exports){
+},{"./ExecutionEnvironment":83,"./createNodesFromMarkup":167,"./emptyFunction":171,"./getMarkupWrap":180,"./invariant":187,"FWaASH":51}],74:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -9404,7 +11738,7 @@ var DefaultDOMPropertyConfig = {
 
 module.exports = DefaultDOMPropertyConfig;
 
-},{"./DOMProperty":63}],67:[function(require,module,exports){
+},{"./DOMProperty":71}],75:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -9450,7 +11784,7 @@ var DefaultEventPluginOrder = [
 
 module.exports = DefaultEventPluginOrder;
 
-},{"./keyOf":186}],68:[function(require,module,exports){
+},{"./keyOf":194}],76:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -9597,7 +11931,7 @@ var EnterLeaveEventPlugin = {
 
 module.exports = EnterLeaveEventPlugin;
 
-},{"./EventConstants":69,"./EventPropagators":74,"./ReactMount":114,"./SyntheticMouseEvent":146,"./keyOf":186}],69:[function(require,module,exports){
+},{"./EventConstants":77,"./EventPropagators":82,"./ReactMount":122,"./SyntheticMouseEvent":154,"./keyOf":194}],77:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -9675,7 +12009,7 @@ var EventConstants = {
 
 module.exports = EventConstants;
 
-},{"./keyMirror":185}],70:[function(require,module,exports){
+},{"./keyMirror":193}],78:[function(require,module,exports){
 (function (process){
 /**
  * @providesModule EventListener
@@ -9748,7 +12082,7 @@ var EventListener = {
 module.exports = EventListener;
 
 }).call(this,require("FWaASH"))
-},{"./emptyFunction":163,"FWaASH":49}],71:[function(require,module,exports){
+},{"./emptyFunction":171,"FWaASH":51}],79:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10047,7 +12381,7 @@ var EventPluginHub = {
 module.exports = EventPluginHub;
 
 }).call(this,require("FWaASH"))
-},{"./EventPluginRegistry":72,"./EventPluginUtils":73,"./ExecutionEnvironment":75,"./accumulate":152,"./forEachAccumulated":168,"./invariant":179,"./isEventSupported":180,"./monitorCodeUse":192,"FWaASH":49}],72:[function(require,module,exports){
+},{"./EventPluginRegistry":80,"./EventPluginUtils":81,"./ExecutionEnvironment":83,"./accumulate":160,"./forEachAccumulated":176,"./invariant":187,"./isEventSupported":188,"./monitorCodeUse":200,"FWaASH":51}],80:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10332,7 +12666,7 @@ var EventPluginRegistry = {
 module.exports = EventPluginRegistry;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],73:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],81:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10550,7 +12884,7 @@ var EventPluginUtils = {
 module.exports = EventPluginUtils;
 
 }).call(this,require("FWaASH"))
-},{"./EventConstants":69,"./invariant":179,"FWaASH":49}],74:[function(require,module,exports){
+},{"./EventConstants":77,"./invariant":187,"FWaASH":51}],82:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10697,7 +13031,7 @@ var EventPropagators = {
 module.exports = EventPropagators;
 
 }).call(this,require("FWaASH"))
-},{"./EventConstants":69,"./EventPluginHub":71,"./accumulate":152,"./forEachAccumulated":168,"FWaASH":49}],75:[function(require,module,exports){
+},{"./EventConstants":77,"./EventPluginHub":79,"./accumulate":160,"./forEachAccumulated":176,"FWaASH":51}],83:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -10743,7 +13077,7 @@ var ExecutionEnvironment = {
 
 module.exports = ExecutionEnvironment;
 
-},{}],76:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -10791,7 +13125,7 @@ var LinkedStateMixin = {
 
 module.exports = LinkedStateMixin;
 
-},{"./ReactLink":112,"./ReactStateSetters":129}],77:[function(require,module,exports){
+},{"./ReactLink":120,"./ReactStateSetters":137}],85:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -10955,7 +13289,7 @@ var LinkedValueUtils = {
 module.exports = LinkedValueUtils;
 
 }).call(this,require("FWaASH"))
-},{"./ReactPropTypes":123,"./invariant":179,"./warning":202,"FWaASH":49}],78:[function(require,module,exports){
+},{"./ReactPropTypes":131,"./invariant":187,"./warning":210,"FWaASH":51}],86:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -11020,7 +13354,7 @@ var MobileSafariClickEventPlugin = {
 
 module.exports = MobileSafariClickEventPlugin;
 
-},{"./EventConstants":69,"./emptyFunction":163}],79:[function(require,module,exports){
+},{"./EventConstants":77,"./emptyFunction":171}],87:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -11143,7 +13477,7 @@ var PooledClass = {
 module.exports = PooledClass;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],80:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],88:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -11244,7 +13578,7 @@ React.version = '0.10.0';
 module.exports = React;
 
 }).call(this,require("FWaASH"))
-},{"./DOMPropertyOperations":64,"./EventPluginUtils":73,"./ExecutionEnvironment":75,"./ReactChildren":84,"./ReactComponent":85,"./ReactCompositeComponent":87,"./ReactContext":88,"./ReactCurrentOwner":89,"./ReactDOM":90,"./ReactDOMComponent":92,"./ReactDefaultInjection":102,"./ReactInstanceHandles":111,"./ReactMount":114,"./ReactMultiChild":116,"./ReactPerf":119,"./ReactPropTypes":123,"./ReactServerRendering":127,"./ReactTextComponent":131,"./onlyChild":195,"FWaASH":49}],81:[function(require,module,exports){
+},{"./DOMPropertyOperations":72,"./EventPluginUtils":81,"./ExecutionEnvironment":83,"./ReactChildren":92,"./ReactComponent":93,"./ReactCompositeComponent":95,"./ReactContext":96,"./ReactCurrentOwner":97,"./ReactDOM":98,"./ReactDOMComponent":100,"./ReactDefaultInjection":110,"./ReactInstanceHandles":119,"./ReactMount":122,"./ReactMultiChild":124,"./ReactPerf":127,"./ReactPropTypes":131,"./ReactServerRendering":135,"./ReactTextComponent":139,"./onlyChild":203,"FWaASH":51}],89:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -11290,7 +13624,7 @@ var ReactBrowserComponentMixin = {
 module.exports = ReactBrowserComponentMixin;
 
 }).call(this,require("FWaASH"))
-},{"./ReactMount":114,"./invariant":179,"FWaASH":49}],82:[function(require,module,exports){
+},{"./ReactMount":122,"./invariant":187,"FWaASH":51}],90:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -11357,7 +13691,7 @@ var ReactCSSTransitionGroup = React.createClass({
 
 module.exports = ReactCSSTransitionGroup;
 
-},{"./React":80,"./ReactCSSTransitionGroupChild":83,"./ReactTransitionGroup":134}],83:[function(require,module,exports){
+},{"./React":88,"./ReactCSSTransitionGroupChild":91,"./ReactTransitionGroup":142}],91:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -11499,7 +13833,7 @@ var ReactCSSTransitionGroupChild = React.createClass({
 module.exports = ReactCSSTransitionGroupChild;
 
 }).call(this,require("FWaASH"))
-},{"./CSSCore":56,"./React":80,"./ReactTransitionEvents":133,"./onlyChild":195,"FWaASH":49}],84:[function(require,module,exports){
+},{"./CSSCore":64,"./React":88,"./ReactTransitionEvents":141,"./onlyChild":203,"FWaASH":51}],92:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -11635,7 +13969,7 @@ var ReactChildren = {
 module.exports = ReactChildren;
 
 }).call(this,require("FWaASH"))
-},{"./PooledClass":79,"./invariant":179,"./traverseAllChildren":200,"FWaASH":49}],85:[function(require,module,exports){
+},{"./PooledClass":87,"./invariant":187,"./traverseAllChildren":208,"FWaASH":51}],93:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -12234,7 +14568,7 @@ var ReactComponent = {
 module.exports = ReactComponent;
 
 }).call(this,require("FWaASH"))
-},{"./ReactCurrentOwner":89,"./ReactOwner":118,"./ReactUpdates":135,"./invariant":179,"./keyMirror":185,"./merge":188,"./monitorCodeUse":192,"FWaASH":49}],86:[function(require,module,exports){
+},{"./ReactCurrentOwner":97,"./ReactOwner":126,"./ReactUpdates":143,"./invariant":187,"./keyMirror":193,"./merge":196,"./monitorCodeUse":200,"FWaASH":51}],94:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -12362,7 +14696,7 @@ var ReactComponentBrowserEnvironment = {
 module.exports = ReactComponentBrowserEnvironment;
 
 }).call(this,require("FWaASH"))
-},{"./ReactDOMIDOperations":94,"./ReactMarkupChecksum":113,"./ReactMount":114,"./ReactPerf":119,"./ReactReconcileTransaction":125,"./getReactRootElementInContainer":174,"./invariant":179,"FWaASH":49}],87:[function(require,module,exports){
+},{"./ReactDOMIDOperations":102,"./ReactMarkupChecksum":121,"./ReactMount":122,"./ReactPerf":127,"./ReactReconcileTransaction":133,"./getReactRootElementInContainer":182,"./invariant":187,"FWaASH":51}],95:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -13953,7 +16287,7 @@ var ReactCompositeComponent = {
 module.exports = ReactCompositeComponent;
 
 }).call(this,require("FWaASH"))
-},{"./ReactComponent":85,"./ReactContext":88,"./ReactCurrentOwner":89,"./ReactErrorUtils":105,"./ReactOwner":118,"./ReactPerf":119,"./ReactPropTransferer":120,"./ReactPropTypeLocationNames":121,"./ReactPropTypeLocations":122,"./ReactUpdates":135,"./instantiateReactComponent":178,"./invariant":179,"./keyMirror":185,"./merge":188,"./mixInto":191,"./monitorCodeUse":192,"./objMap":193,"./shouldUpdateReactComponent":198,"./warning":202,"FWaASH":49}],88:[function(require,module,exports){
+},{"./ReactComponent":93,"./ReactContext":96,"./ReactCurrentOwner":97,"./ReactErrorUtils":113,"./ReactOwner":126,"./ReactPerf":127,"./ReactPropTransferer":128,"./ReactPropTypeLocationNames":129,"./ReactPropTypeLocations":130,"./ReactUpdates":143,"./instantiateReactComponent":186,"./invariant":187,"./keyMirror":193,"./merge":196,"./mixInto":199,"./monitorCodeUse":200,"./objMap":201,"./shouldUpdateReactComponent":206,"./warning":210,"FWaASH":51}],96:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -14022,7 +16356,7 @@ var ReactContext = {
 
 module.exports = ReactContext;
 
-},{"./merge":188}],89:[function(require,module,exports){
+},{"./merge":196}],97:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -14063,7 +16397,7 @@ var ReactCurrentOwner = {
 
 module.exports = ReactCurrentOwner;
 
-},{}],90:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -14272,7 +16606,7 @@ ReactDOM.injection = injection;
 
 module.exports = ReactDOM;
 
-},{"./ReactDOMComponent":92,"./mergeInto":190,"./objMapKeyVal":194}],91:[function(require,module,exports){
+},{"./ReactDOMComponent":100,"./mergeInto":198,"./objMapKeyVal":202}],99:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -14343,7 +16677,7 @@ var ReactDOMButton = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMButton;
 
-},{"./AutoFocusMixin":55,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./keyMirror":185}],92:[function(require,module,exports){
+},{"./AutoFocusMixin":63,"./ReactBrowserComponentMixin":89,"./ReactCompositeComponent":95,"./ReactDOM":98,"./keyMirror":193}],100:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -14763,7 +17097,7 @@ mixInto(ReactDOMComponent, ReactBrowserComponentMixin);
 module.exports = ReactDOMComponent;
 
 }).call(this,require("FWaASH"))
-},{"./CSSPropertyOperations":58,"./DOMProperty":63,"./DOMPropertyOperations":64,"./ReactBrowserComponentMixin":81,"./ReactComponent":85,"./ReactEventEmitter":106,"./ReactMount":114,"./ReactMultiChild":116,"./ReactPerf":119,"./escapeTextForBrowser":165,"./invariant":179,"./keyOf":186,"./merge":188,"./mixInto":191,"FWaASH":49}],93:[function(require,module,exports){
+},{"./CSSPropertyOperations":66,"./DOMProperty":71,"./DOMPropertyOperations":72,"./ReactBrowserComponentMixin":89,"./ReactComponent":93,"./ReactEventEmitter":114,"./ReactMount":122,"./ReactMultiChild":124,"./ReactPerf":127,"./escapeTextForBrowser":173,"./invariant":187,"./keyOf":194,"./merge":196,"./mixInto":199,"FWaASH":51}],101:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -14827,7 +17161,7 @@ var ReactDOMForm = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMForm;
 
-},{"./EventConstants":69,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./ReactEventEmitter":106}],94:[function(require,module,exports){
+},{"./EventConstants":77,"./ReactBrowserComponentMixin":89,"./ReactCompositeComponent":95,"./ReactDOM":98,"./ReactEventEmitter":114}],102:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -15049,7 +17383,7 @@ var ReactDOMIDOperations = {
 module.exports = ReactDOMIDOperations;
 
 }).call(this,require("FWaASH"))
-},{"./CSSPropertyOperations":58,"./DOMChildrenOperations":62,"./DOMPropertyOperations":64,"./ReactMount":114,"./ReactPerf":119,"./invariant":179,"FWaASH":49}],95:[function(require,module,exports){
+},{"./CSSPropertyOperations":66,"./DOMChildrenOperations":70,"./DOMPropertyOperations":72,"./ReactMount":122,"./ReactPerf":127,"./invariant":187,"FWaASH":51}],103:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15112,7 +17446,7 @@ var ReactDOMImg = ReactCompositeComponent.createClass({
 
 module.exports = ReactDOMImg;
 
-},{"./EventConstants":69,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./ReactEventEmitter":106}],96:[function(require,module,exports){
+},{"./EventConstants":77,"./ReactBrowserComponentMixin":89,"./ReactCompositeComponent":95,"./ReactDOM":98,"./ReactEventEmitter":114}],104:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -15298,7 +17632,7 @@ var ReactDOMInput = ReactCompositeComponent.createClass({
 module.exports = ReactDOMInput;
 
 }).call(this,require("FWaASH"))
-},{"./AutoFocusMixin":55,"./DOMPropertyOperations":64,"./LinkedValueUtils":77,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./ReactMount":114,"./invariant":179,"./merge":188,"FWaASH":49}],97:[function(require,module,exports){
+},{"./AutoFocusMixin":63,"./DOMPropertyOperations":72,"./LinkedValueUtils":85,"./ReactBrowserComponentMixin":89,"./ReactCompositeComponent":95,"./ReactDOM":98,"./ReactMount":122,"./invariant":187,"./merge":196,"FWaASH":51}],105:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -15357,7 +17691,7 @@ var ReactDOMOption = ReactCompositeComponent.createClass({
 module.exports = ReactDOMOption;
 
 }).call(this,require("FWaASH"))
-},{"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./warning":202,"FWaASH":49}],98:[function(require,module,exports){
+},{"./ReactBrowserComponentMixin":89,"./ReactCompositeComponent":95,"./ReactDOM":98,"./warning":210,"FWaASH":51}],106:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -15541,7 +17875,7 @@ var ReactDOMSelect = ReactCompositeComponent.createClass({
 module.exports = ReactDOMSelect;
 
 }).call(this,require("FWaASH"))
-},{"./AutoFocusMixin":55,"./LinkedValueUtils":77,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./invariant":179,"./merge":188,"FWaASH":49}],99:[function(require,module,exports){
+},{"./AutoFocusMixin":63,"./LinkedValueUtils":85,"./ReactBrowserComponentMixin":89,"./ReactCompositeComponent":95,"./ReactDOM":98,"./invariant":187,"./merge":196,"FWaASH":51}],107:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15732,7 +18066,7 @@ var ReactDOMSelection = {
 
 module.exports = ReactDOMSelection;
 
-},{"./getNodeForCharacterOffset":173,"./getTextContentAccessor":175}],100:[function(require,module,exports){
+},{"./getNodeForCharacterOffset":181,"./getTextContentAccessor":183}],108:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -15880,7 +18214,7 @@ var ReactDOMTextarea = ReactCompositeComponent.createClass({
 module.exports = ReactDOMTextarea;
 
 }).call(this,require("FWaASH"))
-},{"./AutoFocusMixin":55,"./DOMPropertyOperations":64,"./LinkedValueUtils":77,"./ReactBrowserComponentMixin":81,"./ReactCompositeComponent":87,"./ReactDOM":90,"./invariant":179,"./merge":188,"./warning":202,"FWaASH":49}],101:[function(require,module,exports){
+},{"./AutoFocusMixin":63,"./DOMPropertyOperations":72,"./LinkedValueUtils":85,"./ReactBrowserComponentMixin":89,"./ReactCompositeComponent":95,"./ReactDOM":98,"./invariant":187,"./merge":196,"./warning":210,"FWaASH":51}],109:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -15957,7 +18291,7 @@ var ReactDefaultBatchingStrategy = {
 
 module.exports = ReactDefaultBatchingStrategy;
 
-},{"./ReactUpdates":135,"./Transaction":150,"./emptyFunction":163,"./mixInto":191}],102:[function(require,module,exports){
+},{"./ReactUpdates":143,"./Transaction":158,"./emptyFunction":171,"./mixInto":199}],110:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -16086,7 +18420,7 @@ module.exports = {
 };
 
 }).call(this,require("FWaASH"))
-},{"./ChangeEventPlugin":59,"./ClientReactRootIndex":60,"./CompositionEventPlugin":61,"./DefaultDOMPropertyConfig":66,"./DefaultEventPluginOrder":67,"./EnterLeaveEventPlugin":68,"./ExecutionEnvironment":75,"./MobileSafariClickEventPlugin":78,"./ReactBrowserComponentMixin":81,"./ReactComponentBrowserEnvironment":86,"./ReactDOM":90,"./ReactDOMButton":91,"./ReactDOMForm":93,"./ReactDOMImg":95,"./ReactDOMInput":96,"./ReactDOMOption":97,"./ReactDOMSelect":98,"./ReactDOMTextarea":100,"./ReactDefaultBatchingStrategy":101,"./ReactDefaultPerf":103,"./ReactEventTopLevelCallback":108,"./ReactInjection":109,"./ReactInstanceHandles":111,"./ReactMount":114,"./SelectEventPlugin":137,"./ServerReactRootIndex":138,"./SimpleEventPlugin":139,"./createFullPageComponent":158,"FWaASH":49}],103:[function(require,module,exports){
+},{"./ChangeEventPlugin":67,"./ClientReactRootIndex":68,"./CompositionEventPlugin":69,"./DefaultDOMPropertyConfig":74,"./DefaultEventPluginOrder":75,"./EnterLeaveEventPlugin":76,"./ExecutionEnvironment":83,"./MobileSafariClickEventPlugin":86,"./ReactBrowserComponentMixin":89,"./ReactComponentBrowserEnvironment":94,"./ReactDOM":98,"./ReactDOMButton":99,"./ReactDOMForm":101,"./ReactDOMImg":103,"./ReactDOMInput":104,"./ReactDOMOption":105,"./ReactDOMSelect":106,"./ReactDOMTextarea":108,"./ReactDefaultBatchingStrategy":109,"./ReactDefaultPerf":111,"./ReactEventTopLevelCallback":116,"./ReactInjection":117,"./ReactInstanceHandles":119,"./ReactMount":122,"./SelectEventPlugin":145,"./ServerReactRootIndex":146,"./SimpleEventPlugin":147,"./createFullPageComponent":166,"FWaASH":51}],111:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -16332,7 +18666,7 @@ var ReactDefaultPerf = {
 
 module.exports = ReactDefaultPerf;
 
-},{"./DOMProperty":63,"./ReactDefaultPerfAnalysis":104,"./ReactMount":114,"./ReactPerf":119,"./performanceNow":196}],104:[function(require,module,exports){
+},{"./DOMProperty":71,"./ReactDefaultPerfAnalysis":112,"./ReactMount":122,"./ReactPerf":127,"./performanceNow":204}],112:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -16533,7 +18867,7 @@ var ReactDefaultPerfAnalysis = {
 
 module.exports = ReactDefaultPerfAnalysis;
 
-},{"./merge":188}],105:[function(require,module,exports){
+},{"./merge":196}],113:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -16572,7 +18906,7 @@ var ReactErrorUtils = {
 
 module.exports = ReactErrorUtils;
 
-},{}],106:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -16915,7 +19249,7 @@ var ReactEventEmitter = merge(ReactEventEmitterMixin, {
 module.exports = ReactEventEmitter;
 
 }).call(this,require("FWaASH"))
-},{"./EventConstants":69,"./EventListener":70,"./EventPluginHub":71,"./EventPluginRegistry":72,"./ExecutionEnvironment":75,"./ReactEventEmitterMixin":107,"./ViewportMetrics":151,"./invariant":179,"./isEventSupported":180,"./merge":188,"FWaASH":49}],107:[function(require,module,exports){
+},{"./EventConstants":77,"./EventListener":78,"./EventPluginHub":79,"./EventPluginRegistry":80,"./ExecutionEnvironment":83,"./ReactEventEmitterMixin":115,"./ViewportMetrics":159,"./invariant":187,"./isEventSupported":188,"./merge":196,"FWaASH":51}],115:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -16974,7 +19308,7 @@ var ReactEventEmitterMixin = {
 
 module.exports = ReactEventEmitterMixin;
 
-},{"./EventPluginHub":71,"./ReactUpdates":135}],108:[function(require,module,exports){
+},{"./EventPluginHub":79,"./ReactUpdates":143}],116:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -17125,7 +19459,7 @@ var ReactEventTopLevelCallback = {
 
 module.exports = ReactEventTopLevelCallback;
 
-},{"./PooledClass":79,"./ReactEventEmitter":106,"./ReactInstanceHandles":111,"./ReactMount":114,"./getEventTarget":171,"./mixInto":191}],109:[function(require,module,exports){
+},{"./PooledClass":87,"./ReactEventEmitter":114,"./ReactInstanceHandles":119,"./ReactMount":122,"./getEventTarget":179,"./mixInto":199}],117:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -17170,7 +19504,7 @@ var ReactInjection = {
 
 module.exports = ReactInjection;
 
-},{"./DOMProperty":63,"./EventPluginHub":71,"./ReactComponent":85,"./ReactCompositeComponent":87,"./ReactDOM":90,"./ReactEventEmitter":106,"./ReactPerf":119,"./ReactRootIndex":126,"./ReactUpdates":135}],110:[function(require,module,exports){
+},{"./DOMProperty":71,"./EventPluginHub":79,"./ReactComponent":93,"./ReactCompositeComponent":95,"./ReactDOM":98,"./ReactEventEmitter":114,"./ReactPerf":127,"./ReactRootIndex":134,"./ReactUpdates":143}],118:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -17313,7 +19647,7 @@ var ReactInputSelection = {
 
 module.exports = ReactInputSelection;
 
-},{"./ReactDOMSelection":99,"./containsNode":155,"./focusNode":167,"./getActiveElement":169}],111:[function(require,module,exports){
+},{"./ReactDOMSelection":107,"./containsNode":163,"./focusNode":175,"./getActiveElement":177}],119:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -17655,7 +19989,7 @@ var ReactInstanceHandles = {
 module.exports = ReactInstanceHandles;
 
 }).call(this,require("FWaASH"))
-},{"./ReactRootIndex":126,"./invariant":179,"FWaASH":49}],112:[function(require,module,exports){
+},{"./ReactRootIndex":134,"./invariant":187,"FWaASH":51}],120:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -17711,7 +20045,7 @@ function ReactLink(value, requestChange) {
 
 module.exports = ReactLink;
 
-},{}],113:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -17766,7 +20100,7 @@ var ReactMarkupChecksum = {
 
 module.exports = ReactMarkupChecksum;
 
-},{"./adler32":153}],114:[function(require,module,exports){
+},{"./adler32":161}],122:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -18419,7 +20753,7 @@ var ReactMount = {
 module.exports = ReactMount;
 
 }).call(this,require("FWaASH"))
-},{"./DOMProperty":63,"./ReactEventEmitter":106,"./ReactInstanceHandles":111,"./ReactPerf":119,"./containsNode":155,"./getReactRootElementInContainer":174,"./instantiateReactComponent":178,"./invariant":179,"./shouldUpdateReactComponent":198,"FWaASH":49}],115:[function(require,module,exports){
+},{"./DOMProperty":71,"./ReactEventEmitter":114,"./ReactInstanceHandles":119,"./ReactPerf":127,"./containsNode":163,"./getReactRootElementInContainer":182,"./instantiateReactComponent":186,"./invariant":187,"./shouldUpdateReactComponent":206,"FWaASH":51}],123:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -18516,7 +20850,7 @@ PooledClass.addPoolingTo(ReactMountReady);
 
 module.exports = ReactMountReady;
 
-},{"./PooledClass":79,"./mixInto":191}],116:[function(require,module,exports){
+},{"./PooledClass":87,"./mixInto":199}],124:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -18950,7 +21284,7 @@ var ReactMultiChild = {
 
 module.exports = ReactMultiChild;
 
-},{"./ReactComponent":85,"./ReactMultiChildUpdateTypes":117,"./flattenChildren":166,"./instantiateReactComponent":178,"./shouldUpdateReactComponent":198}],117:[function(require,module,exports){
+},{"./ReactComponent":93,"./ReactMultiChildUpdateTypes":125,"./flattenChildren":174,"./instantiateReactComponent":186,"./shouldUpdateReactComponent":206}],125:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -18990,7 +21324,7 @@ var ReactMultiChildUpdateTypes = keyMirror({
 
 module.exports = ReactMultiChildUpdateTypes;
 
-},{"./keyMirror":185}],118:[function(require,module,exports){
+},{"./keyMirror":193}],126:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -19153,7 +21487,7 @@ var ReactOwner = {
 module.exports = ReactOwner;
 
 }).call(this,require("FWaASH"))
-},{"./emptyObject":164,"./invariant":179,"FWaASH":49}],119:[function(require,module,exports){
+},{"./emptyObject":172,"./invariant":187,"FWaASH":51}],127:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -19242,7 +21576,7 @@ function _noMeasure(objName, fnName, func) {
 module.exports = ReactPerf;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":49}],120:[function(require,module,exports){
+},{"FWaASH":51}],128:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -19393,7 +21727,7 @@ var ReactPropTransferer = {
 module.exports = ReactPropTransferer;
 
 }).call(this,require("FWaASH"))
-},{"./emptyFunction":163,"./invariant":179,"./joinClasses":184,"./merge":188,"FWaASH":49}],121:[function(require,module,exports){
+},{"./emptyFunction":171,"./invariant":187,"./joinClasses":192,"./merge":196,"FWaASH":51}],129:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -19428,7 +21762,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = ReactPropTypeLocationNames;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":49}],122:[function(require,module,exports){
+},{"FWaASH":51}],130:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -19459,7 +21793,7 @@ var ReactPropTypeLocations = keyMirror({
 
 module.exports = ReactPropTypeLocations;
 
-},{"./keyMirror":185}],123:[function(require,module,exports){
+},{"./keyMirror":193}],131:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -19822,7 +22156,7 @@ function createChainableTypeChecker(validate) {
 module.exports = Props;
 
 }).call(this,require("FWaASH"))
-},{"./ReactComponent":85,"./ReactPropTypeLocationNames":121,"./createObjectFrom":160,"./warning":202,"FWaASH":49}],124:[function(require,module,exports){
+},{"./ReactComponent":93,"./ReactPropTypeLocationNames":129,"./createObjectFrom":168,"./warning":210,"FWaASH":51}],132:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -19885,7 +22219,7 @@ PooledClass.addPoolingTo(ReactPutListenerQueue);
 
 module.exports = ReactPutListenerQueue;
 
-},{"./PooledClass":79,"./ReactEventEmitter":106,"./mixInto":191}],125:[function(require,module,exports){
+},{"./PooledClass":87,"./ReactEventEmitter":114,"./mixInto":199}],133:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -20069,7 +22403,7 @@ PooledClass.addPoolingTo(ReactReconcileTransaction);
 
 module.exports = ReactReconcileTransaction;
 
-},{"./PooledClass":79,"./ReactEventEmitter":106,"./ReactInputSelection":110,"./ReactMountReady":115,"./ReactPutListenerQueue":124,"./Transaction":150,"./mixInto":191}],126:[function(require,module,exports){
+},{"./PooledClass":87,"./ReactEventEmitter":114,"./ReactInputSelection":118,"./ReactMountReady":123,"./ReactPutListenerQueue":132,"./Transaction":158,"./mixInto":199}],134:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -20107,7 +22441,7 @@ var ReactRootIndex = {
 
 module.exports = ReactRootIndex;
 
-},{}],127:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -20200,7 +22534,7 @@ module.exports = {
 };
 
 }).call(this,require("FWaASH"))
-},{"./ReactComponent":85,"./ReactInstanceHandles":111,"./ReactMarkupChecksum":113,"./ReactServerRenderingTransaction":128,"./instantiateReactComponent":178,"./invariant":179,"FWaASH":49}],128:[function(require,module,exports){
+},{"./ReactComponent":93,"./ReactInstanceHandles":119,"./ReactMarkupChecksum":121,"./ReactServerRenderingTransaction":136,"./instantiateReactComponent":186,"./invariant":187,"FWaASH":51}],136:[function(require,module,exports){
 /**
  * Copyright 2014 Facebook, Inc.
  *
@@ -20318,7 +22652,7 @@ PooledClass.addPoolingTo(ReactServerRenderingTransaction);
 
 module.exports = ReactServerRenderingTransaction;
 
-},{"./PooledClass":79,"./ReactMountReady":115,"./ReactPutListenerQueue":124,"./Transaction":150,"./emptyFunction":163,"./mixInto":191}],129:[function(require,module,exports){
+},{"./PooledClass":87,"./ReactMountReady":123,"./ReactPutListenerQueue":132,"./Transaction":158,"./emptyFunction":171,"./mixInto":199}],137:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -20431,7 +22765,7 @@ ReactStateSetters.Mixin = {
 
 module.exports = ReactStateSetters;
 
-},{}],130:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -20827,7 +23161,7 @@ for (eventType in topLevelTypes) {
 
 module.exports = ReactTestUtils;
 
-},{"./EventConstants":69,"./EventPluginHub":71,"./EventPropagators":74,"./React":80,"./ReactComponent":85,"./ReactDOM":90,"./ReactEventEmitter":106,"./ReactMount":114,"./ReactTextComponent":131,"./ReactUpdates":135,"./SyntheticEvent":143,"./copyProperties":156,"./mergeInto":190}],131:[function(require,module,exports){
+},{"./EventConstants":77,"./EventPluginHub":79,"./EventPropagators":82,"./React":88,"./ReactComponent":93,"./ReactDOM":98,"./ReactEventEmitter":114,"./ReactMount":122,"./ReactTextComponent":139,"./ReactUpdates":143,"./SyntheticEvent":151,"./copyProperties":164,"./mergeInto":198}],139:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -20950,7 +23284,7 @@ ReactTextComponent.prototype.type = ReactTextComponent;
 
 module.exports = ReactTextComponent;
 
-},{"./DOMPropertyOperations":64,"./ReactBrowserComponentMixin":81,"./ReactComponent":85,"./escapeTextForBrowser":165,"./mixInto":191}],132:[function(require,module,exports){
+},{"./DOMPropertyOperations":72,"./ReactBrowserComponentMixin":89,"./ReactComponent":93,"./escapeTextForBrowser":173,"./mixInto":199}],140:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21058,7 +23392,7 @@ var ReactTransitionChildMapping = {
 
 module.exports = ReactTransitionChildMapping;
 
-},{"./ReactChildren":84}],133:[function(require,module,exports){
+},{"./ReactChildren":92}],141:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21157,7 +23491,7 @@ var ReactTransitionEvents = {
 
 module.exports = ReactTransitionEvents;
 
-},{"./ExecutionEnvironment":75}],134:[function(require,module,exports){
+},{"./ExecutionEnvironment":83}],142:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21346,7 +23680,7 @@ var ReactTransitionGroup = React.createClass({
 
 module.exports = ReactTransitionGroup;
 
-},{"./React":80,"./ReactTransitionChildMapping":132,"./cloneWithProps":154,"./emptyFunction":163,"./merge":188}],135:[function(require,module,exports){
+},{"./React":88,"./ReactTransitionChildMapping":140,"./cloneWithProps":162,"./emptyFunction":171,"./merge":196}],143:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -21498,7 +23832,7 @@ var ReactUpdates = {
 module.exports = ReactUpdates;
 
 }).call(this,require("FWaASH"))
-},{"./ReactPerf":119,"./invariant":179,"FWaASH":49}],136:[function(require,module,exports){
+},{"./ReactPerf":127,"./invariant":187,"FWaASH":51}],144:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -21555,7 +23889,7 @@ module.exports = React;
 
 
 }).call(this,require("FWaASH"))
-},{"./LinkedStateMixin":76,"./React":80,"./ReactCSSTransitionGroup":82,"./ReactTestUtils":130,"./ReactTransitionGroup":134,"./cloneWithProps":154,"./cx":161,"./update":201,"FWaASH":49}],137:[function(require,module,exports){
+},{"./LinkedStateMixin":84,"./React":88,"./ReactCSSTransitionGroup":90,"./ReactTestUtils":138,"./ReactTransitionGroup":142,"./cloneWithProps":162,"./cx":169,"./update":209,"FWaASH":51}],145:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21757,7 +24091,7 @@ var SelectEventPlugin = {
 
 module.exports = SelectEventPlugin;
 
-},{"./EventConstants":69,"./EventPropagators":74,"./ReactInputSelection":110,"./SyntheticEvent":143,"./getActiveElement":169,"./isTextInputElement":182,"./keyOf":186,"./shallowEqual":197}],138:[function(require,module,exports){
+},{"./EventConstants":77,"./EventPropagators":82,"./ReactInputSelection":118,"./SyntheticEvent":151,"./getActiveElement":177,"./isTextInputElement":190,"./keyOf":194,"./shallowEqual":205}],146:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -21795,7 +24129,7 @@ var ServerReactRootIndex = {
 
 module.exports = ServerReactRootIndex;
 
-},{}],139:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -22212,7 +24546,7 @@ var SimpleEventPlugin = {
 module.exports = SimpleEventPlugin;
 
 }).call(this,require("FWaASH"))
-},{"./EventConstants":69,"./EventPluginUtils":73,"./EventPropagators":74,"./SyntheticClipboardEvent":140,"./SyntheticDragEvent":142,"./SyntheticEvent":143,"./SyntheticFocusEvent":144,"./SyntheticKeyboardEvent":145,"./SyntheticMouseEvent":146,"./SyntheticTouchEvent":147,"./SyntheticUIEvent":148,"./SyntheticWheelEvent":149,"./invariant":179,"./keyOf":186,"FWaASH":49}],140:[function(require,module,exports){
+},{"./EventConstants":77,"./EventPluginUtils":81,"./EventPropagators":82,"./SyntheticClipboardEvent":148,"./SyntheticDragEvent":150,"./SyntheticEvent":151,"./SyntheticFocusEvent":152,"./SyntheticKeyboardEvent":153,"./SyntheticMouseEvent":154,"./SyntheticTouchEvent":155,"./SyntheticUIEvent":156,"./SyntheticWheelEvent":157,"./invariant":187,"./keyOf":194,"FWaASH":51}],148:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22265,7 +24599,7 @@ SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 module.exports = SyntheticClipboardEvent;
 
 
-},{"./SyntheticEvent":143}],141:[function(require,module,exports){
+},{"./SyntheticEvent":151}],149:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22318,7 +24652,7 @@ SyntheticEvent.augmentClass(
 module.exports = SyntheticCompositionEvent;
 
 
-},{"./SyntheticEvent":143}],142:[function(require,module,exports){
+},{"./SyntheticEvent":151}],150:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22364,7 +24698,7 @@ SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 
 module.exports = SyntheticDragEvent;
 
-},{"./SyntheticMouseEvent":146}],143:[function(require,module,exports){
+},{"./SyntheticMouseEvent":154}],151:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22530,7 +24864,7 @@ PooledClass.addPoolingTo(SyntheticEvent, PooledClass.threeArgumentPooler);
 
 module.exports = SyntheticEvent;
 
-},{"./PooledClass":79,"./emptyFunction":163,"./getEventTarget":171,"./merge":188,"./mergeInto":190}],144:[function(require,module,exports){
+},{"./PooledClass":87,"./emptyFunction":171,"./getEventTarget":179,"./merge":196,"./mergeInto":198}],152:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22576,7 +24910,7 @@ SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 
 module.exports = SyntheticFocusEvent;
 
-},{"./SyntheticUIEvent":148}],145:[function(require,module,exports){
+},{"./SyntheticUIEvent":156}],153:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22636,7 +24970,7 @@ SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 
 module.exports = SyntheticKeyboardEvent;
 
-},{"./SyntheticUIEvent":148,"./getEventKey":170}],146:[function(require,module,exports){
+},{"./SyntheticUIEvent":156,"./getEventKey":178}],154:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22723,7 +25057,7 @@ SyntheticUIEvent.augmentClass(SyntheticMouseEvent, MouseEventInterface);
 
 module.exports = SyntheticMouseEvent;
 
-},{"./SyntheticUIEvent":148,"./ViewportMetrics":151}],147:[function(require,module,exports){
+},{"./SyntheticUIEvent":156,"./ViewportMetrics":159}],155:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22775,7 +25109,7 @@ SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 
 module.exports = SyntheticTouchEvent;
 
-},{"./SyntheticUIEvent":148}],148:[function(require,module,exports){
+},{"./SyntheticUIEvent":156}],156:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22822,7 +25156,7 @@ SyntheticEvent.augmentClass(SyntheticUIEvent, UIEventInterface);
 
 module.exports = SyntheticUIEvent;
 
-},{"./SyntheticEvent":143}],149:[function(require,module,exports){
+},{"./SyntheticEvent":151}],157:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -22890,7 +25224,7 @@ SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 
 module.exports = SyntheticWheelEvent;
 
-},{"./SyntheticMouseEvent":146}],150:[function(require,module,exports){
+},{"./SyntheticMouseEvent":154}],158:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23170,7 +25504,7 @@ var Transaction = {
 module.exports = Transaction;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],151:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],159:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23209,7 +25543,7 @@ var ViewportMetrics = {
 
 module.exports = ViewportMetrics;
 
-},{"./getUnboundedScrollPosition":176}],152:[function(require,module,exports){
+},{"./getUnboundedScrollPosition":184}],160:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23267,7 +25601,7 @@ function accumulate(current, next) {
 module.exports = accumulate;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],153:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],161:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23308,7 +25642,7 @@ function adler32(data) {
 
 module.exports = adler32;
 
-},{}],154:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23371,7 +25705,7 @@ function cloneWithProps(child, props) {
 module.exports = cloneWithProps;
 
 }).call(this,require("FWaASH"))
-},{"./ReactPropTransferer":120,"./keyOf":186,"./warning":202,"FWaASH":49}],155:[function(require,module,exports){
+},{"./ReactPropTransferer":128,"./keyOf":194,"./warning":210,"FWaASH":51}],163:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23422,7 +25756,7 @@ function containsNode(outerNode, innerNode) {
 
 module.exports = containsNode;
 
-},{"./isTextNode":183}],156:[function(require,module,exports){
+},{"./isTextNode":191}],164:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23480,7 +25814,7 @@ function copyProperties(obj, a, b, c, d, e, f) {
 module.exports = copyProperties;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":49}],157:[function(require,module,exports){
+},{"FWaASH":51}],165:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23573,7 +25907,7 @@ function createArrayFrom(obj) {
 
 module.exports = createArrayFrom;
 
-},{"./toArray":199}],158:[function(require,module,exports){
+},{"./toArray":207}],166:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23640,7 +25974,7 @@ function createFullPageComponent(componentClass) {
 module.exports = createFullPageComponent;
 
 }).call(this,require("FWaASH"))
-},{"./ReactCompositeComponent":87,"./invariant":179,"FWaASH":49}],159:[function(require,module,exports){
+},{"./ReactCompositeComponent":95,"./invariant":187,"FWaASH":51}],167:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23737,7 +26071,7 @@ function createNodesFromMarkup(markup, handleScript) {
 module.exports = createNodesFromMarkup;
 
 }).call(this,require("FWaASH"))
-},{"./ExecutionEnvironment":75,"./createArrayFrom":157,"./getMarkupWrap":172,"./invariant":179,"FWaASH":49}],160:[function(require,module,exports){
+},{"./ExecutionEnvironment":83,"./createArrayFrom":165,"./getMarkupWrap":180,"./invariant":187,"FWaASH":51}],168:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23802,7 +26136,7 @@ function createObjectFrom(keys, values /* = true */) {
 module.exports = createObjectFrom;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":49}],161:[function(require,module,exports){
+},{"FWaASH":51}],169:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23848,7 +26182,7 @@ function cx(classNames) {
 
 module.exports = cx;
 
-},{}],162:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23907,7 +26241,7 @@ function dangerousStyleValue(styleName, value) {
 
 module.exports = dangerousStyleValue;
 
-},{"./CSSProperty":57}],163:[function(require,module,exports){
+},{"./CSSProperty":65}],171:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -23952,7 +26286,7 @@ copyProperties(emptyFunction, {
 
 module.exports = emptyFunction;
 
-},{"./copyProperties":156}],164:[function(require,module,exports){
+},{"./copyProperties":164}],172:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -23983,7 +26317,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = emptyObject;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":49}],165:[function(require,module,exports){
+},{"FWaASH":51}],173:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24032,7 +26366,7 @@ function escapeTextForBrowser(text) {
 
 module.exports = escapeTextForBrowser;
 
-},{}],166:[function(require,module,exports){
+},{}],174:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -24093,7 +26427,7 @@ function flattenChildren(children) {
 module.exports = flattenChildren;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"./traverseAllChildren":200,"FWaASH":49}],167:[function(require,module,exports){
+},{"./invariant":187,"./traverseAllChildren":208,"FWaASH":51}],175:[function(require,module,exports){
 /**
  * Copyright 2014 Facebook, Inc.
  *
@@ -24128,7 +26462,7 @@ function focusNode(node) {
 
 module.exports = focusNode;
 
-},{}],168:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24166,7 +26500,7 @@ var forEachAccumulated = function(arr, cb, scope) {
 
 module.exports = forEachAccumulated;
 
-},{}],169:[function(require,module,exports){
+},{}],177:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24202,7 +26536,7 @@ function getActiveElement() /*?DOMElement*/ {
 
 module.exports = getActiveElement;
 
-},{}],170:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24289,7 +26623,7 @@ function getEventKey(nativeEvent) {
 
 module.exports = getEventKey;
 
-},{}],171:[function(require,module,exports){
+},{}],179:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24327,7 +26661,7 @@ function getEventTarget(nativeEvent) {
 
 module.exports = getEventTarget;
 
-},{}],172:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -24449,7 +26783,7 @@ function getMarkupWrap(nodeName) {
 module.exports = getMarkupWrap;
 
 }).call(this,require("FWaASH"))
-},{"./ExecutionEnvironment":75,"./invariant":179,"FWaASH":49}],173:[function(require,module,exports){
+},{"./ExecutionEnvironment":83,"./invariant":187,"FWaASH":51}],181:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24531,7 +26865,7 @@ function getNodeForCharacterOffset(root, offset) {
 
 module.exports = getNodeForCharacterOffset;
 
-},{}],174:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24573,7 +26907,7 @@ function getReactRootElementInContainer(container) {
 
 module.exports = getReactRootElementInContainer;
 
-},{}],175:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24617,7 +26951,7 @@ function getTextContentAccessor() {
 
 module.exports = getTextContentAccessor;
 
-},{"./ExecutionEnvironment":75}],176:[function(require,module,exports){
+},{"./ExecutionEnvironment":83}],184:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24664,7 +26998,7 @@ function getUnboundedScrollPosition(scrollable) {
 
 module.exports = getUnboundedScrollPosition;
 
-},{}],177:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24701,7 +27035,7 @@ function hyphenate(string) {
 
 module.exports = hyphenate;
 
-},{}],178:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -24775,7 +27109,7 @@ function instantiateReactComponent(descriptor) {
 module.exports = instantiateReactComponent;
 
 }).call(this,require("FWaASH"))
-},{"./warning":202,"FWaASH":49}],179:[function(require,module,exports){
+},{"./warning":210,"FWaASH":51}],187:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -24841,7 +27175,7 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = invariant;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":49}],180:[function(require,module,exports){
+},{"FWaASH":51}],188:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24913,7 +27247,7 @@ function isEventSupported(eventNameSuffix, capture) {
 
 module.exports = isEventSupported;
 
-},{"./ExecutionEnvironment":75}],181:[function(require,module,exports){
+},{"./ExecutionEnvironment":83}],189:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24948,7 +27282,7 @@ function isNode(object) {
 
 module.exports = isNode;
 
-},{}],182:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -24999,7 +27333,7 @@ function isTextInputElement(elem) {
 
 module.exports = isTextInputElement;
 
-},{}],183:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25031,7 +27365,7 @@ function isTextNode(object) {
 
 module.exports = isTextNode;
 
-},{"./isNode":181}],184:[function(require,module,exports){
+},{"./isNode":189}],192:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25077,7 +27411,7 @@ function joinClasses(className/*, ... */) {
 
 module.exports = joinClasses;
 
-},{}],185:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -25139,7 +27473,7 @@ var keyMirror = function(obj) {
 module.exports = keyMirror;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],186:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],194:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25182,7 +27516,7 @@ var keyOf = function(oneKeyObj) {
 
 module.exports = keyOf;
 
-},{}],187:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25223,7 +27557,7 @@ function memoizeStringOnly(callback) {
 
 module.exports = memoizeStringOnly;
 
-},{}],188:[function(require,module,exports){
+},{}],196:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25262,7 +27596,7 @@ var merge = function(one, two) {
 
 module.exports = merge;
 
-},{"./mergeInto":190}],189:[function(require,module,exports){
+},{"./mergeInto":198}],197:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -25402,7 +27736,7 @@ var mergeHelpers = {
 module.exports = mergeHelpers;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"./keyMirror":185,"FWaASH":49}],190:[function(require,module,exports){
+},{"./invariant":187,"./keyMirror":193,"FWaASH":51}],198:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25449,7 +27783,7 @@ function mergeInto(one, two) {
 
 module.exports = mergeInto;
 
-},{"./mergeHelpers":189}],191:[function(require,module,exports){
+},{"./mergeHelpers":197}],199:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25485,7 +27819,7 @@ var mixInto = function(constructor, methodBag) {
 
 module.exports = mixInto;
 
-},{}],192:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014 Facebook, Inc.
@@ -25526,7 +27860,7 @@ function monitorCodeUse(eventName, data) {
 module.exports = monitorCodeUse;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],193:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],201:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25575,7 +27909,7 @@ function objMap(obj, func, context) {
 
 module.exports = objMap;
 
-},{}],194:[function(require,module,exports){
+},{}],202:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25624,7 +27958,7 @@ function objMapKeyVal(obj, func, context) {
 
 module.exports = objMapKeyVal;
 
-},{}],195:[function(require,module,exports){
+},{}],203:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -25671,7 +28005,7 @@ function onlyChild(children) {
 module.exports = onlyChild;
 
 }).call(this,require("FWaASH"))
-},{"./ReactComponent":85,"./invariant":179,"FWaASH":49}],196:[function(require,module,exports){
+},{"./ReactComponent":93,"./invariant":187,"FWaASH":51}],204:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25715,7 +28049,7 @@ var performanceNow = performance.now.bind(performance);
 
 module.exports = performanceNow;
 
-},{"./ExecutionEnvironment":75}],197:[function(require,module,exports){
+},{"./ExecutionEnvironment":83}],205:[function(require,module,exports){
 /**
  * Copyright 2013-2014 Facebook, Inc.
  *
@@ -25766,7 +28100,7 @@ function shallowEqual(objA, objB) {
 
 module.exports = shallowEqual;
 
-},{}],198:[function(require,module,exports){
+},{}],206:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -25831,7 +28165,7 @@ function shouldUpdateReactComponent(prevComponentInstance, nextDescriptor) {
 module.exports = shouldUpdateReactComponent;
 
 }).call(this,require("FWaASH"))
-},{"FWaASH":49}],199:[function(require,module,exports){
+},{"FWaASH":51}],207:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014 Facebook, Inc.
@@ -25910,7 +28244,7 @@ function toArray(obj) {
 module.exports = toArray;
 
 }).call(this,require("FWaASH"))
-},{"./invariant":179,"FWaASH":49}],200:[function(require,module,exports){
+},{"./invariant":187,"FWaASH":51}],208:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -26104,7 +28438,7 @@ function traverseAllChildren(children, callback, traverseContext) {
 module.exports = traverseAllChildren;
 
 }).call(this,require("FWaASH"))
-},{"./ReactInstanceHandles":111,"./ReactTextComponent":131,"./invariant":179,"FWaASH":49}],201:[function(require,module,exports){
+},{"./ReactInstanceHandles":119,"./ReactTextComponent":139,"./invariant":187,"FWaASH":51}],209:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2014 Facebook, Inc.
@@ -26267,7 +28601,7 @@ function update(value, spec) {
 module.exports = update;
 
 }).call(this,require("FWaASH"))
-},{"./copyProperties":156,"./invariant":179,"./keyOf":186,"FWaASH":49}],202:[function(require,module,exports){
+},{"./copyProperties":164,"./invariant":187,"./keyOf":194,"FWaASH":51}],210:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2014 Facebook, Inc.
@@ -26319,10 +28653,10 @@ if ("production" !== process.env.NODE_ENV) {
 module.exports = warning;
 
 }).call(this,require("FWaASH"))
-},{"./emptyFunction":163,"FWaASH":49}],203:[function(require,module,exports){
+},{"./emptyFunction":171,"FWaASH":51}],211:[function(require,module,exports){
 module.exports = require('./lib/React');
 
-},{"./lib/React":80}],204:[function(require,module,exports){
+},{"./lib/React":88}],212:[function(require,module,exports){
 'use strict';
 
 /**
@@ -26528,7 +28862,7 @@ if ('object' === typeof module && module.exports) {
   module.exports = EventEmitter;
 }
 
-},{}],205:[function(require,module,exports){
+},{}],213:[function(require,module,exports){
 exports.createdStores = [];
 
 exports.createdActions = [];
@@ -26542,7 +28876,7 @@ exports.reset = function() {
     }
 };
 
-},{}],206:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 var _ = require('./utils'),
     slice = Array.prototype.slice;
 
@@ -26741,7 +29075,7 @@ module.exports = {
 };
 
 
-},{"./utils":216}],207:[function(require,module,exports){
+},{"./utils":224}],215:[function(require,module,exports){
 var _ = require('./utils'),
     ListenerMethods = require('./ListenerMethods');
 
@@ -26758,7 +29092,7 @@ module.exports = _.extend({
 
 }, ListenerMethods);
 
-},{"./ListenerMethods":206,"./utils":216}],208:[function(require,module,exports){
+},{"./ListenerMethods":214,"./utils":224}],216:[function(require,module,exports){
 var _ = require('./utils');
 
 /**
@@ -26825,7 +29159,7 @@ module.exports = {
     }
 };
 
-},{"./utils":216}],209:[function(require,module,exports){
+},{"./utils":224}],217:[function(require,module,exports){
 var createStore = require('./createStore');
 
 /**
@@ -26847,7 +29181,7 @@ module.exports = function(/* listenables... */) {
     });
 };
 
-},{"./createStore":212}],210:[function(require,module,exports){
+},{"./createStore":220}],218:[function(require,module,exports){
 var Reflux = require('../src'),
     _ = require('./utils');
 
@@ -26869,7 +29203,7 @@ module.exports = function(listenable,key){
     };
 };
 
-},{"../src":213,"./utils":216}],211:[function(require,module,exports){
+},{"../src":221,"./utils":224}],219:[function(require,module,exports){
 var _ = require('./utils'),
     Reflux = require('../src'),
     Keep = require('./Keep');
@@ -26906,7 +29240,7 @@ module.exports = function(definition) {
 
 };
 
-},{"../src":213,"./Keep":205,"./utils":216}],212:[function(require,module,exports){
+},{"../src":221,"./Keep":213,"./utils":224}],220:[function(require,module,exports){
 var _ = require('./utils'),
     Reflux = require('../src'),
     Keep = require('./Keep');
@@ -26950,7 +29284,7 @@ module.exports = function(definition) {
     return store;
 };
 
-},{"../src":213,"./Keep":205,"./utils":216}],213:[function(require,module,exports){
+},{"../src":221,"./Keep":213,"./utils":224}],221:[function(require,module,exports){
 exports.ListenerMethods = require('./ListenerMethods');
 
 exports.PublisherMethods = require('./PublisherMethods');
@@ -27004,7 +29338,7 @@ exports.nextTick = function(nextTick) {
  */
 exports.__keep = require('./Keep');
 
-},{"./Keep":205,"./ListenerMethods":206,"./ListenerMixin":207,"./PublisherMethods":208,"./all":209,"./connect":210,"./createAction":211,"./createStore":212,"./listenTo":214,"./listenToMany":215,"./utils":216}],214:[function(require,module,exports){
+},{"./Keep":213,"./ListenerMethods":214,"./ListenerMixin":215,"./PublisherMethods":216,"./all":217,"./connect":218,"./createAction":219,"./createStore":220,"./listenTo":222,"./listenToMany":223,"./utils":224}],222:[function(require,module,exports){
 var Reflux = require('../src');
 
 
@@ -27042,7 +29376,7 @@ module.exports = function(listenable,callback,initial){
     };
 };
 
-},{"../src":213}],215:[function(require,module,exports){
+},{"../src":221}],223:[function(require,module,exports){
 var Reflux = require('../src');
 
 /**
@@ -27077,7 +29411,7 @@ module.exports = function(listenables){
     };
 };
 
-},{"../src":213}],216:[function(require,module,exports){
+},{"../src":221}],224:[function(require,module,exports){
 /*
  * isObject, extend, isFunction, isArguments are taken from undescore/lodash in
  * order to remove the dependency
@@ -27127,7 +29461,7 @@ exports.isArguments = function(value) {
     return value && typeof value == 'object' && typeof value.length == 'number' &&
       (toString.call(value) === '[object Arguments]' || (hasOwnProperty.call(value, 'callee' && !propertyIsEnumerable.call(value, 'callee')))) || false;
 };
-},{"eventemitter3":204}],217:[function(require,module,exports){
+},{"eventemitter3":212}],225:[function(require,module,exports){
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
 //     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
