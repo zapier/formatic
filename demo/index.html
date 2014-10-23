@@ -18,23 +18,15 @@
   <script src="./lib/formatic.js"></script>
   <script>
 
-    var formatic = require('formatic').create('core', 'bootstrap');
+    // var formatic = require('formatic').create({
+    //   style: ['bootstrap']
+    // });
+
+    var formatic = require('formatic');
+
 
     var form = formatic({
       fields: [
-        // {
-        //   key: 'firstName',
-        //   type: 'string',
-        //   label: 'First Name',
-        //   maxRows: 1
-        // },
-        // {
-        //   key: 'lastName',
-        //   type: 'string',
-        //   label: 'Last Name',
-        //   maxRows: 1
-        // }
-
         {
           label: 'Short Name',
           type: 'object',
@@ -126,6 +118,7 @@
           type: 'string',
           key: 'country',
           choices: [],
+          lookup: 'countries',
           eval: {
             choices: "lookup( 'locations' )"
           }
