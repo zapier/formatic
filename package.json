@@ -39,7 +39,7 @@
     "objectpath": "^1.0.5",
     "react": "^0.10.0",
     "react-addons": "^0.9.0",
-    "reflux": "^0.1.12",
+    "reflux": "^0.1.13",
     "underscore": "^1.6.0"
   },
   "jest": {
