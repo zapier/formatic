@@ -1,31 +1,3 @@
-derived fields
-buttons
-dependent fields (like mutually exclusive/inclusive fields)
-multiple nodes (return react components)
-clean up construction api
-allow differential/mixin construction
-tests
-allow multiple views of same data
-allow external render
-arbitrary keys
-properly separate types and views
-self references
-readme
-watcher
-types as a plugin
-type validations
-template plugin (self references)
-object for choices
-unique keys
-root changes type
-get bundle smaller!!!
-
-config vs meta!!!
-
-get initial data from fields (so list type doesn't have to side-effect data)
-
-less magic bindings??
-
-block key conflicts
-
-internal vs external emitter (so you can't wipe out all internal events)
+- list/object item keys
+- contextifiers
+- bootstrap plugin
