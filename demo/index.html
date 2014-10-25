@@ -22,7 +22,11 @@
     //   style: ['bootstrap']
     // });
 
-    var formatic = require('formatic');
+    var formatic = require('formatic').create({
+      component: {
+        props: ['bootstrap']
+      }
+    });
 
 
     var form = formatic({
