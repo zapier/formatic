@@ -191,6 +191,7 @@
           maxRows: 1
         },
         {
+          label: 'Some Blob',
           key: 'blob',
           type: 'json'
         }
@@ -255,13 +256,28 @@
 
     });
 
+    var jsonForm = formatic({
+      fields: [
+        {
+          type: 'json',
+          key: 'value',
+          label: 'Value of the other form up there',
+          rows: 10
+        }
+      ]
+    })
+
     var component = form.component({
       onChange: function (value) {
-        console.log(value);
+        jsonForm.val({value: value});
       }
     });
 
+    var jsonComponent = jsonForm.component();
+
     formatic.render(component, document.getElementById('user'));
+
+    formatic.render(jsonComponent, document.getElementById('json'));
 
   </script>
 </body>
