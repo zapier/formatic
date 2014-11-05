@@ -255,7 +255,11 @@
 
     });
 
-    var component = form.component();
+    var component = form.component({
+      onChange: function (value) {
+        console.log(value);
+      }
+    });
 
     formatic.render(component, document.getElementById('user'));
 
