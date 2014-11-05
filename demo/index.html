@@ -18,10 +18,6 @@
   <script src="./lib/formatic.js"></script>
   <script>
 
-    // var formatic = require('formatic').create({
-    //   style: ['bootstrap']
-    // });
-
     var formatic = require('formatic').create({
       component: {
         props: ['bootstrap']
@@ -94,15 +90,34 @@
           id: 'nameType',
           key: 'type'
         },
+
+        //{key: 'watchedField', match: 'exact', value: 'ok changed', action: 'hide'}
         {
           template: true,
-          type: 'array',
+          type: 'string',
           label: 'Silly',
           id: 'silly',
-          choices: [],
           eval: {
-            choices: "if( aliases filter( map( slice(aliases 0 __index) fn([alias] get(alias 'first')) ) fn([alias] alias) ) )"
+            //hidden: ['@if', ['@not', ['@getIn', 'name', 'first']], true, false]
+            //value: ['@if']['@sum', 1, 1]
+            //value: ['@get', 'likesCookies']
+            hidden: ['@not', ['@get', 'likesCookies']]//,
+            // needsMeta: ['@if',
+            //   ['get', 'country'],
+            //   {source: 'location', params: {country: ['@get', 'country']}}
+            // ]
           }
+          // eval: {
+          //   choices: getAll(firstName, 'alias')
+          //   choices: lookup('location', country)
+          //   choices: {call: 'lookup', args: ['']}
+          //   hidden: {}
+          // }
+          // when: {test: 'eq', },
+          // choices: [],
+          // eval: {
+          //   choices: "if( aliases filter( map( slice(aliases 0 __index) fn([alias] get(alias 'first')) ) fn([alias] alias) ) )"
+          // }
         },
         {
           type: 'array',
@@ -122,20 +137,28 @@
           type: 'string',
           key: 'country',
           choices: [],
-          lookup: 'countries',
-          eval: {
-            choices: "lookup( 'locations' )"
-          }
+          lookup: {source: 'locations'}
+          // eval: {
+          //   needsMeta: [
+          //     ['@if', ['@getMeta', 'locations'], null, ['locations']]
+          //   ],
+          //   choices: ['@getMeta', 'locations']
+          // }
         },
+
         {
           template: true,
           label: 'State',
           type: 'string',
           key: 'state',
-          choices: {},
-          eval: {
-            choices: "lookup( 'locations' country)"
-          }
+          choices: [],
+          lookup: {source: 'locations', keys: ['country']}
+          // eval: {
+          //   needsMeta: [
+          //     ['@if', ['@getMeta', 'locations', ['@get', 'country']], null, ['locations', ['@get', 'country']]]
+          //   ],
+          //   choices: ['@getMeta', 'locations', ['@get', 'country']]
+          // }
         },
         {
           template: true,
@@ -143,16 +166,20 @@
           type: 'string',
           key: 'city',
           choices: [],
-          eval: {
-            choices: "lookup( 'locations' country state)"
-          }
+          lookup: {source: 'locations', keys: ['country', 'state']}
+          // eval: {
+          //   needsMeta: [
+          //     ['@if', ['@getMeta', 'locations', ['@get', 'country'], ['@get', 'state']], null, ['locations', ['@get', 'country'], ['@get', 'state']]]
+          //   ],
+          //   choices: ['@getMeta', 'locations', ['@get', 'country'], ['@get', 'state']]
+          // }
         },
         {
           template: true,
           label: 'Full Name',
           type: 'object',
           key: 'fullName',
-          fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, , 'city'],
+          fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, {extends: 'address', key: 'address'}],
           match: {type: 'full'}
         },
         {
@@ -165,6 +192,63 @@
         }
       ],
       value: {}
+    });
+
+    form.source('locations', function (country, state) {
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          if (country && state) {
+
+            return resolve({
+              us: {
+                'us:mo': ['St. Louis', 'Jefferson City'],
+                'us:il': ['Chicago', 'Springfield']
+              },
+              ca: {
+                'ca:on': ['Toronto']
+              }
+            }[country][state]);
+
+          } else if (country) {
+
+            return resolve({
+              us: [
+                {
+                  value: 'us:mo',
+                  label: 'Missouri'
+                },
+                {
+                  value: 'us:il',
+                  label: 'Illinois'
+                }
+              ],
+              ca: [
+                {
+                  value: 'ca:on',
+                  label: 'Ontario'
+                }
+              ]
+            }[country]);
+
+          } else {
+
+            return resolve([
+              {
+                value: 'us',
+                label: 'United States'
+              },
+              {
+                value: 'ca',
+                label: 'Canada'
+              }
+            ]);
+          }
+
+          return reject('crap');
+        }, 100)
+
+      });
+
     });
 
     var component = form.component();
