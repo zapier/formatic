@@ -10,6 +10,7 @@ var watchify = require('watchify');
 gulp.task('bundle-dev', function () {
   return browserify({entries: ['./index.js']})
     .require('./index.js', {expose: 'formatic'})
+    .external(['underscore', 'react', 'react/addons'])
     .bundle({debug: true})
     .pipe(source('formatic-dev.js'))
     .pipe(gulp.dest('./build'));
@@ -18,6 +19,7 @@ gulp.task('bundle-dev', function () {
 gulp.task('bundle-prod', ['lint'], function () {
   return browserify({entries: ['./index.js']})
     .require('./index.js', {expose: 'formatic'})
+    .external(['underscore', 'react', 'react/addons'])
     .bundle()
     .pipe(source('formatic.js'))
     .pipe(gulp.dest('./build'));
@@ -26,6 +28,7 @@ gulp.task('bundle-prod', ['lint'], function () {
 gulp.task('bundle-prod-min', ['lint'], function () {
   return browserify({entries: ['./index.js']})
     .require('./index.js', {expose: 'formatic'})
+    .external(['underscore', 'react', 'react/addons'])
     .bundle()
     .pipe(source('formatic-min.js'))
     .pipe(plugins.streamify(plugins.uglify()))
@@ -34,7 +37,8 @@ gulp.task('bundle-prod-min', ['lint'], function () {
 
 gulp.task('bundle-watch', function () {
   var bundler = watchify({entries: ['./index.js']})
-    .require('./index.js', {expose: 'formatic'});
+    .require('./index.js', {expose: 'formatic'})
+    .external(['underscore', 'react', 'react/addons']);
 
   var rebundle = function () {
     var bundle = bundler.bundle({debug: true});
