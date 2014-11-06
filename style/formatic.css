@@ -107,6 +107,54 @@
   opacity: 0.01;
 }
 
+.formatic .pretty-part {
+  border-radius: 12px;
+  background: #ff9266;
+  cursor: pointer;
+}
+
+.formatic .pretty-part-left, .formatic .pretty-part-right {
+}
+
+.formatic .pretty-overlay {
+  color: rgba(0, 0, 0, 0) !important;
+}
+
+/*.formatic .pretty-content {
+  font-family: 'Open Sans', Helvetica, arial, sans-serif;
+  font-size: 13px;
+  max-width: 870px;
+  border: solid 1px;
+  height: 100px;
+  padding: 2px;
+  margin: 2px;
+  overflow: scroll;
+  width: 200px;
+}
+
+.formatic .pretty-overlay {
+  font-family: 'Open Sans', Helvetica, arial, sans-serif;
+  font-size: 13px;
+  max-width: 870px;
+  border: solid 1px;
+  height: 100px;
+  padding: 2px;
+  margin: 2px;
+  overflow: scroll;
+  width: 200px;
+
+  color: rgba(0, 0, 0, 0);
+
+  height: 98px;
+  border-bottom: 0px;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+  word-break: keep-all;
+}*/
+
 /*
 .formatic .boolean-checkbox-field label {
   display: inline

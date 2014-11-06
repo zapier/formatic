@@ -194,6 +194,12 @@
           label: 'Some Blob',
           key: 'blob',
           type: 'json'
+        },
+        {
+          label: 'Pretty Stuff',
+          key: 'pretty',
+          type: 'string',
+          replaceTags: []
         }
       ],
       value: {}
@@ -265,7 +271,7 @@
           rows: 10
         }
       ]
-    })
+    });
 
     var component = form.component({
       onChange: function (value) {
