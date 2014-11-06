@@ -13,7 +13,7 @@
   "license": "MIT",
   "devDependencies": {
     "body-parser": "^1.4.3",
-    "browserify": "^6.2.0",
+    "browserify": "git+https://github.com/jdeal/node-browserify.git",
     "browserify-shim": "^3.8.0",
     "chai": "^1.9.1",
     "connect-livereload": "^0.4.0",
