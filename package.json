@@ -13,7 +13,7 @@
   "license": "MIT",
   "devDependencies": {
     "body-parser": "^1.4.3",
-    "browserify": "^4.1.10",
+    "browserify": "^6.2.0",
     "browserify-shim": "^3.8.0",
     "chai": "^1.9.1",
     "connect-livereload": "^0.4.0",
@@ -30,7 +30,7 @@
     "require-dir": "^0.1.0",
     "tiny-lr": "0.0.9",
     "vinyl-source-stream": "^0.1.1",
-    "watchify": "^0.2.0"
+    "watchify": "^2.1.1"
   },
   "dependencies": {
     "component-emitter": "^1.1.2",
@@ -55,7 +55,9 @@
     ]
   },
   "browserify": {
-    "transform": [ "browserify-shim" ]
+    "transform": [
+      "browserify-shim"
+    ]
   },
   "browserify-shim": {
     "react": "global:React",
