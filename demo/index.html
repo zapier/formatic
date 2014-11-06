@@ -13,7 +13,13 @@
   </div>
 
   <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="./bower_components/underscore/underscore-min.js"></script>
   <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="./bower_components/react/react-with-addons.js"></script>
+
+  <script>
+  console.log(React)
+  </script>
 
   <script src="./lib/formatic.js"></script>
   <script>
@@ -199,7 +205,7 @@
           label: 'Pretty Stuff',
           key: 'pretty',
           type: 'string',
-          replaceTags: []
+          replaceTags: {'long':'Some Long Label','some_shorty':'Short'}
         }
       ],
       value: {}
