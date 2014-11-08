@@ -117,7 +117,9 @@
 }
 
 .formatic .pretty-overlay {
-  color: rgba(0, 0, 0, 0) !important;
+}
+
+.formatic .pretty-content {
 }
 
 /*.formatic .pretty-content {
