@@ -7,6 +7,35 @@ describe('util', function() {
 
   var util = formatic.plugin('util');
 
+  it('should see an empty string as a blank', function () {
+
+    expect(util.isBlank('')).toEqual(true);
+  });
+
+  it('should see a non-empty string as not blank', function () {
+
+    expect(util.isBlank('foo')).toEqual(false);
+  });
+
+  it('should see a null as a blank', function () {
+
+    expect(util.isBlank(null)).toEqual(true);
+  });
+
+  it('should see undefined as a blank', function () {
+
+    expect(util.isBlank(undefined)).toEqual(true);
+  });
+
+  it('should set prop in obj', function () {
+
+    var obj = {foo: 'bar'};
+
+    util.setIn(obj, 'foo', 'baz');
+
+    expect(obj.foo).toEqual('baz');
+  });
+
   it('should parse blank text', function () {
 
     expect(util.parseTextWithTags('')).toEqual([]);
