@@ -27,13 +27,70 @@ describe('util', function() {
     expect(util.isBlank(undefined)).toEqual(true);
   });
 
-  it('should set prop in obj', function () {
+  it('should set prop in obj with string key', function () {
 
-    var obj = {foo: 'bar'};
+    var obj = {name: 'joe'};
 
-    util.setIn(obj, 'foo', 'baz');
+    util.setIn(obj, 'name', 'bob');
 
-    expect(obj.foo).toEqual('baz');
+    expect(obj.name).toEqual('bob');
+  });
+
+  it('should set prop in obj with array key', function () {
+
+    var obj = {name: {first: 'joe'}};
+
+    util.setIn(obj, ['name', 'first'], 'bob');
+
+    expect(obj.name.first).toEqual('bob');
+  });
+
+  it('should set prop in obj with array key and index', function () {
+
+    var obj = {cars: ['mustang', 'corvette']};
+
+    util.setIn(obj, ['cars', 1], 'ferrari');
+
+    expect(obj.cars[1]).toEqual('ferrari');
+  });
+
+  it('should remove prop in obj with string key', function () {
+
+    var obj = {x: 1, y: 2};
+
+    util.removeIn(obj, 'y');
+
+    expect(obj).toEqual({x: 1});
+  });
+
+  it('should remove prop in obj with array key', function () {
+
+    var obj = {x: {y: 1, z: 2}};
+
+    util.removeIn(obj, ['x', 'z']);
+
+    expect(obj).toEqual({x: {y: 1}});
+  });
+
+  it('should get prop in obj with string key', function () {
+
+    var obj = {x: 1};
+
+    expect(util.getIn(obj, 'x')).toEqual(1);
+  });
+
+  it('should get prop in obj with array key', function () {
+
+    var obj = {x: {y: 1}};
+
+    expect(util.getIn(obj, ['x', 'y'])).toEqual(1);
+  });
+
+  it('should get prop in obj with array and index key', function () {
+
+    var obj = {x: [1]};
+
+    expect(util.getIn(obj, ['x', 0])).toEqual(1);
   });
 
   it('should parse blank text', function () {
