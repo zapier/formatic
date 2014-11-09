@@ -880,7 +880,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/default/compiler.js",
             "targetPath": "default/compiler",
             "pageTitle": "default/compiler",
-            "title": "compiler"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Compiler plugin (compiler)",
+                "slug": "compiler-plugin-compiler",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Compiler plugin (compiler)"
           },
           "depth": 2,
           "outline": []
@@ -900,7 +910,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/default/component.js",
             "targetPath": "default/component",
             "pageTitle": "default/component",
-            "title": "component"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Component plugin (component)",
+                "slug": "component-plugin-component",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Component plugin (component)"
           },
           "depth": 2,
           "outline": []
@@ -920,10 +940,41 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/default/core.js",
             "targetPath": "default/core",
             "pageTitle": "default/core",
-            "title": "core"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Core plugin (core)",
+                "slug": "core-plugin-core",
+                "isFileHeader": true
+              },
+              "depth": 1,
+              "children": [
+                {
+                  "type": "heading",
+                  "data": {
+                    "level": 2,
+                    "title": "Form prototype",
+                    "slug": "form-prototype"
+                  },
+                  "depth": 2
+                }
+              ]
+            },
+            "title": "Core plugin (core)"
           },
           "depth": 2,
-          "outline": []
+          "outline": [
+            {
+              "type": "heading",
+              "data": {
+                "level": 2,
+                "title": "Form prototype",
+                "slug": "form-prototype"
+              },
+              "depth": 2
+            }
+          ]
         }, {
           "type": "file",
           "data": {
@@ -940,7 +991,37 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/default/eval.js",
             "targetPath": "default/eval",
             "pageTitle": "default/eval",
-            "title": "eval"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Eval plugin (eval)",
+                "slug": "eval-plugin-eval",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Eval plugin (eval)"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/eval-functions.js",
+            "projectPath": "lib/default/eval-functions.js",
+            "targetPath": "default/eval-functions",
+            "pageTitle": "default/eval-functions",
+            "title": "eval-functions"
           },
           "depth": 2,
           "outline": []
