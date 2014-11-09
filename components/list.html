@@ -1,0 +1,132 @@
+<!DOCTYPE html><html lang="en"><head><title>components/list</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="components/list"><meta name="groc-project-path" content="lib/components/list.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/components/list.js">lib/components/list.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
+<span class="hljs-keyword">var</span> R = React.DOM;
+
+module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
+
+  plugin.exports.component = React.createClass({
+
+    mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/field'</span>)],
+
+    getDefaultProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> {
+        className: plugin.config.className
+      };
+    },
+
+    nextLookupId: <span class="hljs-number">0</span>,
+
+    getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Need to create artificial keys for the array. Indexes are not good keys,
+since they change. So, map each position to an artificial key</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">var</span> lookups = [];
+      <span class="hljs-keyword">this</span>.props.field.fields().forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, i)</span> {</span>
+        lookups[i] = <span class="hljs-string">'_'</span> + <span class="hljs-keyword">this</span>.nextLookupId;
+        <span class="hljs-keyword">this</span>.nextLookupId++;
+      }.bind(<span class="hljs-keyword">this</span>));
+
+      <span class="hljs-keyword">return</span> {
+        lookups: lookups
+      };
+    },
+
+    componentWillReceiveProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(newProps)</span> {</span>
+
+      <span class="hljs-keyword">var</span> lookups = <span class="hljs-keyword">this</span>.state.lookups;
+      <span class="hljs-keyword">var</span> fields = newProps.field.fields();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Need to set artificial keys for new array items.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (fields.length &gt; lookups.length) {
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = lookups.length; i &lt; fields.length; i++) {
+          lookups[i] = <span class="hljs-string">'_'</span> + <span class="hljs-keyword">this</span>.nextLookupId;
+          <span class="hljs-keyword">this</span>.nextLookupId++;
+        }
+      }
+
+      <span class="hljs-keyword">this</span>.setState({
+        lookups: lookups
+      });
+    },
+
+    onAppend: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemIndex)</span> {</span>
+      <span class="hljs-keyword">this</span>.props.field.append(itemIndex);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>  var field = this.props.field;
+  var item = null;
+  if (this.refs.typeSelect) {
+    var index = parseInt(this.refs.typeSelect.getDOMNode().value);
+    item = field.itemTypes[index].item;
+  }
+  this.props.form.actions.insert(this.props.field, null, item);
+  if (this.props.field.collapsableItems) {
+    // var collapsed = this.props.field.fields.map(function () {
+    //   return true;
+    // }.bind(this));
+    var collapsed = this.state.collapsed;
+    collapsed = collapsed.concat(false);
+    this.setState({
+      collapsed: collapsed
+    });
+  }</p></div></div><div class="code"><div class="wrapper">    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>onClickLabel: function (i) {
+  if (this.props.field.collapsableItems) {
+    var collapsed;
+    // if (!this.state.collapsed[i]) {
+    //   collapsed = this.state.collapsed;
+    //   collapsed[i] = true;
+    //   this.setState({collapsed: collapsed});
+    // } else {
+    //   collapsed = this.props.field.fields.map(function () {
+    //     return true;
+    //   });
+    //   collapsed[i] = false;
+    //   this.setState({collapsed: collapsed});
+    // }
+    collapsed = this.state.collapsed;
+    collapsed[i] = !collapsed[i];
+    this.setState({collapsed: collapsed});
+  }</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-comment">// ,</span>
+    onRemove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(i)</span> {</span>
+      <span class="hljs-keyword">var</span> lookups = <span class="hljs-keyword">this</span>.state.lookups;
+      lookups.splice(i, <span class="hljs-number">1</span>);
+      <span class="hljs-keyword">this</span>.setState({
+        lookups: lookups
+      });
+      <span class="hljs-keyword">this</span>.props.field.remove(i);
+    },
+    onMove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fromIndex, toIndex)</span> {</span>
+      <span class="hljs-keyword">var</span> lookups = <span class="hljs-keyword">this</span>.state.lookups;
+      <span class="hljs-keyword">var</span> fromId = lookups[fromIndex];
+      <span class="hljs-keyword">var</span> toId = lookups[toIndex];
+      lookups[fromIndex] = toId;
+      lookups[toIndex] = fromId;
+      <span class="hljs-keyword">this</span>.setState({
+        lookups: lookups
+      });
+      <span class="hljs-keyword">this</span>.props.field.move(fromIndex, toIndex);
+    },
+
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+
+      <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
+      <span class="hljs-keyword">var</span> fields = field.fields();
+
+      <span class="hljs-keyword">var</span> numItems = fields.length;
+
+      <span class="hljs-keyword">return</span> plugin.component(<span class="hljs-string">'field'</span>)({
+        field: field
+      },
+        R.div({className: <span class="hljs-keyword">this</span>.props.className},
+          React.addons.CSSTransitionGroup({transitionName: <span class="hljs-string">'reveal'</span>},
+            fields.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child, i)</span> {</span>
+              <span class="hljs-keyword">return</span> plugin.component(<span class="hljs-string">'list-item'</span>)({
+                key: <span class="hljs-keyword">this</span>.state.lookups[i],
+                form: <span class="hljs-keyword">this</span>.props.form,
+                field: child,
+                parent: field,
+                index: i,
+                numItems: numItems,
+                onMove: <span class="hljs-keyword">this</span>.onMove,
+                onRemove: <span class="hljs-keyword">this</span>.onRemove
+              });
+            }.bind(<span class="hljs-keyword">this</span>))
+          ),
+          plugin.component(<span class="hljs-string">'list-control'</span>)({field: field, onAppend: <span class="hljs-keyword">this</span>.onAppend})
+        )
+      );
+    }
+  });
+};</div></div></div></div></body></html>

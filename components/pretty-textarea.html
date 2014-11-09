@@ -1,0 +1,372 @@
+<!DOCTYPE html><html lang="en"><head><title>components/pretty-textarea</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="components/pretty-textarea"><meta name="groc-project-path" content="lib/components/pretty-textarea.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/components/pretty-textarea.js">lib/components/pretty-textarea.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
+<span class="hljs-keyword">var</span> R = React.DOM;
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+
+<span class="hljs-keyword">var</span> noBreak = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+  <span class="hljs-keyword">return</span> value.replace(<span class="hljs-regexp">/ /g</span>, <span class="hljs-string">'\u00a0'</span>);
+};
+
+<span class="hljs-keyword">var</span> LEFT_PAD = <span class="hljs-string">'\u00a0\u00a0'</span>;
+<span class="hljs-keyword">var</span> RIGHT_PAD = <span class="hljs-string">'\u00a0\u00a0'</span>;
+
+module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
+
+  <span class="hljs-keyword">var</span> util = plugin.require(<span class="hljs-string">'util'</span>);
+
+  plugin.exports.component = React.createClass({
+
+    mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/undo-stack'</span>), <span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/resize'</span>)],
+
+    getDefaultProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> {
+        className: plugin.config.className
+      };
+    },
+
+    getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> {
+        undoDepth: <span class="hljs-number">100</span>
+      };
+    },
+
+    componentWillMount: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Not quite state, this is for tracking selection info.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">this</span>.tracking = {};
+
+      <span class="hljs-keyword">var</span> parts = util.parseTextWithTags(<span class="hljs-keyword">this</span>.props.field.value);
+      <span class="hljs-keyword">var</span> tokens = <span class="hljs-keyword">this</span>.tokens(parts);
+      <span class="hljs-keyword">var</span> indexMap = <span class="hljs-keyword">this</span>.indexMap(tokens);
+
+      <span class="hljs-keyword">this</span>.tracking.pos = indexMap.length;
+      <span class="hljs-keyword">this</span>.tracking.range = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">this</span>.tracking.tokens = tokens;
+      <span class="hljs-keyword">this</span>.tracking.indexMap = indexMap;
+    },
+
+    getStateSnapshot: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> {
+        value: <span class="hljs-keyword">this</span>.props.field.value,
+        pos: <span class="hljs-keyword">this</span>.tracking.pos,
+        range: <span class="hljs-keyword">this</span>.tracking.range
+      };
+    },
+
+    setStateSnapshot: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(snapshot)</span> {</span>
+      <span class="hljs-keyword">this</span>.tracking.pos = snapshot.pos;
+      <span class="hljs-keyword">this</span>.tracking.range = snapshot.range;
+      <span class="hljs-keyword">this</span>.props.field.val(snapshot.value);
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Turn into individual characters and tags</p></div></div><div class="code"><div class="wrapper">    tokens: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parts)</span> {</span>
+      <span class="hljs-keyword">return</span> [].concat.apply([], parts.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(part)</span> {</span>
+        <span class="hljs-keyword">if</span> (part.type === <span class="hljs-string">'tag'</span>) {
+          <span class="hljs-keyword">return</span> part;
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> part.value.split(<span class="hljs-string">''</span>);
+        }
+      }));
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Map each textarea index back to a token</p></div></div><div class="code"><div class="wrapper">    indexMap: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tokens)</span> {</span>
+      <span class="hljs-keyword">var</span> indexMap = [];
+      _.each(tokens, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(token, tokenIndex)</span> {</span>
+        <span class="hljs-keyword">if</span> (token.type === <span class="hljs-string">'tag'</span>) {
+          <span class="hljs-keyword">var</span> label = LEFT_PAD + noBreak(<span class="hljs-keyword">this</span>.prettyLabel(token.value)) + RIGHT_PAD;
+          <span class="hljs-keyword">var</span> labelChars = label.split(<span class="hljs-string">''</span>);
+          _.each(labelChars, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+            indexMap.push(tokenIndex);
+          });
+        } <span class="hljs-keyword">else</span> {
+          indexMap.push(tokenIndex);
+        }
+      }.bind(<span class="hljs-keyword">this</span>));
+      <span class="hljs-keyword">return</span> indexMap;
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Make highlight scroll match textarea scroll</p></div></div><div class="code"><div class="wrapper">    onScroll: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">this</span>.refs.highlight.getDOMNode().scrollTop = <span class="hljs-keyword">this</span>.refs.content.getDOMNode().scrollTop;
+      <span class="hljs-keyword">this</span>.refs.highlight.getDOMNode().scrollLeft = <span class="hljs-keyword">this</span>.refs.content.getDOMNode().scrollLeft;
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given some postion, return the token index (position could be in the middle of a token)</p></div></div><div class="code"><div class="wrapper">    tokenIndex: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(pos, tokens, indexMap)</span> {</span>
+      <span class="hljs-keyword">if</span> (pos &lt; <span class="hljs-number">0</span>) {
+        pos = <span class="hljs-number">0</span>;
+      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pos &gt;= indexMap.length) {
+        <span class="hljs-keyword">return</span> tokens.length;
+      }
+      <span class="hljs-keyword">return</span> indexMap[pos];
+    },
+
+    onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> {</span>
+      <span class="hljs-comment">//console.log('change:', event.target.value);</span>
+
+      <span class="hljs-keyword">var</span> node = event.target;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Tracking is holding previous position and range</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">var</span> prevPos = <span class="hljs-keyword">this</span>.tracking.pos;
+      <span class="hljs-keyword">var</span> prevRange = <span class="hljs-keyword">this</span>.tracking.range;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>New position</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">var</span> pos = node.selectionStart;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Going to mutate the tokens.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">var</span> tokens = <span class="hljs-keyword">this</span>.tracking.tokens;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Using the previous position and range, get the previous token position
+and range</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">var</span> prevTokenIndex = <span class="hljs-keyword">this</span>.tokenIndex(prevPos, tokens, <span class="hljs-keyword">this</span>.tracking.indexMap);
+      <span class="hljs-keyword">var</span> prevTokenEndIndex = <span class="hljs-keyword">this</span>.tokenIndex(prevPos + prevRange, tokens, <span class="hljs-keyword">this</span>.tracking.indexMap);
+      <span class="hljs-keyword">var</span> prevTokenRange = prevTokenEndIndex - prevTokenIndex;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wipe out any tokens in the selected range because the change would have
+erased that selection.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (prevTokenRange &gt; <span class="hljs-number">0</span>) {
+        tokens.splice(prevTokenIndex, prevTokenRange);
+        <span class="hljs-keyword">this</span>.tracking.indexMap = <span class="hljs-keyword">this</span>.indexMap(tokens);
+      }</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If cursor has moved forward, then text was added.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (pos &gt; prevPos) {
+        <span class="hljs-keyword">var</span> addedText = node.value.substring(prevPos, pos);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Insert the text into the tokens.</p></div></div><div class="code"><div class="wrapper">        tokens.splice(prevTokenIndex, <span class="hljs-number">0</span>, addedText);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If cursor has moved backward, then we deleted (backspaced) text</p></div></div><div class="code"><div class="wrapper">      } <span class="hljs-keyword">if</span> (pos &lt; prevPos) {
+        <span class="hljs-keyword">var</span> token = <span class="hljs-keyword">this</span>.tokenAt(pos);
+        <span class="hljs-keyword">var</span> tokenBefore = <span class="hljs-keyword">this</span>.tokenBefore(pos);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If we moved back onto a token, then we should move back to beginning
+of token.</p></div></div><div class="code"><div class="wrapper">        <span class="hljs-keyword">if</span> (token === tokenBefore) {
+          pos = <span class="hljs-keyword">this</span>.moveOffTag(pos, tokens, <span class="hljs-keyword">this</span>.indexMap(tokens), -<span class="hljs-number">1</span>);
+        }
+        <span class="hljs-keyword">var</span> tokenIndex = <span class="hljs-keyword">this</span>.tokenIndex(pos, tokens, <span class="hljs-keyword">this</span>.tracking.indexMap);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Now we can remove the tokens that were deleted.</p></div></div><div class="code"><div class="wrapper">        tokens.splice(tokenIndex, prevTokenIndex - tokenIndex);
+      }</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert tokens back into raw value with tags. Newly formed tags will
+become part of the raw value.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">var</span> rawValue = <span class="hljs-keyword">this</span>.rawValue(tokens);
+
+      <span class="hljs-keyword">this</span>.tracking.pos = pos;
+      <span class="hljs-keyword">this</span>.tracking.range = <span class="hljs-number">0</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Set the value to the new raw value.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">this</span>.props.field.val(rawValue);
+
+      <span class="hljs-keyword">this</span>.snapshot();
+    },
+
+    componentDidUpdate: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">if</span> (document.activeElement === <span class="hljs-keyword">this</span>.refs.content.getDOMNode()) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>React can lose the selection, so put it back.</p></div></div><div class="code"><div class="wrapper">        <span class="hljs-keyword">var</span> value = <span class="hljs-keyword">this</span>.props.field.value || <span class="hljs-string">''</span>;
+        <span class="hljs-keyword">var</span> parts = util.parseTextWithTags(value);
+        <span class="hljs-keyword">this</span>.tracking.tokens = <span class="hljs-keyword">this</span>.tokens(parts);
+        <span class="hljs-keyword">this</span>.tracking.indexMap = <span class="hljs-keyword">this</span>.indexMap(<span class="hljs-keyword">this</span>.tracking.tokens);
+
+        <span class="hljs-keyword">var</span> pos = <span class="hljs-keyword">this</span>.normalizePosition(<span class="hljs-keyword">this</span>.tracking.pos);
+        <span class="hljs-keyword">var</span> range = <span class="hljs-keyword">this</span>.tracking.range;
+        <span class="hljs-keyword">var</span> endPos = <span class="hljs-keyword">this</span>.normalizePosition(pos + range);
+        range = endPos - pos;
+
+        <span class="hljs-keyword">this</span>.tracking.pos = pos;
+        <span class="hljs-keyword">this</span>.tracking.range = range;
+
+        <span class="hljs-keyword">this</span>.refs.content.getDOMNode().setSelectionRange(pos, pos + range);
+      }
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the label for a key.</p></div></div><div class="code"><div class="wrapper">    prettyLabel: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.props.field.def.replaceTags[key]) {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.props.field.def.replaceTags[key];
+      }
+      <span class="hljs-keyword">return</span> util.humanize(key);
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the actual value of the field (with tags), get the plain text that
+should show in the textarea.</p></div></div><div class="code"><div class="wrapper">    plainValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+      <span class="hljs-keyword">var</span> parts = util.parseTextWithTags(value);
+      <span class="hljs-keyword">return</span> parts.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(part)</span> {</span>
+        <span class="hljs-keyword">if</span> (part.type === <span class="hljs-string">'text'</span>) {
+          <span class="hljs-keyword">return</span> part.value;
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> LEFT_PAD + noBreak(<span class="hljs-keyword">this</span>.prettyLabel(part.value)) + RIGHT_PAD;
+        }
+      }.bind(<span class="hljs-keyword">this</span>)).join(<span class="hljs-string">''</span>);
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the actual value of the field (with tags), get the html used to
+highlight the labels.</p></div></div><div class="code"><div class="wrapper">    prettyValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+      <span class="hljs-keyword">var</span> parts = util.parseTextWithTags(value);
+      <span class="hljs-keyword">return</span> parts.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(part, i)</span> {</span>
+        <span class="hljs-keyword">if</span> (part.type === <span class="hljs-string">'text'</span>) {
+          <span class="hljs-keyword">if</span> (i === (parts.length - <span class="hljs-number">1</span>)) {
+            <span class="hljs-keyword">if</span> (part.value[part.value.length - <span class="hljs-number">1</span>] === <span class="hljs-string">'\n'</span>) {
+              <span class="hljs-keyword">return</span> part.value + <span class="hljs-string">'\u00a0'</span>;
+            }
+          }
+          <span class="hljs-keyword">return</span> part.value;
+        } <span class="hljs-keyword">else</span> {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Make a pill</p></div></div><div class="code"><div class="wrapper">          <span class="hljs-keyword">return</span> R.span({className: <span class="hljs-string">'pretty-part'</span>},
+            R.span({className: <span class="hljs-string">'pretty-part-left'</span>}, LEFT_PAD),
+            R.span({className: <span class="hljs-string">'pretty-part-text'</span>}, noBreak(<span class="hljs-keyword">this</span>.prettyLabel(part.value))),
+            R.span({className: <span class="hljs-string">'pretty-part-right'</span>}, RIGHT_PAD)
+          );
+        }
+      }.bind(<span class="hljs-keyword">this</span>));
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the tokens for a field, get the actual value of the field (with
+tags)</p></div></div><div class="code"><div class="wrapper">    rawValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tokens)</span> {</span>
+      <span class="hljs-keyword">return</span> tokens.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(token)</span> {</span>
+        <span class="hljs-keyword">if</span> (token.type === <span class="hljs-string">'tag'</span>) {
+          <span class="hljs-keyword">return</span> <span class="hljs-string">'{{'</span> + token.value + <span class="hljs-string">'}}'</span>;
+        } <span class="hljs-keyword">else</span> {
+          <span class="hljs-keyword">return</span> token;
+        }
+      }).join(<span class="hljs-string">''</span>);
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a position, if it&#39;s on a label, get the position left or right of
+the label, based on direction and/or which side is closer</p></div></div><div class="code"><div class="wrapper">    moveOffTag: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(pos, tokens, indexMap, dir)</span> {</span>
+      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> dir === <span class="hljs-string">'undefined'</span> || dir &gt; <span class="hljs-number">0</span>) {
+        dir = <span class="hljs-number">1</span>;
+      } <span class="hljs-keyword">else</span> {
+        dir = -<span class="hljs-number">1</span>;
+      }
+      <span class="hljs-keyword">var</span> token;
+      <span class="hljs-keyword">if</span> (dir &gt; <span class="hljs-number">0</span>) {
+        token = tokens[indexMap[pos]];
+        <span class="hljs-keyword">while</span> (pos &lt; indexMap.length &amp;&amp; tokens[indexMap[pos]].type === <span class="hljs-string">'tag'</span> &amp;&amp; tokens[indexMap[pos]] === token) {
+          pos++;
+        }
+      } <span class="hljs-keyword">else</span> {
+        token = tokens[indexMap[pos - <span class="hljs-number">1</span>]];
+        <span class="hljs-keyword">while</span> (pos &gt; <span class="hljs-number">0</span> &amp;&amp; tokens[indexMap[pos - <span class="hljs-number">1</span>]].type === <span class="hljs-string">'tag'</span> &amp;&amp; tokens[indexMap[pos - <span class="hljs-number">1</span>]] === token) {
+          pos--;
+        }
+      }
+
+      <span class="hljs-keyword">return</span> pos;
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the token at some position.</p></div></div><div class="code"><div class="wrapper">    tokenAt: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(pos)</span> {</span>
+      <span class="hljs-keyword">if</span> (pos &gt;= <span class="hljs-keyword">this</span>.tracking.indexMap.length) {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+      }
+      <span class="hljs-keyword">if</span> (pos &lt; <span class="hljs-number">0</span>) {
+        pos = <span class="hljs-number">0</span>;
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.tracking.tokens[<span class="hljs-keyword">this</span>.tracking.indexMap[pos]];
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the token immediately before some position.</p></div></div><div class="code"><div class="wrapper">    tokenBefore: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(pos)</span> {</span>
+      <span class="hljs-keyword">if</span> (pos &gt;= <span class="hljs-keyword">this</span>.tracking.indexMap.length) {
+        pos = <span class="hljs-keyword">this</span>.tracking.indexMap.length;
+      }
+      <span class="hljs-keyword">if</span> (pos &lt;= <span class="hljs-number">0</span>) {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+      }
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.tracking.tokens[<span class="hljs-keyword">this</span>.tracking.indexMap[pos - <span class="hljs-number">1</span>]];
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a position, get a corrected position (if necessary to be
+corrected).</p></div></div><div class="code"><div class="wrapper">    normalizePosition: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(pos, prevPos)</span> {</span>
+      <span class="hljs-keyword">if</span> (_.isUndefined(prevPos)) {
+        prevPos = pos;
+      }</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>At start or end, so okay.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (pos &lt;= <span class="hljs-number">0</span> || pos &gt;= <span class="hljs-keyword">this</span>.tracking.indexMap.length) {
+        <span class="hljs-keyword">if</span> (pos &lt; <span class="hljs-number">0</span>) {
+          pos = <span class="hljs-number">0</span>;
+        }
+        <span class="hljs-keyword">if</span> (pos &gt; <span class="hljs-keyword">this</span>.tracking.indexMap.length) {
+          pos = <span class="hljs-keyword">this</span>.tracking.indexMap.length;
+        }
+        <span class="hljs-keyword">return</span> pos;
+      }
+
+      <span class="hljs-keyword">var</span> token = <span class="hljs-keyword">this</span>.tokenAt(pos);
+      <span class="hljs-keyword">var</span> tokenBefore = <span class="hljs-keyword">this</span>.tokenBefore(pos);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Between two tokens, so okay.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (token !== tokenBefore) {
+        <span class="hljs-keyword">return</span> pos;
+      }
+
+      <span class="hljs-keyword">var</span> prevToken = <span class="hljs-keyword">this</span>.tokenAt(prevPos);
+      <span class="hljs-keyword">var</span> prevTokenBefore = <span class="hljs-keyword">this</span>.tokenBefore(prevPos);
+
+      <span class="hljs-keyword">var</span> rightPos = <span class="hljs-keyword">this</span>.moveOffTag(pos, <span class="hljs-keyword">this</span>.tracking.tokens, <span class="hljs-keyword">this</span>.tracking.indexMap);
+      <span class="hljs-keyword">var</span> leftPos = <span class="hljs-keyword">this</span>.moveOffTag(pos, <span class="hljs-keyword">this</span>.tracking.tokens, <span class="hljs-keyword">this</span>.tracking.indexMap, -<span class="hljs-number">1</span>);
+
+      <span class="hljs-keyword">if</span> (prevToken !== prevTokenBefore) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Moved from left edge.</p></div></div><div class="code"><div class="wrapper">        <span class="hljs-keyword">if</span> (prevToken === token) {
+          <span class="hljs-keyword">return</span> rightPos;
+        }</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Moved from right edge.</p></div></div><div class="code"><div class="wrapper">        <span class="hljs-keyword">if</span> (prevTokenBefore === token) {
+          <span class="hljs-keyword">return</span> leftPos;
+        }
+      }
+
+      <span class="hljs-keyword">var</span> newPos = rightPos;
+
+      <span class="hljs-keyword">if</span> (pos === prevPos || pos &lt; prevPos) {
+        <span class="hljs-keyword">if</span> (rightPos - pos &gt; pos - leftPos) {
+          newPos = leftPos;
+        }
+      }
+      <span class="hljs-keyword">return</span> newPos;
+    },
+
+    onSelect: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> {</span>
+      <span class="hljs-keyword">var</span> node = event.target;
+
+      <span class="hljs-keyword">var</span> pos = node.selectionStart;
+      <span class="hljs-keyword">var</span> endPos = node.selectionEnd;
+
+      pos = <span class="hljs-keyword">this</span>.normalizePosition(pos, <span class="hljs-keyword">this</span>.tracking.pos);
+      endPos = <span class="hljs-keyword">this</span>.normalizePosition(endPos, <span class="hljs-keyword">this</span>.tracking.pos + <span class="hljs-keyword">this</span>.tracking.range);
+
+      <span class="hljs-keyword">this</span>.tracking.pos = pos;
+      <span class="hljs-keyword">this</span>.tracking.range = endPos - pos;
+
+      node.selectionStart = pos;
+      node.selectionEnd = endPos;
+    },
+
+    onCopy: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> node = <span class="hljs-keyword">this</span>.refs.content.getDOMNode();
+      <span class="hljs-keyword">var</span> start = node.selectionStart;
+      <span class="hljs-keyword">var</span> end = node.selectionEnd;
+      <span class="hljs-keyword">var</span> text = node.value.substring(start, end);
+      <span class="hljs-keyword">var</span> realStartIndex = <span class="hljs-keyword">this</span>.tokenIndex(start, <span class="hljs-keyword">this</span>.tracking.tokens, <span class="hljs-keyword">this</span>.tracking.indexMap);
+      <span class="hljs-keyword">var</span> realEndIndex = <span class="hljs-keyword">this</span>.tokenIndex(end, <span class="hljs-keyword">this</span>.tracking.tokens, <span class="hljs-keyword">this</span>.tracking.indexMap);
+      <span class="hljs-keyword">var</span> tokens = <span class="hljs-keyword">this</span>.tracking.tokens.slice(realStartIndex, realEndIndex);
+      text = <span class="hljs-keyword">this</span>.rawValue(tokens);
+      <span class="hljs-keyword">var</span> originalValue = node.value;
+      node.value = node.value + text;
+      node.setSelectionRange(originalValue.length, originalValue.length + text.length);
+      window.setTimeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
+        node.value = originalValue;
+        node.setSelectionRange(start, end);
+      },<span class="hljs-number">0</span>);
+    },
+
+    onKeyDown: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> {</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Cmd-Z or Ctrl-Z</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (event.keyCode === <span class="hljs-number">90</span> &amp;&amp; (event.metaKey || event.ctrlKey) &amp;&amp; !event.shiftKey) {
+        event.preventDefault();
+        <span class="hljs-keyword">this</span>.undo();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Cmd-Shift-Z or Ctrl-Y</p></div></div><div class="code"><div class="wrapper">      } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (
+        (event.keyCode === <span class="hljs-number">89</span> &amp;&amp; event.ctrlKey &amp;&amp; !event.shiftKey) ||
+        (event.keyCode === <span class="hljs-number">90</span> &amp;&amp; event.metaKey &amp;&amp; event.shiftKey)
+      ) {
+        <span class="hljs-keyword">this</span>.redo();
+      }
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Keep the highlight styles in sync with the textarea styles.</p></div></div><div class="code"><div class="wrapper">    adjustStyles: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> overlay = <span class="hljs-keyword">this</span>.refs.highlight.getDOMNode();
+      <span class="hljs-keyword">var</span> content = <span class="hljs-keyword">this</span>.refs.content.getDOMNode();
+
+      util.copyElementStyle(content, overlay);
+
+      overlay.style.position = <span class="hljs-string">'absolute'</span>;
+      overlay.style.whiteSpace = <span class="hljs-string">'pre-wrap'</span>;
+      overlay.style.color = <span class="hljs-string">'rgba(0,0,0,0)'</span>;
+      overlay.style.webkitTextFillColor = <span class="hljs-string">'rgba(0,0,0,0)'</span>;
+      overlay.style.resize = <span class="hljs-string">'none'</span>;
+      overlay.style.borderColor = <span class="hljs-string">'rgba(0,0,0,0)'</span>;
+
+      <span class="hljs-keyword">if</span> (util.browser.isMozilla) {
+        <span class="hljs-keyword">var</span> style = window.getComputedStyle(content);
+        <span class="hljs-keyword">var</span> paddingTop = <span class="hljs-built_in">parseFloat</span>(style.paddingTop);
+        <span class="hljs-keyword">var</span> paddingBottom = <span class="hljs-built_in">parseFloat</span>(style.paddingBottom);
+
+        <span class="hljs-keyword">var</span> borderTop = <span class="hljs-built_in">parseFloat</span>(style.borderTopWidth);
+        <span class="hljs-keyword">var</span> borderBottom = <span class="hljs-built_in">parseFloat</span>(style.borderBottomWidth);
+
+        overlay.style.paddingTop = <span class="hljs-string">'0px'</span>;
+        overlay.style.paddingBottom = <span class="hljs-string">'0px'</span>;
+
+        overlay.style.height = (content.clientHeight - paddingTop - paddingBottom + borderTop + borderBottom) + <span class="hljs-string">'px'</span>;
+        overlay.style.top = style.paddingTop;
+        overlay.style.boxShadow = <span class="hljs-string">'none'</span>;
+      }
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If the textarea is resized, need to re-sync the styles.</p></div></div><div class="code"><div class="wrapper">    onResize: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">this</span>.adjustStyles();
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If the window is resized, may need to re-sync the styles.
+Probably not necessary with element resize?</p></div></div><div class="code"><div class="wrapper">    onResizeWindow: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">this</span>.adjustStyles();
+    },
+
+    componentDidMount: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">this</span>.adjustStyles();
+      <span class="hljs-keyword">this</span>.setOnResize(<span class="hljs-string">'content'</span>, <span class="hljs-keyword">this</span>.onResize);
+    },
+
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
+      <span class="hljs-keyword">return</span> R.div({style: {position: <span class="hljs-string">'relative'</span>}},
+
+        R.pre({
+          className: <span class="hljs-string">'pretty-highlight'</span>,
+          ref: <span class="hljs-string">'highlight'</span>
+        },
+          <span class="hljs-keyword">this</span>.prettyValue(field.value)
+        ),
+
+        R.textarea(_.extend({
+          className: util.className(<span class="hljs-keyword">this</span>.props.className, <span class="hljs-string">'pretty-content'</span>),
+          ref: <span class="hljs-string">'content'</span>,
+          rows: <span class="hljs-number">5</span>,
+          name: field.key,
+          value: <span class="hljs-keyword">this</span>.plainValue(field.value),
+          onChange: <span class="hljs-keyword">this</span>.onChange,
+          onScroll: <span class="hljs-keyword">this</span>.onScroll,
+          style: {
+            backgroundColor: <span class="hljs-string">'rgba(0,0,0,0)'</span>,
+            position: <span class="hljs-string">'relative'</span>,
+            top: <span class="hljs-number">0</span>,
+            left: <span class="hljs-number">0</span>
+          },
+          onKeyPress: <span class="hljs-keyword">this</span>.onKeyPress,
+          onKeyDown: <span class="hljs-keyword">this</span>.onKeyDown,
+          onSelect: <span class="hljs-keyword">this</span>.onSelect,
+          onCopy: <span class="hljs-keyword">this</span>.onCopy
+        }, plugin.config.attributes))
+      );
+    }
+  });
+};</div></div></div></div></body></html>

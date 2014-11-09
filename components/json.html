@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="en"><head><title>components/json</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="components/json"><meta name="groc-project-path" content="lib/components/json.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/components/json.js">lib/components/json.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>);
+<span class="hljs-keyword">var</span> R = React.DOM;
+
+module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
+
+  plugin.exports.component = React.createClass({
+
+    mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/field'</span>)],
+
+    getDefaultProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> {
+        className: plugin.config.className,
+        rows: plugin.config.rows || <span class="hljs-number">5</span>
+      };
+    },
+
+    isValidValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+
+      <span class="hljs-keyword">try</span> {
+        <span class="hljs-built_in">JSON</span>.parse(value);
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+      } <span class="hljs-keyword">catch</span> (e) {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+      }
+    },
+
+    getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> {
+        isValid: <span class="hljs-literal">true</span>,
+        value: <span class="hljs-built_in">JSON</span>.stringify(<span class="hljs-keyword">this</span>.props.field.value)
+      };
+    },
+
+    onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> {</span>
+      <span class="hljs-keyword">var</span> isValid = <span class="hljs-keyword">this</span>.isValidValue(event.target.value);
+
+      <span class="hljs-keyword">if</span> (isValid) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Need to handle this better. Need to track position.</p></div></div><div class="code"><div class="wrapper">        <span class="hljs-keyword">this</span>._isChanging = <span class="hljs-literal">true</span>;
+        <span class="hljs-keyword">this</span>.props.field.val(<span class="hljs-built_in">JSON</span>.parse(event.target.value));
+      }
+
+      <span class="hljs-keyword">this</span>.setState({
+        isValid: isValid,
+        value: event.target.value
+      });
+    },
+
+    componentWillReceiveProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(nextProps)</span> {</span>
+      <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>._isChanging) {
+        <span class="hljs-keyword">this</span>.setState({
+          isValid: <span class="hljs-literal">true</span>,
+          value: <span class="hljs-built_in">JSON</span>.stringify(nextProps.field.value, <span class="hljs-literal">null</span>, <span class="hljs-number">2</span>)
+        });
+      }
+      <span class="hljs-keyword">this</span>._isChanging = <span class="hljs-literal">false</span>;
+    },
+
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+
+      <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
+
+      <span class="hljs-keyword">return</span> plugin.component(<span class="hljs-string">'field'</span>)({
+        field: field
+      }, R.textarea({
+          className: <span class="hljs-keyword">this</span>.props.className,
+          value: <span class="hljs-keyword">this</span>.state.value,
+          onChange: <span class="hljs-keyword">this</span>.onChange,
+          style: {backgroundColor: <span class="hljs-keyword">this</span>.state.isValid ? <span class="hljs-string">''</span> : <span class="hljs-string">'rgb(255,200,200)'</span>},
+          rows: field.def.rows || <span class="hljs-keyword">this</span>.props.rows
+        })
+      );
+    }
+  });
+};</div></div></div></div></body></html>

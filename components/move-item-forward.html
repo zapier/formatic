@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="en"><head><title>components/move-item-forward</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="components/move-item-forward"><meta name="groc-project-path" content="lib/components/move-item-forward.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/components/move-item-forward.js">lib/components/move-item-forward.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
+<span class="hljs-keyword">var</span> R = React.DOM;
+
+module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
+
+  plugin.exports.component = React.createClass({
+
+    getDefaultProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> {
+        className: plugin.config.className,
+        label: plugin.configValue(<span class="hljs-string">'label'</span>, <span class="hljs-string">'[down]'</span>)
+      };
+    },
+
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">return</span> R.span({className: <span class="hljs-keyword">this</span>.props.className, onClick: <span class="hljs-keyword">this</span>.props.onClick}, <span class="hljs-keyword">this</span>.props.label);
+    }
+  });
+};</div></div></div></div></body></html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html><html lang="en"><head><title>compilers/choices</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="compilers/choices"><meta name="groc-project-path" content="lib/compilers/choices.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/compilers/choices.js">lib/compilers/choices.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+
+module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
+
+  plugin.exports.compile = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
+    <span class="hljs-keyword">if</span> (def.choices) {
+
+      <span class="hljs-keyword">var</span> choices = def.choices;
+
+      <span class="hljs-keyword">if</span> (_.isString(choices)) {
+        choices = choices.split(<span class="hljs-string">','</span>);
+      }
+
+      <span class="hljs-keyword">if</span> (!_.isArray(choices) &amp;&amp; _.isObject(choices)) {
+        choices = <span class="hljs-built_in">Object</span>.keys(choices).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
+          <span class="hljs-keyword">return</span> {
+            value: key,
+            label: choices[key]
+          };
+        });
+      }
+
+      choices = choices.slice(<span class="hljs-number">0</span>);
+
+      choices.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> {</span>
+        <span class="hljs-keyword">if</span> (_.isString(choice)) {
+          choices[i] = {
+            value: choice,
+            label: choice
+          };
+        }
+      });
+
+      def.choices = choices;
+    }
+  };
+};</div></div></div></div></body></html>

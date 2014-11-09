@@ -1,0 +1,100 @@
+<!DOCTYPE html><html lang="en"><head><title>default/compiler</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="default/compiler"><meta name="groc-project-path" content="lib/default/compiler.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/default/compiler.js">lib/default/compiler.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+
+module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
+
+  <span class="hljs-keyword">var</span> compilerPlugins = plugin.requireAll(plugin.config.compilers);
+  <span class="hljs-keyword">var</span> util = plugin.require(<span class="hljs-string">'util'</span>);
+
+  <span class="hljs-keyword">var</span> compiler = plugin.exports;
+
+  compiler.templateMap = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fields)</span> {</span>
+    <span class="hljs-keyword">var</span> map = {};
+    fields.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
+      <span class="hljs-keyword">if</span> (field.key) {
+        map[field.key] = field;
+      }
+      <span class="hljs-keyword">if</span> (field.id) {
+        map[field.id] = field;
+      }
+    });
+    <span class="hljs-keyword">return</span> map;
+  };
+
+  compiler.expandDef = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def, templateMap)</span> {</span>
+    <span class="hljs-keyword">var</span> isTemplate = def.template;
+    <span class="hljs-keyword">var</span> ext = def.extends;
+    <span class="hljs-keyword">if</span> (_.isString(ext)) {
+      ext = [ext];
+    }
+    <span class="hljs-keyword">if</span> (ext) {
+      <span class="hljs-keyword">var</span> bases = ext.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(base)</span> {</span>
+        <span class="hljs-keyword">var</span> template = templateMap[base];
+        <span class="hljs-keyword">if</span> (!template) {
+          <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Template '</span> + base + <span class="hljs-string">' not found.'</span>);
+        }
+        <span class="hljs-keyword">return</span> template;
+      });
+      <span class="hljs-keyword">var</span> chain = [{}].concat(bases.reverse().concat([def]));
+      def = _.extend.apply(_, chain);
+    }
+    <span class="hljs-keyword">if</span> (def.fields) {
+      def.fields = def.fields.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childDef)</span> {</span>
+        <span class="hljs-keyword">if</span> (!_.isString(childDef)) {
+          <span class="hljs-keyword">return</span> compiler.expandDef(childDef, templateMap);
+        }
+        <span class="hljs-keyword">return</span> childDef;
+      });
+    }
+    <span class="hljs-keyword">if</span> (def.items) {
+      def.items = def.items.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemDef)</span> {</span>
+        <span class="hljs-keyword">if</span> (!_.isString(itemDef)) {
+          <span class="hljs-keyword">return</span> compiler.expandDef(itemDef, templateMap);
+        }
+        <span class="hljs-keyword">return</span> itemDef;
+      });
+    }
+    <span class="hljs-keyword">if</span> (!isTemplate &amp;&amp; def.template) {
+      <span class="hljs-keyword">delete</span> def.template;
+    }
+    <span class="hljs-keyword">return</span> def;
+  };
+
+  compiler.expandFields = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fields)</span> {</span>
+    <span class="hljs-keyword">var</span> templateMap = compiler.templateMap(fields);
+    <span class="hljs-keyword">return</span> fields.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
+      <span class="hljs-keyword">return</span> compiler.expandDef(def, templateMap);
+    });
+  };
+
+  compiler.compileDef = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
+
+    def = util.deepCopy(def);
+
+    <span class="hljs-keyword">var</span> result;
+    compilerPlugins.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
+      result = plugin.compile(def);
+      <span class="hljs-keyword">if</span> (result) {
+        def = result;
+      }
+    });
+
+    <span class="hljs-keyword">var</span> typePlugin = plugin.require(<span class="hljs-string">'type.'</span> + def.type);
+
+    <span class="hljs-keyword">if</span> (typePlugin.compile) {
+      result = typePlugin.compile(def);
+      <span class="hljs-keyword">if</span> (result) {
+        def = result;
+      }
+    }
+
+    <span class="hljs-keyword">return</span> def;
+  };
+
+  compiler.compileFields = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fields)</span> {</span>
+    <span class="hljs-keyword">return</span> fields.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
+      <span class="hljs-keyword">return</span> compiler.compileDef(field);
+    });
+  };
+};</div></div></div></div></body></html>
