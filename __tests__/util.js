@@ -93,6 +93,50 @@ describe('util', function() {
     expect(util.getIn(obj, ['x', 0])).toEqual(1);
   });
 
+  it('should append in obj with string key', function () {
+
+    var obj = {x: ['a']};
+
+    expect(util.appendIn(obj, 'x', 'b')).toEqual({x: ['a', 'b']});
+  });
+
+  it('should append in obj with array key', function () {
+
+    var obj = {x: {y: ['a']}};
+
+    expect(util.appendIn(obj, ['x', 'y'], 'b')).toEqual({x: {y: ['a', 'b']}});
+  });
+
+  it('should move in obj', function () {
+
+    var obj = {x: ['a', 'b']};
+
+    expect(util.moveIn(obj, ['x'], 0, 1)).toEqual({x: ['b', 'a']});
+    expect(util.moveIn(obj, ['x'], 1, 0)).toEqual({x: ['a', 'b']});
+  });
+
+  it('should copy json', function () {
+
+    var obj = {x: {y: 1}};
+
+    var copy = util.copyValue(obj);
+
+    obj.x.y = 2;
+
+    expect(copy).toEqual({x: {y: 1}});
+  });
+
+  it('should deep copy obj', function () {
+
+    var obj = {x: {y: 1}};
+
+    var copy = util.deepCopy(obj);
+
+    obj.x.y = 2;
+
+    expect(copy).toEqual({x: {y: 1}});
+  });
+
   it('should parse blank text', function () {
 
     expect(util.parseTextWithTags('')).toEqual([]);
