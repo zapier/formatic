@@ -137,6 +137,55 @@ describe('util', function() {
     expect(copy).toEqual({x: {y: 1}});
   });
 
+  it('should match item to value', function () {
+
+    var obj = {type: 'foo'};
+
+    var item = {match: {type: 'foo'}};
+
+    expect(util.itemMatchesValue(item, obj)).toEqual(true);
+  });
+
+  it('should not match item to value', function () {
+
+    var obj = {type: 'foo'};
+
+    var item = {match: {type: 'bar'}};
+
+    expect(util.itemMatchesValue(item, obj)).toEqual(false);
+  });
+
+  it('should create string field from string', function () {
+
+    var def = util.fieldDefFromValue('foo');
+
+    expect(def).toEqual({type: 'string'});
+  });
+
+  it('should create object field from object', function () {
+
+    var def = util.fieldDefFromValue({foo: 'bar'});
+
+    expect(def).toEqual({type: 'object', fields: [{type: 'string', label: 'Foo', key: 'foo'}]});
+  });
+
+  it('should create array field from array', function () {
+
+    var def = util.fieldDefFromValue(['foo']);
+
+    expect(def).toEqual({type: 'array', fields: [{type: 'string', key: 0}]});
+  });
+
+  it('should humanize a string', function () {
+
+    expect(util.humanize('foo')).toEqual('Foo');
+  });
+
+  it('should add class names togeter', function () {
+
+    expect(util.className('foo', null, 'bar')).toEqual('foo bar');
+  });
+
   it('should parse blank text', function () {
 
     expect(util.parseTextWithTags('')).toEqual([]);
