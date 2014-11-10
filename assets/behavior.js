@@ -790,7 +790,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/core/field.js",
             "targetPath": "core/field",
             "pageTitle": "core/field",
-            "title": "field"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Core field plugin (core.field)",
+                "slug": "core-field-plugin-corefield",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Core field plugin (core.field)"
           },
           "depth": 2,
           "outline": []
@@ -840,7 +850,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/core/form-init.js",
             "targetPath": "core/form-init",
             "pageTitle": "core/form-init",
-            "title": "form-init"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Core form init plugin (core.form-init)",
+                "slug": "core-form-init-plugin-coreform-init",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Core form init plugin (core.form-init)"
           },
           "depth": 2,
           "outline": []
@@ -1131,7 +1151,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/default/loader.js",
             "targetPath": "default/loader",
             "pageTitle": "default/loader",
-            "title": "loader"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Loader plugin (loader)",
+                "slug": "loader-plugin-loader",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Loader plugin (loader)"
           },
           "depth": 2,
           "outline": []
