@@ -157,9 +157,9 @@
           lookup: {source: 'locations', keys: ['country']}
           // eval: {
           //   needsMeta: [
-          //     ['@if', ['@getMeta', 'locations', ['@get', 'country']], null, ['locations', ['@get', 'country']]]
+          //     ['@if', ['@getMeta', 'locations', {country: ['@get', 'country']}], null, ['locations', {country: ['@get', 'country']}]]
           //   ],
-          //   choices: ['@getMeta', 'locations', ['@get', 'country']]
+          //   choices: ['@getMeta', 'locations', {country: ['@get', 'country']}]
           // }
         },
         {
@@ -171,9 +171,9 @@
           lookup: {source: 'locations', keys: ['country', 'state']}
           // eval: {
           //   needsMeta: [
-          //     ['@if', ['@getMeta', 'locations', ['@get', 'country'], ['@get', 'state']], null, ['locations', ['@get', 'country'], ['@get', 'state']]]
+          //     ['@if', ['@getMeta', 'locations', {country: ['@get', 'country'], state: ['@get', 'state']}], null, ['locations', {country: ['@get', 'country'], state: ['@get', 'state']}]]
           //   ],
-          //   choices: ['@getMeta', 'locations', ['@get', 'country'], ['@get', 'state']]
+          //   choices: ['@getMeta', 'locations', {country: ['@get', 'country'], state: ['@get', 'state']}]
           // }
         },
         {
@@ -207,7 +207,9 @@
       value: {}
     });
 
-    form.source('locations', function (country, state) {
+    form.source('locations', function (params) {
+      var country = params.country;
+      var state = params.state;
       return new Promise(function (resolve, reject) {
         setTimeout(function () {
           if (country && state) {
