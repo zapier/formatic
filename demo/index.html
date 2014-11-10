@@ -181,7 +181,8 @@
           label: 'Full Name',
           type: 'object',
           key: 'fullName',
-          fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, {extends: 'address', key: 'address'}],
+          group: 'fullNames',
+          fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, {extends: 'address', key: 'address'}, 'crazy'],
           match: {type: 'full'}
         },
         {
@@ -191,6 +192,31 @@
           type: 'string',
           key: 'middle',
           maxRows: 1
+        },
+        {
+          template: true,
+          label: 'Crazy',
+          key: 'crazy',
+          type: 'array',
+          choices: [],
+          eval: {
+            //choices: ['@pluck', ['@get', 'aliases'], 'first']
+            needsMeta: [
+              '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
+              ['names', {name: ['@get', 'alias', 'first']}],
+              ['@not', ['@getMeta', 'names', {name: ['@get', 'alias', 'first']}]],
+            ],
+            choices: [
+              //'@forEach', 'alias', ['@get', 'aliases'], ['@get', 'alias', 'first'], ['@not', ['@eq', ['@get', 'alias', 'first'], 'joe']]
+              //'@forEach', 'alias', ['@getGroupValues', 'fullNames'], ['@get', 'alias', 'first'], ['@get', 'alias', 'first']
+              '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
+              ['@getMeta', 'names', {name: ['@get', 'alias', 'first']}],
+              ['@getMeta', 'names', {name: ['@get', 'alias', 'first']}]
+              //'@forEach', 'alias', ['@get', 'fullNames'], ['@get', 'alias', 'first'], ['@not', ['@eq', ['@get', 'alias', 'first'], 'joe']]
+              //'@getGroupValues', 'fullNames'
+            ]
+            //choices: ['@map', ['@get', 'aliases'], ['@fn', ['alias'], ['@getIn', 'alias', 'first']]]
+          }
         },
         {
           label: 'Some Blob',
@@ -264,6 +290,11 @@
 
       });
 
+    });
+
+    form.source('names', function (params) {
+      //console.log(params.name.toUpperCase())
+      return params.name.toUpperCase();
     });
 
     var jsonForm = formatic({
