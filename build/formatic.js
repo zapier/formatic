@@ -3330,7 +3330,7 @@ module.exports = function (plugin) {
         } else {
           store.value = util.setIn(store.value, path, value);
         }
-        store.update();
+        update();
       },
 
       removeValue: function (path) {
@@ -3339,7 +3339,7 @@ module.exports = function (plugin) {
 
         store.value = util.removeIn(store.value, path);
 
-        store.update();
+        update();
       },
 
       // Happens when component is unmounted. Don't want to trigger update for
@@ -3356,7 +3356,7 @@ module.exports = function (plugin) {
 
         store.value = util.appendIn(store.value, path, value);
 
-        store.update();
+        update();
       },
 
       moveValue: function (path, fromKey, toKey) {
@@ -3364,7 +3364,7 @@ module.exports = function (plugin) {
 
         store.value = util.moveIn(store.value, path, fromKey, toKey);
 
-        store.update();
+        update();
       },
 
       setFields: function (fields) {
@@ -3373,14 +3373,14 @@ module.exports = function (plugin) {
         store.fields = fields;
         store.inflate();
 
-        store.update();
+        update();
       },
 
       setMeta: function (key, value) {
         var store = this;
 
         store.meta[key] = value;
-        store.update();
+        update();
       },
 
       update: function () {

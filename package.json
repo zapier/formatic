@@ -34,23 +34,18 @@
     "watchify": "^2.1.1"
   },
   "dependencies": {
-    "component-emitter": "^1.1.2",
     "envify": "^1.2.1",
+    "eventemitter3": "^0.1.5",
     "funql": "0.0.15",
-    "immutable": "^2.0.17",
-    "objectpath": "^1.0.5",
     "react": "^0.10.0",
     "react-addons": "^0.9.0",
     "react-component-resizable": "^0.1.1",
-    "reflux": "^0.1.13",
     "underscore": "^1.6.0"
   },
   "jest": {
     "unmockedModulePathPatterns": [
       "<rootDir>/node_modules/react",
       "<rootDir>/node_modules/underscore",
-      "<rootDir>/node_modules/component-emitter",
-      "<rootDir>/node_modules/objectpath",
       "<rootDir>/index.js",
       "<rootDir>/lib"
     ]
