@@ -1351,6 +1351,65 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
       "type": "file",
       "data": {
         "language": {
+          "nameMatchers": [".md", ".markdown", ".mkd", ".mkdn", ".mdown"],
+          "commentsOnly": true,
+          "name": "Markdown"
+        },
+        "sourcePath": "/Users/justin/Dropbox/git/formatic/examples.md",
+        "projectPath": "examples.md",
+        "targetPath": "examples",
+        "pageTitle": "examples",
+        "firstHeader": {
+          "type": "heading",
+          "data": {
+            "level": 1,
+            "title": "Examples",
+            "slug": "examples",
+            "isFileHeader": true
+          },
+          "depth": 1
+        },
+        "title": "Examples"
+      },
+      "depth": 1,
+      "outline": [],
+      "children": [
+        {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/examples/01-basic-usage.js",
+            "projectPath": "examples/01-basic-usage.js",
+            "targetPath": "examples/01-basic-usage",
+            "pageTitle": "examples/01-basic-usage",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "1. Basic usage",
+                "slug": "1-basic-usage",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "1. Basic usage"
+          },
+          "depth": 2,
+          "outline": []
+        }
+      ]
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
           "nameMatchers": [".js"],
           "pygmentsLexer": "javascript",
           "multiLineComment": ["/*", "*", "*/"],
