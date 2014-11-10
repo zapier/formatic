@@ -70,8 +70,9 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
         store.value = util.removeIn(store.value, path);
 
         update();
-      },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Happens when component is unmounted. Don&#39;t want to trigger update for
-this.</p></div></div><div class="code"><div class="wrapper">      eraseValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(path)</span> {</span>
+      },
+
+      eraseValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(path)</span> {</span>
 
         store.value = util.removeIn(store.value, path);
 

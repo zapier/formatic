@@ -1304,7 +1304,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/plugins/bootstrap.js",
             "targetPath": "plugins/bootstrap",
             "pageTitle": "plugins/bootstrap",
-            "title": "bootstrap"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Bootstrap plugin bundle (bootstrap)",
+                "slug": "bootstrap-plugin-bundle-bootstrap",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Bootstrap plugin bundle (bootstrap)"
           },
           "depth": 2,
           "outline": []
