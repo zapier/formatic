@@ -1,4 +1,23 @@
-<!DOCTYPE html><html lang="en"><head><title>components/pretty-textarea</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="components/pretty-textarea"><meta name="groc-project-path" content="lib/components/pretty-textarea.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/components/pretty-textarea.js">lib/components/pretty-textarea.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+<!DOCTYPE html><html lang="en"><head><title>components/pretty-textarea</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="components/pretty-textarea"><meta name="groc-project-path" content="lib/components/pretty-textarea.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/components/pretty-textarea.js">lib/components/pretty-textarea.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="componentpretty-textarea">component.pretty-textarea</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Textarea that will display highlights behind &quot;tags&quot;. Tags currently mean text
+that is enclosed in braces like <code>{{foo}}</code>. Tags are replaced with labels if
+available or humanized.</p>
+<p>This component is quite complicated because:</p>
+<ul>
+<li>We are displaying text in the textarea but have to keep track of the real
+text value in the background. We can&#39;t use a data attribute, because it&#39;s a
+textarea, so we can&#39;t use any elements at all!</li>
+<li>Because of the hidden data, we also have to do some interception of
+copy, which is a little weird. We intercept copy and copy the real text
+to the end of the textarea. Then we erase that text, which leaves the copied
+data in the buffer.</li>
+<li>React loses the caret position when you update the value to something
+different than before. So we have to retain tracking information for when
+that happens.</li>
+<li>Because we monkey with copy, we also have to do our own undo/redo. Otherwise
+the default undo will have weird states in it.</li>
+</ul>
+<p>So good luck!</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+'use strict'</span>;
 
 <span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
 <span class="hljs-keyword">var</span> R = React.DOM;
@@ -17,7 +36,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
 
   plugin.exports = React.createClass({
 
-    mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/field'</span>), <span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/undo-stack'</span>), <span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/resize'</span>)],
+    mixins: [plugin.require(<span class="hljs-string">'mixin.field'</span>), plugin.require(<span class="hljs-string">'mixin.undo-stack'</span>), plugin.require(<span class="hljs-string">'mixin.resize'</span>)],
 
     getDefaultProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
       <span class="hljs-keyword">return</span> {

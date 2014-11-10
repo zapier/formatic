@@ -140,7 +140,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/compilers/choices.js",
             "targetPath": "compilers/choices",
             "pageTitle": "compilers/choices",
-            "title": "choices"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "compiler.choices",
+                "slug": "compilerchoices",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "compiler.choices"
           },
           "depth": 2,
           "outline": []
@@ -160,7 +170,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/compilers/lookup.js",
             "targetPath": "compilers/lookup",
             "pageTitle": "compilers/lookup",
-            "title": "lookup"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "compiler.lookup",
+                "slug": "compilerlookup",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "compiler.lookup"
           },
           "depth": 2,
           "outline": []
@@ -180,7 +200,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/compilers/prop-aliases.js",
             "targetPath": "compilers/prop-aliases",
             "pageTitle": "compilers/prop-aliases",
-            "title": "prop-aliases"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "compilers.prop-aliases",
+                "slug": "compilersprop-aliases",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "compilers.prop-aliases"
           },
           "depth": 2,
           "outline": []
@@ -200,7 +230,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/compilers/types.js",
             "targetPath": "compilers/types",
             "pageTitle": "compilers/types",
-            "title": "types"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "compilers.types",
+                "slug": "compilerstypes",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "compilers.types"
           },
           "depth": 2,
           "outline": []
@@ -230,7 +270,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/add-item.js",
             "targetPath": "components/add-item",
             "pageTitle": "components/add-item",
-            "title": "add-item"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.add-item",
+                "slug": "componentadd-item",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.add-item"
           },
           "depth": 2,
           "outline": []
@@ -250,7 +300,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/checkbox-list.js",
             "targetPath": "components/checkbox-list",
             "pageTitle": "components/checkbox-list",
-            "title": "checkbox-list"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.checkbox-list",
+                "slug": "componentcheckbox-list",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.checkbox-list"
           },
           "depth": 2,
           "outline": []
@@ -270,7 +330,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/field.js",
             "targetPath": "components/field",
             "pageTitle": "components/field",
-            "title": "field"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.field",
+                "slug": "componentfield",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.field"
           },
           "depth": 2,
           "outline": []
@@ -290,7 +360,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/fieldset.js",
             "targetPath": "components/fieldset",
             "pageTitle": "components/fieldset",
-            "title": "fieldset"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.fieldset",
+                "slug": "componentfieldset",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.fieldset"
           },
           "depth": 2,
           "outline": []
@@ -310,7 +390,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/formatic.js",
             "targetPath": "components/formatic",
             "pageTitle": "components/formatic",
-            "title": "formatic"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.formatic",
+                "slug": "componentformatic",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.formatic"
           },
           "depth": 2,
           "outline": []
@@ -330,7 +420,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/help.js",
             "targetPath": "components/help",
             "pageTitle": "components/help",
-            "title": "help"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.help",
+                "slug": "componenthelp",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.help"
           },
           "depth": 2,
           "outline": []
@@ -350,7 +450,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/item-choices.js",
             "targetPath": "components/item-choices",
             "pageTitle": "components/item-choices",
-            "title": "item-choices"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.item-choices",
+                "slug": "componentitem-choices",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.item-choices"
           },
           "depth": 2,
           "outline": []
@@ -370,7 +480,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/json.js",
             "targetPath": "components/json",
             "pageTitle": "components/json",
-            "title": "json"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.json",
+                "slug": "componentjson",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.json"
           },
           "depth": 2,
           "outline": []
@@ -390,7 +510,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/label.js",
             "targetPath": "components/label",
             "pageTitle": "components/label",
-            "title": "label"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.label",
+                "slug": "componentlabel",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.label"
           },
           "depth": 2,
           "outline": []
@@ -410,7 +540,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/list.js",
             "targetPath": "components/list",
             "pageTitle": "components/list",
-            "title": "list"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.list",
+                "slug": "componentlist",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.list"
           },
           "depth": 2,
           "outline": []
@@ -430,7 +570,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/list-control.js",
             "targetPath": "components/list-control",
             "pageTitle": "components/list-control",
-            "title": "list-control"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.list-control",
+                "slug": "componentlist-control",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.list-control"
           },
           "depth": 2,
           "outline": []
@@ -450,7 +600,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/list-item.js",
             "targetPath": "components/list-item",
             "pageTitle": "components/list-item",
-            "title": "list-item"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.list-item",
+                "slug": "componentlist-item",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.list-item"
           },
           "depth": 2,
           "outline": []
@@ -470,7 +630,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/list-item-control.js",
             "targetPath": "components/list-item-control",
             "pageTitle": "components/list-item-control",
-            "title": "list-item-control"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.list-item-control",
+                "slug": "componentlist-item-control",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.list-item-control"
           },
           "depth": 2,
           "outline": []
@@ -490,120 +660,20 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/list-item-value.js",
             "targetPath": "components/list-item-value",
             "pageTitle": "components/list-item-value",
-            "title": "list-item-value"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.list-item-value",
+                "slug": "componentlist-item-value",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.list-item-value"
           },
           "depth": 2,
           "outline": []
-        }, {
-          "type": "folder",
-          "data": {
-            "path": "components/mixins",
-            "title": "mixins"
-          },
-          "depth": 2,
-          "children": [
-            {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "multiLineComment": ["/*", "*", "*/"],
-                  "singleLineComment": ["//"],
-                  "ignorePrefix": "}",
-                  "foldPrefix": "^",
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/mixins/click-outside.js",
-                "projectPath": "lib/components/mixins/click-outside.js",
-                "targetPath": "components/mixins/click-outside",
-                "pageTitle": "components/mixins/click-outside",
-                "title": "click-outside"
-              },
-              "depth": 3,
-              "outline": []
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "multiLineComment": ["/*", "*", "*/"],
-                  "singleLineComment": ["//"],
-                  "ignorePrefix": "}",
-                  "foldPrefix": "^",
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/mixins/field.js",
-                "projectPath": "lib/components/mixins/field.js",
-                "targetPath": "components/mixins/field",
-                "pageTitle": "components/mixins/field",
-                "title": "field"
-              },
-              "depth": 3,
-              "outline": []
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "multiLineComment": ["/*", "*", "*/"],
-                  "singleLineComment": ["//"],
-                  "ignorePrefix": "}",
-                  "foldPrefix": "^",
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/mixins/input-actions.js",
-                "projectPath": "lib/components/mixins/input-actions.js",
-                "targetPath": "components/mixins/input-actions",
-                "pageTitle": "components/mixins/input-actions",
-                "title": "input-actions"
-              },
-              "depth": 3,
-              "outline": []
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "multiLineComment": ["/*", "*", "*/"],
-                  "singleLineComment": ["//"],
-                  "ignorePrefix": "}",
-                  "foldPrefix": "^",
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/mixins/resize.js",
-                "projectPath": "lib/components/mixins/resize.js",
-                "targetPath": "components/mixins/resize",
-                "pageTitle": "components/mixins/resize",
-                "title": "resize"
-              },
-              "depth": 3,
-              "outline": []
-            }, {
-              "type": "file",
-              "data": {
-                "language": {
-                  "nameMatchers": [".js"],
-                  "pygmentsLexer": "javascript",
-                  "multiLineComment": ["/*", "*", "*/"],
-                  "singleLineComment": ["//"],
-                  "ignorePrefix": "}",
-                  "foldPrefix": "^",
-                  "name": "JavaScript"
-                },
-                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/mixins/undo-stack.js",
-                "projectPath": "lib/components/mixins/undo-stack.js",
-                "targetPath": "components/mixins/undo-stack",
-                "pageTitle": "components/mixins/undo-stack",
-                "title": "undo-stack"
-              },
-              "depth": 3,
-              "outline": []
-            }
-          ]
         }, {
           "type": "file",
           "data": {
@@ -620,7 +690,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/move-item-back.js",
             "targetPath": "components/move-item-back",
             "pageTitle": "components/move-item-back",
-            "title": "move-item-back"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.move-item-back",
+                "slug": "componentmove-item-back",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.move-item-back"
           },
           "depth": 2,
           "outline": []
@@ -640,7 +720,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/move-item-forward.js",
             "targetPath": "components/move-item-forward",
             "pageTitle": "components/move-item-forward",
-            "title": "move-item-forward"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.move-item-forward",
+                "slug": "componentmove-item-forward",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.move-item-forward"
           },
           "depth": 2,
           "outline": []
@@ -660,7 +750,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/pretty-textarea.js",
             "targetPath": "components/pretty-textarea",
             "pageTitle": "components/pretty-textarea",
-            "title": "pretty-textarea"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.pretty-textarea",
+                "slug": "componentpretty-textarea",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.pretty-textarea"
           },
           "depth": 2,
           "outline": []
@@ -680,7 +780,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/remove-item.js",
             "targetPath": "components/remove-item",
             "pageTitle": "components/remove-item",
-            "title": "remove-item"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.remove-item",
+                "slug": "componentremove-item",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.remove-item"
           },
           "depth": 2,
           "outline": []
@@ -700,7 +810,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/root.js",
             "targetPath": "components/root",
             "pageTitle": "components/root",
-            "title": "root"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.root",
+                "slug": "componentroot",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.root"
           },
           "depth": 2,
           "outline": []
@@ -720,7 +840,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/select.js",
             "targetPath": "components/select",
             "pageTitle": "components/select",
-            "title": "select"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.select",
+                "slug": "componentselect",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.select"
           },
           "depth": 2,
           "outline": []
@@ -740,7 +870,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/text.js",
             "targetPath": "components/text",
             "pageTitle": "components/text",
-            "title": "text"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.text",
+                "slug": "componenttext",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.text"
           },
           "depth": 2,
           "outline": []
@@ -760,7 +900,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/components/textarea.js",
             "targetPath": "components/textarea",
             "pageTitle": "components/textarea",
-            "title": "textarea"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "component.textarea",
+                "slug": "componenttextarea",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "component.textarea"
           },
           "depth": 2,
           "outline": []
@@ -794,13 +944,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Core field plugin (core.field)",
-                "slug": "core-field-plugin-corefield",
+                "title": "core.field",
+                "slug": "corefield",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Core field plugin (core.field)"
+            "title": "core.field"
           },
           "depth": 2,
           "outline": []
@@ -824,13 +974,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Core form plugin (core.form)",
-                "slug": "core-form-plugin-coreform",
+                "title": "core.form",
+                "slug": "coreform",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Core form plugin (core.form)"
+            "title": "core.form"
           },
           "depth": 2,
           "outline": []
@@ -854,13 +1004,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Core form init plugin (core.form-init)",
-                "slug": "core-form-init-plugin-coreform-init",
+                "title": "core.form-init",
+                "slug": "coreform-init",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Core form init plugin (core.form-init)"
+            "title": "core.form-init"
           },
           "depth": 2,
           "outline": []
@@ -884,13 +1034,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Core formatic plugin (core.formatic)",
-                "slug": "core-formatic-plugin-coreformatic",
+                "title": "core.formatic",
+                "slug": "coreformatic",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Core formatic plugin (core.formatic)"
+            "title": "core.formatic"
           },
           "depth": 2,
           "outline": []
@@ -924,13 +1074,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Compiler plugin (compiler)",
-                "slug": "compiler-plugin-compiler",
+                "title": "compiler",
+                "slug": "compiler",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Compiler plugin (compiler)"
+            "title": "compiler"
           },
           "depth": 2,
           "outline": []
@@ -954,13 +1104,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Component plugin (component)",
-                "slug": "component-plugin-component",
+                "title": "component",
+                "slug": "component",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Component plugin (component)"
+            "title": "component"
           },
           "depth": 2,
           "outline": []
@@ -984,8 +1134,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Core plugin (core)",
-                "slug": "core-plugin-core",
+                "title": "core",
+                "slug": "core",
                 "isFileHeader": true
               },
               "depth": 1,
@@ -1001,7 +1151,7 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 }
               ]
             },
-            "title": "Core plugin (core)"
+            "title": "core"
           },
           "depth": 2,
           "outline": [
@@ -1035,13 +1185,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Eval plugin (eval)",
-                "slug": "eval-plugin-eval",
+                "title": "eval",
+                "slug": "eval",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Eval plugin (eval)"
+            "title": "eval"
           },
           "depth": 2,
           "outline": []
@@ -1065,13 +1215,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Eval functions plugin bundle (eval-functions)",
-                "slug": "eval-functions-plugin-bundle-eval-functions",
+                "title": "eval-functions",
+                "slug": "eval-functions",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Eval functions plugin bundle (eval-functions)"
+            "title": "eval-functions"
           },
           "depth": 2,
           "outline": []
@@ -1095,13 +1245,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Field router plugin (field-router)",
-                "slug": "field-router-plugin-field-router",
+                "title": "field-router",
+                "slug": "field-router",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Field router plugin (field-router)"
+            "title": "field-router"
           },
           "depth": 2,
           "outline": []
@@ -1125,13 +1275,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Route functions plugin bundle (field-routes)",
-                "slug": "route-functions-plugin-bundle-field-routes",
+                "title": "field-routes",
+                "slug": "field-routes",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Route functions plugin bundle (field-routes)"
+            "title": "field-routes"
           },
           "depth": 2,
           "outline": []
@@ -1155,13 +1305,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Loader plugin (loader)",
-                "slug": "loader-plugin-loader",
+                "title": "loader",
+                "slug": "loader",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Loader plugin (loader)"
+            "title": "loader"
           },
           "depth": 2,
           "outline": []
@@ -1185,13 +1335,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Utility plugin (util)",
-                "slug": "utility-plugin-util",
+                "title": "util",
+                "slug": "util",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Utility plugin (util)"
+            "title": "util"
           },
           "depth": 2,
           "outline": []
@@ -1283,6 +1433,166 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
     }, {
       "type": "folder",
       "data": {
+        "path": "mixins",
+        "title": "mixins"
+      },
+      "depth": 1,
+      "children": [
+        {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/click-outside.js",
+            "projectPath": "lib/mixins/click-outside.js",
+            "targetPath": "mixins/click-outside",
+            "pageTitle": "mixins/click-outside",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "mixin.click-outside",
+                "slug": "mixinclick-outside",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "mixin.click-outside"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/field.js",
+            "projectPath": "lib/mixins/field.js",
+            "targetPath": "mixins/field",
+            "pageTitle": "mixins/field",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "mixin.field",
+                "slug": "mixinfield",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "mixin.field"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/input-actions.js",
+            "projectPath": "lib/mixins/input-actions.js",
+            "targetPath": "mixins/input-actions",
+            "pageTitle": "mixins/input-actions",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "mixin.input-actions",
+                "slug": "mixininput-actions",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "mixin.input-actions"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/resize.js",
+            "projectPath": "lib/mixins/resize.js",
+            "targetPath": "mixins/resize",
+            "pageTitle": "mixins/resize",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "mixin.resize",
+                "slug": "mixinresize",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "mixin.resize"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/undo-stack.js",
+            "projectPath": "lib/mixins/undo-stack.js",
+            "targetPath": "mixins/undo-stack",
+            "pageTitle": "mixins/undo-stack",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "mixin.undo-stack",
+                "slug": "mixinundo-stack",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "mixin.undo-stack"
+          },
+          "depth": 2,
+          "outline": []
+        }
+      ]
+    }, {
+      "type": "folder",
+      "data": {
         "path": "plugins",
         "title": "plugins"
       },
@@ -1308,13 +1618,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "Bootstrap plugin bundle (bootstrap)",
-                "slug": "bootstrap-plugin-bundle-bootstrap",
+                "title": "bootstrap",
+                "slug": "bootstrap",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "Bootstrap plugin bundle (bootstrap)"
+            "title": "bootstrap"
           },
           "depth": 2,
           "outline": []
@@ -1344,7 +1654,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/store/memory.js",
             "targetPath": "store/memory",
             "pageTitle": "store/memory",
-            "title": "memory"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "store.memory",
+                "slug": "storememory",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "store.memory"
           },
           "depth": 2,
           "outline": []
@@ -1374,7 +1694,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/types/array.js",
             "targetPath": "types/array",
             "pageTitle": "types/array",
-            "title": "array"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "type.array",
+                "slug": "typearray",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "type.array"
           },
           "depth": 2,
           "outline": []
@@ -1394,7 +1724,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/types/boolean.js",
             "targetPath": "types/boolean",
             "pageTitle": "types/boolean",
-            "title": "boolean"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "type.boolean",
+                "slug": "typeboolean",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "type.boolean"
           },
           "depth": 2,
           "outline": []
@@ -1414,7 +1754,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/types/json.js",
             "targetPath": "types/json",
             "pageTitle": "types/json",
-            "title": "json"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "type.json",
+                "slug": "typejson",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "type.json"
           },
           "depth": 2,
           "outline": []
@@ -1434,7 +1784,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/types/object.js",
             "targetPath": "types/object",
             "pageTitle": "types/object",
-            "title": "object"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "type.object",
+                "slug": "typeobject",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "type.object"
           },
           "depth": 2,
           "outline": []
@@ -1454,7 +1814,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/types/root.js",
             "targetPath": "types/root",
             "pageTitle": "types/root",
-            "title": "root"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "type.root",
+                "slug": "typeroot",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "type.root"
           },
           "depth": 2,
           "outline": []
@@ -1474,7 +1844,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/types/string.js",
             "targetPath": "types/string",
             "pageTitle": "types/string",
-            "title": "string"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "type.string",
+                "slug": "typestring",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "type.string"
           },
           "depth": 2,
           "outline": []
