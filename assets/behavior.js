@@ -810,7 +810,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/core/form.js",
             "targetPath": "core/form",
             "pageTitle": "core/form",
-            "title": "form"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Core form plugin (core.form)",
+                "slug": "core-form-plugin-coreform",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Core form plugin (core.form)"
           },
           "depth": 2,
           "outline": []
@@ -850,7 +860,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/core/formatic.js",
             "targetPath": "core/formatic",
             "pageTitle": "core/formatic",
-            "title": "formatic"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Core formatic plugin (core.formatic)",
+                "slug": "core-formatic-plugin-coreformatic",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Core formatic plugin (core.formatic)"
           },
           "depth": 2,
           "outline": []
@@ -1021,7 +1041,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/default/eval-functions.js",
             "targetPath": "default/eval-functions",
             "pageTitle": "default/eval-functions",
-            "title": "eval-functions"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Eval functions plugin bundle (eval-functions)",
+                "slug": "eval-functions-plugin-bundle-eval-functions",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Eval functions plugin bundle (eval-functions)"
           },
           "depth": 2,
           "outline": []
@@ -1041,7 +1071,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/default/field-router.js",
             "targetPath": "default/field-router",
             "pageTitle": "default/field-router",
-            "title": "field-router"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Field router plugin (field-router)",
+                "slug": "field-router-plugin-field-router",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Field router plugin (field-router)"
           },
           "depth": 2,
           "outline": []
@@ -1061,7 +1101,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
             "projectPath": "lib/default/field-routes.js",
             "targetPath": "default/field-routes",
             "pageTitle": "default/field-routes",
-            "title": "field-routes"
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "Route functions plugin bundle (field-routes)",
+                "slug": "route-functions-plugin-bundle-field-routes",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "Route functions plugin bundle (field-routes)"
           },
           "depth": 2,
           "outline": []

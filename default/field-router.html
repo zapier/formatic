@@ -1,4 +1,20 @@
-<!DOCTYPE html><html lang="en"><head><title>default/field-router</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="default/field-router"><meta name="groc-project-path" content="lib/default/field-router.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/default/field-router.js">lib/default/field-router.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+<!DOCTYPE html><html lang="en"><head><title>default/field-router</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="default/field-router"><meta name="groc-project-path" content="lib/default/field-router.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/default/field-router.js">lib/default/field-router.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="field-router-plugin-field-router">Field router plugin (field-router)</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Fields and components get glued together via routes. This is similar to URL
+routing where a request gets dynamically routed to a handler. This gives a lot
+of flexibility in introducing new types and components. You can create a new
+type and route it to an existing component, or you can create a new component
+and route existing types to it. Or you can create both and route the new type
+to the new component. New routes are added via route plugins. A route plugin
+simply exports an array like:</p>
+<p>```js
+[
+  &#39;color&#39;, // Route this type
+  &#39;color-picker-with-alpha&#39;, // To this component
+  function (field) {
+    return typeof field.def.alpha !== &#39;undefined&#39;;
+  }
+]</p>
+<p>Route plugins can be stacked and are sensitive to ordering.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+'use strict'</span>;
 
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 
@@ -6,11 +22,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
 
   <span class="hljs-keyword">var</span> routes = {};
 
-  <span class="hljs-keyword">var</span> router = plugin.exports;
-
-  <span class="hljs-keyword">var</span> routePlugins = plugin.requireAll(plugin.config.routes);
-
-  router.route = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(typeName, componentName, testFn)</span> {</span>
+  <span class="hljs-keyword">var</span> router = plugin.exports;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get all the route plugins.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-keyword">var</span> routePlugins = plugin.requireAll(plugin.config.routes);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Register a route.</p></div></div><div class="code"><div class="wrapper">  router.route = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(typeName, componentName, testFn)</span> {</span>
     <span class="hljs-keyword">if</span> (!routes[typeName]) {
       routes[typeName] = [];
     }
@@ -18,14 +30,10 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
       component: componentName,
       test: testFn
     });
-  };
-
-  routePlugins.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(routePlugin)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Register each of the routes provided by the route plugins.</p></div></div><div class="code"><div class="wrapper">  routePlugins.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(routePlugin)</span> {</span>
 
     router.route.apply(router, routePlugin);
-  });
-
-  router.componentForField = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
+  });</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine the best component for a field, based on the routes.</p></div></div><div class="code"><div class="wrapper">  router.componentForField = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
 
     <span class="hljs-keyword">var</span> typeName = field.def.type;
 
@@ -44,9 +52,5 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'No component for field: '</span> + <span class="hljs-built_in">JSON</span>.stringify(field.def));
-  };
-
-  router.component = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> {</span>
-    <span class="hljs-keyword">return</span> plugin.component(name);
   };
 };</div></div></div></div></body></html>

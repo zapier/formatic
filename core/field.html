@@ -1,4 +1,9 @@
-<!DOCTYPE html><html lang="en"><head><title>core/field</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="core/field"><meta name="groc-project-path" content="lib/core/field.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/core/field.js">lib/core/field.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+<!DOCTYPE html><html lang="en"><head><title>core/field</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="core/field"><meta name="groc-project-path" content="lib/core/field.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/core/field.js">lib/core/field.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><p>Core field plugin (core.field)</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The core field plugin provides the Field prototype. Fields represent a
+particular state in time of a field definition, and they provide helper methods
+to notify the form store of changes.</p>
+<p>Fields are lazily created and evaluated, but once evaluated, they should be
+considered immutable.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+'use strict'</span>;
 
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 
@@ -7,18 +12,14 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
   <span class="hljs-keyword">var</span> router = plugin.require(<span class="hljs-string">'field-router'</span>);
   <span class="hljs-keyword">var</span> util = plugin.require(<span class="hljs-string">'util'</span>);
   <span class="hljs-keyword">var</span> evaluator = plugin.require(<span class="hljs-string">'eval'</span>);
-  <span class="hljs-keyword">var</span> compiler = plugin.require(<span class="hljs-string">'compiler'</span>);
-
-  <span class="hljs-keyword">var</span> Field = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(form, def, value, parent)</span> {</span>
+  <span class="hljs-keyword">var</span> compiler = plugin.require(<span class="hljs-string">'compiler'</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The Field constructor.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-keyword">var</span> Field = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(form, def, value, parent)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     field.form = form;
     field.def = def;
     field.value = value;
     field.parent = parent;
-  };
-
-  plugin.exports.field = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Attach a field factory to the form prototype.</p></div></div><div class="code"><div class="wrapper">  plugin.exports.field = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Field(form, {
@@ -26,9 +27,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }, form.store.value);
   };
 
-  <span class="hljs-keyword">var</span> proto = Field.prototype;
-
-  proto.typePlugin = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  <span class="hljs-keyword">var</span> proto = Field.prototype;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Return the type plugin for this field.</p></div></div><div class="code"><div class="wrapper">  proto.typePlugin = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!field._typePlugin) {
@@ -36,17 +35,13 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> field._typePlugin;
-  };
-
-  proto.component = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get a component for this field.</p></div></div><div class="code"><div class="wrapper">  proto.component = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
     <span class="hljs-keyword">var</span> component = router.componentForField(field);
     <span class="hljs-keyword">return</span> component({
       field: field
     });
-  };
-
-  proto.fields = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the child fields for this field.</p></div></div><div class="code"><div class="wrapper">  proto.fields = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!field._fields) {
@@ -64,9 +59,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> field._fields;
-  };
-
-  proto.items = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the items (child field definitions) for this field.</p></div></div><div class="code"><div class="wrapper">  proto.items = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!field._items) {
@@ -80,9 +73,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> field._items;
-  };
-
-  proto.resolve = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Resolve a field reference if necessary.</p></div></div><div class="code"><div class="wrapper">  proto.resolve = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (_.isString(def)) {
@@ -93,9 +84,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> def;
-  };
-
-  proto.evalDef = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Evaluate a field definition and return a new field definition.</p></div></div><div class="code"><div class="wrapper">  proto.evalDef = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (def.eval) {
@@ -113,13 +102,9 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> def;
-  };
-
-  proto.eval = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(expression)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Evaluate an expression in the context of a field.</p></div></div><div class="code"><div class="wrapper">  proto.eval = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(expression)</span> {</span>
     <span class="hljs-keyword">return</span> evaluator.evaluate(expression, <span class="hljs-keyword">this</span>);
-  };
-
-  proto.createChild = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a child field from a definition.</p></div></div><div class="code"><div class="wrapper">  proto.createChild = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(def)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     def = field.resolve(def);
@@ -139,9 +124,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Field(field.form, def, value, field);
-  };
-
-  proto.itemForValue = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a value, find an appropriate field definition for this field.</p></div></div><div class="code"><div class="wrapper">  proto.itemForValue = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> item = _.find(field.items(), <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> {</span>
@@ -154,9 +137,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> item;
-  };
-
-  proto.valuePath = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childPath)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Walk backwards through parents and build out a path array to the value.</p></div></div><div class="code"><div class="wrapper">  proto.valuePath = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childPath)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> path = childPath || [];
@@ -167,29 +148,21 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
       <span class="hljs-keyword">return</span> field.parent.valuePath(path);
     }
     <span class="hljs-keyword">return</span> path;
-  };
-
-  proto.val = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Set the value for this field.</p></div></div><div class="code"><div class="wrapper">  proto.val = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     field.form.actions.setValue(field.valuePath(), value);
-  };
-
-  proto.remove = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Remove a child value from this field.</p></div></div><div class="code"><div class="wrapper">  proto.remove = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> path = field.valuePath().concat(key);
 
     field.form.actions.removeValue(path);
-  };
-
-  proto.move = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fromKey, toKey)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Move a child value from one key to another.</p></div></div><div class="code"><div class="wrapper">  proto.move = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fromKey, toKey)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     field.form.actions.moveValue(field.valuePath(), fromKey, toKey);
-  };
-
-  proto.default = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the default value for this field.</p></div></div><div class="code"><div class="wrapper">  proto.default = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!_.isUndefined(field.def.value)) {
@@ -205,9 +178,8 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
-  };
-
-  proto.append = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemIndex)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Append a new value. Use the <code>itemIndex</code> to get an appropriate
+item, inflate it, and create a default value.</p></div></div><div class="code"><div class="wrapper">  proto.append = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemIndex)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> item = field.items()[itemIndex];
@@ -228,13 +200,12 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     field.form.actions.appendValue(field.valuePath(), obj);
-  };
-
-  proto.hidden = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine whether the field is hidden.</p></div></div><div class="code"><div class="wrapper">  proto.hidden = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">return</span> field.def.hidden || field.typePlugin().hidden;
-  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>expand all fields and seed values if necessary</p></div></div><div class="code"><div class="wrapper">  proto.inflate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(onSetValue)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Expand all child fields and call the setter function with the default
+values at each path.</p></div></div><div class="code"><div class="wrapper">  proto.inflate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(onSetValue)</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!util.isBlank(field.def.key) &amp;&amp; _.isUndefined(field.value)) {
@@ -246,7 +217,8 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     fields.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(child)</span> {</span>
       child.inflate(onSetValue);
     });
-  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Called from unmount.</p></div></div><div class="code"><div class="wrapper">  proto.erase = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Called from unmount. When fields are removed for whatever reason, we
+should delete the corresponding value.</p></div></div><div class="code"><div class="wrapper">  proto.erase = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>;
     <span class="hljs-keyword">if</span> (!util.isBlank(field.def.key) &amp;&amp; !_.isUndefined(field.value)) {
       field.form.actions.eraseValue(field.valuePath(), {});

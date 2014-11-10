@@ -15,9 +15,9 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
 
   <span class="hljs-keyword">var</span> util = plugin.require(<span class="hljs-string">'util'</span>);
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/undo-stack'</span>), <span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/resize'</span>)],
+    mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/field'</span>), <span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/undo-stack'</span>), <span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/resize'</span>)],
 
     getDefaultProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
       <span class="hljs-keyword">return</span> {
@@ -338,7 +338,10 @@ Probably not necessary with element resize?</p></div></div><div class="code"><di
 
     render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
       <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
-      <span class="hljs-keyword">return</span> R.div({style: {position: <span class="hljs-string">'relative'</span>}},
+
+      <span class="hljs-keyword">return</span> plugin.component(<span class="hljs-string">'field'</span>)({
+        field: field
+      }, R.div({style: {position: <span class="hljs-string">'relative'</span>}},
 
         R.pre({
           className: <span class="hljs-string">'pretty-highlight'</span>,
@@ -366,7 +369,7 @@ Probably not necessary with element resize?</p></div></div><div class="code"><di
           onSelect: <span class="hljs-keyword">this</span>.onSelect,
           onCopy: <span class="hljs-keyword">this</span>.onCopy
         }, plugin.config.attributes))
-      );
+      ));
     }
   });
 };</div></div></div></div></body></html>

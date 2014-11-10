@@ -1,38 +1,30 @@
-<!DOCTYPE html><html lang="en"><head><title>core/form</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="core/form"><meta name="groc-project-path" content="lib/core/form.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/core/form.js">lib/core/form.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+<!DOCTYPE html><html lang="en"><head><title>core/form</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="core/form"><meta name="groc-project-path" content="lib/core/form.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/core/form.js">lib/core/form.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="core-form-plugin-coreform">Core form plugin (core.form)</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The core form plugin supplies methods that get added to the Form prototype.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+'use strict'</span>;
 
-<span class="hljs-keyword">var</span> Reflux = <span class="hljs-built_in">require</span>(<span class="hljs-string">'reflux'</span>);
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+<span class="hljs-keyword">var</span> EventEmitter = <span class="hljs-built_in">require</span>(<span class="hljs-string">'eventemitter3'</span>);
 
 module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
 
-  <span class="hljs-keyword">var</span> proto = plugin.exports;
+  <span class="hljs-keyword">var</span> proto = plugin.exports;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the store plugin.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-keyword">var</span> createStore = plugin.require(plugin.config.store);
 
-  <span class="hljs-keyword">var</span> storePlugin = plugin.require(plugin.config.store);
   <span class="hljs-keyword">var</span> util = plugin.require(<span class="hljs-string">'util'</span>);
-  <span class="hljs-keyword">var</span> loader = plugin.require(<span class="hljs-string">'loader'</span>);
-
-  <span class="hljs-keyword">var</span> createSyncActions = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(names)</span> {</span>
+  <span class="hljs-keyword">var</span> loader = plugin.require(<span class="hljs-string">'loader'</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Helper to create actions, which will tell the store that something has
+happened. Note that actions go straight to the store. No events,
+dispatcher, etc.</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-keyword">var</span> createSyncActions = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(store, names)</span> {</span>
     <span class="hljs-keyword">var</span> actions = {};
     names.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> {</span>
-      actions[name] = Reflux.createAction({sync: <span class="hljs-literal">true</span>});
+      actions[name] = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+        store[name].apply(store, <span class="hljs-built_in">arguments</span>);
+      };
     });
     <span class="hljs-keyword">return</span> actions;
-  };
-
-  proto.init = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(options)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Initialize the form instance.</p></div></div><div class="code"><div class="wrapper">  proto.init = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(options)</span> {</span>
     <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>;
 
-    options = options || {};
-
-    <span class="hljs-comment">//form.actions = Reflux.createActions(['setValue', 'setFields', 'removeValue', 'appendValue', 'moveValue']);</span>
-    form.actions = createSyncActions([<span class="hljs-string">'setValue'</span>, <span class="hljs-string">'setFields'</span>, <span class="hljs-string">'removeValue'</span>, <span class="hljs-string">'appendValue'</span>, <span class="hljs-string">'moveValue'</span>, <span class="hljs-string">'eraseValue'</span>, <span class="hljs-string">'setMeta'</span>]);
-    form.store = storePlugin.create(form.actions, form, options);
-    form.store.inflate();
-
-    form.contextifiers = {};
-  };
-
-  proto.component = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> {</span>
+    options = options || {};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Need an emitter to emit change events from the store.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">var</span> storeEmitter = <span class="hljs-keyword">new</span> EventEmitter();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a store.</p></div></div><div class="code"><div class="wrapper">    form.store = createStore(form, storeEmitter, options);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create the actions to notify the store of changes.</p></div></div><div class="code"><div class="wrapper">    form.actions = createSyncActions(form.store, [<span class="hljs-string">'setValue'</span>, <span class="hljs-string">'setFields'</span>, <span class="hljs-string">'removeValue'</span>, <span class="hljs-string">'appendValue'</span>, <span class="hljs-string">'moveValue'</span>, <span class="hljs-string">'eraseValue'</span>, <span class="hljs-string">'setMeta'</span>]);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Seed the value from any fields.</p></div></div><div class="code"><div class="wrapper">    form.store.inflate();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add on/off to get change events from form.</p></div></div><div class="code"><div class="wrapper">    form.on = storeEmitter.on.bind(storeEmitter);
+    form.off = storeEmitter.off.bind(storeEmitter);
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the root component for a form.</p></div></div><div class="code"><div class="wrapper">  proto.component = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> {</span>
 
     <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>;
 
@@ -43,9 +35,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     <span class="hljs-keyword">var</span> component = plugin.component(<span class="hljs-string">'formatic'</span>);
 
     <span class="hljs-keyword">return</span> component(props);
-  };
-
-  proto.val = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get or set the value of a form.</p></div></div><div class="code"><div class="wrapper">  proto.val = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
     <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!_.isUndefined(value)) {
@@ -53,27 +43,15 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> util.copyValue(form.store.value);
-  };
-
-  proto.fields = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fields)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Set/change the fields for a form.</p></div></div><div class="code"><div class="wrapper">  proto.fields = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fields)</span> {</span>
     <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>;
 
     form.actions.setFields(fields);
-  };
-
-  proto.findDef = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Find a field template given a key.</p></div></div><div class="code"><div class="wrapper">  proto.findDef = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
     <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">return</span> form.store.templateMap[key] || <span class="hljs-literal">null</span>;
-  };
-
-  proto.contextifier = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key, contextify)</span> {</span>
-    <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>;
-
-    form.contextifiers[key] = contextify;
-  };
-
-  proto.meta = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key, value)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get or set metadata.</p></div></div><div class="code"><div class="wrapper">  proto.meta = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key, value)</span> {</span>
     <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!_.isUndefined(value)) {
@@ -81,9 +59,7 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
     }
 
     <span class="hljs-keyword">return</span> form.store.meta[key];
-  };
-
-  proto.loadMeta = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(keys)</span> {</span>
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Load metadata.</p></div></div><div class="code"><div class="wrapper">  proto.loadMeta = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(keys)</span> {</span>
     <span class="hljs-keyword">var</span> validKeys = keys.filter(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
       <span class="hljs-keyword">return</span> key;
     });
@@ -91,7 +67,5 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
       <span class="hljs-keyword">return</span>;
     }
     loader.loadMeta(<span class="hljs-keyword">this</span>, keys);
-  };
-
-  proto.source = loader.source;
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add a metdata source function, via the loader plugin.</p></div></div><div class="code"><div class="wrapper">  proto.source = loader.source;
 };</div></div></div></div></body></html>

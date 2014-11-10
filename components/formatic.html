@@ -2,13 +2,10 @@
 
 <span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
 <span class="hljs-keyword">var</span> R = React.DOM;
-<span class="hljs-keyword">var</span> Reflux = <span class="hljs-built_in">require</span>(<span class="hljs-string">'reflux'</span>);
 
 module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
 
-  plugin.exports.component = React.createClass({
-
-    mixins: [Reflux.ListenerMixin],
+  plugin.exports = React.createClass({
 
     getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
       <span class="hljs-keyword">return</span> {
@@ -18,7 +15,12 @@ module.exports = <span class="hljs-function"><span class="hljs-keyword">function
 
     componentDidMount: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> {</span>
       <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>.props.form;
-      <span class="hljs-keyword">this</span>.listenTo(form.store, <span class="hljs-keyword">this</span>.onFormChanged);
+      form.on(<span class="hljs-string">'change'</span>, <span class="hljs-keyword">this</span>.onFormChanged);
+    },
+
+    componentWillUnmount: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+      <span class="hljs-keyword">var</span> form = <span class="hljs-keyword">this</span>.props.form;
+      form.off(<span class="hljs-string">'change'</span>, <span class="hljs-keyword">this</span>.onFormChanged);
     },
 
     onFormChanged: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
