@@ -246,6 +246,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className,
@@ -278,6 +280,8 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     mixins: [plugin.require('mixin.field')],
 
@@ -367,6 +371,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className
@@ -407,6 +413,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     mixins: [plugin.require('mixin.field')],
 
@@ -449,6 +457,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     getInitialState: function () {
       return {
@@ -501,6 +511,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className
@@ -537,6 +549,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     getDefaultProps: function () {
       return {
@@ -584,6 +598,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     mixins: [plugin.require('mixin.field')],
 
@@ -672,6 +688,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className
@@ -728,6 +746,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     getDefaultProps: function () {
       return {
@@ -787,6 +807,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className
@@ -835,6 +857,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className
@@ -874,6 +898,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className
@@ -908,6 +934,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     mixins: [plugin.require('mixin.field')],
 
@@ -1046,6 +1074,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className,
@@ -1076,6 +1106,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     getDefaultProps: function () {
       return {
@@ -1135,6 +1167,8 @@ module.exports = function (plugin) {
   var util = plugin.require('util');
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     mixins: [plugin.require('mixin.field'), plugin.require('mixin.undo-stack'), plugin.require('mixin.resize')],
 
@@ -1338,7 +1372,7 @@ module.exports = function (plugin) {
           return part.value;
         } else {
           // Make a pill
-          return R.span({className: 'pretty-part'},
+          return R.span({key: i, className: 'pretty-part'},
             R.span({className: 'pretty-part-left'}, LEFT_PAD),
             R.span({className: 'pretty-part-text'}, noBreak(this.prettyLabel(part.value))),
             R.span({className: 'pretty-part-right'}, RIGHT_PAD)
@@ -1576,7 +1610,7 @@ module.exports = function (plugin) {
         R.textarea(_.extend({
           className: util.className(this.props.className, 'pretty-content'),
           ref: 'content',
-          rows: 5,
+          rows: field.def.rows || this.props.rows,
           name: field.key,
           value: this.plainValue(field.value),
           onChange: this.onChange,
@@ -1614,6 +1648,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     getDefaultProps: function () {
       return {
         className: plugin.config.className,
@@ -1646,6 +1682,8 @@ module.exports = function (plugin) {
   var util = plugin.require('util');
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     getDefaultProps: function () {
       return {
@@ -1684,6 +1722,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     getDefaultProps: function () {
       return {
@@ -1724,6 +1764,8 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     mixins: [plugin.require('mixin.field')],
 
@@ -1812,6 +1854,8 @@ module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
 
+    displayName: plugin.name,
+
     mixins: [plugin.require('mixin.field')],
 
     getDefaultProps: function () {
@@ -1859,6 +1903,8 @@ var R = React.DOM;
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
+
+    displayName: plugin.name,
 
     mixins: [plugin.require('mixin.field')],
 
@@ -2021,7 +2067,7 @@ module.exports = function (plugin) {
           def = compiler.compileDef(def);
           if (def.fields) {
             def.fields = def.fields.map(function (childDef) {
-              childDef = compiler.expandDef(childDef, field.form.store.templateMap)
+              childDef = compiler.expandDef(childDef, field.form.store.templateMap);
               return compiler.compileDef(childDef);
             });
           }
@@ -3513,6 +3559,9 @@ var pluginRegistry = {};
 // Group plugins by prefix.
 var pluginGroups = {};
 
+// For anonymous plugins, incrementing number for names.
+var pluginId = 0;
+
 // Register a plugin or plugin bundle (array of plugins) globally.
 var registerPlugin = function (name, pluginInitFn) {
 
@@ -3599,15 +3648,16 @@ var Formatic = function (config) {
 
   // When a plugin is instantiated, we call the `Plugin` constructor. The plugin
   // instance is then passed to the plugin's initialization function.
-  var Plugin = function (config) {
+  var Plugin = function (name, config) {
     if (!(this instanceof Plugin)) {
-      return new Plugin(config);
+      return new Plugin(name, config);
     }
     // Exports analogous to CommonJS exports.
     this.exports = {};
     // Config values passed in via factory are routed to the appropriate
     // plugin and available via `.config`.
     this.config = config || {};
+    this.name = name;
   };
 
   // Get a config value for a plugin or return the default value.
@@ -3694,7 +3744,8 @@ var Formatic = function (config) {
       var factory = name;
 
       if (_.isUndefined(factory.__exports__)) {
-        plugin = Plugin(pluginConfig || {});
+        pluginId++;
+        plugin = Plugin('anonymous_plugin_' + pluginId, pluginConfig || {});
         factory(plugin);
         // Store the exports on the anonymous function so we know it's already
         // been instantiated, and we can just grab the exports.
@@ -3714,7 +3765,7 @@ var Formatic = function (config) {
 
       if (pluginRegistry[name]) {
         if (_.isFunction(pluginRegistry[name])) {
-          plugin = Plugin(pluginConfig || config[name]);
+          plugin = Plugin(name, pluginConfig || config[name]);
           pluginRegistry[name](plugin);
           pluginCache[name] = plugin.exports;
         } else {
