@@ -199,24 +199,19 @@
           key: 'crazy',
           type: 'array',
           choices: [],
-          eval: {
-            //choices: ['@pluck', ['@get', 'aliases'], 'first']
-            needsMeta: [
-              '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
-              ['names', {name: ['@get', 'alias', 'first']}],
-              ['@not', ['@getMeta', 'names', {name: ['@get', 'alias', 'first']}]],
-            ],
-            choices: [
-              //'@forEach', 'alias', ['@get', 'aliases'], ['@get', 'alias', 'first'], ['@not', ['@eq', ['@get', 'alias', 'first'], 'joe']]
-              //'@forEach', 'alias', ['@getGroupValues', 'fullNames'], ['@get', 'alias', 'first'], ['@get', 'alias', 'first']
-              '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
-              ['@getMeta', 'names', {name: ['@get', 'alias', 'first']}],
-              ['@getMeta', 'names', {name: ['@get', 'alias', 'first']}]
-              //'@forEach', 'alias', ['@get', 'fullNames'], ['@get', 'alias', 'first'], ['@not', ['@eq', ['@get', 'alias', 'first'], 'joe']]
-              //'@getGroupValues', 'fullNames'
-            ]
-            //choices: ['@map', ['@get', 'aliases'], ['@fn', ['alias'], ['@getIn', 'alias', 'first']]]
-          }
+          lookup: {source: 'names', keys: ['first'], group: 'fullNames'}
+          // eval: {
+          //   needsMeta: [
+          //     '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
+          //     ['names', {first: ['@get', 'alias', 'first']}],
+          //     ['@not', ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}]],
+          //   ],
+          //   choices: [
+          //     '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
+          //     ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}],
+          //     ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}]
+          //   ]
+          // }
         },
         {
           label: 'Some Blob',
@@ -293,8 +288,7 @@
     });
 
     form.source('names', function (params) {
-      //console.log(params.name.toUpperCase())
-      return params.name.toUpperCase();
+      return [params.first.toUpperCase()];
     });
 
     var jsonForm = formatic({
