@@ -8,7 +8,8 @@ var source = require('vinyl-source-stream');
 var watchify = require('watchify');
 
 gulp.task('bundle-dev', function () {
-  return browserify({entries: ['./index.js'], debug: true})
+  return browserify({entries: ['./index.js'], debug: true, standalone: 'formatic'})
+    .add('./index.js')
     .require('./index.js', {expose: 'formatic'})
     .external(['underscore', 'react', 'react/addons'])
     .bundle()
@@ -17,7 +18,8 @@ gulp.task('bundle-dev', function () {
 });
 
 gulp.task('bundle-prod', ['lint'], function () {
-  return browserify({entries: ['./index.js']})
+  return browserify({entries: ['./index.js'], standalone: 'formatic'})
+    .add('./index.js')
     .require('./index.js', {expose: 'formatic'})
     .external(['underscore', 'react', 'react/addons'])
     .bundle()
@@ -26,7 +28,8 @@ gulp.task('bundle-prod', ['lint'], function () {
 });
 
 gulp.task('bundle-prod-min', ['lint'], function () {
-  return browserify({entries: ['./index.js']})
+  return browserify({entries: ['./index.js'], standalone: 'formatic'})
+    .add('./index.js')
     .require('./index.js', {expose: 'formatic'})
     .external(['underscore', 'react', 'react/addons'])
     .bundle()
@@ -41,7 +44,8 @@ gulp.task('bundle-watch', function () {
     packageCache: {},
     fullPaths: true,
     entries: ['./index.js'],
-    debug: true
+    debug: true,
+    standalone: 'formatic'
   });
   //b = b.require('./index.js', {expose: 'formatic'});
 
@@ -53,7 +57,7 @@ gulp.task('bundle-watch', function () {
 
   bundler
     // This line is goofy workaround for watchify bug that breaks next line.
-    .add('./index.js', {expose: 'formatic'})
+    .add('./index.js')
     // Only this should be necessary.
     .require('./index.js', {expose: 'formatic'})
     .external(['underscore', 'react', 'react/addons'])

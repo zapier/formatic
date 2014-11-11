@@ -20,7 +20,7 @@
   <script src="./lib/formatic.js"></script>
   <script>
 
-    var formatic = require('formatic').create({
+    formatic = formatic.create({
       component: {
         props: ['bootstrap']
       }
@@ -64,6 +64,16 @@
           type: 'array',
           key: 'colors',
           choices: ['red', 'green', 'blue']
+        },
+        {
+          label: 'Foods',
+          type: 'array',
+          key: 'foods',
+          choices: [
+            {value: 'tacos', label: 'Tacos', sample: 'Some sample'},
+            {value: 'burritos', label: 'Burritos', sample: 'Another sample'},
+            {value: 'enchiladas', label: 'Enchiladas', sample: 'Tasty sample'}
+          ]
         },
         {
           template: true,
@@ -223,7 +233,26 @@
           key: 'pretty',
           type: 'string',
           replaceTags: {'long':'Some Long Label','some_shorty':'Short'}
+        },
+        {
+          label: 'Mirror',
+          type: 'json',
+          eval: {
+            value: ['@join', ['@reverse', ['@split', ['@or', '=pretty', ''], '']], '']
+          }
+        },
+        {
+          label: 'Dynamic Fields',
+          type: 'object',
+          key: 'dynamicFields',
+          eval: {
+            fields: [
+              '@forEach', 'param', ['foo', 'bar'],
+                {key: '=param', label: '=param', extends: 'address'}
+            ]
+          }
         }
+
       ],
       value: {}
     });

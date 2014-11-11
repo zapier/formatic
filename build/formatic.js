@@ -1,8 +1,27 @@
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports = require('./lib/formatic');
-
-},{"./lib/formatic":43}],2:[function(require,module,exports){
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.formatic=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 (function (global){
+// # compiler.choices
+
+/*
+Normalizes the choices for a field. Supports the following formats.
+
+```js
+'red, blue'
+
+['red', 'blue']
+
+{red: 'Red', blue: 'Blue'}
+
+[{value: 'red', label: 'Red'}, {value: 'blue', label: 'Blue'}]
+```
+
+All of those formats are normalized to:
+
+```js
+[{value: 'red', label: 'Red'}, {value: 'blue', label: 'Blue'}]
+```
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -10,14 +29,18 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 module.exports = function (plugin) {
 
   plugin.exports.compile = function (def) {
-    if (def.choices) {
+    if (def.choices === '') {
+      def.choices = [];
+    } else if (def.choices) {
 
       var choices = def.choices;
 
+      // Convert comma separated string to array of strings.
       if (_.isString(choices)) {
         choices = choices.split(',');
       }
 
+      // Convert object to array of objects with `value` and `label` properties.
       if (!_.isArray(choices) && _.isObject(choices)) {
         choices = Object.keys(choices).map(function (key) {
           return {
@@ -27,9 +50,15 @@ module.exports = function (plugin) {
         });
       }
 
+      // Copy the array of choices so we can manipulate them.
       choices = choices.slice(0);
 
+      // Array of choice arrays should be flattened.
+      choices = _.flatten(choices);
+
       choices.forEach(function (choice, i) {
+        // Convert any string choices to objects with `value` and `label`
+        // properties.
         if (_.isString(choice)) {
           choices[i] = {
             value: choice,
@@ -44,13 +73,51 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
+// # compiler.lookup
+
+/*
+Convert a lookup declaration to an evaluation. A lookup property is used like:
+
+```js
+{
+  type: 'string',
+  key: 'states',
+  lookup: {source: 'locations', keys: ['country']}
+}
+```
+
+Logically, the above will use the `country` key of the value to ask the
+`locations` source for states choices. This works by converting the lookup to
+the following evaluation.
+
+```js
+{
+  type: 'string',
+  key: 'states',
+  choices: [],
+  eval: {
+    needsMeta: [
+      ['@if', ['@getMeta', 'locations', {country: ['@get', 'country']}], null, ['locations', {country: ['@get', 'country']}]]
+    ],
+    choices: ['@getMeta', 'locations', {country: ['@get', 'country']}]
+  }
+}
+```
+
+The above says to add a `needsMeta` property if necessary and add a `choices`
+array if it's available. Otherwise, choices will default to an empty array.
+*/
+
 'use strict';
 
 module.exports = function (plugin) {
 
   plugin.exports.compile = function (def) {
     if (def.lookup) {
+      if (!def.choices) {
+        def.choices = [];
+      }
       if (!def.eval) {
         def.eval = {};
       }
@@ -58,19 +125,47 @@ module.exports = function (plugin) {
         def.eval.needsMeta = [];
       }
       var keys = def.lookup.keys || [];
-      var metaKeys = keys.map(function (key) {
-        return ['@get', key];
-      });
-      metaKeys = [def.lookup.source].concat(metaKeys);
-      var metaGet = ['@getMeta'].concat(metaKeys);
-      def.eval.needsMeta.push(['@if', metaGet, null, metaKeys]);
-      def.eval.choices = metaGet;
+      var params = {};
+      var metaArgs, metaGet;
+
+      if (def.lookup.group) {
+
+        keys.forEach(function (key) {
+          params[key] = ['@get', 'item', key];
+        });
+        metaArgs = [def.lookup.source].concat(params);
+        metaGet = ['@getMeta'].concat(metaArgs);
+        var metaForEach = ['@forEach', 'item', ['@getGroupValues', def.lookup.group]];
+        def.eval.needsMeta.push(metaForEach.concat([
+          metaArgs,
+          ['@not', metaGet]
+        ]));
+        def.eval.choices = metaForEach.concat([
+          metaGet,
+          metaGet
+        ]);
+      } else {
+        keys.forEach(function (key) {
+          params[key] = ['@get', key];
+        });
+        metaArgs = [def.lookup.source].concat(params);
+        metaGet = ['@getMeta'].concat(metaArgs);
+        def.eval.needsMeta.push(['@if', metaGet, null, metaArgs]);
+        def.eval.choices = metaGet;
+      }
+
       delete def.lookup;
     }
   };
 };
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
+// # compilers.prop-aliases
+
+/*
+Alias some properties to other properties.
+*/
+
 'use strict';
 
 module.exports = function (plugin) {
@@ -89,14 +184,22 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function (global){
+// # compilers.types
+
+/*
+Convert some high-level types to low-level types and properties.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = function (plugin) {
 
+  // Map high-level type to low-level type. If a function is supplied, can
+  // modify the field definition.
   var typeCoerce = {
     unicode: function (def) {
       def.type = 'string';
@@ -113,6 +216,7 @@ module.exports = function (plugin) {
 
 
   plugin.exports.compile = function (def) {
+
     var coerceType = typeCoerce[def.type];
     if (coerceType) {
       if (_.isString(coerceType)) {
@@ -125,8 +229,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
+// # component.add-item
+
+/*
+The add button to append an item to a field.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -134,7 +244,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -150,18 +260,26 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (global){
+// # component.checkbox-list
+
+/*
+Used with array values to supply multiple checkboxes for adding multiple
+enumerated values to an array.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 var R = React.DOM;
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [require('./mixins/field')],
+    mixins: [plugin.require('mixin.field')],
 
     getDefaultProps: function () {
       return {
@@ -170,6 +288,7 @@ module.exports = function (plugin) {
     },
 
     onChange: function () {
+      // Get all the checked checkboxes and convert to an array of values.
       var choiceNodes = this.refs.choices.getDOMNode().getElementsByTagName('input');
       choiceNodes = Array.prototype.slice.call(choiceNodes, 0);
       var values = choiceNodes.map(function (node) {
@@ -186,6 +305,10 @@ module.exports = function (plugin) {
 
       var choices = field.def.choices || [];
 
+      var isInline = !_.find(choices, function (choice) {
+        return choice.sample;
+      });
+
       var value = field.value || [];
 
       return plugin.component('field')({
@@ -193,22 +316,32 @@ module.exports = function (plugin) {
       },
         R.div({className: this.props.className, ref: 'choices'},
           choices.map(function (choice, i) {
-            return R.span({key: i, className: 'field-choice'},
-              R.span({style: {whiteSpace: 'nowrap'}},
-                R.input({
-                  name: field.def.key,
-                  type: 'checkbox',
-                  value: choice.value,
-                  checked: value.indexOf(choice.value) >= 0 ? true : false,
-                  onChange: this.onChange
-                  //onFocus: this.props.actions.focus
-                }),
-                R.span({className: 'field-choice-label'},
-                  choice.label
-                )
-              ),
-              ' '
+
+            var inputField = R.span({style: {whiteSpace: 'nowrap'}},
+              R.input({
+                name: field.def.key,
+                type: 'checkbox',
+                value: choice.value,
+                checked: value.indexOf(choice.value) >= 0 ? true : false,
+                onChange: this.onChange
+                //onFocus: this.props.actions.focus
+              }),
+              ' ',
+              R.span({className: 'field-choice-label'},
+                choice.label
+              )
             );
+
+            if (isInline) {
+              return R.span({key: i, className: 'field-choice'},
+                inputField, ' '
+              );
+            } else {
+              return R.div({key: i, className: 'field-choice'},
+                inputField, ' ',
+                plugin.component('sample')({field: field, choice: choice})
+              );
+            }
           }.bind(this))
         )
       );
@@ -217,8 +350,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./mixins/field":20}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global){
+// # component.field
+
+/*
+Used by any fields to put the label and help text around the field.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -226,7 +365,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -252,8 +391,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function (global){
+// # component.fieldset
+
+/*
+Render multiple child fields for a field.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -261,9 +406,9 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [require('./mixins/field')],
+    mixins: [plugin.require('mixin.field')],
 
     getDefaultProps: function () {
       return {
@@ -278,8 +423,8 @@ module.exports = function (plugin) {
         field: field
       },
         R.fieldset({className: this.props.className},
-          field.fields().map(function (field) {
-            return field.component();
+          field.fields().map(function (field, i) {
+            return field.component({key: field.def.key || i});
           }.bind(this))
         )
       );
@@ -288,19 +433,22 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./mixins/field":20}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (global){
+// # component.formatic
+
+/*
+Top-level component which gets a form and then listens to the form for changes.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 var R = React.DOM;
-var Reflux = require('reflux');
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
-
-    mixins: [Reflux.ListenerMixin],
+  plugin.exports = React.createClass({
 
     getInitialState: function () {
       return {
@@ -310,7 +458,12 @@ module.exports = function (plugin) {
 
     componentDidMount: function() {
       var form = this.props.form;
-      this.listenTo(form.store, this.onFormChanged);
+      form.on('change', this.onFormChanged);
+    },
+
+    componentWillUnmount: function () {
+      var form = this.props.form;
+      form.off('change', this.onFormChanged);
     },
 
     onFormChanged: function () {
@@ -331,8 +484,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"reflux":62}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function (global){
+// # component.help
+
+/*
+Just the help text block.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -340,7 +499,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -362,8 +521,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (global){
+// # component.item-choices
+
+/*
+Give a list of choices of item types to create as children of an field.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -371,7 +536,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -402,8 +567,15 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
+// # component.json
+
+/*
+Textarea editor for JSON. Will validate the JSON before setting the value, so
+while the value is invalid, no external state changes will occur.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -411,9 +583,9 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [require('./mixins/field')],
+    mixins: [plugin.require('mixin.field')],
 
     getDefaultProps: function () {
       return {
@@ -483,8 +655,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./mixins/field":20}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (global){
+// # component.label
+
+/*
+Just the label for a field.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -492,7 +670,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -534,8 +712,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
+// # component.list-control
+
+/*
+Render the item type choices and the add button.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -543,7 +727,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -586,8 +770,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function (global){
+// # component.list-item-control
+
+/*
+Render the remove and move buttons for a field.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -595,7 +785,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -628,8 +818,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (global){
+// # component.list-item-value
+
+/*
+Render the value of a list item.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -637,55 +833,13 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
         className: plugin.config.className
       };
     },
-    //
-    // getInitialState: function () {
-    //   return {
-    //     maybeDelete: false
-    //   };
-    // },
-    //
-    // onDelete: function () {
-    //   var parent = this.props.field.parent;
-    //   if (this.props.onDelete) {
-    //     this.props.onDelete(this.props.field.index);
-    //   }
-    //   this.props.form.actions.delete(parent, this.props.field.index);
-    // },
-    //
-    // onMoveUp: function () {
-    //   var parent = this.props.field.parent;
-    //   if (this.props.onMove) {
-    //     this.props.onMove(this.props.field.index, this.props.field.index - 1);
-    //   }
-    //   this.props.form.actions.move(parent, this.props.field.index, this.props.field.index - 1);
-    // },
-    //
-    // onMoveDown: function () {
-    //   var parent = this.props.field.parent;
-    //   if (this.props.onMove) {
-    //     this.props.onMove(this.props.field.index, this.props.field.index + 1);
-    //   }
-    //   this.props.form.actions.move(parent, this.props.field.index, this.props.field.index + 1);
-    // },
-    //
-    // onMouseOver: function () {
-    //   this.setState({
-    //     maybeDelete: true
-    //   });
-    // },
-    //
-    // onMouseOut: function () {
-    //   this.setState({
-    //     maybeDelete: false
-    //   });
-    // },
 
     render: function () {
       var field = this.props.field;
@@ -703,8 +857,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (global){
+// # component.list-item
+
+/*
+Render a list item.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -712,91 +872,34 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
         className: plugin.config.className
       };
     },
-    //
-    // getInitialState: function () {
-    //   return {
-    //     maybeDelete: false
-    //   };
-    // },
-    //
-    // onDelete: function () {
-    //   var parent = this.props.field.parent;
-    //   if (this.props.onDelete) {
-    //     this.props.onDelete(this.props.field.index);
-    //   }
-    //   this.props.form.actions.delete(parent, this.props.field.index);
-    // },
-    //
-    // onMoveUp: function () {
-    //   var parent = this.props.field.parent;
-    //   if (this.props.onMove) {
-    //     this.props.onMove(this.props.field.index, this.props.field.index - 1);
-    //   }
-    //   this.props.form.actions.move(parent, this.props.field.index, this.props.field.index - 1);
-    // },
-    //
-    // onMoveDown: function () {
-    //   var parent = this.props.field.parent;
-    //   if (this.props.onMove) {
-    //     this.props.onMove(this.props.field.index, this.props.field.index + 1);
-    //   }
-    //   this.props.form.actions.move(parent, this.props.field.index, this.props.field.index + 1);
-    // },
-    //
-    // onMouseOver: function () {
-    //   this.setState({
-    //     maybeDelete: true
-    //   });
-    // },
-    //
-    // onMouseOut: function () {
-    //   this.setState({
-    //     maybeDelete: false
-    //   });
-    // },
 
     render: function () {
       var field = this.props.field;
 
-      //var parent = this.props.parent;
-      //var item = field.field;
-      //var form = this.props.form;
-
-      //var className = formatic.className('list-item', plugin.config.className, field.className);
-
-      // var valueClassName = formatic.className('object-value', plugin.config.value_className, field.value_className);
-      // var controlClassName = formatic.className('list-control', plugin.config.control_className, field.control_className);
-      // var removeClassName = formatic.className('list-control-remove', plugin.config.removeButton_className, field.removeButton_className);
-      // var upClassName = formatic.className('list-control-up', plugin.config.upButton_className, field.upButton_className);
-      // var downClassName = formatic.className('list-control-down', plugin.config.downButton_className, field.downButton_className);
-      //
-      // var removeLabel = plugin.configValue('removeButton_label', '[remove]');
-      // var upLabel = plugin.configValue('upButton_label', '[up]');
-      // var downLabel = plugin.configValue('downButton_label', '[down]');
       return R.div({className: this.props.className},
         plugin.component('list-item-value')({form: this.props.form, field: field, index: this.props.index}),
         plugin.component('list-item-control')({field: field, index: this.props.index, numItems: this.props.numItems, onMove: this.props.onMove, onRemove: this.props.onRemove})
-        //,
-        // R.div({className: controlClassName},
-        //   R.span({className: removeClassName, onMouseOver: this.onMouseOver, onMouseOut: this.onMouseOut, onClick: this.onDelete}, removeLabel),
-        //   this.props.field.index > 0 ? R.span({className: upClassName, onClick: this.onMoveUp}, upLabel) : null,
-        //   this.props.field.index < (this.props.field.numItems - 1) ? R.span({className: downClassName, onClick: this.onMoveDown}, downLabel) : null
-        // )
       );
     }
   });
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (global){
+// # component.list
+
+/*
+Render a list.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -804,9 +907,9 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [require('./mixins/field')],
+    mixins: [plugin.require('mixin.field')],
 
     getDefaultProps: function () {
       return {
@@ -851,23 +954,6 @@ module.exports = function (plugin) {
 
     onAppend: function (itemIndex) {
       this.props.field.append(itemIndex);
-    //   var field = this.props.field;
-    //   var item = null;
-    //   if (this.refs.typeSelect) {
-    //     var index = parseInt(this.refs.typeSelect.getDOMNode().value);
-    //     item = field.itemTypes[index].item;
-    //   }
-    //   this.props.form.actions.insert(this.props.field, null, item);
-    //   if (this.props.field.collapsableItems) {
-    //     // var collapsed = this.props.field.fields.map(function () {
-    //     //   return true;
-    //     // }.bind(this));
-    //     var collapsed = this.state.collapsed;
-    //     collapsed = collapsed.concat(false);
-    //     this.setState({
-    //       collapsed: collapsed
-    //     });
-    //   }
     },
     //
     // onClickLabel: function (i) {
@@ -917,7 +1003,6 @@ module.exports = function (plugin) {
       var fields = field.fields();
 
       var numItems = fields.length;
-
       return plugin.component('field')({
         field: field
       },
@@ -944,120 +1029,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./mixins/field":20}],20:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-
-  loadNeededMeta: function (props) {
-    if (props.field && props.field.form) {
-      if (props.field.def.needsMeta && props.field.def.needsMeta.length > 0) {
-        props.field.def.needsMeta.forEach(function (keys) {
-          if (keys) {
-            props.field.form.loadMeta(keys);
-          }
-        });
-      }
-    }
-  },
-
-  componentDidMount: function () {
-    this.loadNeededMeta(this.props);
-  },
-
-  componentWillReceiveProps: function (nextProps) {
-    this.loadNeededMeta(nextProps);
-  },
-
-  componentWillUnmount: function () {
-    if (this.props.field) {
-      this.props.field.erase();
-    }
-  }
-};
-
-},{}],21:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-
-  componentDidMount: function () {
-    if (this.onResizeWindow) {
-      window.addEventListener('resize', this.onResizeWindow);
-    }
-  },
-
-  componentWillUnmount: function () {
-    if (this.onResizeWindow) {
-      window.removeEventListener('resize', this.onResizeWindow);
-    }
-  }
-};
-
-},{}],22:[function(require,module,exports){
-// http://prometheusresearch.github.io/react-forms/examples/undo.html
-
-'use strict';
-
-var UndoStack = {
-  getInitialState: function() {
-    return {undo: [], redo: []};
-  },
-
-  snapshot: function() {
-    var undo = this.state.undo.concat(this.getStateSnapshot());
-    if (typeof this.state.undoDepth === 'number') {
-      if (undo.length > this.state.undoDepth) {
-        undo.shift();
-      }
-    }
-    this.setState({undo: undo, redo: []});
-  },
-
-  hasUndo: function() {
-    return this.state.undo.length > 0;
-  },
-
-  hasRedo: function() {
-    return this.state.redo.length > 0;
-  },
-
-  redo: function() {
-    this._undoImpl(true);
-  },
-
-  undo: function() {
-    this._undoImpl();
-  },
-
-  _undoImpl: function(isRedo) {
-    var undo = this.state.undo.slice(0);
-    var redo = this.state.redo.slice(0);
-    var snapshot;
-
-    if (isRedo) {
-      if (redo.length === 0) {
-        return;
-      }
-      snapshot = redo.pop();
-      undo.push(this.getStateSnapshot());
-    } else {
-      if (undo.length === 0) {
-        return;
-      }
-      snapshot = undo.pop();
-      redo.push(this.getStateSnapshot());
-    }
-
-    this.setStateSnapshot(snapshot);
-    this.setState({undo:undo, redo:redo});
-  }
-};
-
-module.exports = UndoStack;
-
-},{}],23:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (global){
+// # component.move-item-back
+
+/*
+Button to move an item backwards in list.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -1065,7 +1044,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -1081,8 +1060,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],24:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (global){
+// # component.move-item-forward
+
+/*
+Button to move an item forward in a list.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -1090,7 +1075,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -1106,14 +1091,37 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],25:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (global){
+// # component.pretty-textarea
+
+/*
+Textarea that will display highlights behind "tags". Tags currently mean text
+that is enclosed in braces like `{{foo}}`. Tags are replaced with labels if
+available or humanized.
+
+This component is quite complicated because:
+- We are displaying text in the textarea but have to keep track of the real
+  text value in the background. We can't use a data attribute, because it's a
+  textarea, so we can't use any elements at all!
+- Because of the hidden data, we also have to do some interception of
+  copy, which is a little weird. We intercept copy and copy the real text
+  to the end of the textarea. Then we erase that text, which leaves the copied
+  data in the buffer.
+- React loses the caret position when you update the value to something
+  different than before. So we have to retain tracking information for when
+  that happens.
+- Because we monkey with copy, we also have to do our own undo/redo. Otherwise
+  the default undo will have weird states in it.
+
+So good luck!
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 var R = React.DOM;
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
-var Resizable = require('react-component-resizable');
 
 var noBreak = function (value) {
   return value.replace(/ /g, '\u00a0');
@@ -1126,9 +1134,9 @@ module.exports = function (plugin) {
 
   var util = plugin.require('util');
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [require('./mixins/undo-stack'), require('./mixins/resize')],
+    mixins: [plugin.require('mixin.field'), plugin.require('mixin.undo-stack'), plugin.require('mixin.resize')],
 
     getDefaultProps: function () {
       return {
@@ -1137,48 +1145,37 @@ module.exports = function (plugin) {
     },
 
     getInitialState: function () {
-      var value = this.props.field.value || '';
-      var parts = util.parseTextWithTags(value);
-      var tokens = this.tokens(parts);
-      var indexMap = this.indexMap(tokens);
-
       return {
-        tokens: tokens,
-        indexMap: indexMap,
-        value: value,
-        plainValue: this.plainValue(value),
-        pos: indexMap.length,
-        range: 0,
         undoDepth: 100
       };
     },
 
+    componentWillMount: function () {
+      // Not quite state, this is for tracking selection info.
+      this.tracking = {};
+
+      var parts = util.parseTextWithTags(this.props.field.value);
+      var tokens = this.tokens(parts);
+      var indexMap = this.indexMap(tokens);
+
+      this.tracking.pos = indexMap.length;
+      this.tracking.range = 0;
+      this.tracking.tokens = tokens;
+      this.tracking.indexMap = indexMap;
+    },
+
     getStateSnapshot: function () {
       return {
-        value: this.state.value,
-        pos: this.state.pos
+        value: this.props.field.value,
+        pos: this.tracking.pos,
+        range: this.tracking.range
       };
     },
 
     setStateSnapshot: function (snapshot) {
+      this.tracking.pos = snapshot.pos;
+      this.tracking.range = snapshot.range;
       this.props.field.val(snapshot.value);
-      this.setState({
-        pos: snapshot.pos
-      });
-    },
-
-    componentWillReceiveProps: function (props) {
-      var value = props.field.value || '';
-      var parts = util.parseTextWithTags(value);
-      var tokens = this.tokens(parts);
-      var indexMap = this.indexMap(tokens);
-
-      this.setState({
-        value: value,
-        plainValue: this.plainValue(value),
-        tokens: tokens,
-        indexMap: indexMap
-      });
     },
 
     // Turn into individual characters and tags
@@ -1217,8 +1214,6 @@ module.exports = function (plugin) {
 
     // Given some postion, return the token index (position could be in the middle of a token)
     tokenIndex: function (pos, tokens, indexMap) {
-      tokens = tokens || this.state.tokens;
-      indexMap = indexMap || this.state.indexMap;
       if (pos < 0) {
         pos = 0;
       } else if (pos >= indexMap.length) {
@@ -1228,61 +1223,87 @@ module.exports = function (plugin) {
     },
 
     onChange: function (event) {
+      //console.log('change:', event.target.value);
 
-      //console.log('change');
-      //console.log(event);
+      var node = event.target;
 
-      var node = this.refs.content.getDOMNode();
+      // Tracking is holding previous position and range
+      var prevPos = this.tracking.pos;
+      var prevRange = this.tracking.range;
 
-      var prevPos = this.state.pos;
-      var prevRange = this.state.range;
+      // New position
       var pos = node.selectionStart;
 
-      var tokens = this.state.tokens;
-      var realPrevIndex = this.tokenIndex(prevPos);
-      var realPrevEndIndex = this.tokenIndex(prevPos + prevRange);
-      var realPrevRange = realPrevEndIndex - realPrevIndex;
+      // Going to mutate the tokens.
+      var tokens = this.tracking.tokens;
 
-      //console.log(prevPos + ',' + prevRange + ',' + pos);
-      //console.log(realPrevIndex + ',' + realPrevEndIndex + ',' + realPrevRange);
-      //console.log(node.value);
+      // Using the previous position and range, get the previous token position
+      // and range
+      var prevTokenIndex = this.tokenIndex(prevPos, tokens, this.tracking.indexMap);
+      var prevTokenEndIndex = this.tokenIndex(prevPos + prevRange, tokens, this.tracking.indexMap);
+      var prevTokenRange = prevTokenEndIndex - prevTokenIndex;
 
-      if (realPrevRange > 0) {
-        tokens.splice(realPrevIndex, realPrevRange);
+      // Wipe out any tokens in the selected range because the change would have
+      // erased that selection.
+      if (prevTokenRange > 0) {
+        tokens.splice(prevTokenIndex, prevTokenRange);
+        this.tracking.indexMap = this.indexMap(tokens);
       }
 
+      // If cursor has moved forward, then text was added.
       if (pos > prevPos) {
         var addedText = node.value.substring(prevPos, pos);
-        tokens.splice(realPrevIndex, 0, addedText);
-      } else if ((node.value.length + 1) === this.state.plainValue.length) {
+        // Insert the text into the tokens.
+        tokens.splice(prevTokenIndex, 0, addedText);
+      // If cursor has moved backward, then we deleted (backspaced) text
+      } if (pos < prevPos) {
         var token = this.tokenAt(pos);
         var tokenBefore = this.tokenBefore(pos);
+        // If we moved back onto a token, then we should move back to beginning
+        // of token.
         if (token === tokenBefore) {
           pos = this.moveOffTag(pos, tokens, this.indexMap(tokens), -1);
         }
-        tokens.splice(realPrevIndex - 1, 1);
-        node.setSelectionRange(pos, pos);
+        var tokenIndex = this.tokenIndex(pos, tokens, this.tracking.indexMap);
+        // Now we can remove the tokens that were deleted.
+        tokens.splice(tokenIndex, prevTokenIndex - tokenIndex);
       }
 
+      // Convert tokens back into raw value with tags. Newly formed tags will
+      // become part of the raw value.
       var rawValue = this.rawValue(tokens);
 
+      this.tracking.pos = pos;
+      this.tracking.range = 0;
+
+      // Set the value to the new raw value.
       this.props.field.val(rawValue);
 
       this.snapshot();
-
-      this.setState({
-        range: 0,
-        pos: pos
-      });
     },
-    //
+
     componentDidUpdate: function () {
       if (document.activeElement === this.refs.content.getDOMNode()) {
-      //   this.refs.content.getDOMNode().setSelectionRange(this.state.pos, this.state.pos + this.state.range);
-        this.refs.content.getDOMNode().setSelectionRange(this.state.pos, this.state.pos + this.state.range);
+        // React can lose the selection, so put it back.
+
+        var value = this.props.field.value || '';
+        var parts = util.parseTextWithTags(value);
+        this.tracking.tokens = this.tokens(parts);
+        this.tracking.indexMap = this.indexMap(this.tracking.tokens);
+
+        var pos = this.normalizePosition(this.tracking.pos);
+        var range = this.tracking.range;
+        var endPos = this.normalizePosition(pos + range);
+        range = endPos - pos;
+
+        this.tracking.pos = pos;
+        this.tracking.range = range;
+
+        this.refs.content.getDOMNode().setSelectionRange(pos, pos + range);
       }
     },
 
+    // Get the label for a key.
     prettyLabel: function (key) {
       if (this.props.field.def.replaceTags[key]) {
         return this.props.field.def.replaceTags[key];
@@ -1290,6 +1311,8 @@ module.exports = function (plugin) {
       return util.humanize(key);
     },
 
+    // Given the actual value of the field (with tags), get the plain text that
+    // should show in the textarea.
     plainValue: function (value) {
       var parts = util.parseTextWithTags(value);
       return parts.map(function (part) {
@@ -1301,6 +1324,8 @@ module.exports = function (plugin) {
       }.bind(this)).join('');
     },
 
+    // Given the actual value of the field (with tags), get the html used to
+    // highlight the labels.
     prettyValue: function (value) {
       var parts = util.parseTextWithTags(value);
       return parts.map(function (part, i) {
@@ -1312,6 +1337,7 @@ module.exports = function (plugin) {
           }
           return part.value;
         } else {
+          // Make a pill
           return R.span({className: 'pretty-part'},
             R.span({className: 'pretty-part-left'}, LEFT_PAD),
             R.span({className: 'pretty-part-text'}, noBreak(this.prettyLabel(part.value))),
@@ -1321,6 +1347,8 @@ module.exports = function (plugin) {
       }.bind(this));
     },
 
+    // Given the tokens for a field, get the actual value of the field (with
+    // tags)
     rawValue: function (tokens) {
       return tokens.map(function (token) {
         if (token.type === 'tag') {
@@ -1331,6 +1359,8 @@ module.exports = function (plugin) {
       }).join('');
     },
 
+    // Given a position, if it's on a label, get the position left or right of
+    // the label, based on direction and/or which side is closer
     moveOffTag: function (pos, tokens, indexMap, dir) {
       if (typeof dir === 'undefined' || dir > 0) {
         dir = 1;
@@ -1353,34 +1383,41 @@ module.exports = function (plugin) {
       return pos;
     },
 
+    // Get the token at some position.
     tokenAt: function (pos) {
-      if (pos >= this.state.indexMap.length) {
+      if (pos >= this.tracking.indexMap.length) {
         return null;
       }
       if (pos < 0) {
         pos = 0;
       }
-      return this.state.tokens[this.state.indexMap[pos]];
+      return this.tracking.tokens[this.tracking.indexMap[pos]];
     },
 
+    // Get the token immediately before some position.
     tokenBefore: function (pos) {
-      if (pos >= this.state.indexMap.length) {
-        pos = this.state.indexMap.length;
+      if (pos >= this.tracking.indexMap.length) {
+        pos = this.tracking.indexMap.length;
       }
       if (pos <= 0) {
         return null;
       }
-      return this.state.tokens[this.state.indexMap[pos - 1]];
+      return this.tracking.tokens[this.tracking.indexMap[pos - 1]];
     },
 
-    normalizePosition: function (pos, selectDir) {
+    // Given a position, get a corrected position (if necessary to be
+    // corrected).
+    normalizePosition: function (pos, prevPos) {
+      if (_.isUndefined(prevPos)) {
+        prevPos = pos;
+      }
       // At start or end, so okay.
-      if (pos <= 0 || pos >= this.state.indexMap.length) {
+      if (pos <= 0 || pos >= this.tracking.indexMap.length) {
         if (pos < 0) {
           pos = 0;
         }
-        if (pos > this.state.indexMap.length) {
-          pos = this.state.indexMap.length;
+        if (pos > this.tracking.indexMap.length) {
+          pos = this.tracking.indexMap.length;
         }
         return pos;
       }
@@ -1393,11 +1430,11 @@ module.exports = function (plugin) {
         return pos;
       }
 
-      var prevToken = this.tokenAt(this.state.pos);
-      var prevTokenBefore = this.tokenBefore(this.state.pos);
+      var prevToken = this.tokenAt(prevPos);
+      var prevTokenBefore = this.tokenBefore(prevPos);
 
-      var rightPos = this.moveOffTag(pos, this.state.tokens, this.state.indexMap);
-      var leftPos = this.moveOffTag(pos, this.state.tokens, this.state.indexMap, -1);
+      var rightPos = this.moveOffTag(pos, this.tracking.tokens, this.tracking.indexMap);
+      var leftPos = this.moveOffTag(pos, this.tracking.tokens, this.tracking.indexMap, -1);
 
       if (prevToken !== prevTokenBefore) {
         // Moved from left edge.
@@ -1411,7 +1448,8 @@ module.exports = function (plugin) {
       }
 
       var newPos = rightPos;
-      if (typeof selectDir === 'undefined' || selectDir === -1) {
+
+      if (pos === prevPos || pos < prevPos) {
         if (rightPos - pos > pos - leftPos) {
           newPos = leftPos;
         }
@@ -1419,41 +1457,20 @@ module.exports = function (plugin) {
       return newPos;
     },
 
-    onSelect: function () {
-      //console.log('select');
-      var node = this.refs.content.getDOMNode();
+    onSelect: function (event) {
+      var node = event.target;
 
-      var start = node.selectionStart;
-      var pos = this.normalizePosition(start);
+      var pos = node.selectionStart;
+      var endPos = node.selectionEnd;
 
+      pos = this.normalizePosition(pos, this.tracking.pos);
+      endPos = this.normalizePosition(endPos, this.tracking.pos + this.tracking.range);
 
-      var end = node.selectionEnd;
-      var range = 0;
-      //console.log(start + ',' + pos + ',' + end + ',' + range);
-      //console.log(node.value);
+      this.tracking.pos = pos;
+      this.tracking.range = endPos - pos;
 
-      if (node.value !== this.state.value) {
-        //console.log(node.value + ' != ' + this.state.value);
-        return;
-      }
-
-      if (end > start) {
-        var selectDir = 1;
-        if (end === this.state.pos) {
-          selectDir = -1;
-        }
-        //console.log(this.state.pos + ', selDir: ' + selectDir);
-        var endPos = this.normalizePosition(end, selectDir);
-        //console.log('endPos:' + endPos);
-        if (endPos > pos) {
-          range = endPos - pos;
-        }
-      }
-
-      this.setState({
-        pos: pos,
-        range: range
-      });
+      node.selectionStart = pos;
+      node.selectionEnd = endPos;
     },
 
     onCopy: function () {
@@ -1461,9 +1478,9 @@ module.exports = function (plugin) {
       var start = node.selectionStart;
       var end = node.selectionEnd;
       var text = node.value.substring(start, end);
-      var realStartIndex = this.tokenIndex(start);
-      var realEndIndex = this.tokenIndex(end);
-      var tokens = this.state.tokens.slice(realStartIndex, realEndIndex);
+      var realStartIndex = this.tokenIndex(start, this.tracking.tokens, this.tracking.indexMap);
+      var realEndIndex = this.tokenIndex(end, this.tracking.tokens, this.tracking.indexMap);
+      var tokens = this.tracking.tokens.slice(realStartIndex, realEndIndex);
       text = this.rawValue(tokens);
       var originalValue = node.value;
       node.value = node.value + text;
@@ -1475,9 +1492,11 @@ module.exports = function (plugin) {
     },
 
     onKeyDown: function (event) {
+      // Cmd-Z or Ctrl-Z
       if (event.keyCode === 90 && (event.metaKey || event.ctrlKey) && !event.shiftKey) {
         event.preventDefault();
         this.undo();
+      // Cmd-Shift-Z or Ctrl-Y
       } else if (
         (event.keyCode === 89 && event.ctrlKey && !event.shiftKey) ||
         (event.keyCode === 90 && event.metaKey && event.shiftKey)
@@ -1486,37 +1505,72 @@ module.exports = function (plugin) {
       }
     },
 
+    // Keep the highlight styles in sync with the textarea styles.
     adjustStyles: function () {
       var overlay = this.refs.highlight.getDOMNode();
       var content = this.refs.content.getDOMNode();
-      overlay.style.cssText = document.defaultView.getComputedStyle(content, '').cssText;
+
+      var style = window.getComputedStyle(content);
+
+      var backgroundColor = style.backgroundColor;
+
+      util.copyElementStyle(content, overlay);
+
       overlay.style.position = 'absolute';
+      overlay.style.whiteSpace = 'pre-wrap';
+      overlay.style.color = 'rgba(0,0,0,0)';
+      overlay.style.webkitTextFillColor = 'rgba(0,0,0,0)';
+      overlay.style.resize = 'none';
+      overlay.style.borderColor = 'rgba(0,0,0,0)';
+
+      if (util.browser.isMozilla) {
+
+        var paddingTop = parseFloat(style.paddingTop);
+        var paddingBottom = parseFloat(style.paddingBottom);
+
+        var borderTop = parseFloat(style.borderTopWidth);
+        var borderBottom = parseFloat(style.borderBottomWidth);
+
+        overlay.style.paddingTop = '0px';
+        overlay.style.paddingBottom = '0px';
+
+        overlay.style.height = (content.clientHeight - paddingTop - paddingBottom + borderTop + borderBottom) + 'px';
+        overlay.style.top = style.paddingTop;
+        overlay.style.boxShadow = 'none';
+      }
+
+      overlay.style.backgroundColor = backgroundColor;
+      content.style.backgroundColor = 'rgba(0,0,0,0)';
     },
 
+    // If the textarea is resized, need to re-sync the styles.
     onResize: function () {
       this.adjustStyles();
     },
 
+    // If the window is resized, may need to re-sync the styles.
+    // Probably not necessary with element resize?
     onResizeWindow: function () {
       this.adjustStyles();
     },
 
     componentDidMount: function () {
       this.adjustStyles();
+      this.setOnResize('content', this.onResize);
     },
 
     render: function () {
       var field = this.props.field;
-      return Resizable({}, R.div({style: {position: 'relative'}},
 
-        R.div({
+      return plugin.component('field')({
+        field: field
+      }, R.div({style: {position: 'relative'}},
+
+        R.pre({
           className: 'pretty-highlight',
-          ref: 'highlight',
-          style: {
-            position: 'absolute'
-          }
+          ref: 'highlight'
         },
-          this.prettyValue(this.state.value)
+          this.prettyValue(field.value)
         ),
 
         R.textarea(_.extend({
@@ -1524,13 +1578,10 @@ module.exports = function (plugin) {
           ref: 'content',
           rows: 5,
           name: field.key,
-          value: this.state.plainValue,
+          value: this.plainValue(field.value),
           onChange: this.onChange,
-          onFocus: this.onFocus,
-          onBlur: this.onBlur,
           onScroll: this.onScroll,
           style: {
-            backgroundColor: 'rgba(0,0,0,0)',
             position: 'relative',
             top: 0,
             left: 0
@@ -1546,8 +1597,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./mixins/resize":21,"./mixins/undo-stack":22,"react-component-resizable":52}],26:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function (global){
+// # component.remove-item
+
+/*
+Remove an item.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -1555,7 +1612,7 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -1571,8 +1628,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],27:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (global){
+// # component.root
+
+/*
+Root component just used to spit out all the fields for a form.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -1582,7 +1645,7 @@ module.exports = function (plugin) {
 
   var util = plugin.require('util');
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
     getDefaultProps: function () {
       return {
@@ -1596,8 +1659,8 @@ module.exports = function (plugin) {
       return R.div({
         className: this.props.className
       },
-        field.fields().map(function (field) {
-          return field.component();
+        field.fields().map(function (field, i) {
+          return field.component({key: field.def.key || i});
         })
       );
     }
@@ -1605,8 +1668,53 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],28:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (global){
+// # component.help
+
+/*
+Just the help text block.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+
+module.exports = function (plugin) {
+
+  plugin.exports = React.createClass({
+
+    getDefaultProps: function () {
+      return {
+        className: plugin.config.className
+      };
+    },
+
+    render: function () {
+
+      var choice = this.props.choice;
+
+      return choice.sample ?
+        R.div({className: this.props.className},
+          choice.sample
+        ) :
+        R.span(null);
+    }
+  });
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],25:[function(require,module,exports){
+(function (global){
+// # component.select
+
+/*
+Render select element to give a user choices for the value of a field. Note
+it should support values other than strings. Currently this is only tested for
+boolean values, but it _should_ work for other values.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -1615,9 +1723,9 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [require('./mixins/field')],
+    mixins: [plugin.require('mixin.field')],
 
     getDefaultProps: function () {
       return {
@@ -1687,8 +1795,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./mixins/field":20}],29:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
+// # component.text
+
+/*
+Just a simple text input.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -1696,9 +1810,9 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [require('./mixins/field')],
+    mixins: [plugin.require('mixin.field')],
 
     getDefaultProps: function () {
       return {
@@ -1729,8 +1843,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./mixins/field":20}],30:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (global){
+// # component.textarea
+
+/*
+Just a simple multi-row textarea.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -1738,9 +1858,9 @@ var R = React.DOM;
 
 module.exports = function (plugin) {
 
-  plugin.exports.component = React.createClass({
+  plugin.exports = React.createClass({
 
-    mixins: [require('./mixins/field')],
+    mixins: [plugin.require('mixin.field')],
 
     getDefaultProps: function () {
       return {
@@ -1771,8 +1891,19 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./mixins/field":20}],31:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (global){
+// # core.field
+
+/*
+The core field plugin provides the Field prototype. Fields represent a
+particular state in time of a field definition, and they provide helper methods
+to notify the form store of changes.
+
+Fields are lazily created and evaluated, but once evaluated, they should be
+considered immutable.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -1784,6 +1915,7 @@ module.exports = function (plugin) {
   var evaluator = plugin.require('eval');
   var compiler = plugin.require('compiler');
 
+  // The Field constructor.
   var Field = function (form, def, value, parent) {
     var field = this;
 
@@ -1791,8 +1923,10 @@ module.exports = function (plugin) {
     field.def = def;
     field.value = value;
     field.parent = parent;
+    field.groups = {};
   };
 
+  // Attach a field factory to the form prototype.
   plugin.exports.field = function () {
     var form = this;
 
@@ -1803,6 +1937,7 @@ module.exports = function (plugin) {
 
   var proto = Field.prototype;
 
+  // Return the type plugin for this field.
   proto.typePlugin = function () {
     var field = this;
 
@@ -1813,14 +1948,15 @@ module.exports = function (plugin) {
     return field._typePlugin;
   };
 
-  proto.component = function () {
+  // Get a component for this field.
+  proto.component = function (props) {
     var field = this;
+    props = _.extend({}, props, {field: field});
     var component = router.componentForField(field);
-    return component({
-      field: field
-    });
+    return component(props);
   };
 
+  // Get the child fields for this field.
   proto.fields = function () {
     var field = this;
 
@@ -1841,6 +1977,7 @@ module.exports = function (plugin) {
     return field._fields;
   };
 
+  // Get the items (child field definitions) for this field.
   proto.items = function () {
     var field = this;
 
@@ -1857,6 +1994,7 @@ module.exports = function (plugin) {
     return field._items;
   };
 
+  // Resolve a field reference if necessary.
   proto.resolve = function (def) {
     var field = this;
 
@@ -1870,6 +2008,7 @@ module.exports = function (plugin) {
     return def;
   };
 
+  // Evaluate a field definition and return a new field definition.
   proto.evalDef = function (def) {
     var field = this;
 
@@ -1880,20 +2019,29 @@ module.exports = function (plugin) {
         if (extDef) {
           def = _.extend({}, def, extDef);
           def = compiler.compileDef(def);
+          if (def.fields) {
+            def.fields = def.fields.map(function (childDef) {
+              childDef = compiler.expandDef(childDef, field.form.store.templateMap)
+              return compiler.compileDef(childDef);
+            });
+          }
         }
       } catch (e) {
         console.log('Problem in eval: ', JSON.stringify(def.eval));
         console.log(e.message);
+        console.log(e.stack);
       }
     }
 
     return def;
   };
 
-  proto.eval = function (expression) {
-    return evaluator.evaluate(expression, this);
+  // Evaluate an expression in the context of a field.
+  proto.eval = function (expression, context) {
+    return evaluator.evaluate(expression, this, context);
   };
 
+  // Create a child field from a definition.
   proto.createChild = function (def) {
     var field = this;
 
@@ -1916,6 +2064,7 @@ module.exports = function (plugin) {
     return new Field(field.form, def, value, field);
   };
 
+  // Given a value, find an appropriate field definition for this field.
   proto.itemForValue = function (value) {
     var field = this;
 
@@ -1931,6 +2080,28 @@ module.exports = function (plugin) {
     return item;
   };
 
+  // Get all the fields belonging to a group.
+  proto.groupFields = function (groupName) {
+    var field = this;
+
+    if (!field.groups[groupName]) {
+      field.groups[groupName] = [];
+      if (field.parent) {
+        var siblings = field.parent.fields();
+        siblings.forEach(function (sibling) {
+          if (sibling !== field && sibling.def.group === groupName) {
+            field.groups[groupName].push(sibling);
+          }
+        });
+        var parentGroupFields = field.parent.groupFields(groupName);
+        field.groups[groupName] = field.groups[groupName].concat(parentGroupFields);
+      }
+    }
+
+    return field.groups[groupName];
+  };
+
+  // Walk backwards through parents and build out a path array to the value.
   proto.valuePath = function (childPath) {
     var field = this;
 
@@ -1944,12 +2115,14 @@ module.exports = function (plugin) {
     return path;
   };
 
+  // Set the value for this field.
   proto.val = function (value) {
     var field = this;
 
     field.form.actions.setValue(field.valuePath(), value);
   };
 
+  // Remove a child value from this field.
   proto.remove = function (key) {
     var field = this;
 
@@ -1958,12 +2131,14 @@ module.exports = function (plugin) {
     field.form.actions.removeValue(path);
   };
 
+  // Move a child value from one key to another.
   proto.move = function (fromKey, toKey) {
     var field = this;
 
     field.form.actions.moveValue(field.valuePath(), fromKey, toKey);
   };
 
+  // Get the default value for this field.
   proto.default = function () {
     var field = this;
 
@@ -1982,6 +2157,8 @@ module.exports = function (plugin) {
     return null;
   };
 
+  // Append a new value. Use the `itemIndex` to get an appropriate
+  // item, inflate it, and create a default value.
   proto.append = function (itemIndex) {
     var field = this;
 
@@ -2005,13 +2182,15 @@ module.exports = function (plugin) {
     field.form.actions.appendValue(field.valuePath(), obj);
   };
 
+  // Determine whether the field is hidden.
   proto.hidden = function () {
     var field = this;
 
     return field.def.hidden || field.typePlugin().hidden;
   };
 
-  // expand all fields and seed values if necessary
+  // Expand all child fields and call the setter function with the default
+  // values at each path.
   proto.inflate = function (onSetValue) {
     var field = this;
 
@@ -2026,7 +2205,8 @@ module.exports = function (plugin) {
     });
   };
 
-  // Called from unmount.
+  // Called from unmount. When fields are removed for whatever reason, we
+  // should delete the corresponding value.
   proto.erase = function () {
     var field = this;
     if (!util.isBlank(field.def.key) && !_.isUndefined(field.value)) {
@@ -2036,7 +2216,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],32:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
+// # core.form-init
+
+/*
+This plugin makes it easy to hook into form initialization, without having to
+configure all the other core plugins.
+*/
+
 'use strict';
 
 module.exports = function (plugin) {
@@ -2054,42 +2241,66 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],33:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (global){
+// # core.form
+
+/*
+The core form plugin supplies methods that get added to the Form prototype.
+*/
+
 'use strict';
 
-var Reflux = require('reflux');
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+var EventEmitter = require('eventemitter3');
 
 module.exports = function (plugin) {
 
   var proto = plugin.exports;
 
-  var storePlugin = plugin.require(plugin.config.store);
+  // Get the store plugin.
+  var createStore = plugin.require(plugin.config.store);
+
   var util = plugin.require('util');
   var loader = plugin.require('loader');
 
-  var createSyncActions = function (names) {
+  // Helper to create actions, which will tell the store that something has
+  // happened. Note that actions go straight to the store. No events,
+  // dispatcher, etc.
+  var createSyncActions = function (store, names) {
     var actions = {};
     names.forEach(function (name) {
-      actions[name] = Reflux.createAction({sync: true});
+      actions[name] = function () {
+        store[name].apply(store, arguments);
+      };
     });
     return actions;
   };
 
+  // Initialize the form instance.
   proto.init = function (options) {
     var form = this;
 
     options = options || {};
 
-    //form.actions = Reflux.createActions(['setValue', 'setFields', 'removeValue', 'appendValue', 'moveValue']);
-    form.actions = createSyncActions(['setValue', 'setFields', 'removeValue', 'appendValue', 'moveValue', 'eraseValue', 'setMeta']);
-    form.store = storePlugin.create(form.actions, form, options);
+    // Need an emitter to emit change events from the store.
+    var storeEmitter = new EventEmitter();
+
+    // Create a store.
+    form.store = createStore(form, storeEmitter, options);
+
+    // Create the actions to notify the store of changes.
+    form.actions = createSyncActions(form.store, ['setValue', 'setFields', 'removeValue', 'appendValue', 'moveValue', 'eraseValue', 'setMeta']);
+
+    // Seed the value from any fields.
     form.store.inflate();
 
-    form.contextifiers = {};
+    // Add on/off to get change events from form.
+    form.on = storeEmitter.on.bind(storeEmitter);
+    form.off = storeEmitter.off.bind(storeEmitter);
   };
 
+  // Get the root component for a form.
   proto.component = function (props) {
 
     var form = this;
@@ -2103,6 +2314,7 @@ module.exports = function (plugin) {
     return component(props);
   };
 
+  // Get or set the value of a form.
   proto.val = function (value) {
     var form = this;
 
@@ -2113,24 +2325,21 @@ module.exports = function (plugin) {
     return util.copyValue(form.store.value);
   };
 
+  // Set/change the fields for a form.
   proto.fields = function (fields) {
     var form = this;
 
     form.actions.setFields(fields);
   };
 
+  // Find a field template given a key.
   proto.findDef = function (key) {
     var form = this;
 
     return form.store.templateMap[key] || null;
   };
 
-  proto.contextifier = function (key, contextify) {
-    var form = this;
-
-    form.contextifiers[key] = contextify;
-  };
-
+  // Get or set metadata.
   proto.meta = function (key, value) {
     var form = this;
 
@@ -2141,22 +2350,32 @@ module.exports = function (plugin) {
     return form.store.meta[key];
   };
 
-  proto.loadMeta = function (keys) {
+  // Load metadata.
+  proto.loadMeta = function (source, params) {
+    params = params || {};
+    var keys = Object.keys(params);
     var validKeys = keys.filter(function (key) {
-      return key;
+      return params[key];
     });
     if (validKeys.length < keys.length) {
       return;
     }
-    loader.loadMeta(this, keys);
+    loader.loadMeta(this, source, params);
   };
 
+  // Add a metdata source function, via the loader plugin.
   proto.source = loader.source;
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"reflux":62}],34:[function(require,module,exports){
+},{"eventemitter3":55}],31:[function(require,module,exports){
 (function (global){
+// # core.formatic
+
+/*
+The core formatic plugin adds methods to the formatic instance.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -2165,10 +2384,13 @@ module.exports = function (plugin) {
 
   var f = plugin.exports;
 
+  // Use the field-router plugin as the router.
   var router = plugin.require('field-router');
 
+  // Route a field to a component.
   f.route = router.route;
 
+  // Render a component to a node.
   f.render = function (component, node) {
 
     React.renderComponent(component, node);
@@ -2176,19 +2398,29 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],35:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 (function (global){
+// # compiler
+
+// The compiler plugin knows how to normalize field definitions into standard
+// field definitions that can be understood be routers and components.
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = function (plugin) {
 
+  // Grab all the compiler plugins which can be stacked.
   var compilerPlugins = plugin.requireAll(plugin.config.compilers);
+
   var util = plugin.require('util');
 
   var compiler = plugin.exports;
 
+  // For a set of fields, make a map of template names to field definitions. All
+  // field definitions can be used as templates, whether marked as templates or
+  // not.
   compiler.templateMap = function (fields) {
     var map = {};
     fields.forEach(function (field) {
@@ -2202,6 +2434,9 @@ module.exports = function (plugin) {
     return map;
   };
 
+  // Fields and items can extend other field definitions. Fields can also have
+  // child fields that point to other field definitions. Here, we expand all
+  // those out so that components don't have to worry about this.
   compiler.expandDef = function (def, templateMap) {
     var isTemplate = def.template;
     var ext = def.extends;
@@ -2241,6 +2476,7 @@ module.exports = function (plugin) {
     return def;
   };
 
+  // For an array of field definitions, expand each field definition.
   compiler.expandFields = function (fields) {
     var templateMap = compiler.templateMap(fields);
     return fields.map(function (def) {
@@ -2248,6 +2484,7 @@ module.exports = function (plugin) {
     });
   };
 
+  // Run a field definition through all available compilers.
   compiler.compileDef = function (def) {
 
     def = util.deepCopy(def);
@@ -2272,6 +2509,7 @@ module.exports = function (plugin) {
     return def;
   };
 
+  // For an array of field definitions, compile each field definition.
   compiler.compileFields = function (fields) {
     return fields.map(function (field) {
       return compiler.compileDef(field);
@@ -2280,13 +2518,26 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],36:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
+// # component
+
+// At its most basic level, the component plugin simply maps component names to
+// plugin names, returning the component factory for that component. For
+// example, `plugin.component('text')` becomes
+// `plugin.require('component.text')`. This is a useful placholder in case we
+// later want to make formatic able to decide components at runtime. For now,
+// however, this allows us to inject "prop modifiers" which are plugins that
+// modify a components properties before it receives them.
+
 'use strict';
 
 module.exports = function (plugin) {
 
+  // Registry for prop modifiers.
   var propModifiers = {};
 
+  // Add a "prop modifer" which is just a function that modifies a components
+  // properties before it receives them.
   var addPropModifier = function (name, modifyFn) {
     if (!propModifiers[name]) {
       propModifiers[name] = [];
@@ -2294,18 +2545,24 @@ module.exports = function (plugin) {
     propModifiers[name].push(modifyFn);
   };
 
+  // Grab all the prop modifier plugins.
   var propsPlugins = plugin.requireAll(plugin.config.props);
 
+  // Register all the prop modifier plugins.
   propsPlugins.forEach(function (plugin) {
     addPropModifier.apply(null, plugin);
   });
 
+  // Registry for component factories. Since we'll be modifying the props going
+  // to the factories, we'll store our own component factories here.
   var componentFactories = {};
 
+  // Retrieve the appropriate component factory, which may be a wrapper that
+  // runs the component properties through prop modifier functions.
   plugin.exports.component = function (name) {
 
     if (!componentFactories[name]) {
-      var component = plugin.require('component.' + name).component;
+      var component = plugin.require('component.' + name);
       componentFactories[name] = function (props, children) {
         if (propModifiers[name]) {
           propModifiers[name].forEach(function (modify) {
@@ -2322,8 +2579,13 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],37:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (global){
+// # core
+
+// The core plugin exports a function that takes a formatic instance and
+// extends the instance with additional methods.
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -2332,9 +2594,16 @@ module.exports = function (plugin) {
 
   plugin.exports = function (formatic) {
 
+    // The core plugin really doesn't do much. It actually relies on other
+    // plugins to do the dirty work. This way, you can easily add additional
+    // plugins to do more dirty work.
     var formaticPlugins = plugin.requireAll(plugin.config.formatic);
+
+    // We have special form plugins which are just used to modify the Form
+    // prototype.
     var formPlugins = plugin.requireAll(plugin.config.form);
 
+    // Pass the formatic instance off to each of the formatic plugins.
     formaticPlugins.forEach(function (f) {
       _.keys(f).forEach(function (key) {
         if (!_.isUndefined(formatic[key])) {
@@ -2344,22 +2613,31 @@ module.exports = function (plugin) {
       });
     });
 
+    // ## Form prototype
+
+    // The Form constructor creates a form given a set of options. Options
+    // can have `fields` and `value`.
     var Form = function (options) {
       if (this.init) {
         this.init(options);
       }
     };
 
+    // Add the form factory to the formatic instance.
     formatic.form = function (options) {
       return new Form(options);
     };
 
     Form.prototype = formatic.form;
 
+    // Keep form init methods here.
     var inits = [];
 
+    // Go through form plugins and add each plugin's methods to the form
+    // prototype.
     formPlugins.forEach(function (proto) {
       _.keys(proto).forEach(function (key) {
+        // Init plugins can be stacked.
         if (key === 'init') {
           inits.push(proto[key]);
         } else {
@@ -2371,6 +2649,8 @@ module.exports = function (plugin) {
       });
     });
 
+    // Create an init method for the form prototype based on the available init
+    // methods.
     if (inits.length === 0) {
       Form.prototype.init = function () {};
     } else if (inits.length === 1) {
@@ -2386,37 +2666,239 @@ module.exports = function (plugin) {
       };
     }
   };
-
-  //formatic.plugin('core.base');
-
-  // formatic.filterPluginsInRegistry(function (plugin) {
-  //   return plugin.name.indexOf('component.') === 0;
-  // }).forEach(function (plugin) {
-  //   formatic.plugin(plugin.name);
-  // });
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],38:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 (function (global){
+// # eval-functions
+
+/*
+Default eval functions. Each function is part of its own plugin, but all are
+kept together here as part of a plugin bundle.
+
+Note that eval functions decide when their arguments get evaluated. This way,
+you can create control structures (like if) that conditionally evaluates its
+arguments.
+*/
+
+'use strict';
+
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+
+var wrapFn = function (fn) {
+  return function (plugin) {
+    plugin.exports = function (args, field, context) {
+      args = field.eval(args, context);
+      var result = fn.apply(null, args);
+      return result;
+    };
+  };
+};
+
+var methodCall = function (method) {
+  return function (plugin) {
+    plugin.exports = function (args, field, context) {
+      args = field.eval(args, context);
+      if (args.length > 0) {
+        return args[0][method].apply(args[0], args.slice(1));
+      }
+    };
+  };
+};
+
+var plugins = {
+  if: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      return field.eval(args[0], context) ? field.eval(args[1], context) : field.eval(args[2], context);
+    };
+  },
+
+  eq: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      return field.eval(args[0], context) === field.eval(args[1], context);
+    };
+  },
+
+  not: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      return !field.eval(args[0], context);
+    };
+  },
+
+  or: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      for (var i = 0; i < args.length; i++) {
+        var arg = field.eval(args[i], context);
+        if (arg) {
+          return arg;
+        }
+      }
+      return args[args.length - 1];
+    };
+  },
+
+  and: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      for (var i = 0; i < args.length; i++) {
+        var arg = field.eval(args[i], context);
+        if (!arg || i === (args.length - 1)) {
+          return arg;
+        }
+      }
+      return undefined;
+    };
+  },
+
+  get: function (plugin) {
+    var get = plugin.exports = function (args, field, context) {
+      var util = plugin.require('util');
+      var key = field.eval(args[0], context);
+      var obj;
+      if (context && key in context) {
+        obj = context[key];
+      } else if (!_.isUndefined(field.value) && key in field.value) {
+        obj = field.value[key];
+      } else if (field.parent) {
+        obj = get(args, field.parent);
+      }
+      if (args.length > 1) {
+        var getInKeys = field.eval(args.slice(1), context);
+        return util.getIn(obj, getInKeys);
+      }
+      return obj;
+    };
+  },
+
+  getGroupValues: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      var groupName = field.eval(args[0], context);
+
+      var groupFields = field.groupFields(groupName);
+
+      return groupFields.map(function (field) {
+        return field.value;
+      });
+    };
+  },
+
+  getMeta: function (plugin) {
+    var util = plugin.require('util');
+    plugin.exports = function (args, field, context) {
+      args = field.eval(args, context);
+      var cacheKey = util.metaCacheKey(args[0], args[1]);
+      return field.form.meta(cacheKey);
+    };
+  },
+
+  sum: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      var sum = 0;
+      for (var i = 0; i < args.length; i++) {
+        sum += field.eval(args[i], context);
+      }
+      return sum;
+    };
+  },
+
+  forEach: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      var itemName = args[0];
+      var array = field.eval(args[1], context);
+      var mapExpr = args[2];
+      var filterExpr = args[3];
+      context = Object.create(context || {});
+
+      var results = [];
+
+      for (var i = 0; i < array.length; i++) {
+        var item = array[i];
+        context[itemName] = item;
+        if (_.isUndefined(filterExpr) || field.eval(filterExpr, context)) {
+          results.push(field.eval(mapExpr, context));
+        }
+      }
+
+      return results;
+    };
+  },
+
+  concat: methodCall('concat'),
+  split: methodCall('split'),
+  reverse: methodCall('reverse'),
+  join: methodCall('join'),
+
+  pick: wrapFn(_.pick),
+  pluck: wrapFn(_.pluck)
+};
+
+// Build a plugin bundle.
+_.each(plugins, function (fn, name) {
+  module.exports['eval-function.' + name] = fn;
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],36:[function(require,module,exports){
+(function (global){
+// # eval
+
+/*
+The eval plugin will evaluate a field's `eval` property (which must be an
+object) and exchange the properties of that object for whatever the
+expression returns. Expressions are just JSON except if the first element of
+an array is a string that starts with '@'. In that case, the array is
+treated as a Lisp expression where the first element refers to a function
+that is called with the rest of the elements as the arguments. For example:
+
+```js
+['@sum', 1, 2]
+```
+
+will return the value 3. The expression could be used in an `eval` property of
+a field like:
+
+```js
+{
+  type: 'string',
+  key: 'name',
+  eval: {
+    rows: ['@sum', 1, 2]
+  }
+}
+```
+
+The `rows` property of the field would be set to 3 in this case.
+
+Any plugin registered with the prefix `eval-function.` will be available as a
+function in these expressions.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = function (plugin) {
 
-  var util = plugin.require('util');
+  // Grab all the function plugins.
+  var evalFunctionPlugins = plugin.requireAllOf('eval-function');
 
+  // Just strip off the 'eval-functions.' prefix and put in a different object.
   var functions = {};
+  _.each(evalFunctionPlugins, function (fn, name) {
+    var fnName = name.substring(name.indexOf('.') + 1);
+    functions[fnName] = fn;
+  });
 
+  // Check an array to see if it's a function expression.
   var isFunctionArray = function (array) {
     return array.length > 0 && array[0][0] === '@';
   };
 
-  var evalFunction = function (fnArray, field) {
+  // Evaluate a function expression and return the result.
+  var evalFunction = function (fnArray, field, context) {
     var fnName = fnArray[0].substring(1);
     try {
-      return functions[fnName](fnArray.slice(1), field);
+      return functions[fnName](fnArray.slice(1), field, context);
     } catch (e) {
       if (!(fnName in functions)) {
         throw new Error('Eval function ' + fnName + ' not defined.');
@@ -2425,76 +2907,61 @@ module.exports = function (plugin) {
     }
   };
 
-  var evaluate = function (expression, field) {
+  // Evaluate an expression in the context of a field.
+  var evaluate = function (expression, field, context) {
     if (_.isArray(expression)) {
       if (isFunctionArray(expression)) {
-        return evalFunction(expression, field);
+        return evalFunction(expression, field, context);
       } else {
         return expression.map(function (item) {
-          return evaluate(item, field);
+          return evaluate(item, field, context);
         });
       }
     } else if (_.isObject(expression)) {
       var obj = {};
       Object.keys(expression).forEach(function (key) {
-        var result = evaluate(expression[key], field);
+        var result = evaluate(expression[key], field, context);
         if (typeof result !== 'undefined') {
           obj[key] = result;
         }
       });
       return obj;
+    } else if (_.isString(expression) && expression[0] === '=') {
+      return functions.get([expression.substring(1)], field, context);
     } else {
       return expression;
     }
-  };
-
-  functions.if = function (args, field) {
-    return field.eval(args[0]) ? field.eval(args[1]) : field.eval(args[2]);
-  };
-
-  functions.eq = function (args, field) {
-    return field.eval(args[0]) === field.eval(args[1]);
-  };
-
-  functions.not = function (args, field) {
-    return !field.eval(args[0]);
-  };
-
-  functions.get = function (args, field) {
-    var key = field.eval(args[0]);
-    if (!_.isUndefined(field.value)) {
-      if (key in field.value) {
-        return field.value[key];
-      }
-    }
-    if (field.parent) {
-      return functions.get(args, field.parent);
-    }
-    return undefined;
-  };
-
-  functions.getMeta = function (args, field) {
-    var keys = args.map(function (arg) {
-      return field.eval(arg);
-    });
-    var key = util.joinMetaKeys(keys);
-    return field.form.meta(key);
-  };
-
-  functions.sum = function (args, field) {
-    var sum = 0;
-    for (var i = 0; i < args.length; i++) {
-      sum += field.eval(args[i]);
-    }
-    return sum;
   };
 
   plugin.exports.evaluate = evaluate;
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],39:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function (global){
+// # field-router
+
+/*
+Fields and components get glued together via routes. This is similar to URL
+routing where a request gets dynamically routed to a handler. This gives a lot
+of flexibility in introducing new types and components. You can create a new
+type and route it to an existing component, or you can create a new component
+and route existing types to it. Or you can create both and route the new type
+to the new component. New routes are added via route plugins. A route plugin
+simply exports an array like:
+
+```js
+[
+  'color', // Route this type
+  'color-picker-with-alpha', // To this component
+  function (field) {
+    return typeof field.def.alpha !== 'undefined';
+  }
+]
+
+Route plugins can be stacked and are sensitive to ordering.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -2505,8 +2972,10 @@ module.exports = function (plugin) {
 
   var router = plugin.exports;
 
+  // Get all the route plugins.
   var routePlugins = plugin.requireAll(plugin.config.routes);
 
+  // Register a route.
   router.route = function (typeName, componentName, testFn) {
     if (!routes[typeName]) {
       routes[typeName] = [];
@@ -2517,11 +2986,13 @@ module.exports = function (plugin) {
     });
   };
 
+  // Register each of the routes provided by the route plugins.
   routePlugins.forEach(function (routePlugin) {
 
     router.route.apply(router, routePlugin);
   });
 
+  // Determine the best component for a field, based on the routes.
   router.componentForField = function (field) {
 
     var typeName = field.def.type;
@@ -2542,15 +3013,18 @@ module.exports = function (plugin) {
 
     throw new Error('No component for field: ' + JSON.stringify(field.def));
   };
-
-  router.component = function (name) {
-    return plugin.component(name);
-  };
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],40:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 (function (global){
+// # field-routes
+
+/*
+Default routes. Each route is part of its own plugin, but all are kept together
+here as part of a plugin bundle.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -2619,11 +3093,19 @@ _.each(routes, function (route, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],41:[function(require,module,exports){
-(function (global){
-'use strict';
+},{}],39:[function(require,module,exports){
+// # loader
 
-var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+/*
+When metadata isn't available, we ask the loader to load it. The loader will
+try to find an appropriate source based on the metadata keys.
+
+Note that we ask the loader to load metadata with a set of keys like
+`['foo', 'bar']`, but those are converted to a single key like `foo::bar` for
+the sake of caching.
+*/
+
+'use strict';
 
 module.exports = function (plugin) {
 
@@ -2634,57 +3116,48 @@ module.exports = function (plugin) {
   var isLoading = {};
   var sources = {};
 
-  // loader.pushNeedsKey = function (key) {
-  //   if (this._needsKeys.indexOf(key) < 0) {
-  //     this._needsKeys.push(key);
-  //   }
-  // };
-  //
-  // loader.nextNeedsKey = function () {
-  //   return this._needsKeys.shift();
-  // };
+  // Load metadata for a given form and params.
+  loader.loadMeta = function (form, source, params) {
+    var cacheKey = util.metaCacheKey(source, params);
 
-  // loader.loadNeededMetadata = function (form) {
-  //
-  //   var key = loader.nextNeedsKey();
-  //
-  //   while (key) {
-  //     if (!isLoading[key]) {
-  //       isLoading[key] = true;
-  //       loader.loadAsyncFromSource(form, key);
-  //     }
-  //     key = loader.nextNeedsKey();
-  //   }
-  // };
+    if (isLoading[cacheKey]) {
+      return;
+    }
 
-  loader.loadMeta = function (form, keys) {
-    loader.loadAsyncFromSource(form, util.joinMetaKeys(keys));
+    isLoading[cacheKey] = true;
+
+    loader.loadAsyncFromSource(form, source, params);
   };
 
-  loader.loadAsyncFromSource = function (form, key, waitTime) {
+  // Make sure to load metadata asynchronously.
+  loader.loadAsyncFromSource = function (form, source, params, waitTime) {
     setTimeout(function () {
-      loader.loadFromSource(form, key);
+      loader.loadFromSource(form, source, params);
     }, waitTime || 0);
   };
 
-  loader.loadFromSource = function (form, key) {
+  // Load metadata for a form and params.
+  loader.loadFromSource = function (form, sourceName, params) {
 
-    var source = loader.bestSource(form, key);
+    // Find the best source for this cache key.
+    var source = sources[sourceName];
     if (source) {
-      var args = util.splitMetaKey(key);
-      args = args.slice(source.staticArgs.length);
 
-      var result = source.fn.apply(null, args);
+      var cacheKey = util.metaCacheKey(sourceName, params);
+
+      // Call the source function.
+      var result = source.call(null, params);
 
       if (result) {
+        // Result could be a promise.
         if (result.then) {
           var promise = result.then(function (result) {
-            form.meta(key, result);
-            isLoading[key] = false;
+            form.meta(cacheKey, result);
+            isLoading[cacheKey] = false;
           });
 
           var onError = function () {
-            isLoading[key] = false;
+            isLoading[cacheKey] = false;
           };
 
           if (promise.catch) {
@@ -2693,62 +3166,36 @@ module.exports = function (plugin) {
             // silly jQuery promises
             promise.fail(onError);
           }
-
+        // Or it could be a value. In that case, make sure to asyncify it.
         } else {
           setTimeout(function () {
-            form.meta(key, result);
-            isLoading[key] = false;
+            form.meta(cacheKey, result);
+            isLoading[cacheKey] = false;
           }, 0);
         }
       } else {
-        isLoading[key] = false;
+        isLoading[cacheKey] = false;
       }
 
     } else {
-      isLoading[key] = false;
+      isLoading[cacheKey] = false;
     }
   };
 
-  loader.bestSource = function (form, key) {
-    if (sources[key]) {
-      return {
-        staticArgs: util.splitMetaKey(key),
-        fn: sources[key]
-      };
-    } else {
-      var args = util.splitMetaKey(key);
-      if (args.length > 1) {
-        args = args.slice(0, args.length - 1);
-        return loader.bestSource(form, util.joinMetaKeys(args));
-      } else if (sources.__default__) {
-        return {
-          staticArgs: [],
-          fn: sources.__default__
-        };
-      } else {
-        return null;
-      }
-    }
-  };
+  // Register a source function.
+  loader.source = function (name, fn) {
 
-  loader.source = function () {
-    var args = _.toArray(arguments);
-
-    if (args.length > 0 && _.isFunction(args[args.length - 1])) {
-      var fn = args[args.length - 1];
-      var sourceKey = '__default__';
-      if (args.length > 1) {
-        sourceKey = util.joinMetaKeys(args.slice(0, args.length - 1));
-      }
-      sources[sourceKey] = fn;
-    }
+    sources[name] = fn;
   };
 
 };
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],42:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function (global){
+// # util
+
+// Some utility functions to be used by other plugins.
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -2757,11 +3204,16 @@ module.exports = function (plugin) {
 
   var util = plugin.exports;
 
+  // Check if a value is "blank".
   util.isBlank = function (value) {
-    return value === undefined || value === null && value === '';
+    return value === undefined || value === null || value === '';
   };
 
+  // Set value at some path in object.
   util.setIn = function (obj, path, value) {
+    if (_.isString(path)) {
+      path = [path];
+    }
     if (path.length === 0) {
       return value;
     }
@@ -2776,7 +3228,11 @@ module.exports = function (plugin) {
     return obj;
   };
 
+  // Remove value at path in some object.
   util.removeIn = function (obj, path) {
+    if (_.isString(path)) {
+      path = [path];
+    }
     if (path.length === 0) {
       return null;
     }
@@ -2796,16 +3252,21 @@ module.exports = function (plugin) {
     return obj;
   };
 
+  // Get value at path in some object.
   util.getIn = function (obj, path) {
+    if (_.isString(path)) {
+      path = [path];
+    }
     if (path.length === 0) {
       return obj;
     }
-    if (obj[path[0]]) {
+    if (path[0] in obj) {
       return util.getIn(obj[path[0]], path.slice(1));
     }
     return null;
   };
 
+  // Append to array at path in some object.
   util.appendIn = function (obj, path, value) {
     var subObj = util.getIn(obj, path);
     if (_.isArray(subObj)) {
@@ -2814,6 +3275,7 @@ module.exports = function (plugin) {
     return obj;
   };
 
+  // Swap two keys at path in some object.
   util.moveIn = function (obj, path, fromKey, toKey) {
     var subObj = util.getIn(obj, path);
     if (_.isArray(subObj)) {
@@ -2835,10 +3297,12 @@ module.exports = function (plugin) {
     return obj;
   };
 
+  // Copy obj, leaving non-JSON behind.
   util.copyValue = function (value) {
     return JSON.parse(JSON.stringify(value));
   };
 
+  // Copy obj recursing deeply.
   util.deepCopy = function (obj) {
     if (_.isArray(obj)) {
       return obj.map(function (item) {
@@ -2855,6 +3319,7 @@ module.exports = function (plugin) {
     }
   };
 
+  // Check if item matches some value, based on the item's `match` property.
   util.itemMatchesValue = function (item, value) {
     var match = item.match;
     if (!match) {
@@ -2865,6 +3330,7 @@ module.exports = function (plugin) {
     });
   };
 
+  // Create a field definition from a value.
   util.fieldDefFromValue = function (value) {
     var def = {
       type: 'json'
@@ -2902,15 +3368,23 @@ module.exports = function (plugin) {
     return def;
   };
 
-  util.humanize = function(property) {
-    property = property.replace(/\{\{/g, '');
-    property = property.replace(/\}\}/g, '');
-    return property.replace(/_/g, ' ')
-      .replace(/(\w+)/g, function(match) {
-        return match.charAt(0).toUpperCase() + match.slice(1);
-      });
-  };
+  if (plugin.config.humanize) {
+    // Get the humanize function from a plugin if provided.
+    util.humanize = plugin.require(plugin.config.humanize);
+  } else {
+    // Convert property keys to "human" labels. For example, 'foo' becomes
+    // 'Foo'.
+    util.humanize = function(property) {
+      property = property.replace(/\{\{/g, '');
+      property = property.replace(/\}\}/g, '');
+      return property.replace(/_/g, ' ')
+        .replace(/(\w+)/g, function(match) {
+          return match.charAt(0).toUpperCase() + match.slice(1);
+        });
+    };
+  }
 
+  // Join multiple CSS class names together, ignoring any that aren't there.
   util.className = function () {
 
     var classNames = Array.prototype.slice.call(arguments, 0);
@@ -2922,14 +3396,23 @@ module.exports = function (plugin) {
     return classNames.join(' ');
   };
 
+  // Join keys together to make single "meta" key. For looking up metadata in
+  // the metadata part of the store.
   util.joinMetaKeys = function (keys) {
     return keys.join('::');
   };
 
+  // Split a joined key into separate key parts.
   util.splitMetaKey = function (key) {
     return key.split('::');
   };
 
+  util.metaCacheKey = function (source, params) {
+    params = params || {};
+    return source + '::params(' + JSON.stringify(params) + ')';
+  };
+
+  // Wrap a text value so it has a type. For parsing text with tags.
   var textPart = function (value, type) {
     type = type || 'text';
     return {
@@ -2938,9 +3421,10 @@ module.exports = function (plugin) {
     };
   };
 
+  // Parse text that has tags like {{tag}} into text and tags.
   util.parseTextWithTags = function (value) {
     value = value || '';
-    var parts = value.split('{{');
+    var parts = value.split(/{{(?!{)/);
     var frontPart = [];
     if (parts[0] !== '') {
       frontPart = [
@@ -2962,41 +3446,107 @@ module.exports = function (plugin) {
     return [].concat.apply([], parts);
   };
 
+  // Copy all computed styles from one DOM element to another.
+  util.copyElementStyle = function (fromElement, toElement) {
+    var fromStyle = window.getComputedStyle(fromElement, '');
+
+    if (fromStyle.cssText !== '') {
+      toElement.style.cssText = fromStyle.cssText;
+      return;
+    }
+
+    var cssRules = [];
+    for (var i = 0; i < fromStyle.length; i++) {
+      //console.log(i, fromStyle[i], fromStyle.getPropertyValue(fromStyle[i]))
+      //toElement.style[fromStyle[i]] = fromStyle.getPropertyValue(fromStyle[i]);
+      cssRules.push(fromStyle[i] + ':' + fromStyle.getPropertyValue(fromStyle[i]) + ';');
+    }
+    var cssText = cssRules.join('');
+
+    toElement.style.cssText = cssText;
+  };
+
+  // Object to hold browser sniffing info.
+  var browser = {
+    isChrome: false,
+    isMozilla: false,
+    isOpera: false,
+    isIe: false,
+    isSafari: false
+  };
+
+  // Sniff the browser.
+  var ua = navigator.userAgent;
+  if(ua.indexOf('Chrome') > -1) {
+    browser.isChrome = true;
+  } else if (ua.indexOf('Safari') > -1) {
+    browser.isSafari = true;
+  } else if (ua.indexOf('Opera') > -1) {
+    browser.isOpera = true;
+  } else if (ua.indexOf('Firefox') > -1) {
+    browser.isMozilla = true;
+  } else if (ua.indexOf('MSIE') > -1) {
+    browser.isIe = true;
+  }
+
+  util.browser = browser;
+
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],43:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 (function (global){
+// # Formatic plugin core
+
+// At its core, Formatic is just a plugin host. All of the functionality it has
+// out of the box is via plugins. These plugins can be replaced or extended by
+// other plugins.
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
+// The global plugin registry holds registered (but not yet instantiated)
+// plugins.
 var pluginRegistry = {};
 
-var registerPlugin = function (name, pluginFactory) {
+// Group plugins by prefix.
+var pluginGroups = {};
+
+// Register a plugin or plugin bundle (array of plugins) globally.
+var registerPlugin = function (name, pluginInitFn) {
 
   if (pluginRegistry[name]) {
     throw new Error('Plugin ' + name + ' is already registered.');
   }
 
-  if (_.isArray(pluginFactory)) {
+  if (_.isArray(pluginInitFn)) {
     pluginRegistry[name] = [];
-    pluginFactory.forEach(function (pluginSpec) {
+    pluginInitFn.forEach(function (pluginSpec) {
       registerPlugin(pluginSpec.name, pluginSpec.plugin);
       pluginRegistry[name].push(pluginSpec.name);
     });
-  } else if (_.isObject(pluginFactory) && !_.isFunction(pluginFactory)) {
+  } else if (_.isObject(pluginInitFn) && !_.isFunction(pluginInitFn)) {
     var bundleName = name;
     pluginRegistry[bundleName] = [];
-    Object.keys(pluginFactory).forEach(function (name) {
-      registerPlugin(name, pluginFactory[name]);
+    Object.keys(pluginInitFn).forEach(function (name) {
+      registerPlugin(name, pluginInitFn[name]);
       pluginRegistry[bundleName].push(name);
     });
   } else {
-    pluginRegistry[name] = pluginFactory;
+    pluginRegistry[name] = pluginInitFn;
+    // Add plugin name to plugin group if it has a prefix.
+    if (name.indexOf('.') > 0) {
+      var prefix = name.substring(0, name.indexOf('.'));
+      pluginGroups[prefix] = pluginGroups[prefix] || [];
+      pluginGroups[prefix].push(name);
+    }
   }
 };
 
+// Default plugin config. Each key represents a plugin name. Each key of that
+// plugin represents a setting for that plugin. Passed-in config will override
+// each individual setting.
 var defaultPluginConfig = {
   core: {
     formatic: ['core.formatic'],
@@ -3013,28 +3563,54 @@ var defaultPluginConfig = {
   }
 };
 
+// ## Formatic factory
+
+// Create a new formatic instance. A formatic instance is a function that can
+// create forms. It also has a `.create` method that can create other formatic
+// instances.
 var Formatic = function (config) {
 
+  // Make a copy of config so we can monkey with it.
   config = _.extend({}, config);
 
+  // Add default config settings (where not overridden).
   _.keys(defaultPluginConfig).forEach(function (key) {
     config[key] = _.extend({}, defaultPluginConfig[key], config[key]);
   });
 
-  var formatic, Plugin;
+  // The `formatic` variable will hold the function that gets returned from the
+  // factory.
+  var formatic;
 
+  // Instantiated plugins are cached just like CommonJS modules.
   var pluginCache = {};
 
-  // Plugin
+  // ## Plugin prototype
 
-  Plugin = function (config) {
+  // The Plugin prototype exists inside the Formatic factory function just to
+  // make it easier to grab values from the closure.
+
+  // Plugins are similar to CommonJS modules. Formatic uses plugins as a slight
+  // variant though because:
+  // - Formatic plugins are configurable.
+  // - Formatic plugins are instantiated per formatic instance. CommonJS modules
+  //   are created once and would be shared across all formatic instances.
+  // - Formatic plugins are easily overridable (also via configuration).
+
+  // When a plugin is instantiated, we call the `Plugin` constructor. The plugin
+  // instance is then passed to the plugin's initialization function.
+  var Plugin = function (config) {
     if (!(this instanceof Plugin)) {
       return new Plugin(config);
     }
+    // Exports analogous to CommonJS exports.
     this.exports = {};
+    // Config values passed in via factory are routed to the appropriate
+    // plugin and available via `.config`.
     this.config = config || {};
   };
 
+  // Get a config value for a plugin or return the default value.
   Plugin.prototype.configValue = function (key, defaultValue) {
 
     if (typeof this.config[key] !== 'undefined') {
@@ -3043,10 +3619,12 @@ var Formatic = function (config) {
     return defaultValue || '';
   };
 
+  // Require another plugin by name. This is much like a CommonJS require
   Plugin.prototype.require = function (name) {
     return formatic.plugin(name);
   };
 
+  // Handle a special plugin, the `component` plugin which finds components.
   var componentPlugin;
 
   // Just here in case we want to dynamically choose component later.
@@ -3054,14 +3632,19 @@ var Formatic = function (config) {
     return componentPlugin.component(name);
   };
 
+  // Check if a plugin exists.
   Plugin.prototype.hasPlugin = function (name) {
     return (name in pluginCache) || (name in pluginRegistry);
   };
 
+  // Check if a component exists. Components are really just plugins with
+  // a particular prefix to their names.
   Plugin.prototype.hasComponent = function (name) {
     return this.hasPlugin('component.' + name);
   };
 
+  // Given a list of plugin names, require them all and return a list of
+  // instantiated plugins.
   Plugin.prototype.requireAll = function (pluginList) {
     if (!pluginList) {
       pluginList = [];
@@ -3069,7 +3652,8 @@ var Formatic = function (config) {
     if (!_.isArray(pluginList)) {
       pluginList = [pluginList];
     }
-    // Inflate registered bundles.
+    // Inflate registered bundles. A bundle is just a name that points to an
+    // array of other plugin names.
     pluginList = pluginList.map(function (plugin) {
       if (_.isString(plugin)) {
         if (_.isArray(pluginRegistry[plugin])) {
@@ -3078,16 +3662,33 @@ var Formatic = function (config) {
       }
       return plugin;
     });
-    // Flatten bundles.
+    // Flatten any bundles, so we end up with a flat array of plugin names.
     pluginList = _.flatten(pluginList);
     return pluginList.map(function (plugin) {
       return this.require(plugin);
     }.bind(this));
   };
 
+  // Given a prefix, return a map of all instantiated plugins with that prefix.
+  Plugin.prototype.requireAllOf = function (prefix) {
+    var map = {};
+
+    if (pluginGroups[prefix]) {
+      pluginGroups[prefix].forEach(function (name) {
+        map[name] = this.require(name);
+      }.bind(this));
+    }
+
+    return map;
+  };
+
+  // ## Formatic factory, continued...
+
+  // Grab a plugin from the cache, or load it fresh from the registry.
   var loadPlugin = function (name, pluginConfig) {
     var plugin;
 
+    // We can also load anonymous plugins.
     if (_.isFunction(name)) {
 
       var factory = name;
@@ -3095,9 +3696,12 @@ var Formatic = function (config) {
       if (_.isUndefined(factory.__exports__)) {
         plugin = Plugin(pluginConfig || {});
         factory(plugin);
+        // Store the exports on the anonymous function so we know it's already
+        // been instantiated, and we can just grab the exports.
         factory.__exports__ = plugin.exports;
       }
 
+      // Load the cached exports.
       return factory.__exports__;
 
     } else if (_.isUndefined(pluginCache[name])) {
@@ -3123,32 +3727,39 @@ var Formatic = function (config) {
     return pluginCache[name];
   };
 
+  // Assign `formatic` to a function that takes form options and returns a form.
   formatic = function (options) {
     return formatic.form(options);
   };
 
-  formatic.register = function (name, pluginFactory) {
-    registerPlugin(name, pluginFactory);
+  // Allow global plugin registry from the formatic function instance.
+  formatic.register = function (name, pluginInitFn) {
+    registerPlugin(name, pluginInitFn);
     return formatic;
   };
 
+  // Allow retrieving plugins from the formatic function instance.
   formatic.plugin = function (name) {
     return loadPlugin(name);
   };
 
+  // Allow creating a new formatic instance from a formatic instance.
   formatic.create = Formatic;
 
+  // Use the core plugin to add methods to the formatic instance.
   var core = loadPlugin('core');
 
   core(formatic);
 
-  // Binding the component plugin late so it can load plugins after core is
-  // loaded.
+  // Now bind the component plugin. We wait till now, so the core is loaded
+  // first.
   componentPlugin = loadPlugin('component');
 
+  // Return the formatic function instance.
   return formatic;
 };
 
+// Just a helper to register a bunch of plugins.
 var registerPlugins = function () {
   var arg = _.toArray(arguments);
   arg.forEach(function (arg) {
@@ -3158,6 +3769,7 @@ var registerPlugins = function () {
   });
 };
 
+// Register all the built-in plugins.
 registerPlugins(
   ['core', require('./default/core')],
 
@@ -3169,6 +3781,7 @@ registerPlugins(
   ['util', require('./default/util')],
   ['compiler', require('./default/compiler')],
   ['eval', require('./default/eval')],
+  ['eval-functions', require('./default/eval-functions')],
   ['loader', require('./default/loader')],
   ['field-router', require('./default/field-router')],
   ['field-routes', require('./default/field-routes')],
@@ -3194,6 +3807,7 @@ registerPlugins(
   ['component.field', require('./components/field')],
   ['component.label', require('./components/label')],
   ['component.help', require('./components/help')],
+  ['component.sample', require('./components/sample')],
   ['component.fieldset', require('./components/fieldset')],
   ['component.text', require('./components/text')],
   ['component.textarea', require('./components/textarea')],
@@ -3212,16 +3826,408 @@ registerPlugins(
   ['component.checkbox-list', require('./components/checkbox-list')],
   ['component.pretty-textarea', require('./components/pretty-textarea')],
 
+  ['mixin.click-outside', require('./mixins/click-outside')],
+  ['mixin.field', require('./mixins/field')],
+  ['mixin.input-actions', require('./mixins/input-actions')],
+  ['mixin.resize', require('./mixins/resize')],
+  ['mixin.undo-stack', require('./mixins/undo-stack')],
+
   ['bootstrap', require('./plugins/bootstrap')]
 );
 
+// Create the default formatic instance.
 var defaultFormatic = Formatic();
 
+// Export it!
 module.exports = defaultFormatic;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./compilers/choices":2,"./compilers/lookup":3,"./compilers/prop-aliases":4,"./compilers/types":5,"./components/add-item":6,"./components/checkbox-list":7,"./components/field":8,"./components/fieldset":9,"./components/formatic":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":23,"./components/move-item-forward":24,"./components/pretty-textarea":25,"./components/remove-item":26,"./components/root":27,"./components/select":28,"./components/text":29,"./components/textarea":30,"./core/field":31,"./core/form":33,"./core/form-init":32,"./core/formatic":34,"./default/compiler":35,"./default/component":36,"./default/core":37,"./default/eval":38,"./default/field-router":39,"./default/field-routes":40,"./default/loader":41,"./default/util":42,"./plugins/bootstrap":44,"./store/memory":45,"./types/array":46,"./types/boolean":47,"./types/json":48,"./types/object":49,"./types/root":50,"./types/string":51}],44:[function(require,module,exports){
+},{"./compilers/choices":1,"./compilers/lookup":2,"./compilers/prop-aliases":3,"./compilers/types":4,"./components/add-item":5,"./components/checkbox-list":6,"./components/field":7,"./components/fieldset":8,"./components/formatic":9,"./components/help":10,"./components/item-choices":11,"./components/json":12,"./components/label":13,"./components/list":18,"./components/list-control":14,"./components/list-item":17,"./components/list-item-control":15,"./components/list-item-value":16,"./components/move-item-back":19,"./components/move-item-forward":20,"./components/pretty-textarea":21,"./components/remove-item":22,"./components/root":23,"./components/sample":24,"./components/select":25,"./components/text":26,"./components/textarea":27,"./core/field":28,"./core/form":30,"./core/form-init":29,"./core/formatic":31,"./default/compiler":32,"./default/component":33,"./default/core":34,"./default/eval":36,"./default/eval-functions":35,"./default/field-router":37,"./default/field-routes":38,"./default/loader":39,"./default/util":40,"./mixins/click-outside":42,"./mixins/field":43,"./mixins/input-actions":44,"./mixins/resize":45,"./mixins/undo-stack":46,"./plugins/bootstrap":47,"./store/memory":48,"./types/array":49,"./types/boolean":50,"./types/json":51,"./types/object":52,"./types/root":53,"./types/string":54}],42:[function(require,module,exports){
+// # mixin.click-outside
+
+/*
+There's no native React way to detect clicking outside an element. Sometimes
+this is useful, so that's what this mixin does. To use it, mix it in and use it
+from your component like this:
+
+```js
+module.exports = function (plugin) {
+  plugin.exports = React.createClass({
+
+    mixins: [plugin.require('mixin.click-outside')],
+
+    onClickOutside: function () {
+      console.log('clicked outside!');
+    },
+
+    componentDidMount: function () {
+      this.setOnClickOutside('myDiv', this.onClickOutside);
+    },
+
+    render: function () {
+      return React.DOM.div({ref: 'myDiv'},
+        'Hello!'
+      )
+    }
+  });
+};
+```
+*/
+
+'use strict';
+
+var hasAncestor = function (child, parent) {
+  if (child.parentNode === parent) {
+    return true;
+  }
+  if (child.parentNode === child.parentNode) {
+    return false;
+  }
+  if (child.parentNode === null) {
+    return false;
+  }
+  return hasAncestor(child.parentNode, parent);
+};
+
+var isOutside = function (nodeOut, nodeIn) {
+  if (nodeOut === nodeIn) {
+    return false;
+  }
+  if (hasAncestor(nodeOut, nodeIn)) {
+    return false;
+  }
+  return true;
+};
+
+var onClickDocument = function (event) {
+  Object.keys(this.clickOutsideHandlers).forEach(function (ref) {
+    if (this.clickOutsideHandlers[ref].length > 0) {
+      if (isOutside(event.target, this.refs[ref].getDOMNode())) {
+        this.clickOutsideHandlers[ref].forEach(function (fn) {
+          fn.call(this, ref);
+        }.bind(this));
+      }
+    }
+  }.bind(this));
+};
+
+module.exports = function (plugin) {
+
+  plugin.exports = {
+
+    setOnClickOutside: function (ref, fn) {
+      if (!this.clickOutsideHandlers[ref]) {
+        this.clickOutsideHandlers[ref] = [];
+      }
+      this.clickOutsideHandlers[ref].push(fn);
+    },
+
+    componentDidMount: function () {
+      this.clickOutsideHandlers = {};
+      document.addEventListener('click', onClickDocument.bind(this));
+    },
+
+    componentWillUnmount: function () {
+      this.clickOutsideHandlers = {};
+      document.removeEventListener('click', onClickDocument.bind(this));
+    }
+  };
+};
+
+},{}],43:[function(require,module,exports){
 (function (global){
+// # mixin.field
+
+/*
+Wrap up your fields with this mixin to get:
+- Automatic metadata loading.
+- Automatic erasing of values when the field disappears.
+- Anything else decided later.
+*/
+
+'use strict';
+
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+
+module.exports = function (plugin) {
+
+  plugin.exports = {
+
+    loadNeededMeta: function (props) {
+      if (props.field && props.field.form) {
+        if (props.field.def.needsMeta && props.field.def.needsMeta.length > 0) {
+
+          var needsMeta = [];
+
+          props.field.def.needsMeta.forEach(function (args) {
+            if (_.isArray(args) && args.length > 0) {
+              if (_.isArray(args[0])) {
+                args.forEach(function (args) {
+                  needsMeta.push(args);
+                });
+              } else {
+                needsMeta.push(args);
+              }
+            }
+          });
+
+          if (needsMeta.length === 0) {
+            // Must just be a single need, and not an array.
+            needsMeta = [props.field.def.needsMeta];
+          }
+
+          needsMeta.forEach(function (needs) {
+            if (needs) {
+              props.field.form.loadMeta.apply(props.field.form, needs);
+            }
+          });
+        }
+      }
+    },
+
+    componentDidMount: function () {
+      this.loadNeededMeta(this.props);
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+      this.loadNeededMeta(nextProps);
+    },
+
+    componentWillUnmount: function () {
+      if (this.props.field) {
+        this.props.field.erase();
+      }
+    }
+  };
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],44:[function(require,module,exports){
+// # mixin.input-actions
+
+/*
+Currently unused.
+*/
+
+'use strict';
+
+module.exports = function (plugin) {
+
+  plugin.exports = {
+
+    onFocus: function () {
+
+    },
+
+    onBlur: function () {
+
+    },
+
+    onChange: function () {
+
+    }
+  };
+};
+
+},{}],45:[function(require,module,exports){
+// # mixin.resize
+
+/*
+You'd think it would be pretty easy to detect when a DOM element is resized.
+And you'd be wrong. There are various tricks, but none of them work very well.
+So, using good ol' polling here. To try to be as efficient as possible, there
+is only a single setInterval used for all elements. To use:
+
+```js
+module.exports = function (plugin) {
+  plugin.exports = React.createClass({
+
+    mixins: [plugin.require('mixin.resize')],
+
+    onResize: function () {
+      console.log('resized!');
+    },
+
+    componentDidMount: function () {
+      this.setOnResize('myText', this.onResize);
+    },
+
+    onChange: function () {
+      ...
+    },
+
+    render: function () {
+      return React.DOM.textarea({ref: 'myText', value: this.props.value, onChange: ...})
+    }
+  });
+};
+```
+*/
+
+'use strict';
+
+var id = 0;
+
+var resizeIntervalElements = {};
+var resizeIntervalElementsCount = 0;
+var resizeIntervalTimer = null;
+
+var checkElements = function () {
+  Object.keys(resizeIntervalElements).forEach(function (key) {
+    var element = resizeIntervalElements[key];
+    if (element.clientWidth !== element.__prevClientWidth || element.clientHeight !== element.__prevClientHeight) {
+      element.__prevClientWidth = element.clientWidth;
+      element.__prevClientHeight = element.clientHeight;
+      var handlers = element.__resizeHandlers;
+      handlers.forEach(function (handler) {
+        handler();
+      });
+    }
+  }, 100);
+};
+
+var addResizeIntervalHandler = function (element, fn) {
+  if (resizeIntervalTimer === null) {
+    resizeIntervalTimer = setInterval(checkElements, 100);
+  }
+  if (!('__resizeId' in element)) {
+    id++;
+    element.__prevClientWidth = element.clientWidth;
+    element.__prevClientHeight = element.clientHeight;
+    element.__resizeId = id;
+    resizeIntervalElementsCount++;
+    resizeIntervalElements[id] = element;
+    element.__resizeHandlers = [];
+  }
+  element.__resizeHandlers.push(fn);
+};
+
+var removeResizeIntervalHandlers = function (element) {
+  if (!('__resizeId' in element)) {
+    return;
+  }
+  var id = element.__resizeId;
+  delete element.__resizeId;
+  delete element.__resizeHandlers;
+  delete resizeIntervalElements[id];
+  resizeIntervalElementsCount--;
+  if (resizeIntervalElementsCount < 1) {
+    clearInterval(resizeIntervalTimer);
+  }
+};
+
+var onResize = function (ref, fn) {
+  fn(ref);
+};
+
+module.exports = function (plugin) {
+
+  plugin.exports = {
+
+    componentDidMount: function () {
+      if (this.onResizeWindow) {
+        window.addEventListener('resize', this.onResizeWindow);
+      }
+      this.resizeElementRefs = {};
+    },
+
+    componentWillUnmount: function () {
+      if (this.onResizeWindow) {
+        window.removeEventListener('resize', this.onResizeWindow);
+      }
+      Object.keys(this.resizeElementRefs).forEach(function (ref) {
+        removeResizeIntervalHandlers(this.refs[ref].getDOMNode());
+      }.bind(this));
+    },
+
+    setOnResize: function (ref, fn) {
+      if (!this.resizeElementRefs[ref]) {
+        this.resizeElementRefs[ref] = true;
+      }
+      addResizeIntervalHandler(this.refs[ref].getDOMNode(), onResize.bind(this, ref, fn));
+    }
+  };
+};
+
+},{}],46:[function(require,module,exports){
+// # mixin.undo-stack
+
+/*
+Gives your component an undo stack.
+*/
+
+// http://prometheusresearch.github.io/react-forms/examples/undo.html
+
+'use strict';
+
+var UndoStack = {
+  getInitialState: function() {
+    return {undo: [], redo: []};
+  },
+
+  snapshot: function() {
+    var undo = this.state.undo.concat(this.getStateSnapshot());
+    if (typeof this.state.undoDepth === 'number') {
+      if (undo.length > this.state.undoDepth) {
+        undo.shift();
+      }
+    }
+    this.setState({undo: undo, redo: []});
+  },
+
+  hasUndo: function() {
+    return this.state.undo.length > 0;
+  },
+
+  hasRedo: function() {
+    return this.state.redo.length > 0;
+  },
+
+  redo: function() {
+    this._undoImpl(true);
+  },
+
+  undo: function() {
+    this._undoImpl();
+  },
+
+  _undoImpl: function(isRedo) {
+    var undo = this.state.undo.slice(0);
+    var redo = this.state.redo.slice(0);
+    var snapshot;
+
+    if (isRedo) {
+      if (redo.length === 0) {
+        return;
+      }
+      snapshot = redo.pop();
+      undo.push(this.getStateSnapshot());
+    } else {
+      if (undo.length === 0) {
+        return;
+      }
+      snapshot = undo.pop();
+      redo.push(this.getStateSnapshot());
+    }
+
+    this.setStateSnapshot(snapshot);
+    this.setState({undo:undo, redo:redo});
+  }
+};
+
+module.exports = function (plugin) {
+  plugin.exports = UndoStack;
+};
+
+},{}],47:[function(require,module,exports){
+(function (global){
+// # bootstrap
+
+/*
+The bootstrap plugin bundle exports a bunch of "prop modifier" plugins which
+manipulate the props going into many of the components.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -3230,6 +4236,7 @@ var modifiers = {
 
   'field': {className: 'form-group'},
   'help': {className: 'help-block'},
+  'sample': {className: 'help-block'},
   'text': {className: 'form-control'},
   'textarea': {className: 'form-control'},
   'pretty-textarea': {className: 'form-control'},
@@ -3267,14 +4274,18 @@ _.each(modifiers, function (modifier, name) {
 
 });
 
-//formatic.config('component.formatic..attributes', {role: 'form'});
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],45:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (global){
+// # store.memory
+
+/*
+The memory store plugin keeps the state of fields, data, and metadata. It
+responds to actions and emits a change event if there are any changes.
+*/
+
 'use strict';
 
-var Reflux = require('reflux');
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = function (plugin) {
@@ -3282,43 +4293,56 @@ module.exports = function (plugin) {
   var compiler = plugin.require('compiler');
   var util = plugin.require('util');
 
-  plugin.exports.create = function (actions, form, options) {
+  plugin.exports = function (form, emitter, options) {
 
-    return Reflux.createStore({
+    var store = {};
 
-      init: function () {
-        var store = this;
+    store.fields = [];
+    store.templateMap = {};
+    store.value = {};
+    store.meta = {};
 
-        store.fields = [];
-        store.templateMap = {};
-        if (options.fields) {
-          store.fields = compiler.expandFields(options.fields);
-          store.fields = compiler.compileFields(store.fields);
-          store.templateMap = compiler.templateMap(store.fields);
-          store.fields = store.fields.filter(function (def) {
-            return !def.template;
-          });
-        }
-        if (!_.isUndefined(options.value)) {
-          store.value = util.copyValue(options.value);
-        } else {
-          store.value = {};
-        }
-        store.meta = {};
-        store.listenToMany(actions);
-      },
+    // Helper to setup fields. Field definitions need to be expanded, compiled,
+    // etc.
+    var setupFields = function (fields) {
+      store.fields = compiler.expandFields(fields);
+      store.fields = compiler.compileFields(store.fields);
+      store.templateMap = compiler.templateMap(store.fields);
+      store.fields = store.fields.filter(function (def) {
+        return !def.template;
+      });
+    };
 
-      inflate: function () {
-        var store = this;
+    if (options.fields) {
+      setupFields(options.fields);
+    }
 
-        var field = form.field();
-        field.inflate(function (path, value) {
-          store.value = util.setIn(store.value, path, value);
-        });
-      },
+    if (!_.isUndefined(options.value)) {
+      store.value = util.copyValue(options.value);
+    }
 
+    // Currently, just a single event for any change.
+    var update = function () {
+      emitter.emit('change', {
+        value: store.value,
+        meta: store.meta,
+        fields: store.fields
+      });
+    };
+
+    // When fields change, we need to "inflate" them, meaning expand them and
+    // run any evaluations in order to get the default value out.
+    store.inflate = function () {
+      var field = form.field();
+      field.inflate(function (path, value) {
+        store.value = util.setIn(store.value, path, value);
+      });
+    };
+
+    var actions = {
+
+      // Set value at a path.
       setValue: function (path, value) {
-        var store = this;
 
         if (_.isUndefined(value)) {
           value = path;
@@ -3333,70 +4357,69 @@ module.exports = function (plugin) {
         update();
       },
 
+      // Remove a value at a path.
       removeValue: function (path) {
-
-        var store = this;
 
         store.value = util.removeIn(store.value, path);
 
         update();
       },
 
-      // Happens when component is unmounted. Don't want to trigger update for
-      // this.
+      // Erase a value. User actions can remove values, but nodes can also
+      // disappear due to changing evaluations. This action occurs automatically
+      // (and may be unnecessary if the value was already removed).
       eraseValue: function (path) {
 
-        var store = this;
-
         store.value = util.removeIn(store.value, path);
+
+        update();
       },
 
+      // Append a value to an array at a path.
       appendValue: function (path, value) {
-        var store = this;
-
         store.value = util.appendIn(store.value, path, value);
 
         update();
       },
 
+      // Swap values of two keys.
       moveValue: function (path, fromKey, toKey) {
-        var store = this;
-
         store.value = util.moveIn(store.value, path, fromKey, toKey);
 
         update();
       },
 
+      // Change all the fields.
       setFields: function (fields) {
-        var store = this;
-
-        store.fields = fields;
+        setupFields(fields);
         store.inflate();
 
         update();
       },
 
+      // Set a metadata value for a key.
       setMeta: function (key, value) {
-        var store = this;
-
         store.meta[key] = value;
         update();
-      },
-
-      update: function () {
-        this.trigger({
-          value: this.value,
-          meta: this.meta,
-          fields: this.fields
-        });
       }
-    });
+    };
+
+    _.extend(store, actions);
+
+    return store;
   };
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"reflux":62}],46:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 (function (global){
+// # type.array
+
+/*
+Support array type where child fields are dynamically determined based on the
+values of the array.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -3420,7 +4443,13 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],47:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
+// # type.boolean
+
+/*
+Support a true/false value.
+*/
+
 'use strict';
 
 module.exports = function (plugin) {
@@ -3437,7 +4466,13 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],48:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
+// # type.json
+
+/*
+Arbitrary JSON value.
+*/
+
 'use strict';
 
 module.exports = function (plugin) {
@@ -3446,8 +4481,16 @@ module.exports = function (plugin) {
 
 };
 
-},{}],49:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 (function (global){
+// # type.object
+
+/*
+Support for object types. Object fields can supply static child fields, or if
+there are additional child keys, dynamic child fields will be created much
+like an array.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -3478,6 +4521,7 @@ module.exports = function (plugin) {
     if (unusedKeys.length > 0) {
       unusedKeys.forEach(function (key) {
         var item = field.itemForValue(value[key]);
+        item.label = util.humanize(key);
         item.key = key;
         fields.push(field.createChild(item));
       });
@@ -3488,7 +4532,14 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],50:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
+// # type.root
+
+/*
+Special type representing the root of the form. Gets the fields directly from
+the store.
+*/
+
 'use strict';
 
 module.exports = function (plugin) {
@@ -3502,7 +4553,13 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],51:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
+// # type.string
+
+/*
+Support string values, of course.
+*/
+
 'use strict';
 
 module.exports = function (plugin) {
@@ -3511,108 +4568,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],52:[function(require,module,exports){
-module.exports = require('./src/component');
-
-},{"./src/component":53}],53:[function(require,module,exports){
-/**
- * @jsx React.DOM
- */
-
-var React = require('react');
-
-var Resizeable = React.createClass({
-  propTypes: {
-    triggersClass: React.PropTypes.string,
-    expandClass: React.PropTypes.string,
-    contractClass: React.PropTypes.string,
-    embedCss: React.PropTypes.bool,
-    onResize: React.PropTypes.func.isRequired
-  },
-  getDefaultProps: function () {
-    return {
-      triggersClass: 'resize-triggers',
-      expandClass: 'expand-trigger',
-      contractClass: 'contract-trigger',
-      embedCss: true
-    };
-  },
-
-  requestFrame: function (fn) {
-    return (window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || function(fn){ return window.setTimeout(fn, 20); })(fn);
-  },
-
-  cancelFrame: function (id) {
-    return (window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame || window.clearTimeout)(id);
-  },
-
-  componentDidMount: function () {
-    this.resetTriggers();
-  },
-  componentDidUpdate: function () {
-    this.resetTriggers();
-  },
-
-  resetTriggers: function () {
-    var contract = this.refs.contract.getDOMNode();
-    var expandChild = this.refs.expandChild.getDOMNode();
-    var expand = this.refs.expandChild.getDOMNode();
-
-    contract.scrollLeft      = contract.scrollWidth;
-    contract.scrollTop       = contract.scrollHeight;
-    expandChild.style.width  = expand.offsetWidth + 1 + 'px';
-    expandChild.style.height = expand.offsetHeight + 1 + 'px';
-    expand.scrollLeft        = expand.scrollWidth;
-    expand.scrollTop         = expand.scrollHeight;
-  },
-
-  checkTriggers: function () {
-    var element = this.refs.resizable.getDOMNode();
-    return element.offsetWidth != this.lastWidth || element.offsetHeight != this.lastHeight;
-  },
-
-  onScroll: function () {
-    if (this.r) this.cancelFrame(this.r);
-    this.r = this.requestFrame(function () {
-      if (!this.checkTriggers())
-        return;
-
-      var el = this.refs.resizable.getDOMNode();
-
-      this.lastWidth = el.offsetWidth;
-      this.lastHeight = el.offsetHeight;
-
-      this.props.onResize({
-        width: this.lastWidth,
-        height: this.lastHeight
-      });
-
-    }.bind(this));
-  },
-
-  render: function() {
-
-    return this.transferPropsTo(
-      React.DOM.div({onScroll: this.onScroll, ref: 'resizable'},
-        [
-          this.props.children,
-          React.DOM.div({className: this.props.triggersClass},
-            [
-              React.DOM.div({className: this.props.expandClass, ref: 'expand'}, React.DOM.div({ref: 'expandChild'})),
-              React.DOM.div({className: this.props.contractClass, ref: 'contract'})
-            ]
-          ),
-          this.props.embedCss ? React.DOM.style({}, '.resize-triggers { visibility: hidden; } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }') : null
-        ]
-      )
-    );
-  }
-
-});
-
-module.exports = Resizeable;
-
-},{"react":"react"}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use strict';
 
 /**
@@ -3818,671 +4774,8 @@ if ('object' === typeof module && module.exports) {
   module.exports = EventEmitter;
 }
 
-},{}],55:[function(require,module,exports){
-exports.createdStores = [];
-
-exports.createdActions = [];
-
-exports.reset = function() {
-    while(exports.createdStores.length) {
-        exports.createdStores.pop();
-    }
-    while(exports.createdActions.length) {
-        exports.createdActions.pop();
-    }
-};
-
-},{}],56:[function(require,module,exports){
-var _ = require('./utils'),
-    maker = require('./joins').instanceJoinCreator;
-
-/**
- * A module of methods related to listening.
- */
-module.exports = {
-
-    /**
-     * An internal utility function used by `validateListening`
-     *
-     * @param {Action|Store} listenable The listenable we want to search for
-     * @returns {Boolean} The result of a recursive search among `this.subscriptions`
-     */
-    hasListener: function(listenable) {
-        var i = 0,
-            listener;
-        for (;i < (this.subscriptions||[]).length; ++i) {
-            listener = this.subscriptions[i].listenable;
-            if (listener === listenable || listener.hasListener && listener.hasListener(listenable)) {
-                return true;
-            }
-        }
-        return false;
-    },
-
-    /**
-     * A convenience method that listens to all listenables in the given object.
-     *
-     * @param {Object} listenables An object of listenables. Keys will be used as callback method names.
-     */
-    listenToMany: function(listenables){
-        for(var key in listenables){
-            var cbname = _.callbackName(key),
-                localname = this[cbname] ? cbname : this[key] ? key : undefined;
-            if (localname){
-                this.listenTo(listenables[key],localname,this[cbname+"Default"]||this[localname+"Default"]||localname);
-            }
-        }
-    },
-
-    /**
-     * Checks if the current context can listen to the supplied listenable
-     *
-     * @param {Action|Store} listenable An Action or Store that should be
-     *  listened to.
-     * @returns {String|Undefined} An error message, or undefined if there was no problem.
-     */
-    validateListening: function(listenable){
-        if (listenable === this) {
-            return "Listener is not able to listen to itself";
-        }
-        if (!_.isFunction(listenable.listen)) {
-            return listenable + " is missing a listen method";
-        }
-        if (listenable.hasListener && listenable.hasListener(this)) {
-            return "Listener cannot listen to this listenable because of circular loop";
-        }
-    },
-
-    /**
-     * Sets up a subscription to the given listenable for the context object
-     *
-     * @param {Action|Store} listenable An Action or Store that should be
-     *  listened to.
-     * @param {Function|String} callback The callback to register as event handler
-     * @param {Function|String} defaultCallback The callback to register as default handler
-     * @returns {Object} A subscription obj where `stop` is an unsub function and `listenable` is the object being listened to
-     */
-    listenTo: function(listenable, callback, defaultCallback) {
-        var desub, unsubscriber, subscriptionobj, subs = this.subscriptions = this.subscriptions || [];
-        _.throwIf(this.validateListening(listenable));
-        this.fetchDefaultData(listenable, defaultCallback);
-        desub = listenable.listen(this[callback]||callback, this);
-        unsubscriber = function() {
-            var index = subs.indexOf(subscriptionobj);
-            _.throwIf(index === -1,'Tried to remove listen already gone from subscriptions list!');
-            subs.splice(index, 1);
-            desub();
-        };
-        subscriptionobj = {
-            stop: unsubscriber,
-            listenable: listenable
-        };
-        subs.push(subscriptionobj);
-        return subscriptionobj;
-    },
-
-    /**
-     * Stops listening to a single listenable
-     *
-     * @param {Action|Store} listenable The action or store we no longer want to listen to
-     * @returns {Boolean} True if a subscription was found and removed, otherwise false.
-     */
-    stopListeningTo: function(listenable){
-        var sub, i = 0, subs = this.subscriptions || [];
-        for(;i < subs.length; i++){
-            sub = subs[i];
-            if (sub.listenable === listenable){
-                sub.stop();
-                _.throwIf(subs.indexOf(sub)!==-1,'Failed to remove listen from subscriptions list!');
-                return true;
-            }
-        }
-        return false;
-    },
-
-    /**
-     * Stops all subscriptions and empties subscriptions array
-     */
-    stopListeningToAll: function(){
-        var remaining, subs = this.subscriptions || [];
-        while((remaining=subs.length)){
-            subs[0].stop();
-            _.throwIf(subs.length!==remaining-1,'Failed to remove listen from subscriptions list!');
-        }
-    },
-
-    /**
-     * Used in `listenTo`. Fetches initial data from a publisher if it has a `getDefaultData` method.
-     * @param {Action|Store} listenable The publisher we want to get default data from
-     * @param {Function|String} defaultCallback The method to receive the data
-     */
-    fetchDefaultData: function (listenable, defaultCallback) {
-        defaultCallback = (defaultCallback && this[defaultCallback]) || defaultCallback;
-        var me = this;
-        if (_.isFunction(defaultCallback) && _.isFunction(listenable.getDefaultData)) {
-            data = listenable.getDefaultData();
-            if (data && _.isFunction(data.then)) {
-                data.then(function() {
-                    defaultCallback.apply(me, arguments);
-                });
-            } else {
-                defaultCallback.call(this, data);
-            }
-        }
-    },
-
-    /**
-     * The callback will be called once all listenables have triggered at least once.
-     * It will be invoked with the last emission from each listenable.
-     * @param {...Publishers} publishers Publishers that should be tracked.
-     * @param {Function|String} callback The method to call when all publishers have emitted
-     */
-    joinTrailing: maker("last"),
-
-    /**
-     * The callback will be called once all listenables have triggered at least once.
-     * It will be invoked with the first emission from each listenable.
-     * @param {...Publishers} publishers Publishers that should be tracked.
-     * @param {Function|String} callback The method to call when all publishers have emitted
-     */
-    joinLeading: maker("first"),
-
-    /**
-     * The callback will be called once all listenables have triggered at least once.
-     * It will be invoked with all emission from each listenable.
-     * @param {...Publishers} publishers Publishers that should be tracked.
-     * @param {Function|String} callback The method to call when all publishers have emitted
-     */
-    joinConcat: maker("all"),
-
-    /**
-     * The callback will be called once all listenables have triggered.
-     * If a callback triggers twice before that happens, an error is thrown.
-     * @param {...Publishers} publishers Publishers that should be tracked.
-     * @param {Function|String} callback The method to call when all publishers have emitted
-     */
-    joinStrict: maker("strict"),
-};
-
-
-},{"./joins":63,"./utils":66}],57:[function(require,module,exports){
-var _ = require('./utils'),
-    ListenerMethods = require('./ListenerMethods');
-
-/**
- * A module meant to be consumed as a mixin by a React component. Supplies the methods from
- * `ListenerMethods` mixin and takes care of teardown of subscriptions.
- */
-module.exports = _.extend({
-
-    /**
-     * Cleans up all listener previously registered.
-     */
-    componentWillUnmount: ListenerMethods.stopListeningToAll
-
-}, ListenerMethods);
-
-},{"./ListenerMethods":56,"./utils":66}],58:[function(require,module,exports){
-var _ = require('./utils');
-
-/**
- * A module of methods for object that you want to be able to listen to.
- * This module is consumed by `createStore` and `createAction`
- */
-module.exports = {
-
-    /**
-     * Hook used by the publisher that is invoked before emitting
-     * and before `shouldEmit`. The arguments are the ones that the action
-     * is invoked with. If this function returns something other than
-     * undefined, that will be passed on as arguments for shouldEmit and
-     * emission.
-     */
-    preEmit: function() {},
-
-    /**
-     * Hook used by the publisher after `preEmit` to determine if the
-     * event should be emitted with given arguments. This may be overridden
-     * in your application, default implementation always returns true.
-     *
-     * @returns {Boolean} true if event should be emitted
-     */
-    shouldEmit: function() { return true; },
-
-    /**
-     * Subscribes the given callback for action triggered
-     *
-     * @param {Function} callback The callback to register as event handler
-     * @param {Mixed} [optional] bindContext The context to bind the callback with
-     * @returns {Function} Callback that unsubscribes the registered event handler
-     */
-    listen: function(callback, bindContext) {
-        var eventHandler = function(args) {
-            callback.apply(bindContext, args);
-        }, me = this;
-        this.emitter.addListener(this.eventLabel, eventHandler);
-        return function() {
-            me.emitter.removeListener(me.eventLabel, eventHandler);
-        };
-    },
-
-    /**
-     * Publishes an event using `this.emitter` (if `shouldEmit` agrees)
-     */
-    trigger: function() {
-        var args = arguments,
-            pre = this.preEmit.apply(this, args);
-        args = pre === undefined ? args : _.isArguments(pre) ? pre : [].concat(pre);
-        if (this.shouldEmit.apply(this, args)) {
-            this.emitter.emit(this.eventLabel, args);
-        }
-    },
-
-    /**
-     * Tries to publish the event on the next tick
-     */
-    triggerAsync: function(){
-        var args = arguments,me = this;
-        _.nextTick(function() {
-            me.trigger.apply(me, args);
-        });
-    }
-};
-
-},{"./utils":66}],59:[function(require,module,exports){
-var Reflux = require('../src'),
-    _ = require('./utils');
-
-module.exports = function(listenable,key){
-    return {
-        componentDidMount: function(){
-            for(var m in Reflux.ListenerMethods){
-                if (this[m] !== Reflux.ListenerMethods[m]){
-                    if (this[m]){
-                        throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
-                    }
-                    this[m] = Reflux.ListenerMethods[m];
-                }
-            }
-            var me = this, cb = (key === undefined ? this.setState : function(v){me.setState(_.object([key],[v]));});
-            this.listenTo(listenable,cb,cb);
-        },
-        componentWillUnmount: Reflux.ListenerMixin.componentWillUnmount
-    };
-};
-
-},{"../src":62,"./utils":66}],60:[function(require,module,exports){
-var _ = require('./utils'),
-    Reflux = require('../src'),
-    Keep = require('./Keep'),
-    allowed = {preEmit:1,shouldEmit:1};
-
-/**
- * Creates an action functor object. It is mixed in with functions
- * from the `PublisherMethods` mixin. `preEmit` and `shouldEmit` may
- * be overridden in the definition object.
- *
- * @param {Object} definition The action object definition
- */
-module.exports = function(definition) {
-
-    definition = definition || {};
-
-    for(var d in definition){
-        if (!allowed[d] && Reflux.PublisherMethods[d]) {
-            throw new Error("Cannot override API method " + d +
-                " in action creation. Use another method name or override it on Reflux.PublisherMethods instead."
-            );
-        }
-    }
-
-    var context = _.extend({
-        eventLabel: "action",
-        emitter: new _.EventEmitter(),
-        _isAction: true
-    },Reflux.PublisherMethods,definition);
-
-    var functor = function() {
-        functor[functor.sync?"trigger":"triggerAsync"].apply(functor, arguments);
-    };
-
-    _.extend(functor,context);
-
-    Keep.createdActions.push(functor);
-
-    return functor;
-
-};
-
-},{"../src":62,"./Keep":55,"./utils":66}],61:[function(require,module,exports){
-var _ = require('./utils'),
-    Reflux = require('../src'),
-    Keep = require('./Keep'),
-    allowed = {preEmit:1,shouldEmit:1};
-
-/**
- * Creates an event emitting Data Store. It is mixed in with functions
- * from the `ListenerMethods` and `PublisherMethods` mixins. `preEmit`
- * and `shouldEmit` may be overridden in the definition object.
- *
- * @param {Object} definition The data store object definition
- * @returns {Store} A data store instance
- */
-module.exports = function(definition) {
-
-    definition = definition || {};
-
-    for(var d in definition){
-        if (!allowed[d] && (Reflux.PublisherMethods[d] || Reflux.ListenerMethods[d])){
-            throw new Error("Cannot override API method " + d + 
-                " in store creation. Use another method name or override it on Reflux.PublisherMethods / Reflux.ListenerMethods instead."
-            );
-        }
-    }
-
-    function Store() {
-        var i=0, arr;
-        this.subscriptions = [];
-        this.emitter = new _.EventEmitter();
-        this.eventLabel = "change";
-        if (this.init && _.isFunction(this.init)) {
-            this.init();
-        }
-        if (this.listenables){
-            arr = [].concat(this.listenables);
-            for(;i < arr.length;i++){
-                this.listenToMany(arr[i]);
-            }
-        }
-    }
-
-    _.extend(Store.prototype, Reflux.ListenerMethods, Reflux.PublisherMethods, definition);
-
-    var store = new Store();
-    Keep.createdStores.push(store);
-
-    return store;
-};
-
-},{"../src":62,"./Keep":55,"./utils":66}],62:[function(require,module,exports){
-exports.ListenerMethods = require('./ListenerMethods');
-
-exports.PublisherMethods = require('./PublisherMethods');
-
-exports.createAction = require('./createAction');
-
-exports.createStore = require('./createStore');
-
-exports.connect = require('./connect');
-
-exports.ListenerMixin = require('./ListenerMixin');
-
-exports.listenTo = require('./listenTo');
-
-exports.listenToMany = require('./listenToMany');
-
-
-var maker = require('./joins').staticJoinCreator;
-
-exports.joinTrailing = exports.all = maker("last"); // Reflux.all alias for backward compatibility
-
-exports.joinLeading = maker("first");
-
-exports.joinStrict = maker("strict");
-
-exports.joinConcat = maker("all");
-
-
-/**
- * Convenience function for creating a set of actions
- *
- * @param actionNames the names for the actions to be created
- * @returns an object with actions of corresponding action names
- */
-exports.createActions = function(actionNames) {
-    var i = 0, actions = {};
-    for (; i < actionNames.length; i++) {
-        actions[actionNames[i]] = exports.createAction();
-    }
-    return actions;
-};
-
-/**
- * Sets the eventmitter that Reflux uses
- */
-exports.setEventEmitter = function(ctx) {
-    var _ = require('./utils');
-    _.EventEmitter = ctx;
-};
-
-/**
- * Sets the method used for deferring actions and stores
- */
-exports.nextTick = function(nextTick) {
-    var _ = require('./utils');
-    _.nextTick = nextTick;
-};
-
-/**
- * Provides the set of created actions and stores for introspection
- */
-exports.__keep = require('./Keep');
-
-},{"./Keep":55,"./ListenerMethods":56,"./ListenerMixin":57,"./PublisherMethods":58,"./connect":59,"./createAction":60,"./createStore":61,"./joins":63,"./listenTo":64,"./listenToMany":65,"./utils":66}],63:[function(require,module,exports){
-/**
- * Internal module used to create static and instance join methods
- */
-
-var slice = Array.prototype.slice,
-    createStore = require("./createStore"),
-    strategyMethodNames = {
-        strict: "joinStrict",
-        first: "joinLeading",
-        last: "joinTrailing",
-        all: "joinConcat"
-    };
-
-/**
- * Used in `index.js` to create the static join methods
- * @param {String} strategy Which strategy to use when tracking listenable trigger arguments
- * @returns {Function} A static function which returns a store with a join listen on the given listenables using the given strategy
- */
-exports.staticJoinCreator = function(strategy){
-    return function(/* listenables... */) {
-        var listenables = slice.call(arguments);
-        return createStore({
-            init: function(){
-                this[strategyMethodNames[strategy]].apply(this,listenables.concat("triggerAsync"));
-            }
-        });
-    };
-};
-
-/**
- * Used in `ListenerMethods.js` to create the instance join methods
- * @param {String} strategy Which strategy to use when tracking listenable trigger arguments
- * @returns {Function} An instance method which sets up a join listen on the given listenables using the given strategy
- */
-exports.instanceJoinCreator = function(strategy){
-    return function(/* listenables..., callback*/){
-        var listenables = slice.call(arguments),
-            callback = listenables.pop(),
-            numberOfListenables = listenables.length,
-            join = {
-                numberOfListenables: numberOfListenables,
-                callback: this[callback]||callback,
-                listener: this,
-                strategy: strategy
-            };
-        for (var i = 0; i < numberOfListenables; i++) {
-            this.listenTo(listenables[i],newListener(i,join));
-        }
-        reset(join);
-    };
-};
-
-// ---- internal join functions ----
-
-function reset(join) {
-    join.listenablesEmitted = new Array(join.numberOfListenables);
-    join.args = new Array(join.numberOfListenables);
-}
-
-function newListener(i,join) {
-    return function() {
-        var callargs = slice.call(arguments);
-        if (join.listenablesEmitted[i]){
-            switch(join.strategy){
-                case "strict": throw new Error("Strict join failed because listener triggered twice.");
-                case "last": join.args[i] = callargs; break;
-                case "all": join.args[i].push(callargs);
-            }
-        } else {
-            join.listenablesEmitted[i] = true;
-            join.args[i] = (join.strategy==="all"?[callargs]:callargs);
-        }
-        emitIfAllListenablesEmitted(join);
-    };
-}
-
-function emitIfAllListenablesEmitted(join) {
-    for (var i = 0; i < join.numberOfListenables; i++) {
-        if (!join.listenablesEmitted[i]) {
-            return;
-        }
-    }
-    join.callback.apply(join.listener,join.args);
-    reset(join);
-}
-
-},{"./createStore":61}],64:[function(require,module,exports){
-var Reflux = require('../src');
-
-
-/**
- * A mixin factory for a React component. Meant as a more convenient way of using the `ListenerMixin`,
- * without having to manually set listeners in the `componentDidMount` method.
- *
- * @param {Action|Store} listenable An Action or Store that should be
- *  listened to.
- * @param {Function|String} callback The callback to register as event handler
- * @param {Function|String} defaultCallback The callback to register as default handler
- * @returns {Object} An object to be used as a mixin, which sets up the listener for the given listenable.
- */
-module.exports = function(listenable,callback,initial){
-    return {
-        /**
-         * Set up the mixin before the initial rendering occurs. Import methods from `ListenerMethods`
-         * and then make the call to `listenTo` with the arguments provided to the factory function
-         */
-        componentDidMount: function() {
-            for(var m in Reflux.ListenerMethods){
-                if (this[m] !== Reflux.ListenerMethods[m]){
-                    if (this[m]){
-                        throw "Can't have other property '"+m+"' when using Reflux.listenTo!";
-                    }
-                    this[m] = Reflux.ListenerMethods[m];
-                }
-            }
-            this.listenTo(listenable,callback,initial);
-        },
-        /**
-         * Cleans up all listener previously registered.
-         */
-        componentWillUnmount: Reflux.ListenerMethods.stopListeningToAll
-    };
-};
-
-},{"../src":62}],65:[function(require,module,exports){
-var Reflux = require('../src');
-
-/**
- * A mixin factory for a React component. Meant as a more convenient way of using the `listenerMixin`,
- * without having to manually set listeners in the `componentDidMount` method. This version is used
- * to automatically set up a `listenToMany` call.
- *
- * @param {Object} listenables An object of listenables
- * @returns {Object} An object to be used as a mixin, which sets up the listeners for the given listenables.
- */
-module.exports = function(listenables){
-    return {
-        /**
-         * Set up the mixin before the initial rendering occurs. Import methods from `ListenerMethods`
-         * and then make the call to `listenTo` with the arguments provided to the factory function
-         */
-        componentDidMount: function() {
-            for(var m in Reflux.ListenerMethods){
-                if (this[m] !== Reflux.ListenerMethods[m]){
-                    if (this[m]){
-                        throw "Can't have other property '"+m+"' when using Reflux.listenToMany!";
-                    }
-                    this[m] = Reflux.ListenerMethods[m];
-                }
-            }
-            this.listenToMany(listenables);
-        },
-        /**
-         * Cleans up all listener previously registered.
-         */
-        componentWillUnmount: Reflux.ListenerMethods.stopListeningToAll
-    };
-};
-
-},{"../src":62}],66:[function(require,module,exports){
-/*
- * isObject, extend, isFunction, isArguments are taken from undescore/lodash in
- * order to remove the dependency
- */
-var isObject = exports.isObject = function(obj) {
-    var type = typeof obj;
-    return type === 'function' || type === 'object' && !!obj;
-};
-
-exports.extend = function(obj) {
-    if (!isObject(obj)) {
-        return obj;
-    }
-    var source, prop;
-    for (var i = 1, length = arguments.length; i < length; i++) {
-        source = arguments[i];
-        for (prop in source) {
-            obj[prop] = source[prop];
-        }
-    }
-    return obj;
-};
-
-exports.isFunction = function(value) {
-    return typeof value === 'function';
-};
-
-exports.EventEmitter = require('eventemitter3');
-
-exports.nextTick = function(callback) {
-    setTimeout(callback, 0);
-};
-
-exports.callbackName = function(string){
-    return "on"+string.charAt(0).toUpperCase()+string.slice(1);
-};
-
-exports.object = function(keys,vals){
-    var o={}, i=0;
-    for(;i<keys.length;i++){
-        o[keys[i]] = vals[i];
-    }
-    return o;
-};
-
-exports.isArguments = function(value) {
-    return value && typeof value == 'object' && typeof value.length == 'number' &&
-      (toString.call(value) === '[object Arguments]' || (hasOwnProperty.call(value, 'callee' && !propertyIsEnumerable.call(value, 'callee')))) || false;
-};
-
-exports.throwIf = function(val,msg){
-    if (val){
-        throw Error(msg||val);
-    }
-};
-
-},{"eventemitter3":54}]},{},[1]);
+},{}],"formatic":[function(require,module,exports){
+module.exports = require('./lib/formatic');
+
+},{"./lib/formatic":41}]},{},[])("formatic")
+});
