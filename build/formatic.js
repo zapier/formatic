@@ -241,7 +241,9 @@ module.exports = function (plugin) {
     select: function (def) {
       def.choices = def.choices || [];
     },
-    bool: 'boolean'
+    bool: 'boolean',
+    dict: 'object',
+    decimal: 'number'
   };
 
   typeCoerce.str = typeCoerce.unicode;
@@ -2499,7 +2501,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"eventemitter3":57}],32:[function(require,module,exports){
+},{"eventemitter3":58}],32:[function(require,module,exports){
 (function (global){
 // # core.formatic
 
@@ -3219,6 +3221,11 @@ var routes = {
   'boolean.default': [
     'boolean',
     'select'
+  ],
+
+  'number.default': [
+    'number',
+    'text'
   ]
 
 };
@@ -3476,6 +3483,10 @@ module.exports = function (plugin) {
     if (_.isString(value)) {
       def = {
         type: 'string'
+      };
+    } else if (_.isNumber(value)) {
+      def = {
+        type: 'number'
       };
     } else if (_.isArray(value)) {
       var arrayItemFields = value.map(function (value, i) {
@@ -3945,6 +3956,7 @@ registerPlugins(
   ['type.boolean', require('./types/boolean')],
   ['type.array', require('./types/array')],
   ['type.json', require('./types/json')],
+  ['type.number', require('./types/number')],
 
   ['component', require('./default/component')],
 
@@ -3989,7 +4001,7 @@ var defaultFormatic = Formatic();
 module.exports = defaultFormatic;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./compilers/choices":2,"./compilers/lookup":3,"./compilers/prop-aliases":4,"./compilers/types":5,"./components/add-item":6,"./components/checkbox-list":7,"./components/field":8,"./components/fieldset":9,"./components/formatic":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":20,"./components/move-item-forward":21,"./components/pretty-textarea":22,"./components/remove-item":23,"./components/root":24,"./components/sample":25,"./components/select":26,"./components/text":27,"./components/textarea":28,"./core/field":29,"./core/form":31,"./core/form-init":30,"./core/formatic":32,"./default/compiler":33,"./default/component":34,"./default/core":35,"./default/eval":37,"./default/eval-functions":36,"./default/field-router":38,"./default/field-routes":39,"./default/loader":40,"./default/util":41,"./mixins/click-outside":43,"./mixins/field":44,"./mixins/input-actions":45,"./mixins/resize":46,"./mixins/undo-stack":47,"./plugins/bootstrap-style":48,"./plugins/default-style":49,"./store/memory":50,"./types/array":51,"./types/boolean":52,"./types/json":53,"./types/object":54,"./types/root":55,"./types/string":56}],43:[function(require,module,exports){
+},{"./compilers/choices":2,"./compilers/lookup":3,"./compilers/prop-aliases":4,"./compilers/types":5,"./components/add-item":6,"./components/checkbox-list":7,"./components/field":8,"./components/fieldset":9,"./components/formatic":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":20,"./components/move-item-forward":21,"./components/pretty-textarea":22,"./components/remove-item":23,"./components/root":24,"./components/sample":25,"./components/select":26,"./components/text":27,"./components/textarea":28,"./core/field":29,"./core/form":31,"./core/form-init":30,"./core/formatic":32,"./default/compiler":33,"./default/component":34,"./default/core":35,"./default/eval":37,"./default/eval-functions":36,"./default/field-router":38,"./default/field-routes":39,"./default/loader":40,"./default/util":41,"./mixins/click-outside":43,"./mixins/field":44,"./mixins/input-actions":45,"./mixins/resize":46,"./mixins/undo-stack":47,"./plugins/bootstrap-style":48,"./plugins/default-style":49,"./store/memory":50,"./types/array":51,"./types/boolean":52,"./types/json":53,"./types/number":54,"./types/object":55,"./types/root":56,"./types/string":57}],43:[function(require,module,exports){
 // # mixin.click-outside
 
 /*
@@ -4684,6 +4696,21 @@ module.exports = function (plugin) {
 };
 
 },{}],54:[function(require,module,exports){
+// # type.number
+
+/*
+Support number values, of course.
+*/
+
+'use strict';
+
+module.exports = function (plugin) {
+
+  plugin.exports.default = 0;
+
+};
+
+},{}],55:[function(require,module,exports){
 (function (global){
 // # type.object
 
@@ -4734,7 +4761,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // # type.root
 
 /*
@@ -4755,7 +4782,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 // # type.string
 
 /*
@@ -4770,7 +4797,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 /**
