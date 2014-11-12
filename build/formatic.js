@@ -28,46 +28,67 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 
 module.exports = function (plugin) {
 
+  var util = plugin.require('util');
+
+  var compileChoices = function (choices) {
+
+    // Convert comma separated string to array of strings.
+    if (_.isString(choices)) {
+      choices = choices.split(',');
+    }
+
+    // Convert object to array of objects with `value` and `label` properties.
+    if (!_.isArray(choices) && _.isObject(choices)) {
+      choices = Object.keys(choices).map(function (key) {
+        return {
+          value: key,
+          label: choices[key]
+        };
+      });
+    }
+
+    // Copy the array of choices so we can manipulate them.
+    choices = choices.slice(0);
+
+    // Array of choice arrays should be flattened.
+    choices = _.flatten(choices);
+
+    choices.forEach(function (choice, i) {
+      // Convert any string choices to objects with `value` and `label`
+      // properties.
+      if (_.isString(choice)) {
+        choices[i] = {
+          value: choice,
+          label: util.humanize(choice)
+        };
+      }
+      if (!choices[i].label) {
+        choices[i].label = util.humanize(choices[i].value);
+      }
+    });
+
+    return choices;
+  };
+
   plugin.exports.compile = function (def) {
     if (def.choices === '') {
       def.choices = [];
     } else if (def.choices) {
 
-      var choices = def.choices;
+      def.choices = compileChoices(def.choices);
+    }
 
-      // Convert comma separated string to array of strings.
-      if (_.isString(choices)) {
-        choices = choices.split(',');
-      }
+    if (def.replaceChoices === '') {
+      def.replaceChoices = [];
+    } else if (def.replaceChoices) {
 
-      // Convert object to array of objects with `value` and `label` properties.
-      if (!_.isArray(choices) && _.isObject(choices)) {
-        choices = Object.keys(choices).map(function (key) {
-          return {
-            value: key,
-            label: choices[key]
-          };
-        });
-      }
+      def.replaceChoices = compileChoices(def.replaceChoices);
 
-      // Copy the array of choices so we can manipulate them.
-      choices = choices.slice(0);
+      def.replaceChoicesLabels = {};
 
-      // Array of choice arrays should be flattened.
-      choices = _.flatten(choices);
-
-      choices.forEach(function (choice, i) {
-        // Convert any string choices to objects with `value` and `label`
-        // properties.
-        if (_.isString(choice)) {
-          choices[i] = {
-            value: choice,
-            label: choice
-          };
-        }
+      def.replaceChoices.forEach(function (choice) {
+        def.replaceChoicesLabels[choice.value] = choice.label;
       });
-
-      def.choices = choices;
     }
   };
 };
@@ -113,10 +134,12 @@ array if it's available. Otherwise, choices will default to an empty array.
 
 module.exports = function (plugin) {
 
-  plugin.exports.compile = function (def) {
-    if (def.lookup) {
-      if (!def.choices) {
-        def.choices = [];
+  var addLookup = function (def, lookupPropName, choicesPropName) {
+    var lookup = def[lookupPropName];
+
+    if (lookup) {
+      if (!def[choicesPropName]) {
+        def[choicesPropName] = [];
       }
       if (!def.eval) {
         def.eval = {};
@@ -124,23 +147,23 @@ module.exports = function (plugin) {
       if (!def.eval.needsMeta) {
         def.eval.needsMeta = [];
       }
-      var keys = def.lookup.keys || [];
+      var keys = lookup.keys || [];
       var params = {};
       var metaArgs, metaGet;
 
-      if (def.lookup.group) {
+      if (lookup.group) {
 
         keys.forEach(function (key) {
           params[key] = ['@get', 'item', key];
         });
-        metaArgs = [def.lookup.source].concat(params);
+        metaArgs = [lookup.source].concat(params);
         metaGet = ['@getMeta'].concat(metaArgs);
-        var metaForEach = ['@forEach', 'item', ['@getGroupValues', def.lookup.group]];
+        var metaForEach = ['@forEach', 'item', ['@getGroupValues', lookup.group]];
         def.eval.needsMeta.push(metaForEach.concat([
           metaArgs,
           ['@not', metaGet]
         ]));
-        def.eval.choices = metaForEach.concat([
+        def.eval[choicesPropName] = metaForEach.concat([
           metaGet,
           metaGet
         ]);
@@ -148,14 +171,20 @@ module.exports = function (plugin) {
         keys.forEach(function (key) {
           params[key] = ['@get', key];
         });
-        metaArgs = [def.lookup.source].concat(params);
+        metaArgs = [lookup.source].concat(params);
         metaGet = ['@getMeta'].concat(metaArgs);
         def.eval.needsMeta.push(['@if', metaGet, null, metaArgs]);
-        def.eval.choices = metaGet;
+        def.eval[choicesPropName] = metaGet;
       }
 
-      delete def.lookup;
+      delete def[lookupPropName];
     }
+  };
+
+  plugin.exports.compile = function (def) {
+
+    addLookup(def, 'lookup', 'choices');
+    addLookup(def, 'lookupReplacements', 'replaceChoices');
   };
 };
 
@@ -366,6 +395,7 @@ Used by any fields to put the label and help text around the field.
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 var R = React.DOM;
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = function (plugin) {
 
@@ -383,8 +413,13 @@ module.exports = function (plugin) {
 
       var field = this.props.field;
 
+      var index = this.props.index;
+      if (!_.isNumber(index)) {
+        index = _.isNumber(field.def.key) ? field.def.key : undefined;
+      }
+
       return R.div({className: this.props.className, style: {display: (field.hidden() ? 'none' : '')}},
-        plugin.component('label')({field: field, index: this.props.index}),
+        plugin.component('label')({field: field, index: index}),
         React.addons.CSSTransitionGroup({transitionName: 'reveal'},
           field.collapsed ? [] : [
             plugin.component('help')({key: 'help', field: field}),
@@ -869,12 +904,13 @@ module.exports = function (plugin) {
       var field = this.props.field;
 
       return R.div({className: this.props.className},
-        plugin.component('field')({
-          field: field,
-          index: this.props.index
-        },
-          field.component()
-        )
+        field.component()
+        // plugin.component('field')({
+        //   field: field,
+        //   index: this.props.index
+        // },
+        //   field.component()
+        // )
       );
     }
   });
@@ -1317,30 +1353,29 @@ module.exports = function (plugin) {
     },
 
     componentDidUpdate: function () {
+      var value = this.props.field.value || '';
+      var parts = util.parseTextWithTags(value);
+      this.tracking.tokens = this.tokens(parts);
+      this.tracking.indexMap = this.indexMap(this.tracking.tokens);
+
+      var pos = this.normalizePosition(this.tracking.pos);
+      var range = this.tracking.range;
+      var endPos = this.normalizePosition(pos + range);
+      range = endPos - pos;
+
+      this.tracking.pos = pos;
+      this.tracking.range = range;
+
       if (document.activeElement === this.refs.content.getDOMNode()) {
         // React can lose the selection, so put it back.
-
-        var value = this.props.field.value || '';
-        var parts = util.parseTextWithTags(value);
-        this.tracking.tokens = this.tokens(parts);
-        this.tracking.indexMap = this.indexMap(this.tracking.tokens);
-
-        var pos = this.normalizePosition(this.tracking.pos);
-        var range = this.tracking.range;
-        var endPos = this.normalizePosition(pos + range);
-        range = endPos - pos;
-
-        this.tracking.pos = pos;
-        this.tracking.range = range;
-
         this.refs.content.getDOMNode().setSelectionRange(pos, pos + range);
       }
     },
 
     // Get the label for a key.
     prettyLabel: function (key) {
-      if (this.props.field.def.replaceTags[key]) {
-        return this.props.field.def.replaceTags[key];
+      if (this.props.field.def.replaceChoicesLabels[key]) {
+        return this.props.field.def.replaceChoicesLabels[key];
       }
       return util.humanize(key);
     },
@@ -1593,8 +1628,28 @@ module.exports = function (plugin) {
       this.setOnResize('content', this.onResize);
     },
 
+    onInsert: function (event) {
+      if (event.target.selectedIndex > 0) {
+        var tag = '{{' + event.target.value + '}}';
+        event.target.selectedIndex = 0;
+        var pos = this.tracking.pos;
+        var insertPos = this.normalizePosition(pos);
+        var tokens = this.tracking.tokens;
+        var tokenIndex = this.tokenIndex(insertPos, tokens, this.tracking.indexMap);
+        tokens.splice(tokenIndex, 0, tag);
+        this.tracking.indexMap = this.indexMap(tokens);
+        var newValue = this.rawValue(tokens);
+        this.props.field.val(newValue);
+      }
+    },
+
     render: function () {
       var field = this.props.field;
+
+      var replaceChoices = [{
+        value: '',
+        label: 'Insert...'
+      }].concat(field.def.replaceChoices);
 
       return plugin.component('field')({
         field: field
@@ -1624,7 +1679,16 @@ module.exports = function (plugin) {
           onKeyDown: this.onKeyDown,
           onSelect: this.onSelect,
           onCopy: this.onCopy
-        }, plugin.config.attributes))
+        }, plugin.config.attributes)),
+
+        R.select({onChange: this.onInsert},
+          replaceChoices.map(function (choice, i) {
+            return R.option({
+              key: i,
+              value: choice.value
+            }, choice.label);
+          })
+        )
       ));
     }
   });
@@ -3094,7 +3158,7 @@ var routes = {
     'string',
     'pretty-textarea',
     function (field) {
-      return field.def.replaceTags;
+      return field.def.replaceChoices;
     }
   ],
 
@@ -4293,7 +4357,7 @@ var modifiers = {
   'pretty-textarea': {className: 'form-control'},
   'json': {className: 'form-control'},
   'select': {className: 'form-control'},
-  'list': {className: 'well'},
+  //'list': {className: 'well'},
   'list-control': {className: 'form-inline'},
   'list-item': {className: 'well'},
   'item-choices': {className: 'form-control'},

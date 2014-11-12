@@ -141,7 +141,8 @@
           id: 'address',
           label: 'Address',
           type: 'object',
-          fields: ['country', 'state', 'city']
+          fields: ['country', 'state', 'city'],
+          collapsed: true
         },
         {
           template: true,
@@ -232,7 +233,8 @@
           label: 'Pretty Stuff',
           key: 'pretty',
           type: 'string',
-          replaceChoices: {'long':'Some Long Label','some_shorty':'Short'}
+          //replaceChoices: {'long':'Some Long Label','some_shorty':'Short'}
+          lookupReplacements: {source: 'locations'}
         },
         {
           label: 'Mirror',
