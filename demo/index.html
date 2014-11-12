@@ -194,7 +194,8 @@
           key: 'fullName',
           group: 'fullNames',
           fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, {extends: 'address', key: 'address'}, 'crazy'],
-          match: {type: 'full'}
+          match: {type: 'full'},
+          collapsed: true
         },
         {
           template: true,
