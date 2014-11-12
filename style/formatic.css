@@ -9,6 +9,9 @@
   /*padding: 10px;*/
 }
 
+.formatic fieldset {
+  margin-left: 5px;
+}
 
 .formatic .field-label {
   /*padding-bottom: 10px;*/
@@ -216,23 +219,23 @@
   border: 1px solid #ccc;
 }*/
 
-.formatic .list-control-add, .formatic .object-control-add {
+.formatic .add-item, .formatic .object-control-add {
   color: green;
   cursor: pointer;
 }
 
-.formatic .list-control-remove, .formatic .object-control-remove {
+.formatic .remove-item, .formatic .object-control-remove {
   color: red;
   cursor: pointer;
   padding-right: 1em;
 }
 
-.formatic .list-control-up {
+.formatic .move-item-back {
   cursor: pointer;
   padding-right: 1em;
 }
 
-.formatic .list-control-down {
+.formatic .move-item-forward {
   cursor: pointer;
   padding-right: 1em;
 }
