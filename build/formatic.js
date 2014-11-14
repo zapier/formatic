@@ -532,9 +532,9 @@ module.exports = function (plugin) {
       form.off('change', this.onFormChanged);
     },
 
-    onFormChanged: function () {
+    onFormChanged: function (event) {
       if (this.props.onChange) {
-        this.props.onChange(this.props.form.val());
+        this.props.onChange(this.props.form.val(), event.changing);
       }
       this.setState({
         field: this.props.form.field()
@@ -4534,11 +4534,12 @@ module.exports = function (plugin) {
     }
 
     // Currently, just a single event for any change.
-    var update = function () {
+    var update = function (changing) {
       emitter.emit('change', {
         value: store.value,
         meta: store.meta,
-        fields: store.fields
+        fields: store.fields,
+        changing: changing
       });
     };
 
@@ -4560,21 +4561,24 @@ module.exports = function (plugin) {
           value = path;
           path = [];
         }
+
+        var oldValue = util.getIn(store.value, path);
+
         if (path.length === 0) {
           store.value = util.copyValue(value);
           store.inflate();
         } else {
           store.value = util.setIn(store.value, path, value);
         }
-        update();
+        update({'path': path, 'new': value, 'old': oldValue, 'action': 'set'});
       },
 
       // Remove a value at a path.
       removeValue: function (path) {
-
+        var oldValue = util.getIn(store.value, path);
         store.value = util.removeIn(store.value, path);
 
-        update();
+        update({'path': path, 'old': oldValue, 'action': 'remove'});
       },
 
       // Erase a value. User actions can remove values, but nodes can also
@@ -4584,21 +4588,23 @@ module.exports = function (plugin) {
 
         store.value = util.removeIn(store.value, path);
 
-        update();
+        update({});
       },
 
       // Append a value to an array at a path.
       appendValue: function (path, value) {
+        var oldValue = util.getIn(store.value, path);
         store.value = util.appendIn(store.value, path, value);
 
-        update();
+        update({'path': path, 'new': value, 'old': oldValue, 'action': 'append'});
       },
 
       // Swap values of two keys.
       moveValue: function (path, fromKey, toKey) {
+        var oldValue = util.getIn(store.value, path);
         store.value = util.moveIn(store.value, path, fromKey, toKey);
 
-        update();
+        update({'path': path, 'new': oldValue, 'old': oldValue, 'fromKey': fromKey, 'toKey': toKey, 'action': 'move'});
       },
 
       // Change all the fields.
@@ -4606,13 +4612,13 @@ module.exports = function (plugin) {
         setupFields(fields);
         store.inflate();
 
-        update();
+        update({'action': 'setFields'});
       },
 
       // Set a metadata value for a key.
       setMeta: function (key, value) {
         store.meta[key] = value;
-        update();
+        update({'action': 'setMeta'});
       }
     };
 
