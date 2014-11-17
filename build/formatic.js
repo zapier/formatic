@@ -1,4 +1,4 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.formatic=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Formatic=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = require('./lib/formatic');
 
 },{"./lib/formatic":42}],2:[function(require,module,exports){
@@ -402,6 +402,8 @@ var React = (typeof window !== "undefined" ? window.React : typeof global !== "u
 var R = React.DOM;
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
+var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
+
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
@@ -443,7 +445,7 @@ module.exports = function (plugin) {
 
       return R.div({className: this.props.className, style: {display: (field.hidden() ? 'none' : '')}},
         plugin.component('label')({field: field, index: index, onClick: this.isCollapsible() ? this.onClickLabel : null}),
-        React.addons.CSSTransitionGroup({transitionName: 'reveal'},
+        CSSTransitionGroup({transitionName: 'reveal'},
           this.state.collapsed ? [] : [
             plugin.component('help')({key: 'help', field: field}),
             this.props.children
@@ -990,6 +992,8 @@ Render a list.
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 var R = React.DOM;
 
+var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
+
 module.exports = function (plugin) {
 
   plugin.exports = React.createClass({
@@ -1094,7 +1098,7 @@ module.exports = function (plugin) {
         field: field
       },
         R.div({className: this.props.className},
-          React.addons.CSSTransitionGroup({transitionName: 'reveal'},
+          CSSTransitionGroup({transitionName: 'reveal'},
             fields.map(function (child, i) {
               return plugin.component('list-item')({
                 key: this.state.lookups[i],
@@ -2431,6 +2435,7 @@ module.exports = function (plugin) {
     // Add on/off to get change events from form.
     form.on = storeEmitter.on.bind(storeEmitter);
     form.off = storeEmitter.off.bind(storeEmitter);
+    form.once = storeEmitter.once.bind(storeEmitter);
   };
 
   // Get the root component for a form.
@@ -2652,6 +2657,7 @@ module.exports = function (plugin) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],34:[function(require,module,exports){
+(function (global){
 // # component
 
 // At its most basic level, the component plugin simply maps component names to
@@ -2663,6 +2669,8 @@ module.exports = function (plugin) {
 // modify a components properties before it receives them.
 
 'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 
 module.exports = function (plugin) {
 
@@ -2695,7 +2703,7 @@ module.exports = function (plugin) {
   plugin.exports.component = function (name) {
 
     if (!componentFactories[name]) {
-      var component = plugin.require('component.' + name);
+      var component = React.createFactory(plugin.require('component.' + name));
       componentFactories[name] = function (props, children) {
         if (propModifiers[name]) {
           propModifiers[name].forEach(function (modify) {
@@ -2712,6 +2720,7 @@ module.exports = function (plugin) {
   };
 };
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],35:[function(require,module,exports){
 (function (global){
 // # core
@@ -3645,15 +3654,17 @@ module.exports = function (plugin) {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],42:[function(require,module,exports){
 (function (global){
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+
 // # Formatic plugin core
 
 // At its core, Formatic is just a plugin host. All of the functionality it has
 // out of the box is via plugins. These plugins can be replaced or extended by
 // other plugins.
-
-'use strict';
-
-var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 // The global plugin registry holds registered (but not yet instantiated)
 // plugins.
@@ -3723,7 +3734,7 @@ var defaultPluginConfig = {
 // Create a new formatic instance. A formatic instance is a function that can
 // create forms. It also has a `.create` method that can create other formatic
 // instances.
-var Formatic = function (config) {
+var createFormaticCore = function (config) {
 
   // Make a copy of config so we can monkey with it.
   config = _.extend({}, config);
@@ -3901,7 +3912,7 @@ var Formatic = function (config) {
   };
 
   // Allow creating a new formatic instance from a formatic instance.
-  formatic.create = Formatic;
+  //formatic.create = Formatic;
 
   // Use the core plugin to add methods to the formatic instance.
   var core = loadPlugin('core');
@@ -3995,10 +4006,86 @@ registerPlugins(
 );
 
 // Create the default formatic instance.
-var defaultFormatic = Formatic();
+//var defaultCore = Formatic();
 
 // Export it!
-module.exports = defaultFormatic;
+//module.exports = defaultFormatic;
+
+var createFormaticComponentClass = function (config) {
+
+  var core = createFormaticCore(config);
+
+  return React.createClass({
+
+    displayName: 'Formatic',
+
+    statics: {
+      config: createFormaticComponentClass,
+      form: core,
+      plugin: core.plugin
+    },
+
+    getInitialState: function () {
+      var form = this.props.form || this.props.defaultForm;
+      return {
+        form: form,
+        field: form.field(),
+        controlled: this.props.form ? true : false
+      };
+    },
+
+    componentDidMount: function() {
+      var form = this.state.form;
+      if (!form) {
+        throw new Error('Must supply a form or defaultForm.');
+      }
+      if (this.state.controlled) {
+        form.once('change', this.onFormChanged);
+      } else {
+        form.on('change', this.onFormChanged);
+      }
+    },
+
+    onFormChanged: function () {
+      if (this.props.onChange) {
+        this.props.onChange(this.props.form.val());
+      }
+      if (!this.state.controlled) {
+        this.setState({
+          field: this.state.form.field()
+        });
+      }
+    },
+
+    componentWillUnmount: function () {
+      var form = this.state.form;
+      if (form) {
+        form.off('change', this.onFormChanged);
+      }
+    },
+
+    componentWillReceiveProps: function (nextProps) {
+      if (this.state.controlled) {
+        if (!nextProps.form) {
+          throw new Error('Must supply a new form for a controlled component.');
+        }
+        nextProps.form.once('change', this.onFormChanged);
+        this.setState({
+          form: nextProps.form,
+          field: nextProps.form.field()
+        });
+      }
+    },
+
+    render: function () {
+      return R.div({className: 'formatic'},
+        this.state.field.component()
+      );
+    }
+  });
+};
+
+module.exports = createFormaticComponentClass();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./compilers/choices":2,"./compilers/lookup":3,"./compilers/prop-aliases":4,"./compilers/types":5,"./components/add-item":6,"./components/checkbox-list":7,"./components/field":8,"./components/fieldset":9,"./components/formatic":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":20,"./components/move-item-forward":21,"./components/pretty-textarea":22,"./components/remove-item":23,"./components/root":24,"./components/sample":25,"./components/select":26,"./components/text":27,"./components/textarea":28,"./core/field":29,"./core/form":31,"./core/form-init":30,"./core/formatic":32,"./default/compiler":33,"./default/component":34,"./default/core":35,"./default/eval":37,"./default/eval-functions":36,"./default/field-router":38,"./default/field-routes":39,"./default/loader":40,"./default/util":41,"./mixins/click-outside":43,"./mixins/field":44,"./mixins/input-actions":45,"./mixins/resize":46,"./mixins/undo-stack":47,"./plugins/bootstrap-style":48,"./plugins/default-style":49,"./store/memory":50,"./types/array":51,"./types/boolean":52,"./types/json":53,"./types/number":54,"./types/object":55,"./types/root":56,"./types/string":57}],43:[function(require,module,exports){
@@ -4518,6 +4605,7 @@ module.exports = function (plugin) {
 
     // Helper to setup fields. Field definitions need to be expanded, compiled,
     // etc.
+
     var setupFields = function (fields) {
       store.fields = compiler.expandFields(fields);
       store.fields = compiler.compileFields(store.fields);
