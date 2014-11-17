@@ -37,9 +37,7 @@
     "envify": "^1.2.1",
     "eventemitter3": "^0.1.5",
     "funql": "0.0.15",
-    "react": "^0.10.0",
-    "react-addons": "^0.9.0",
-    "react-component-resizable": "^0.1.1",
+    "react": "^0.12.0",
     "underscore": "^1.6.0"
   },
   "jest": {

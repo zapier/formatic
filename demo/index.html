@@ -20,14 +20,13 @@
   <script src="./lib/formatic.js"></script>
   <script>
 
-    formatic = formatic.create({
+    var FormClass = Formatic.config({
       component: {
         props: ['default-style', 'bootstrap-style']
       }
     });
 
-
-    var form = formatic({
+    var form = FormClass.form({
       fields: [
         {
           label: 'Short Name',
@@ -333,28 +332,34 @@
       return [params.first.toUpperCase()];
     });
 
-    var jsonForm = formatic({
-      fields: [
-        {
-          type: 'json',
-          key: 'value',
-          label: 'Value of the other form up there',
-          rows: 10
-        }
-      ]
-    });
+    // var jsonForm = formatic({
+    //   fields: [
+    //     {
+    //       type: 'json',
+    //       key: 'value',
+    //       label: 'Value of the other form up there',
+    //       rows: 10
+    //     }
+    //   ]
+    // });
+    //
+    // var component = form.component({
+    //   onChange: function (value) {
+    //     jsonForm.val({value: value});
+    //   }
+    // });
+    //
+    // var jsonComponent = jsonForm.component();
 
-    var component = form.component({
-      onChange: function (value) {
-        jsonForm.val({value: value});
-      }
-    });
+    var Form = React.createFactory(FormClass);
 
-    var jsonComponent = jsonForm.component();
+    React.render(Form({defaultForm: form}), document.getElementById('user'));
 
-    formatic.render(component, document.getElementById('user'));
+    //var formElement = React.createFactory()
 
-    formatic.render(jsonComponent, document.getElementById('json'));
+    //formatic.render(jsonComponent, document.getElementById('json'));
+
+    formatic.ComponentClass
 
   </script>
 </body>

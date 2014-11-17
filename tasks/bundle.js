@@ -8,7 +8,7 @@ var source = require('vinyl-source-stream');
 var watchify = require('watchify');
 
 gulp.task('bundle-dev', function () {
-  return browserify({entries: ['./index.js'], debug: true, standalone: 'formatic'})
+  return browserify({entries: ['./index.js'], debug: true, standalone: 'Formatic'})
     .add('./index.js')
     .require('./index.js', {expose: 'formatic'})
     .external(['underscore', 'react', 'react/addons'])
@@ -18,7 +18,7 @@ gulp.task('bundle-dev', function () {
 });
 
 gulp.task('bundle-prod', ['lint'], function () {
-  return browserify({entries: ['./index.js'], standalone: 'formatic'})
+  return browserify({entries: ['./index.js'], standalone: 'Formatic'})
     .add('./index.js')
     .require('./index.js', {expose: 'formatic'})
     .external(['underscore', 'react', 'react/addons'])
@@ -28,7 +28,7 @@ gulp.task('bundle-prod', ['lint'], function () {
 });
 
 gulp.task('bundle-prod-min', ['lint'], function () {
-  return browserify({entries: ['./index.js'], standalone: 'formatic'})
+  return browserify({entries: ['./index.js'], standalone: 'Formatic'})
     .add('./index.js')
     .require('./index.js', {expose: 'formatic'})
     .external(['underscore', 'react', 'react/addons'])
@@ -45,7 +45,7 @@ gulp.task('bundle-watch', function () {
     fullPaths: true,
     entries: ['./index.js'],
     debug: true,
-    standalone: 'formatic'
+    standalone: 'Formatic'
   });
   //b = b.require('./index.js', {expose: 'formatic'});
 

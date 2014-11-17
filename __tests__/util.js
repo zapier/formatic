@@ -3,9 +3,9 @@
 
 describe('util', function() {
 
-  var formatic = require('../');
+  var Formatic = require('../');
 
-  var util = formatic.plugin('util');
+  var util = Formatic.plugin('util');
 
   it('should see an empty string as a blank', function () {
 
