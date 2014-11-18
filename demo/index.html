@@ -22,7 +22,7 @@
 
     var FormClass = Formatic.config({
       component: {
-        props: ['default-style', 'bootstrap-style']
+        props: ['bootstrap-style']
       }
     });
 
@@ -39,7 +39,8 @@
           label: 'Home Address',
           type: 'object',
           key: 'address_home',
-          extends: 'address'
+          extends: 'address',
+          group: 'addresses'
         },
         {
           label: 'Work Address',
@@ -192,7 +193,7 @@
           type: 'object',
           key: 'fullName',
           group: 'fullNames',
-          fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, {extends: 'address', key: 'address'}, 'crazy'],
+          fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, {extends: 'address', key: 'address'}, 'crazy', 'pretty'],
           match: {type: 'full'},
           collapsed: true
         },
@@ -235,6 +236,13 @@
           type: 'string',
           //replaceChoices: {'long':'Some Long Label','some_shorty':'Short'}
           lookupReplacements: {source: 'locations'}
+        },
+        {
+          label: 'Other Pretty Stuff',
+          key: 'pretty2',
+          type: 'string',
+          //replaceChoices: {'long':'Some Long Label','some_shorty':'Short'}
+          lookupReplacements: {source: 'locations', keys: ['country'], group: 'addresses'}
         },
         {
           label: 'Mirror',

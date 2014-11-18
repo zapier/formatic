@@ -1223,7 +1223,8 @@ var noBreak = function (value) {
 };
 
 var LEFT_PAD = '\u00a0\u00a0';
-var RIGHT_PAD = '\u00a0\u00a0';
+// Why this works, I'm not sure.
+var RIGHT_PAD = '  '; //'\u00a0\u00a0';
 
 module.exports = function (plugin) {
 
@@ -1602,7 +1603,7 @@ module.exports = function (plugin) {
     },
 
     // Keep the highlight styles in sync with the textarea styles.
-    adjustStyles: function () {
+    adjustStyles: function (isMount) {
       var overlay = this.refs.highlight.getDOMNode();
       var content = this.refs.content.getDOMNode();
 
@@ -1635,7 +1636,10 @@ module.exports = function (plugin) {
         overlay.style.boxShadow = 'none';
       }
 
-      overlay.style.backgroundColor = backgroundColor;
+      if (isMount) {
+        this.backgroundColor = backgroundColor;
+      }
+      overlay.style.backgroundColor = this.backgroundColor;
       content.style.backgroundColor = 'rgba(0,0,0,0)';
     },
 
@@ -1651,21 +1655,25 @@ module.exports = function (plugin) {
     },
 
     componentDidMount: function () {
-      this.adjustStyles();
+      this.adjustStyles(true);
       this.setOnResize('content', this.onResize);
     },
 
     onInsert: function (event) {
       if (event.target.selectedIndex > 0) {
-        var tag = '{{' + event.target.value + '}}';
+        var tag = event.target.value;
         event.target.selectedIndex = 0;
         var pos = this.tracking.pos;
         var insertPos = this.normalizePosition(pos);
         var tokens = this.tracking.tokens;
         var tokenIndex = this.tokenIndex(insertPos, tokens, this.tracking.indexMap);
-        tokens.splice(tokenIndex, 0, tag);
+        tokens.splice(tokenIndex, 0, {
+          type: 'tag',
+          value: tag
+        });
         this.tracking.indexMap = this.indexMap(tokens);
         var newValue = this.rawValue(tokens);
+        this.tracking.pos += this.prettyLabel(tag).length;
         this.props.field.val(newValue);
       }
     },
@@ -2061,6 +2069,7 @@ module.exports = function (plugin) {
     field.value = value;
     field.parent = parent;
     field.groups = {};
+    field.tempChildren = [];
   };
 
   // Attach a field factory to the form prototype.
@@ -2198,7 +2207,21 @@ module.exports = function (plugin) {
       value = def.value;
     }
 
-    return new Field(field.form, def, value, field);
+    var childField = new Field(field.form, def, value, field);
+
+    field.tempChildren.push(childField);
+
+    return childField;
+
+    // if (def.eval) {
+    //   def = childField.evalDef(def);
+    //   if (util.isBlank(def.key)) {
+    //     value = def.value;
+    //   }
+    //   childField = new Field(field.form, def, value, field);
+    // }
+    //
+    // return childField;
   };
 
   // Given a value, find an appropriate field definition for this field.
@@ -2218,11 +2241,12 @@ module.exports = function (plugin) {
   };
 
   // Get all the fields belonging to a group.
-  proto.groupFields = function (groupName) {
+  proto.groupFields = function (groupName, ignoreTempChildren) {
     var field = this;
 
     if (!field.groups[groupName]) {
       field.groups[groupName] = [];
+
       if (field.parent) {
         var siblings = field.parent.fields();
         siblings.forEach(function (sibling) {
@@ -2230,9 +2254,20 @@ module.exports = function (plugin) {
             field.groups[groupName].push(sibling);
           }
         });
-        var parentGroupFields = field.parent.groupFields(groupName);
+        var parentGroupFields = field.parent.groupFields(groupName, true);
         field.groups[groupName] = field.groups[groupName].concat(parentGroupFields);
       }
+    }
+
+    if (!ignoreTempChildren && field.groups[groupName].length === 0) {
+      // looking at children so far
+      var childGroupFields = [];
+      field.tempChildren.forEach(function (child) {
+        if (child.def.group === groupName) {
+          childGroupFields.push(child);
+        }
+      });
+      return childGroupFields;
     }
 
     return field.groups[groupName];
@@ -2899,7 +2934,7 @@ var plugins = {
       var obj;
       if (context && key in context) {
         obj = context[key];
-      } else if (!_.isUndefined(field.value) && key in field.value) {
+      } else if (_.isObject(field.value) && key in field.value) {
         obj = field.value[key];
       } else if (field.parent) {
         obj = get(args, field.parent);
@@ -2914,6 +2949,7 @@ var plugins = {
 
   getGroupValues: function (plugin) {
     plugin.exports = function (args, field, context) {
+
       var groupName = field.eval(args[0], context);
 
       var groupFields = field.groupFields(groupName);
@@ -3414,7 +3450,7 @@ module.exports = function (plugin) {
     if (path.length === 0) {
       return obj;
     }
-    if (path[0] in obj) {
+    if (_.isObject(obj) && path[0] in obj) {
       return util.getIn(obj[path[0]], path.slice(1));
     }
     return null;
