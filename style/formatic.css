@@ -92,6 +92,8 @@
   z-index: 1000;
   background: #fff;
   border: 1px solid #ccc;
+  max-width: 600px;
+  overflow-x: hidden;
   /*border-bottom: 1px solid #ccc;
   border-top: 1px solid #ccc;*/
 }
