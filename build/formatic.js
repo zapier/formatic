@@ -1,7 +1,4 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Formatic=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-module.exports = require('./lib/formatic');
-
-},{"./lib/formatic":43}],2:[function(require,module,exports){
 (function (global){
 // # compiler.choices
 
@@ -97,7 +94,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 // # compiler.lookup
 
 /*
@@ -152,7 +149,7 @@ module.exports = function (plugin) {
       }
       var keys = lookup.keys || [];
       var params = {};
-      var metaArgs, metaGet;
+      var metaArgs, metaGet, hiddenTest;
 
       if (lookup.group) {
 
@@ -166,9 +163,12 @@ module.exports = function (plugin) {
           metaArgs,
           ['@not', metaGet]
         ]));
+        hiddenTest = ['@and'].concat(keys.map(function (key) {
+          return ['@get', 'item', key];
+        }));
         def.eval[choicesPropName] = metaForEach.concat([
-          metaGet,
-          metaGet
+          ['@or', metaGet, ['@if', hiddenTest, ['///loading///'], []]],
+          ['@or', hiddenTest, metaGet]
         ]);
       } else {
         keys.forEach(function (key) {
@@ -176,8 +176,20 @@ module.exports = function (plugin) {
         });
         metaArgs = [lookup.source].concat(params);
         metaGet = ['@getMeta'].concat(metaArgs);
+        var metaGetOrLoading = ['@or', metaGet, ['///loading///']];
         def.eval.needsMeta.push(['@if', metaGet, null, metaArgs]);
-        def.eval[choicesPropName] = metaGet;
+        def.eval[choicesPropName] = metaGetOrLoading;
+        if (keys.length > 0) {
+          // Test that we have all needed keys.
+          hiddenTest = ['@and'].concat(keys.map(function (key) {
+            return ['@get', key];
+          }));
+          // Reverse test so we hide if don't have all keys.
+          hiddenTest = ['@not', hiddenTest];
+          if (!def.eval.hidden) {
+            def.eval.hidden = hiddenTest;
+          }
+        }
       }
 
       delete def[lookupPropName];
@@ -191,7 +203,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 // # compilers.prop-aliases
 
 /*
@@ -216,7 +228,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],5:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function (global){
 // # compilers.types
 
@@ -264,7 +276,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
 // # component.add-item
 
@@ -297,7 +309,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],7:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (global){
 // # component.checkbox-list
 
@@ -389,7 +401,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -516,14 +528,20 @@ module.exports = function (plugin) {
           this.props.open ? R.ul({ref: 'choices', className: 'choices'},
             this.props.choices.map(function (choice, i) {
               return R.li({key: i, className: 'choice'},
-                R.a({href: 'JavaScript' + ':', onClick: this.onSelect.bind(this, choice)},
-                  R.span({className: 'choice-label'},
-                    choice.label
-                  ),
-                  R.span({className: 'choice-sample'},
-                    choice.sample
+                choice.value === '///loading///' ?
+                  R.a({href: 'JavaScript' + ':', onClick: this.props.onClose},
+                    R.span({className: 'choice-label'},
+                      'Loading...'
+                    )
+                  ) :
+                  R.a({href: 'JavaScript' + ':', onClick: this.onSelect.bind(this, choice)},
+                    R.span({className: 'choice-label'},
+                      choice.label
+                    ),
+                    R.span({className: 'choice-sample'},
+                      choice.sample
+                    )
                   )
-                )
               );
             }.bind(this))
           ) : null
@@ -608,7 +626,7 @@ module.exports = function (plugin) {
 //   );
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function (global){
 // # component.field
 
@@ -677,7 +695,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (global){
 // # component.fieldset
 
@@ -721,7 +739,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function (global){
 // # component.formatic
 
@@ -774,7 +792,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (global){
 // # component.help
 
@@ -813,7 +831,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
 // # component.item-choices
 
@@ -861,7 +879,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (global){
 // # component.json
 
@@ -951,7 +969,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
 // # component.label
 
@@ -1010,7 +1028,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function (global){
 // # component.list-control
 
@@ -1070,7 +1088,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (global){
 // # component.list-item-control
 
@@ -1120,7 +1138,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (global){
 // # component.list-item-value
 
@@ -1162,7 +1180,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (global){
 // # component.list-item
 
@@ -1199,7 +1217,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (global){
 // # component.list
 
@@ -1340,7 +1358,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (global){
 // # component.move-item-back
 
@@ -1373,7 +1391,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (global){
 // # component.move-item-forward
 
@@ -1406,7 +1424,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function (global){
 // # component.pretty-textarea
 
@@ -2007,7 +2025,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (global){
 // # component.remove-item
 
@@ -2040,7 +2058,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (global){
 // # component.root
 
@@ -2082,7 +2100,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (global){
 // # component.help
 
@@ -2121,7 +2139,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 // # component.select
 
@@ -2166,54 +2184,65 @@ module.exports = function (plugin) {
       var field = this.props.field;
       var choices = field.def.choices || [];
 
-      var value = field.value !== undefined ? field.value : '';
+      var choicesOrLoading;
 
-      choices = choices.map(function (choice, i) {
-        return {
-          choiceValue: 'choice:' + i,
-          value: choice.value,
-          label: choice.label
-        };
-      });
+      if (choices.length === 1 && choices[0].value === '///loading///') {
+        choicesOrLoading = R.div({},
+          'Loading choices...'
+        );
+      } else {
 
-      var valueChoice = _.find(choices, function (choice) {
-        return choice.value === value;
-      });
+        var value = field.value !== undefined ? field.value : '';
 
-      if (valueChoice === undefined) {
+        choices = choices.map(function (choice, i) {
+          return {
+            choiceValue: 'choice:' + i,
+            value: choice.value,
+            label: choice.label
+          };
+        });
 
-        var label = value;
-        if (!_.isString(value)) {
-          label = JSON.stringify(value);
+        var valueChoice = _.find(choices, function (choice) {
+          return choice.value === value;
+        });
+
+        if (valueChoice === undefined) {
+
+          var label = value;
+          if (!_.isString(value)) {
+            label = JSON.stringify(value);
+          }
+          valueChoice = {
+            choiceValue: 'value:',
+            value: value,
+            label: label
+          };
+          choices = [valueChoice].concat(choices);
         }
-        valueChoice = {
-          choiceValue: 'value:',
-          value: value,
-          label: label
-        };
-        choices = [valueChoice].concat(choices);
+
+        choicesOrLoading = R.select({
+          className: this.props.className,
+          onChange: this.onChange,
+          value: valueChoice.choiceValue
+        },
+          choices.map(function (choice, i) {
+            return R.option({
+              key: i,
+              value: choice.choiceValue
+            }, choice.label);
+          }.bind(this))
+        );
       }
 
       return plugin.component('field')({
         field: field
-      }, R.select({
-        className: this.props.className,
-        onChange: this.onChange,
-        value: valueChoice.choiceValue
-      },
-        choices.map(function (choice, i) {
-          return R.option({
-            key: i,
-            value: choice.choiceValue
-          }, choice.label);
-        }.bind(this))
-      ));
+      }, choicesOrLoading);
     }
   });
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (global){
 // # component.text
 
@@ -2263,7 +2292,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (global){
 // # component.textarea
 
@@ -2313,7 +2342,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 (function (global){
 // # core.field
 
@@ -2665,7 +2694,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 // # core.form-init
 
 /*
@@ -2690,7 +2719,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],32:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (global){
 // # core.form
 
@@ -2818,7 +2847,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"eventemitter3":60}],33:[function(require,module,exports){
+},{"eventemitter3":59}],32:[function(require,module,exports){
 (function (global){
 // # core.formatic
 
@@ -2848,7 +2877,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 (function (global){
 // # compiler
 
@@ -2982,7 +3011,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (global){
 // # component
 
@@ -3047,7 +3076,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 (function (global){
 // # core
 
@@ -3137,7 +3166,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 (function (global){
 // # eval-functions
 
@@ -3314,7 +3343,7 @@ _.each(plugins, function (fn, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function (global){
 // # eval
 
@@ -3413,7 +3442,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 (function (global){
 // # field-router
 
@@ -3492,7 +3521,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 (function (global){
 // # field-routes
 
@@ -3574,7 +3603,7 @@ _.each(routes, function (route, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 // # loader
 
 /*
@@ -3671,7 +3700,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 (function (global){
 // # util
 
@@ -3979,7 +4008,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -4417,7 +4446,7 @@ var createFormaticComponentClass = function (config) {
 module.exports = createFormaticComponentClass();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./compilers/choices":2,"./compilers/lookup":3,"./compilers/prop-aliases":4,"./compilers/types":5,"./components/add-item":6,"./components/checkbox-list":7,"./components/choices":8,"./components/field":9,"./components/fieldset":10,"./components/formatic":11,"./components/help":12,"./components/item-choices":13,"./components/json":14,"./components/label":15,"./components/list":20,"./components/list-control":16,"./components/list-item":19,"./components/list-item-control":17,"./components/list-item-value":18,"./components/move-item-back":21,"./components/move-item-forward":22,"./components/pretty-textarea":23,"./components/remove-item":24,"./components/root":25,"./components/sample":26,"./components/select":27,"./components/text":28,"./components/textarea":29,"./core/field":30,"./core/form":32,"./core/form-init":31,"./core/formatic":33,"./default/compiler":34,"./default/component":35,"./default/core":36,"./default/eval":38,"./default/eval-functions":37,"./default/field-router":39,"./default/field-routes":40,"./default/loader":41,"./default/util":42,"./mixins/click-outside":44,"./mixins/field":45,"./mixins/input-actions":46,"./mixins/resize":47,"./mixins/scroll":48,"./mixins/undo-stack":49,"./plugins/bootstrap-style":50,"./plugins/default-style":51,"./store/memory":52,"./types/array":53,"./types/boolean":54,"./types/json":55,"./types/number":56,"./types/object":57,"./types/root":58,"./types/string":59}],44:[function(require,module,exports){
+},{"./compilers/choices":1,"./compilers/lookup":2,"./compilers/prop-aliases":3,"./compilers/types":4,"./components/add-item":5,"./components/checkbox-list":6,"./components/choices":7,"./components/field":8,"./components/fieldset":9,"./components/formatic":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":20,"./components/move-item-forward":21,"./components/pretty-textarea":22,"./components/remove-item":23,"./components/root":24,"./components/sample":25,"./components/select":26,"./components/text":27,"./components/textarea":28,"./core/field":29,"./core/form":31,"./core/form-init":30,"./core/formatic":32,"./default/compiler":33,"./default/component":34,"./default/core":35,"./default/eval":37,"./default/eval-functions":36,"./default/field-router":38,"./default/field-routes":39,"./default/loader":40,"./default/util":41,"./mixins/click-outside":43,"./mixins/field":44,"./mixins/input-actions":45,"./mixins/resize":46,"./mixins/scroll":47,"./mixins/undo-stack":48,"./plugins/bootstrap-style":49,"./plugins/default-style":50,"./store/memory":51,"./types/array":52,"./types/boolean":53,"./types/json":54,"./types/number":55,"./types/object":56,"./types/root":57,"./types/string":58}],43:[function(require,module,exports){
 (function (global){
 // # mixin.click-outside
 
@@ -4550,7 +4579,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 (function (global){
 // # mixin.field
 
@@ -4620,7 +4649,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // # mixin.input-actions
 
 /*
@@ -4647,7 +4676,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 // # mixin.resize
 
 /*
@@ -4768,7 +4797,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 // # mixin.scroll
 
 'use strict';
@@ -4791,7 +4820,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 // # mixin.undo-stack
 
 /*
@@ -4861,7 +4890,7 @@ module.exports = function (plugin) {
   plugin.exports = UndoStack;
 };
 
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 (function (global){
 // # bootstrap
 
@@ -4917,7 +4946,7 @@ _.each(modifiers, function (modifier, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 (function (global){
 // # default-style
 
@@ -4970,7 +4999,7 @@ _.each(modifiers, function (modifier, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 (function (global){
 // # store.memory
 
@@ -5113,7 +5142,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 (function (global){
 // # type.array
 
@@ -5145,7 +5174,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 // # type.boolean
 
 /*
@@ -5168,7 +5197,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 // # type.json
 
 /*
@@ -5183,7 +5212,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 // # type.number
 
 /*
@@ -5198,7 +5227,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 (function (global){
 // # type.object
 
@@ -5249,7 +5278,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 // # type.root
 
 /*
@@ -5270,7 +5299,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 // # type.string
 
 /*
@@ -5285,7 +5314,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],60:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 'use strict';
 
 /**
@@ -5491,5 +5520,8 @@ if ('object' === typeof module && module.exports) {
   module.exports = EventEmitter;
 }
 
-},{}]},{},[1])(1)
+},{}],"formatic":[function(require,module,exports){
+module.exports = require('./lib/formatic');
+
+},{"./lib/formatic":42}]},{},[])("formatic")
 });
