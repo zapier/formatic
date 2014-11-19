@@ -13,332 +13,382 @@
   </div>
 
   <script src="./bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="./bower_components/underscore/underscore-min.js"></script>
   <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="./bower_components/react/react-with-addons.js"></script>
 
   <script src="./lib/formatic.js"></script>
   <script>
-    var formatic = require('formatic');
 
-    formatic.plugin('bootstrap');
-
-    formatic.config('core-type.typeMap', {
-      unicode: 'text'
+    var FormClass = Formatic.config({
+      component: {
+        props: ['bootstrap-style']
+      }
     });
 
-    var form = formatic();
+    var form = FormClass.form({
+      fields: [
+        {
+          label: 'Short Name',
+          type: 'object',
+          key: 'name',
+          fields: ['firstName', 'lastName', {extends: 'nameType', value: 'short'}, 'silly'],
+          match: {type: 'short'}
+        },
+        {
+          label: 'Home Address',
+          type: 'object',
+          key: 'address_home',
+          extends: 'address',
+          group: 'addresses'
+        },
+        {
+          label: 'Work Address',
+          type: 'object',
+          key: 'address_work',
+          extends: 'address'
+        },
+        {
+          label: 'Other Addresses',
+          type: 'object',
+          key: 'addresses_other',
+          items: ['address']
+        },
+        {
+          label: 'Do you like cookies?',
+          type: 'boolean',
+          key: 'likesCookies'
+        },
+        {
+          label: 'Colors',
+          type: 'array',
+          key: 'colors',
+          choices: ['red', 'green', 'blue']
+        },
+        {
+          label: 'Foods',
+          type: 'array',
+          key: 'foods',
+          choices: [
+            {value: 'tacos', label: 'Tacos', sample: 'Some sample'},
+            {value: 'burritos', label: 'Burritos', sample: 'Another sample'},
+            {value: 'enchiladas', label: 'Enchiladas', sample: 'Tasty sample'}
+          ]
+        },
+        {
+          template: true,
+          label: 'First Name',
+          id: 'firstName',
+          type: 'unicode',
+          key: 'first',
+          help_text: 'The name your momma calls you.'
+        },
+        {
+          template: true,
+          label: 'Last Name',
+          id: 'lastName',
+          type: 'string',
+          key: 'last',
+          maxRows: 1,
+          when: [
+            'firstName'
+          ]
+        },
+        {
+          template: true,
+          type: 'unicode',
+          hidden: true,
+          id: 'nameType',
+          key: 'type'
+        },
 
-    form.meta('prettyTextareaLabels', {
-      'field1': 'First Name',
-      'field2': 'Last Name',
-      'field3': 'First Name',
-      'longfield1': 'Shorty'
-    });
+        //{key: 'watchedField', match: 'exact', value: 'ok changed', action: 'hide'}
+        {
+          template: true,
+          type: 'string',
+          label: 'Silly',
+          id: 'silly',
+          eval: {
+            //hidden: ['@if', ['@not', ['@getIn', 'name', 'first']], true, false]
+            //value: ['@if']['@sum', 1, 1]
+            //value: ['@get', 'likesCookies']
+            hidden: ['@not', ['@get', 'likesCookies']]//,
+            // needsMeta: ['@if',
+            //   ['get', 'country'],
+            //   {source: 'location', params: {country: ['@get', 'country']}}
+            // ]
+          }
+          // eval: {
+          //   choices: getAll(firstName, 'alias')
+          //   choices: lookup('location', country)
+          //   choices: {call: 'lookup', args: ['']}
+          //   hidden: {}
+          // }
+          // when: {test: 'eq', },
+          // choices: [],
+          // eval: {
+          //   choices: "if( aliases filter( map( slice(aliases 0 __index) fn([alias] get(alias 'first')) ) fn([alias] alias) ) )"
+          // }
+        },
+        {
+          type: 'array',
+          key: 'aliases',
+          items: ['name', 'fullName']
+        },
+        {
+          template: true,
+          id: 'address',
+          label: 'Address',
+          type: 'object',
+          fields: ['country', 'state', 'city'],
+          collapsed: true
+        },
+        {
+          template: true,
+          label: 'Country',
+          type: 'string',
+          key: 'country',
+          choices: [],
+          lookup: {source: 'locations'}
+          // eval: {
+          //   needsMeta: [
+          //     ['@if', ['@getMeta', 'locations'], null, ['locations']]
+          //   ],
+          //   choices: ['@getMeta', 'locations']
+          // }
+        },
 
-    var humanize = function(property) {
-      property = property.replace(/\{\{/g, '');
-      property = property.replace(/\}\}/g, '');
-      return property.replace(/_/g, ' ')
-        .replace(/(\w+)/g, function(match) {
-          return match.charAt(0).toUpperCase() + match.slice(1);
-        });
-    };
-
-    formatic.config('view-pretty-textarea.labelFallback', humanize);
-
-    form.meta('prettyTextareaLabelFallback', humanize);
-
-    form.fields([
-      {
-        type: 'text',
-        key: 'name.first',
-        label: 'First Name',
-        help_text: 'What your momma calls you.',
-        required: true
-      },
-      {
-        type: 'unicode',
-        key: 'name.last',
-        label: 'Last Name',
-        required: true
-      },
-      {
-        type: 'textarea',
-        key: 'foo',
-        label: 'Foo'
-      },
-      {
-        type: 'pretty-textarea',
-        key: 'party',
-        label: 'Party'
-      },
-      {
-        collapsed: false,
-        type: 'text',
-        key: 'address.city',
-        label: 'City'
-      },
-      {
-        type: 'select',
-        key: 'address.state',
-        label: 'State',
-        choices: ['MO', 'IL']
-      },
-      {
-        type: 'dropdown',
-        key: 'os',
-        label: 'Operating System',
-        choices: [
-          {value: 'osx', label: 'Mac OS X'},
-          {value: 'linux', label: 'Linux'},
-          {value: 'vista', label: 'Windows Vista'},
-          {value: 'win7', label: 'Windows 7'},
-          {value: 'win8', label: 'Windows 8'}
-        ]
-      },
-      {
-        type: 'dropdown',
-        key: 'mood',
-        label: 'How do you feel?',
-        required: true,
-        choices: {
-          happy: 'Happy',
-          sad: 'Sad'
-        }
-      },
-      // Crazy experimental if type. Will dynamically return node depending on
-      // expression (which is also made up of crazy experimental types).
-      {
-        type: 'if',
-        fields: [
-          {
-            type: 'eq',
+        {
+          template: true,
+          label: 'State',
+          type: 'string',
+          key: 'state',
+          choices: [],
+          lookup: {source: 'locations', keys: ['country']}
+          // eval: {
+          //   needsMeta: [
+          //     ['@if', ['@getMeta', 'locations', {country: ['@get', 'country']}], null, ['locations', {country: ['@get', 'country']}]]
+          //   ],
+          //   choices: ['@getMeta', 'locations', {country: ['@get', 'country']}]
+          // }
+        },
+        {
+          template: true,
+          label: 'City',
+          type: 'string',
+          key: 'city',
+          choices: [],
+          lookup: {source: 'locations', keys: ['country', 'state']}
+          // eval: {
+          //   needsMeta: [
+          //     ['@if', ['@getMeta', 'locations', {country: ['@get', 'country'], state: ['@get', 'state']}], null, ['locations', {country: ['@get', 'country'], state: ['@get', 'state']}]]
+          //   ],
+          //   choices: ['@getMeta', 'locations', {country: ['@get', 'country'], state: ['@get', 'state']}]
+          // }
+        },
+        {
+          template: true,
+          label: 'Full Name',
+          type: 'object',
+          key: 'fullName',
+          group: 'fullNames',
+          fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, {extends: 'address', key: 'address'}, 'crazy', 'pretty'],
+          match: {type: 'full'},
+          collapsed: true,
+          help_text: "What is going on here???"
+        },
+        {
+          template: true,
+          label: 'Middle Name',
+          id: 'middleName',
+          type: 'string',
+          key: 'middle',
+          maxRows: 1
+        },
+        {
+          template: true,
+          label: 'Crazy',
+          key: 'crazy',
+          type: 'array',
+          choices: [],
+          lookup: {source: 'names', keys: ['first'], group: 'fullNames'}
+          // eval: {
+          //   needsMeta: [
+          //     '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
+          //     ['names', {first: ['@get', 'alias', 'first']}],
+          //     ['@not', ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}]],
+          //   ],
+          //   choices: [
+          //     '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
+          //     ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}],
+          //     ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}]
+          //   ]
+          // }
+        },
+        {
+          label: 'Some Blob',
+          key: 'blob',
+          type: 'json',
+          default: {foo:'bar'}
+        },
+        {
+          label: 'Pretty Stuff',
+          key: 'pretty',
+          type: 'string',
+          //replaceChoices: {'long':'Some Long Label','some_shorty':'Short'}
+          lookupReplacements: {source: 'locations'}
+        },
+        // {
+        //   label: 'Other Pretty Stuff',
+        //   key: 'pretty2',
+        //   type: 'string',
+        //   //replaceChoices: {'long':'Some Long Label','some_shorty':'Short'}
+        //   lookupReplacements: {source: 'locations', keys: ['country'], group: 'addresses'}
+        // },
+        {
+          label: 'Mirror',
+          type: 'json',
+          eval: {
+            value: ['@join', ['@reverse', ['@split', ['@or', '=pretty', ''], '']], '']
+          }
+        },
+        {
+          label: 'Dynamic Fields',
+          type: 'object',
+          key: 'dynamicFields',
+          eval: {
             fields: [
+              '@forEach', 'param', ['foo', 'bar'],
+                {key: '=param', label: '=param', extends: 'address'}
+            ]
+          }
+        },
+        {
+          label: 'Age',
+          type: 'number',
+          key: 'age'
+        },
+        {
+          label: 'Map',
+          type: 'dict',
+          key: 'myMap'
+        }
+
+      ]
+    });
+
+    form.source('locations', function (params) {
+      var country = params.country;
+      var state = params.state;
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          if (country && state) {
+
+            return resolve({
+              us: {
+                'us:mo': ['St. Louis', 'Jefferson City'],
+                'us:il': ['Chicago', 'Springfield']
+              },
+              ca: {
+                'ca:on': ['Toronto']
+              }
+            }[country][state]);
+
+          } else if (country) {
+
+            return resolve({
+              us: [
+                {
+                  value: 'us:mo',
+                  label: 'Missouri'
+                },
+                {
+                  value: 'us:il',
+                  label: 'Illinois'
+                }
+              ],
+              ca: [
+                {
+                  value: 'ca:on',
+                  label: 'Ontario'
+                }
+              ]
+            }[country]);
+
+          } else {
+
+            return resolve([
               {
-                type: 'get',
-                value: 'mood'
+                value: 'us',
+                label: 'United States',
+                sample: 'Star Spangled Banner!'
               },
               {
-                type: 'string',
-                value: 'sad'
-              }
-            ]
-          },
-          {
-            type: 'code',
-            value: 'So sorry!'
-          },
-          {
-            type: 'code',
-            value: "Glad you're feeling good!"
+                value: 'ca',
+                label: 'Canada',
+                sample: 'O Canada!'
+              },
+              {
+                value: 'foo',
+                label: 'Foo',
+                sample: 'Foolander!'
+              },
+              {
+                value: 'boo',
+                label: 'Boo',
+                sample: 'Boolander!'
+              },
+              {
+                value: 'zoo',
+                label: 'Zoo',
+                sample: 'Zoolander!'
+              },
+              {
+                value: 'qoo',
+                label: 'Qoo',
+                sample: 'Qoolander!'
+              },
+            ]);
           }
-        ]
-      },
-      // Even crazier experimental terse compiler used with if. Same expression
-      // as above, but done with terse string.
-      {
-        type: 'if',
-        fields: [
-          "eq(get('mood'),'sad')",
-          {
-            type: 'code',
-            value: 'Seriously, I feel bad about that!'
-          }
-          // leaving out else field
-        ]
-      },
-      // Another terse compiler.
-      "text:terseKey:Some terse field",
-      "textarea:myKey:Some text area",
-      {
-        type: 'textarea',
-        key: 'story',
-        label: 'Tell me a story'
-      },
-      {
-        type: 'text',
-        label: 'Some readonly field',
-        value: 'Some readonly value'
-      },
-      {
-        type: 'password',
-        key: 'password',
-        label: 'What is your password?'
-      },
-      {
-        type: 'checkbox',
-        key: 'colors',
-        label: 'Favorite colors',
-        choices: ['red', 'green']
-      },
-      {
-        type: 'checkbox',
-        key: 'optIn',
-        label: 'Send me stuff!'
-      },
-      {
-        type: 'select',
-        key: 'optInMore',
-        help_text: 'Seriously, if you like getting stuff...',
-        label: 'Send me MOAR stuff!',
-        value: false
-      },
-      {
-        type: 'json',
-        key: 'helmig',
-        label: 'Some JSON for you',
-        value: {
-          foo: 'bar'
-        }
-      },
-      {
-        type: 'dropdown',
-        key: 'letters',
-        label: 'Favorite letter',
-        choices: Array.apply(null, Array(26)).map(function (num, i) {
-          return String.fromCharCode(65 + i);
-        })
-      },
-      {
-        type: 'list',
-        key: 'notes',
-        label: 'Notes',
-        collapsable: true,
-        value: [{note: 'foo', type: 'basic'}],
-        item: {
-          key: '[]',
-          type: 'fieldset',
-          fields: [{
-            type: 'textarea',
-            key: 'note',
-            label: 'Note'
-          },{
-            type: 'list',
-            key: 'tags',
-            label: 'Tags'
-          },{
-            type: 'select',
-            key: 'state',
-            choices: ['draft', 'publish'],
-            value: 'draft'
-          }]
-        },
-        itemTypes: [
-          {
-            label: 'Basic Note',
-            type: 'basic',
-            item: {
-              label: 'Basic Note',
-              type: 'fieldset',
-              key: '[]',
-              fields: [
-                {
-                  key: 'type',
-                  type: 'text',
-                  label: 'Type',
-                  value: 'basic',
-                  isReadOnly: true
-                },
-                {
-                  key: 'note',
-                  type: 'unicode',
-                  label: 'Note'
-                }
-              ]
-            }
-          },
-          {
-            label: 'Advanced Note',
-            type: 'advanced',
-            item: {
-              label: 'Advanced Note',
-              type: 'fieldset',
-              key: '[]',
-              fields: [
-                {
-                  key: 'type',
-                  type: 'text',
-                  label: 'Type',
-                  value: 'advanced',
-                  isReadOnly: true
-                },
-                {
-                  type: 'textarea',
-                  key: 'note',
-                  label: 'Note'
-                },{
-                  type: 'list',
-                  key: 'tags',
-                  label: 'Tags',
-                  item: {
-                    type: 'text',
-                    key: '[]',
-                    label: 'Tag'
-                  }
-                },
-                {
-                  type: 'select',
-                  key: 'state',
-                  choices: ['draft', 'publish'],
-                  value: 'draft'
-                }
-              ]
-            }
-          }
-        ]
-      },
-      {
-        type: 'object',
-        key: 'users',
-        label: 'Users',
-        keyChoices: ['joe', 'bob'],
-        customKeyChoice: true,
-        itemTypes: [{
-          type: 'joe',
-          item: {
-            key: '[]',
-            type: 'text'
-          }
-        },{
-          type: 'bob',
-          item: {
-            key: '[]',
-            type: 'list'
-          }
-        }],
-        item: {
-          key: '[]',
-          type: 'json'
-        },
-        value: {'mary': 'Mary'}
-      },
-      {
-        type: 'select',
-        choices: [],
-        key: 'nochoice',
-        value: 'none'
-      },
-      {
-        type: 'text',
-        hidden: true,
-        key: 'someHidden',
-        value: 'my hidden value'
-      }
-    ]);
 
-    form.attach(document.getElementById('user'));
+          return reject('crap');
+        }, 2000)
 
-    jsonForm = formatic();
+      });
 
-    jsonForm.attach(document.getElementById('json'));
-
-    form.on('update', function () {
-      jsonForm.fields([
-        {
-          type: 'code',
-          value: JSON.stringify(form.val(), null, 2)
-        }
-      ]);
     });
+
+    form.source('names', function (params) {
+      return [params.first.toUpperCase()];
+    });
+
+    // var jsonForm = formatic({
+    //   fields: [
+    //     {
+    //       type: 'json',
+    //       key: 'value',
+    //       label: 'Value of the other form up there',
+    //       rows: 10
+    //     }
+    //   ]
+    // });
+    //
+    // var component = form.component({
+    //   onChange: function (value) {
+    //     jsonForm.val({value: value});
+    //   }
+    // });
+    //
+    // var jsonComponent = jsonForm.component();
+
+    var Form = React.createFactory(FormClass);
+
+    React.render(Form({defaultForm: form}), document.getElementById('user'));
+
+    //var formElement = React.createFactory()
+
+    //formatic.render(jsonComponent, document.getElementById('json'));
+
   </script>
 </body>
 </html>

@@ -8,7 +8,7 @@ gulp.task('html-copy', function () {
     .pipe(gulp.dest('./live'));
 });
 
-gulp.task('html-watch', function () {
+gulp.task('html-watch', ['html-copy'], function () {
   return gulp.watch(['./demo/*.html'], ['html-copy']);
 });
 
@@ -17,7 +17,7 @@ gulp.task('css-copy', function () {
     .pipe(gulp.dest('./live/style'));
 });
 
-gulp.task('css-watch', function () {
+gulp.task('css-watch', ['css-copy'], function () {
   return gulp.watch(['./style/*.css'], ['css-copy']);
 });
 
