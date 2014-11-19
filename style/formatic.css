@@ -85,11 +85,52 @@
   padding-left: 0px;
 }
 
+.formatic .choices-container {
+  max-height: 400px;
+  overflow-y: scroll;
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ccc;
+  /*border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;*/
+}
+
+.formatic .choices {
+  list-style-type: none;
+  margin: 0px;
+  padding-left: 0px;
+}
+
+.formatic .choice-label {
+  font-weight: 600;
+  padding-right: 10px;
+}
+
+.formatic .choice-sample {
+  color: #999;
+}
+
 .formatic .dropdown-field .field-choice {
   border-left: 1px solid #ccc;
   border-right: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   padding: 10px;
+}
+
+.formatic .choice {
+  /*border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;*/
+  border-bottom: 1px solid #ccc;
+  padding: 0px;
+}
+
+.formatic .choice a {
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+  display: inline-block;
 }
 
 .formatic .reveal-enter {

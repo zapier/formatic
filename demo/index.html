@@ -81,7 +81,6 @@
           id: 'firstName',
           type: 'unicode',
           key: 'first',
-          maxRows: 1,
           help_text: 'The name your momma calls you.'
         },
         {
@@ -97,7 +96,7 @@
         },
         {
           template: true,
-          type: 'string',
+          type: 'unicode',
           hidden: true,
           id: 'nameType',
           key: 'type'
@@ -228,7 +227,8 @@
         {
           label: 'Some Blob',
           key: 'blob',
-          type: 'json'
+          type: 'json',
+          default: {foo:'bar'}
         },
         {
           label: 'Pretty Stuff',
@@ -273,8 +273,7 @@
           key: 'myMap'
         }
 
-      ],
-      value: {}
+      ]
     });
 
     form.source('locations', function (params) {
@@ -320,12 +319,34 @@
             return resolve([
               {
                 value: 'us',
-                label: 'United States'
+                label: 'United States',
+                sample: 'Star Spangled Banner!'
               },
               {
                 value: 'ca',
-                label: 'Canada'
-              }
+                label: 'Canada',
+                sample: 'O Canada!'
+              },
+              {
+                value: 'foo',
+                label: 'Foo',
+                sample: 'Foolander!'
+              },
+              {
+                value: 'boo',
+                label: 'Boo',
+                sample: 'Boolander!'
+              },
+              {
+                value: 'zoo',
+                label: 'Zoo',
+                sample: 'Zoolander!'
+              },
+              {
+                value: 'qoo',
+                label: 'Qoo',
+                sample: 'Qoolander!'
+              },
             ]);
           }
 
