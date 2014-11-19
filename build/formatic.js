@@ -1857,6 +1857,30 @@ module.exports = function (plugin) {
       },0);
     },
 
+    onCut: function () {
+      var node = this.refs.content.getDOMNode();
+      var start = node.selectionStart;
+      var end = node.selectionEnd;
+      var text = node.value.substring(start, end);
+      var realStartIndex = this.tokenIndex(start, this.tracking.tokens, this.tracking.indexMap);
+      var realEndIndex = this.tokenIndex(end, this.tracking.tokens, this.tracking.indexMap);
+      var tokens = this.tracking.tokens.slice(realStartIndex, realEndIndex);
+      text = this.rawValue(tokens);
+      var originalValue = node.value;
+      var cutValue = node.value.substring(0, start) + node.value.substring(end);
+      node.value = node.value + text;
+      node.setSelectionRange(originalValue.length, originalValue.length + text.length);
+      var cutTokens = this.tracking.tokens.slice(0, realStartIndex).concat(this.tracking.tokens.slice(realEndIndex));
+      window.setTimeout(function() {
+        node.value = cutValue;
+        node.setSelectionRange(start, start);
+        this.tracking.pos = start;
+        this.tracking.range = 0;
+        this.tracking.tokens = cutTokens
+        this.tracking.indexMap = this.indexMap(this.tracking.tokens);
+      }.bind(this),0);
+    },
+
     onKeyDown: function (event) {
       // Cmd-Z or Ctrl-Z
       if (event.keyCode === 90 && (event.metaKey || event.ctrlKey) && !event.shiftKey) {
@@ -2030,7 +2054,8 @@ module.exports = function (plugin) {
           onKeyPress: this.onKeyPress,
           onKeyDown: this.onKeyDown,
           onSelect: this.onSelect,
-          onCopy: this.onCopy
+          onCopy: this.onCopy,
+          onCut: this.onCut
         }, plugin.config.attributes)),
 
         R.a({ref: 'toggle', href: 'JavaScript' + ':', onClick: this.onToggleChoices}, 'Insert...'),
