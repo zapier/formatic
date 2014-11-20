@@ -30,27 +30,27 @@
       fields: [
         {
           label: 'Short Name',
-          type: 'object',
+          type: 'fieldset',
           key: 'name',
           fields: ['firstName', 'lastName', {extends: 'nameType', value: 'short'}, 'silly'],
           match: {type: 'short'}
         },
         {
           label: 'Home Address',
-          type: 'object',
+          type: 'fieldset',
           key: 'address_home',
           extends: 'address',
           group: 'addresses'
         },
         {
           label: 'Work Address',
-          type: 'object',
+          type: 'fieldset',
           key: 'address_work',
           extends: 'address'
         },
         {
           label: 'Other Addresses',
-          type: 'object',
+          type: 'fieldset',
           key: 'addresses_other',
           items: ['address']
         },
@@ -139,7 +139,7 @@
           template: true,
           id: 'address',
           label: 'Address',
-          type: 'object',
+          type: 'fieldset',
           fields: ['country', 'state', 'city'],
           collapsed: true
         },
@@ -189,7 +189,7 @@
         {
           template: true,
           label: 'Full Name',
-          type: 'object',
+          type: 'fieldset',
           key: 'fullName',
           group: 'fullNames',
           fields: ['firstName', 'middleName', 'lastName', {extends: 'nameType', value: 'full'}, {extends: 'address', key: 'address'}, 'crazy', 'pretty'],
@@ -254,7 +254,7 @@
         },
         {
           label: 'Dynamic Fields',
-          type: 'object',
+          type: 'fieldset',
           key: 'dynamicFields',
           eval: {
             fields: [
@@ -273,7 +273,6 @@
           type: 'dict',
           key: 'myMap'
         }
-
       ]
     });
 
