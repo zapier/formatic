@@ -1846,7 +1846,7 @@ module.exports = function (plugin) {
       var pos = node.selectionStart;
       var endPos = node.selectionEnd;
 
-      if (pos === endPos && !this.leftArrowDown && !this.rightArrowDown) {
+      if (pos === endPos && this.state.hoverPillRef) {
         var tokenAt = this.tokenAt(pos);
         var tokenBefore = this.tokenBefore(pos);
 
