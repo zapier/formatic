@@ -172,6 +172,10 @@
 .formatic .pretty-content {
 }
 
+.formatic .pretty-part-hover {
+  background: rgb(255, 74, 0);
+}
+
 /*.formatic .pretty-content {
   font-family: 'Open Sans', Helvetica, arial, sans-serif;
   font-size: 13px;

@@ -1493,6 +1493,15 @@ var removeIdPrefix = function (key) {
   return key;
 };
 
+var positionInNode = function (position, node) {
+  var rect = node.getBoundingClientRect();
+  if (position.x >= rect.left && position.x <= rect.right) {
+    if (position.y >= rect.top && position.y <= rect.bottom) {
+      return true;
+    }
+  }
+};
+
 module.exports = function (plugin) {
 
   var util = plugin.require('util');
@@ -1512,7 +1521,8 @@ module.exports = function (plugin) {
     getInitialState: function () {
       return {
         undoDepth: 100,
-        isChoicesOpen: false
+        isChoicesOpen: false,
+        hoverPillRef: null
       };
     },
 
@@ -1704,7 +1714,12 @@ module.exports = function (plugin) {
           return part.value;
         } else {
           // Make a pill
-          return R.span({key: i, className: 'pretty-part'},
+          var pillRef = 'prettyPart' + i;
+          var className = 'pretty-part';
+          if (this.state.hoverPillRef && pillRef === this.state.hoverPillRef) {
+            className += ' pretty-part-hover';
+          }
+          return R.span({key: i, className: className, ref: pillRef, 'data-pretty': true, 'data-ref': pillRef},
             R.span({className: 'pretty-part-left'}, LEFT_PAD),
             R.span({className: 'pretty-part-text'}, noBreak(this.prettyLabel(part.value))),
             R.span({className: 'pretty-part-right'}, RIGHT_PAD)
@@ -2065,6 +2080,36 @@ module.exports = function (plugin) {
       // }
     },
 
+    onMouseMove: function (event) {
+      // Placeholder to get at pill under mouse position. Inefficient, but not
+      // sure there's another way.
+
+      var position = {x: event.clientX, y: event.clientY};
+      var nodes = this.refs.highlight.getDOMNode().childNodes;
+      var matchedNode = null;
+      for (var i = 0; i < nodes.length; i++) {
+        var node = nodes[i];
+        if (nodes[i].getAttribute('data-pretty')) {
+          if (positionInNode(position, node)) {
+            matchedNode = node;
+            break;
+          }
+        }
+      }
+
+      if (matchedNode) {
+        if (this.state.hoverPillRef !== matchedNode.getAttribute('data-ref')) {
+          this.setState({
+            hoverPillRef: matchedNode.getAttribute('data-ref')
+          });
+        }
+      } else if (this.state.hoverPillRef) {
+        this.setState({
+          hoverPillRef: null
+        });
+      }
+    },
+
     render: function () {
       var field = this.props.field;
 
@@ -2097,14 +2142,16 @@ module.exports = function (plugin) {
           style: {
             position: 'relative',
             top: 0,
-            left: 0
+            left: 0,
+            cursor: this.state.hoverPillRef ? 'pointer' : null
           },
           onKeyPress: this.onKeyPress,
           onKeyDown: this.onKeyDown,
           onKeyUp: this.onKeyUp,
           onSelect: this.onSelect,
           onCopy: this.onCopy,
-          onCut: this.onCut
+          onCut: this.onCut,
+          onMouseMove: this.onMouseMove
         }, plugin.config.attributes)),
 
         R.a({ref: 'toggle', href: 'JavaScript' + ':', onClick: this.onToggleChoices}, 'Insert...'),
