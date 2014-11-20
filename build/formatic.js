@@ -507,13 +507,13 @@ module.exports = function (plugin) {
       }.bind(this));
     },
 
-    onScroll: function (event) {
+    onScroll: function () {
       // console.log('stop that!')
       // event.preventDefault();
       // event.stopPropagation();
     },
 
-    onWheel: function (event) {
+    onWheel: function () {
       // event.preventDefault();
       // event.stopPropagation();
     },
@@ -760,59 +760,6 @@ module.exports = function (plugin) {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],10:[function(require,module,exports){
 (function (global){
-// # component.formatic
-
-/*
-Top-level component which gets a form and then listens to the form for changes.
-*/
-
-'use strict';
-
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
-var R = React.DOM;
-
-module.exports = function (plugin) {
-
-  plugin.exports = React.createClass({
-
-    displayName: plugin.name,
-
-    getInitialState: function () {
-      return {
-        field: this.props.form.field()
-      };
-    },
-
-    componentDidMount: function() {
-      var form = this.props.form;
-      form.on('change', this.onFormChanged);
-    },
-
-    componentWillUnmount: function () {
-      var form = this.props.form;
-      form.off('change', this.onFormChanged);
-    },
-
-    onFormChanged: function (event) {
-      if (this.props.onChange) {
-        this.props.onChange(this.props.form.val(), event.changing);
-      }
-      this.setState({
-        field: this.props.form.field()
-      });
-    },
-
-    render: function () {
-      return R.div({className: 'formatic'},
-        this.state.field.component()
-      );
-    }
-  });
-};
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(require,module,exports){
-(function (global){
 // # component.help
 
 /*
@@ -850,7 +797,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (global){
 // # component.item-choices
 
@@ -898,7 +845,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
 // # component.json
 
@@ -988,7 +935,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (global){
 // # component.label
 
@@ -1047,7 +994,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
 // # component.list-control
 
@@ -1107,7 +1054,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function (global){
 // # component.list-item-control
 
@@ -1157,7 +1104,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (global){
 // # component.list-item-value
 
@@ -1199,7 +1146,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (global){
 // # component.list-item
 
@@ -1236,7 +1183,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (global){
 // # component.list
 
@@ -1377,7 +1324,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (global){
 // # component.move-item-back
 
@@ -1410,7 +1357,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (global){
 // # component.move-item-forward
 
@@ -1443,7 +1390,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (global){
 // # component.pretty-textarea
 
@@ -2060,7 +2007,7 @@ module.exports = function (plugin) {
       });
     },
 
-    onCloseChoices: function (event) {
+    onCloseChoices: function () {
       this.setState({
         isChoicesOpen: false
       });
@@ -2070,7 +2017,7 @@ module.exports = function (plugin) {
       return this.refs.toggle.getDOMNode();
     },
 
-    onClickOutsideChoices: function (event) {
+    onClickOutsideChoices: function () {
       // // If we didn't click on the toggle button, close the choices.
       // if (this.isNodeOutside(this.refs.toggle.getDOMNode(), event.target)) {
       //   console.log('not a toggle click')
@@ -2176,7 +2123,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function (global){
 // # component.remove-item
 
@@ -2209,7 +2156,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (global){
 // # component.root
 
@@ -2251,7 +2198,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],25:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (global){
 // # component.help
 
@@ -2290,7 +2237,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (global){
 // # component.select
 
@@ -2393,7 +2340,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 // # component.text
 
@@ -2443,7 +2390,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (global){
 // # component.textarea
 
@@ -2493,7 +2440,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],29:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (global){
 // # core.field
 
@@ -2845,7 +2792,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],30:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 // # core.form-init
 
 /*
@@ -2870,7 +2817,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],31:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (global){
 // # core.form
 
@@ -2930,20 +2877,6 @@ module.exports = function (plugin) {
     form.once = storeEmitter.once.bind(storeEmitter);
   };
 
-  // Get the root component for a form.
-  proto.component = function (props) {
-
-    var form = this;
-
-    props = _.extend({}, props, {
-      form: form
-    });
-
-    var component = plugin.component('formatic');
-
-    return component(props);
-  };
-
   // Get or set the value of a form.
   proto.val = function (value) {
     var form = this;
@@ -2998,7 +2931,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"eventemitter3":59}],32:[function(require,module,exports){
+},{"eventemitter3":58}],31:[function(require,module,exports){
 (function (global){
 // # core.formatic
 
@@ -3028,7 +2961,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],33:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 (function (global){
 // # compiler
 
@@ -3162,7 +3095,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],34:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 (function (global){
 // # component
 
@@ -3227,7 +3160,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (global){
 // # core
 
@@ -3317,7 +3250,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],36:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 (function (global){
 // # eval-functions
 
@@ -3494,7 +3427,7 @@ _.each(plugins, function (fn, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 (function (global){
 // # eval
 
@@ -3593,7 +3526,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function (global){
 // # field-router
 
@@ -3672,7 +3605,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 (function (global){
 // # field-routes
 
@@ -3754,7 +3687,7 @@ _.each(routes, function (route, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],40:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 // # loader
 
 /*
@@ -3851,7 +3784,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],41:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function (global){
 // # util
 
@@ -4159,7 +4092,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],42:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -4478,7 +4411,6 @@ registerPlugins(
 
   ['component', require('./default/component')],
 
-  ['component.formatic', require('./components/formatic')],
   ['component.root', require('./components/root')],
   ['component.field', require('./components/field')],
   ['component.label', require('./components/label')],
@@ -4555,9 +4487,9 @@ var createFormaticComponentClass = function (config) {
       }
     },
 
-    onFormChanged: function () {
+    onFormChanged: function (event) {
       if (this.props.onChange) {
-        this.props.onChange(this.props.form.val());
+        this.props.onChange(this.state.form.val(), event.changing);
       }
       if (!this.state.controlled) {
         this.setState({
@@ -4597,7 +4529,7 @@ var createFormaticComponentClass = function (config) {
 module.exports = createFormaticComponentClass();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./compilers/choices":1,"./compilers/lookup":2,"./compilers/prop-aliases":3,"./compilers/types":4,"./components/add-item":5,"./components/checkbox-list":6,"./components/choices":7,"./components/field":8,"./components/fieldset":9,"./components/formatic":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":20,"./components/move-item-forward":21,"./components/pretty-textarea":22,"./components/remove-item":23,"./components/root":24,"./components/sample":25,"./components/select":26,"./components/text":27,"./components/textarea":28,"./core/field":29,"./core/form":31,"./core/form-init":30,"./core/formatic":32,"./default/compiler":33,"./default/component":34,"./default/core":35,"./default/eval":37,"./default/eval-functions":36,"./default/field-router":38,"./default/field-routes":39,"./default/loader":40,"./default/util":41,"./mixins/click-outside":43,"./mixins/field":44,"./mixins/input-actions":45,"./mixins/resize":46,"./mixins/scroll":47,"./mixins/undo-stack":48,"./plugins/bootstrap-style":49,"./plugins/default-style":50,"./store/memory":51,"./types/array":52,"./types/boolean":53,"./types/json":54,"./types/number":55,"./types/object":56,"./types/root":57,"./types/string":58}],43:[function(require,module,exports){
+},{"./compilers/choices":1,"./compilers/lookup":2,"./compilers/prop-aliases":3,"./compilers/types":4,"./components/add-item":5,"./components/checkbox-list":6,"./components/choices":7,"./components/field":8,"./components/fieldset":9,"./components/help":10,"./components/item-choices":11,"./components/json":12,"./components/label":13,"./components/list":18,"./components/list-control":14,"./components/list-item":17,"./components/list-item-control":15,"./components/list-item-value":16,"./components/move-item-back":19,"./components/move-item-forward":20,"./components/pretty-textarea":21,"./components/remove-item":22,"./components/root":23,"./components/sample":24,"./components/select":25,"./components/text":26,"./components/textarea":27,"./core/field":28,"./core/form":30,"./core/form-init":29,"./core/formatic":31,"./default/compiler":32,"./default/component":33,"./default/core":34,"./default/eval":36,"./default/eval-functions":35,"./default/field-router":37,"./default/field-routes":38,"./default/loader":39,"./default/util":40,"./mixins/click-outside":42,"./mixins/field":43,"./mixins/input-actions":44,"./mixins/resize":45,"./mixins/scroll":46,"./mixins/undo-stack":47,"./plugins/bootstrap-style":48,"./plugins/default-style":49,"./store/memory":50,"./types/array":51,"./types/boolean":52,"./types/json":53,"./types/number":54,"./types/object":55,"./types/root":56,"./types/string":57}],42:[function(require,module,exports){
 (function (global){
 // # mixin.click-outside
 
@@ -4730,7 +4662,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 (function (global){
 // # mixin.field
 
@@ -4800,7 +4732,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],45:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 // # mixin.input-actions
 
 /*
@@ -4827,7 +4759,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],46:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // # mixin.resize
 
 /*
@@ -4948,7 +4880,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],47:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 // # mixin.scroll
 
 'use strict';
@@ -4971,7 +4903,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],48:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 // # mixin.undo-stack
 
 /*
@@ -5041,7 +4973,7 @@ module.exports = function (plugin) {
   plugin.exports = UndoStack;
 };
 
-},{}],49:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (global){
 // # bootstrap
 
@@ -5097,7 +5029,7 @@ _.each(modifiers, function (modifier, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],50:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 (function (global){
 // # default-style
 
@@ -5150,7 +5082,7 @@ _.each(modifiers, function (modifier, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],51:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 (function (global){
 // # store.memory
 
@@ -5293,7 +5225,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],52:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 (function (global){
 // # type.array
 
@@ -5325,7 +5257,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],53:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 // # type.boolean
 
 /*
@@ -5348,7 +5280,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],54:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 // # type.json
 
 /*
@@ -5363,7 +5295,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],55:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 // # type.number
 
 /*
@@ -5378,7 +5310,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],56:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 (function (global){
 // # type.object
 
@@ -5429,7 +5361,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],57:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // # type.root
 
 /*
@@ -5450,7 +5382,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],58:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 // # type.string
 
 /*
@@ -5465,7 +5397,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],59:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict';
 
 /**
@@ -5674,5 +5606,5 @@ if ('object' === typeof module && module.exports) {
 },{}],"formatic":[function(require,module,exports){
 module.exports = require('./lib/formatic');
 
-},{"./lib/formatic":42}]},{},[])("formatic")
+},{"./lib/formatic":41}]},{},[])("formatic")
 });
