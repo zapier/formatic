@@ -2913,7 +2913,19 @@ module.exports = function (plugin) {
     var field = this;
 
     if (!field._typePlugin) {
-      field._typePlugin = plugin.require('type.' + field.def.type);
+      field._typePlugin = null;
+      try {
+        field._typePlugin = plugin.require('type.' + field.def.type);
+      } catch (e) {
+        console.log('Problem trying to load type plugin.');
+        console.log('Field definition:');
+        console.log(JSON.stringify(field.def, null, 2));
+        console.log(field.valuePath());
+        console.log(e.stack);
+      }
+      if (!field._typePlugin) {
+        field._typePlugin = {};
+      }
     }
 
     return field._typePlugin;
@@ -3352,7 +3364,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"eventemitter3":65}],38:[function(require,module,exports){
+},{"eventemitter3":66}],38:[function(require,module,exports){
 (function (global){
 // # core.formatic
 
@@ -4076,6 +4088,12 @@ var routes = {
     function (field) {
       return field.def.maxRows === 1;
     }
+  ],
+
+  // Not sure what to do with nulls.
+  'null.default': [
+    'null',
+    'textarea'
   ],
 
   'string.default': [
@@ -4831,6 +4849,7 @@ registerPlugins(
 
   ['type.root', require('./types/root')],
   ['type.string', require('./types/string')],
+  ['type.null', require('./types/null')],
   ['type.object', require('./types/object')],
   ['type.boolean', require('./types/boolean')],
   ['type.array', require('./types/array')],
@@ -4963,7 +4982,7 @@ var createFormaticComponentClass = function (config) {
 module.exports = createFormaticComponentClass();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./compilers/choices":2,"./compilers/lookup":3,"./compilers/prop-aliases":4,"./compilers/types":5,"./components/add-item":6,"./components/checkbox-list":7,"./components/choices":8,"./components/field":9,"./components/fieldset":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":20,"./components/move-item-forward":21,"./components/object":27,"./components/object-control":22,"./components/object-item":26,"./components/object-item-control":23,"./components/object-item-key":24,"./components/object-item-value":25,"./components/pretty-textarea":28,"./components/remove-item":29,"./components/root":30,"./components/sample":31,"./components/select":32,"./components/text":33,"./components/textarea":34,"./core/field":35,"./core/form":37,"./core/form-init":36,"./core/formatic":38,"./default/compiler":39,"./default/component":40,"./default/core":41,"./default/eval":43,"./default/eval-functions":42,"./default/field-router":44,"./default/field-routes":45,"./default/loader":46,"./default/util":47,"./mixins/click-outside":49,"./mixins/field":50,"./mixins/input-actions":51,"./mixins/resize":52,"./mixins/scroll":53,"./mixins/undo-stack":54,"./plugins/bootstrap-style":55,"./plugins/default-style":56,"./store/memory":57,"./types/array":58,"./types/boolean":59,"./types/json":60,"./types/number":61,"./types/object":62,"./types/root":63,"./types/string":64}],49:[function(require,module,exports){
+},{"./compilers/choices":2,"./compilers/lookup":3,"./compilers/prop-aliases":4,"./compilers/types":5,"./components/add-item":6,"./components/checkbox-list":7,"./components/choices":8,"./components/field":9,"./components/fieldset":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":20,"./components/move-item-forward":21,"./components/object":27,"./components/object-control":22,"./components/object-item":26,"./components/object-item-control":23,"./components/object-item-key":24,"./components/object-item-value":25,"./components/pretty-textarea":28,"./components/remove-item":29,"./components/root":30,"./components/sample":31,"./components/select":32,"./components/text":33,"./components/textarea":34,"./core/field":35,"./core/form":37,"./core/form-init":36,"./core/formatic":38,"./default/compiler":39,"./default/component":40,"./default/core":41,"./default/eval":43,"./default/eval-functions":42,"./default/field-router":44,"./default/field-routes":45,"./default/loader":46,"./default/util":47,"./mixins/click-outside":49,"./mixins/field":50,"./mixins/input-actions":51,"./mixins/resize":52,"./mixins/scroll":53,"./mixins/undo-stack":54,"./plugins/bootstrap-style":55,"./plugins/default-style":56,"./store/memory":57,"./types/array":58,"./types/boolean":59,"./types/json":60,"./types/null":61,"./types/number":62,"./types/object":63,"./types/root":64,"./types/string":65}],49:[function(require,module,exports){
 (function (global){
 // # mixin.click-outside
 
@@ -5731,6 +5750,21 @@ module.exports = function (plugin) {
 };
 
 },{}],61:[function(require,module,exports){
+// # type.string
+
+/*
+Support string values, of course.
+*/
+
+'use strict';
+
+module.exports = function (plugin) {
+
+  plugin.exports.default = null;
+
+};
+
+},{}],62:[function(require,module,exports){
 // # type.number
 
 /*
@@ -5745,7 +5779,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 (function (global){
 // # type.object
 
@@ -5796,7 +5830,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 // # type.root
 
 /*
@@ -5817,7 +5851,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 // # type.string
 
 /*
@@ -5832,7 +5866,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict';
 
 /**
