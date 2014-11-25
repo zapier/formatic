@@ -282,6 +282,7 @@
     });
 
     form.source('locations', function (params) {
+
       var country = params.country;
       var state = params.state;
       return new Promise(function (resolve, reject) {
@@ -296,7 +297,7 @@
               ca: {
                 'ca:on': ['Toronto']
               }
-            }[country][state]);
+            }[country][state] || []);
 
           } else if (country) {
 
@@ -317,9 +318,11 @@
                   label: 'Ontario'
                 }
               ]
-            }[country]);
+            }[country] || []);
 
           } else {
+
+            //return reject('crap');
 
             return resolve([
               {
@@ -387,7 +390,15 @@
 
     var Form = React.createFactory(FormClass);
 
-    React.render(Form({defaultForm: form}), document.getElementById('user'));
+    var onFocus = function (event) {
+      console.log('focus:', event.path);
+    };
+
+    var onBlur = function (event) {
+      console.log('blur:', event.path);
+    };
+
+    React.render(Form({defaultForm: form, onFocus: onFocus, onBlur: onBlur}), document.getElementById('user'));
 
     //var formElement = React.createFactory()
 

@@ -150,9 +150,12 @@ module.exports = function (plugin) {
       if (!def.eval.needsMeta) {
         def.eval.needsMeta = [];
       }
+      if (!def.eval.refreshMeta) {
+        def.eval.refreshMeta = [];
+      }
       var keys = lookup.keys || [];
       var params = {};
-      var metaArgs, metaGet, hiddenTest;
+      var metaArgs, metaGet, metaHasError, hiddenTest;
 
       if (lookup.group) {
 
@@ -179,8 +182,10 @@ module.exports = function (plugin) {
         });
         metaArgs = [lookup.source].concat(params);
         metaGet = ['@getMeta'].concat(metaArgs);
-        var metaGetOrLoading = ['@or', metaGet, ['///loading///']];
+        metaHasError = ['@hasMetaError'].concat(metaArgs);
+        var metaGetOrLoading = ['@if', metaHasError, ['///error///'], ['@or', metaGet, ['///loading///']]];
         def.eval.needsMeta.push(['@if', metaGet, null, metaArgs]);
+        def.eval.refreshMeta.push(metaArgs);
         def.eval[choicesPropName] = metaGetOrLoading;
         if (keys.length > 0) {
           // Test that we have all needed keys.
@@ -760,7 +765,7 @@ module.exports = function (plugin) {
       },
         R.fieldset({className: this.props.className},
           field.fields().map(function (field, i) {
-            return field.component({key: field.def.key || i});
+            return field.component({key: field.def.key || i, onFocus: this.props.onFocus, onBlur: this.props.onBlur});
           }.bind(this))
         )
       );
@@ -938,7 +943,9 @@ module.exports = function (plugin) {
           value: this.state.value,
           onChange: this.onChange,
           style: {backgroundColor: this.state.isValid ? '' : 'rgb(255,200,200)'},
-          rows: field.def.rows || this.props.rows
+          rows: field.def.rows || this.props.rows,
+          onFocus: this.onFocus,
+          onBlur: this.onBlur
         })
       );
     }
@@ -2519,7 +2526,9 @@ module.exports = function (plugin) {
           onSelect: this.onSelect,
           onCopy: this.onCopy,
           onCut: this.onCut,
-          onMouseMove: this.onMouseMove
+          onMouseMove: this.onMouseMove,
+          onFocus: this.onFocus,
+          onBlur: this.onBlur
         }, plugin.config.attributes)),
 
         R.a({ref: 'toggle', href: 'JavaScript' + ':', onClick: this.onToggleChoices}, 'Insert...'),
@@ -2611,8 +2620,8 @@ module.exports = function (plugin) {
         className: this.props.className
       },
         field.fields().map(function (field, i) {
-          return field.component({key: field.def.key || i});
-        })
+          return field.component({key: field.def.key || i, onFocus: this.props.onFocus, onBlur: this.props.onBlur});
+        }.bind(this))
       );
     }
   });
@@ -2742,7 +2751,9 @@ module.exports = function (plugin) {
         choicesOrLoading = R.select({
           className: this.props.className,
           onChange: this.onChange,
-          value: valueChoice.choiceValue
+          value: valueChoice.choiceValue,
+          onFocus: this.onFocus,
+          onBlur: this.onBlur
         },
           choices.map(function (choice, i) {
             return R.option({
@@ -2804,7 +2815,9 @@ module.exports = function (plugin) {
         type: 'text',
         value: field.value,
         rows: field.def.rows,
-        onChange: this.onChange
+        onChange: this.onChange,
+        onFocus: this.onFocus,
+        onBlur: this.onBlur
       }));
     }
   });
@@ -2854,7 +2867,9 @@ module.exports = function (plugin) {
         className: this.props.className,
         value: field.value,
         rows: field.def.rows || this.props.rows,
-        onChange: this.onChange
+        onChange: this.onChange,
+        onFocus: this.onFocus,
+        onBlur: this.onBlur
       }));
     }
   });
@@ -3336,18 +3351,25 @@ module.exports = function (plugin) {
   };
 
   // Get or set metadata.
-  proto.meta = function (key, value) {
+  proto.meta = function (key, value, status) {
     var form = this;
 
     if (!_.isUndefined(value)) {
-      return form.actions.setMeta(key, value);
+      return form.actions.setMeta(key, value, status);
     }
 
-    return form.store.meta[key];
+    return form.store.getMeta(key);
+  };
+
+  proto.metaStatus = function (key) {
+    var form = this;
+
+    return form.store.getMetaStatus(key);
   };
 
   // Load metadata.
   proto.loadMeta = function (source, params) {
+
     params = params || {};
     var keys = Object.keys(params);
     var validKeys = keys.filter(function (key) {
@@ -3357,6 +3379,18 @@ module.exports = function (plugin) {
       return;
     }
     loader.loadMeta(this, source, params);
+  };
+
+  proto.unloadOtherMeta = function (needs) {
+    var form = this;
+
+    var keys = needs.map(function (need) {
+      return util.metaCacheKey.apply(util, need);
+    });
+    var dropKeys = _.without.apply(_, [form.store.metaKeys()].concat(keys));
+    dropKeys.forEach(function (key) {
+      form.meta(key, null, 'unloaded');
+    });
   };
 
   // Add a metdata source function, via the loader plugin.
@@ -3806,6 +3840,24 @@ var plugins = {
     };
   },
 
+  getMetaStatus: function (plugin) {
+    var util = plugin.require('util');
+    plugin.exports = function (args, field, context) {
+      args = field.eval(args, context);
+      var cacheKey = util.metaCacheKey(args[0], args[1]);
+      return field.form.metaStatus(cacheKey);
+    };
+  },
+
+  hasMetaError: function (plugin) {
+    var util = plugin.require('util');
+    plugin.exports = function (args, field, context) {
+      args = field.eval(args, context);
+      var cacheKey = util.metaCacheKey(args[0], args[1]);
+      return field.form.metaStatus(cacheKey) === 'error';
+    };
+  },
+
   sum: function (plugin) {
     plugin.exports = function (args, field, context) {
       var sum = 0;
@@ -4198,6 +4250,7 @@ module.exports = function (plugin) {
           });
 
           var onError = function () {
+            form.meta(cacheKey, null, 'error');
             isLoading[cacheKey] = false;
           };
 
@@ -4454,6 +4507,11 @@ module.exports = function (plugin) {
   util.metaCacheKey = function (source, params) {
     params = params || {};
     return source + '::params(' + JSON.stringify(params) + ')';
+  };
+
+  util.metaErrorCacheKey = function (source, params) {
+    params = params || {};
+    return source + '::params(' + JSON.stringify(params) + ')::error';
   };
 
   // Wrap a text value so it has a type. For parsing text with tags.
@@ -4973,7 +5031,7 @@ var createFormaticComponentClass = function (config) {
 
     render: function () {
       return R.div({className: 'formatic'},
-        this.state.field.component()
+        this.state.field.component({onFocus: this.props.onFocus, onBlur: this.props.onBlur})
       );
     }
   });
@@ -5131,30 +5189,38 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 
 module.exports = function (plugin) {
 
+  var normalizeMeta = function (meta) {
+    var needsMeta = [];
+
+    meta.forEach(function (args) {
+
+
+      if (_.isArray(args) && args.length > 0) {
+        if (_.isArray(args[0])) {
+          args.forEach(function (args) {
+            needsMeta.push(args);
+          });
+        } else {
+          needsMeta.push(args);
+        }
+      }
+    });
+
+    if (needsMeta.length === 0) {
+      // Must just be a single need, and not an array.
+      needsMeta = [meta];
+    }
+
+    return needsMeta;
+  };
+
   plugin.exports = {
 
     loadNeededMeta: function (props) {
       if (props.field && props.field.form) {
         if (props.field.def.needsMeta && props.field.def.needsMeta.length > 0) {
 
-          var needsMeta = [];
-
-          props.field.def.needsMeta.forEach(function (args) {
-            if (_.isArray(args) && args.length > 0) {
-              if (_.isArray(args[0])) {
-                args.forEach(function (args) {
-                  needsMeta.push(args);
-                });
-              } else {
-                needsMeta.push(args);
-              }
-            }
-          });
-
-          if (needsMeta.length === 0) {
-            // Must just be a single need, and not an array.
-            needsMeta = [props.field.def.needsMeta];
-          }
+          var needsMeta = normalizeMeta(props.field.def.needsMeta);
 
           needsMeta.forEach(function (needs) {
             if (needs) {
@@ -5162,6 +5228,15 @@ module.exports = function (plugin) {
             }
           });
         }
+      }
+    },
+
+    // currently unused; will use to unload metadata on change
+    unloadOtherMeta: function () {
+      var props = this.props;
+      if (props.field.def.refreshMeta) {
+        var refreshMeta = normalizeMeta(props.field.def.refreshMeta);
+        props.field.form.unloadOtherMeta(refreshMeta);
       }
     },
 
@@ -5180,6 +5255,18 @@ module.exports = function (plugin) {
       // if (this.props.field) {
       //   this.props.field.erase();
       // }
+    },
+
+    onFocus: function () {
+      if (this.props.onFocus) {
+        this.props.onFocus({path: this.props.field.valuePath()});
+      }
+    },
+
+    onBlur: function () {
+      if (this.props.onBlur) {
+        this.props.onBlur({path: this.props.field.valuePath()});
+      }
     }
   };
 };
@@ -5583,7 +5670,6 @@ module.exports = function (plugin) {
       store.value = util.copyValue(options.value);
     }
 
-    // Currently, just a single event for any change.
     var update = function (changing) {
       emitter.emit('change', {
         value: store.value,
@@ -5600,6 +5686,21 @@ module.exports = function (plugin) {
       field.inflate(function (path, value) {
         store.value = util.setIn(store.value, path, value);
       });
+    };
+
+    store.metaKeys = function () {
+      return Object.keys(store.meta);
+    };
+
+    store.getMeta = function (key) {
+      if (store.meta[key] && store.meta[key].status === 'loaded') {
+        return store.meta[key].value;
+      }
+      return null;
+    };
+
+    store.getMetaStatus = function (key) {
+      return (store.meta[key] && store.meta[key].status) || 'unknown';
     };
 
     var actions = {
@@ -5665,9 +5766,13 @@ module.exports = function (plugin) {
         update({'action': 'setFields'});
       },
 
-      // Set a metadata value for a key.
-      setMeta: function (key, value) {
-        store.meta[key] = value;
+      // Set a metadata value for a key. Optionally set status.
+      setMeta: function (key, value, status) {
+        status = status || 'loaded';
+        store.meta[key] = {
+          value: value,
+          status: status
+        };
         update({'action': 'setMeta'});
       }
     };
