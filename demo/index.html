@@ -10,6 +10,7 @@
     <div id="user"></div>
     <div id="extra"></div>
     <div id="json"></div>
+    <div style="height:200px"></div>
   </div>
 
   <script src="./bower_components/jquery/dist/jquery.min.js"></script>
@@ -277,6 +278,19 @@
           label: 'Null Junk',
           type: 'null',
           key: 'nullJunk'
+        },
+        {
+          label: 'Guess',
+          key: 'guess',
+          default: [],
+          items: ['guessItem'],
+          lookupReplacements: {source: 'locations'}
+        },
+        {
+          key: 'guessItem',
+          type: 'string',
+          //replaceChoices: {'long':'Some Long Label','some_shorty':'Short'}
+          lookupReplacements: {source: 'locations'}
         }
       ]
     });
@@ -391,11 +405,11 @@
     var Form = React.createFactory(FormClass);
 
     var onFocus = function (event) {
-      console.log('focus:', event.path);
+      console.log('focus:', event.path, event.field);
     };
 
     var onBlur = function (event) {
-      console.log('blur:', event.path);
+      console.log('blur:', event.path, event.field);
     };
 
     React.render(Form({defaultForm: form, onFocus: onFocus, onBlur: onBlur}), document.getElementById('user'));
