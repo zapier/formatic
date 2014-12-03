@@ -1,4 +1,7 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Formatic=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = require('./lib/formatic');
+
+},{"./lib/formatic":48}],2:[function(require,module,exports){
 (function (global){
 // # compiler.choices
 
@@ -94,7 +97,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 // # compiler.lookup
 
 /*
@@ -208,7 +211,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 // # compilers.prop-aliases
 
 /*
@@ -233,7 +236,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 (function (global){
 // # compilers.types
 
@@ -285,7 +288,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 (function (global){
 // # component.add-item
 
@@ -318,7 +321,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 (function (global){
 // # component.checkbox-list
 
@@ -410,7 +413,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -654,7 +657,7 @@ module.exports = function (plugin) {
 //   );
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 (function (global){
 // # component.field
 
@@ -727,7 +730,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 (function (global){
 // # component.fieldset
 
@@ -771,7 +774,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 (function (global){
 // # component.help
 
@@ -810,7 +813,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
 // # component.item-choices
 
@@ -858,7 +861,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (global){
 // # component.json
 
@@ -950,7 +953,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
 // # component.label
 
@@ -1009,7 +1012,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 (function (global){
 // # component.list-control
 
@@ -1069,7 +1072,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (global){
 // # component.list-item-control
 
@@ -1119,7 +1122,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (global){
 // # component.list-item-value
 
@@ -1161,7 +1164,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function (global){
 // # component.list-item
 
@@ -1198,7 +1201,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (global){
 // # component.list
 
@@ -1339,7 +1342,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (global){
 // # component.move-item-back
 
@@ -1372,7 +1375,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (global){
 // # component.move-item-forward
 
@@ -1405,7 +1408,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 (function (global){
 // # component.object-control
 
@@ -1465,7 +1468,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (global){
 // # component.object-item-control
 
@@ -1505,7 +1508,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (global){
 // # component.object-item-key
 
@@ -1550,7 +1553,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (global){
 // # component.object-item-value
 
@@ -1586,7 +1589,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 // # component.object-item
 
@@ -1628,7 +1631,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (global){
 // # component.object
 
@@ -1815,7 +1818,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (global){
 // # component.pretty-textarea
 
@@ -2550,7 +2553,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 (function (global){
 // # component.remove-item
 
@@ -2583,7 +2586,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (global){
 // # component.root
 
@@ -2625,7 +2628,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (global){
 // # component.help
 
@@ -2664,7 +2667,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 (function (global){
 // # component.select
 
@@ -2769,7 +2772,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 (function (global){
 // # component.text
 
@@ -2821,7 +2824,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (global){
 // # component.textarea
 
@@ -2873,7 +2876,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 (function (global){
 // # core.field
 
@@ -3200,7 +3203,14 @@ module.exports = function (plugin) {
       };
     }
 
-    item.key = field.value.length;
+    var value = field.value;
+
+    if (!value) {
+      value = [];
+      field.val(value);
+    }
+
+    item.key = value.length;
 
     var child = field.createChild(item);
 
@@ -3251,7 +3261,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 // # core.form-init
 
 /*
@@ -3276,7 +3286,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function (global){
 // # core.form
 
@@ -3409,7 +3419,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"eventemitter3":65}],37:[function(require,module,exports){
+},{"eventemitter3":66}],38:[function(require,module,exports){
 (function (global){
 // # core.formatic
 
@@ -3439,7 +3449,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 (function (global){
 // # compiler
 
@@ -3575,7 +3585,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function (global){
 // # component
 
@@ -3640,7 +3650,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 (function (global){
 // # core
 
@@ -3730,7 +3740,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (global){
 // # eval-functions
 
@@ -3821,6 +3831,8 @@ var plugins = {
         obj = context[key];
       } else if (_.isObject(field.value) && key in field.value) {
         obj = field.value[key];
+      } else if (_.isObject(field.def.context) && key in field.def.context) {
+        obj = field.def.context[key];
       } else if (field.parent) {
         obj = get(args, field.parent);
       }
@@ -3926,7 +3938,7 @@ _.each(plugins, function (fn, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 (function (global){
 // # eval
 
@@ -4025,7 +4037,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 (function (global){
 // # field-router
 
@@ -4104,7 +4116,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (global){
 // # field-routes
 
@@ -4200,7 +4212,7 @@ _.each(routes, function (route, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 // # loader
 
 /*
@@ -4298,7 +4310,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (global){
 // # util
 
@@ -4614,7 +4626,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -5067,7 +5079,7 @@ var createFormaticComponentClass = function (config) {
 module.exports = createFormaticComponentClass();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./compilers/choices":1,"./compilers/lookup":2,"./compilers/prop-aliases":3,"./compilers/types":4,"./components/add-item":5,"./components/checkbox-list":6,"./components/choices":7,"./components/field":8,"./components/fieldset":9,"./components/help":10,"./components/item-choices":11,"./components/json":12,"./components/label":13,"./components/list":18,"./components/list-control":14,"./components/list-item":17,"./components/list-item-control":15,"./components/list-item-value":16,"./components/move-item-back":19,"./components/move-item-forward":20,"./components/object":26,"./components/object-control":21,"./components/object-item":25,"./components/object-item-control":22,"./components/object-item-key":23,"./components/object-item-value":24,"./components/pretty-textarea":27,"./components/remove-item":28,"./components/root":29,"./components/sample":30,"./components/select":31,"./components/text":32,"./components/textarea":33,"./core/field":34,"./core/form":36,"./core/form-init":35,"./core/formatic":37,"./default/compiler":38,"./default/component":39,"./default/core":40,"./default/eval":42,"./default/eval-functions":41,"./default/field-router":43,"./default/field-routes":44,"./default/loader":45,"./default/util":46,"./mixins/click-outside":48,"./mixins/field":49,"./mixins/input-actions":50,"./mixins/resize":51,"./mixins/scroll":52,"./mixins/undo-stack":53,"./plugins/bootstrap-style":54,"./plugins/default-style":55,"./store/memory":56,"./types/array":57,"./types/boolean":58,"./types/json":59,"./types/null":60,"./types/number":61,"./types/object":62,"./types/root":63,"./types/string":64}],48:[function(require,module,exports){
+},{"./compilers/choices":2,"./compilers/lookup":3,"./compilers/prop-aliases":4,"./compilers/types":5,"./components/add-item":6,"./components/checkbox-list":7,"./components/choices":8,"./components/field":9,"./components/fieldset":10,"./components/help":11,"./components/item-choices":12,"./components/json":13,"./components/label":14,"./components/list":19,"./components/list-control":15,"./components/list-item":18,"./components/list-item-control":16,"./components/list-item-value":17,"./components/move-item-back":20,"./components/move-item-forward":21,"./components/object":27,"./components/object-control":22,"./components/object-item":26,"./components/object-item-control":23,"./components/object-item-key":24,"./components/object-item-value":25,"./components/pretty-textarea":28,"./components/remove-item":29,"./components/root":30,"./components/sample":31,"./components/select":32,"./components/text":33,"./components/textarea":34,"./core/field":35,"./core/form":37,"./core/form-init":36,"./core/formatic":38,"./default/compiler":39,"./default/component":40,"./default/core":41,"./default/eval":43,"./default/eval-functions":42,"./default/field-router":44,"./default/field-routes":45,"./default/loader":46,"./default/util":47,"./mixins/click-outside":49,"./mixins/field":50,"./mixins/input-actions":51,"./mixins/resize":52,"./mixins/scroll":53,"./mixins/undo-stack":54,"./plugins/bootstrap-style":55,"./plugins/default-style":56,"./store/memory":57,"./types/array":58,"./types/boolean":59,"./types/json":60,"./types/null":61,"./types/number":62,"./types/object":63,"./types/root":64,"./types/string":65}],49:[function(require,module,exports){
 (function (global){
 // # mixin.click-outside
 
@@ -5200,7 +5212,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 (function (global){
 // # mixin.field
 
@@ -5299,7 +5311,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 // # mixin.input-actions
 
 /*
@@ -5326,7 +5338,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 // # mixin.resize
 
 /*
@@ -5447,7 +5459,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],52:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 // # mixin.scroll
 
 'use strict';
@@ -5470,7 +5482,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 // # mixin.undo-stack
 
 /*
@@ -5540,7 +5552,7 @@ module.exports = function (plugin) {
   plugin.exports = UndoStack;
 };
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 (function (global){
 // # bootstrap
 
@@ -5597,7 +5609,7 @@ _.each(modifiers, function (modifier, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 (function (global){
 // # default-style
 
@@ -5650,7 +5662,7 @@ _.each(modifiers, function (modifier, name) {
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 (function (global){
 // # store.memory
 
@@ -5811,7 +5823,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 (function (global){
 // # type.array
 
@@ -5843,7 +5855,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],58:[function(require,module,exports){
+},{}],59:[function(require,module,exports){
 // # type.boolean
 
 /*
@@ -5866,7 +5878,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 // # type.json
 
 /*
@@ -5881,7 +5893,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 // # type.string
 
 /*
@@ -5896,7 +5908,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 // # type.number
 
 /*
@@ -5911,7 +5923,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],62:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 (function (global){
 // # type.object
 
@@ -5962,7 +5974,7 @@ module.exports = function (plugin) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 // # type.root
 
 /*
@@ -5983,7 +5995,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 // # type.string
 
 /*
@@ -5998,7 +6010,7 @@ module.exports = function (plugin) {
 
 };
 
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict';
 
 /**
@@ -6204,8 +6216,5 @@ if ('object' === typeof module && module.exports) {
   module.exports = EventEmitter;
 }
 
-},{}],"formatic":[function(require,module,exports){
-module.exports = require('./lib/formatic');
-
-},{"./lib/formatic":47}]},{},[])("formatic")
+},{}]},{},[1])(1)
 });

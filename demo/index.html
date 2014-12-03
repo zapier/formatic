@@ -41,13 +41,23 @@
           type: 'fieldset',
           key: 'address_home',
           extends: 'address',
-          group: 'addresses'
+          group: 'addresses',
+          eval: {
+            context: {
+              countryMessage: 'Your native land.'
+            }
+          }
         },
         {
           label: 'Work Address',
           type: 'fieldset',
           key: 'address_work',
-          extends: 'address'
+          extends: 'address',
+          eval: {
+            context: {
+              countryMessage: 'Your working land.'
+            }
+          }
         },
         {
           label: 'Other Addresses',
@@ -150,7 +160,10 @@
           type: 'string',
           key: 'country',
           choices: [],
-          lookup: {source: 'locations'}
+          lookup: {source: 'locations'},
+          eval: {
+            help_text: ['@get', 'countryMessage'],
+          }
           // eval: {
           //   needsMeta: [
           //     ['@if', ['@getMeta', 'locations'], null, ['locations']]
@@ -282,15 +295,7 @@
         {
           label: 'Guess',
           key: 'guess',
-          default: [],
-          items: ['guessItem'],
-          lookupReplacements: {source: 'locations'}
-        },
-        {
-          key: 'guessItem',
-          type: 'string',
-          //replaceChoices: {'long':'Some Long Label','some_shorty':'Short'}
-          lookupReplacements: {source: 'locations'}
+          type: 'array'
         }
       ]
     });
