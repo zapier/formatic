@@ -166,9 +166,9 @@
           }
           // eval: {
           //   needsMeta: [
-          //     ['@if', ['@getMeta', 'locations'], null, ['locations']]
+          //     ['@if', ['@getCachedSource', 'locations'], null, ['locations']]
           //   ],
-          //   choices: ['@getMeta', 'locations']
+          //   choices: ['@getCachedSource', 'locations']
           // }
         },
 
@@ -181,9 +181,9 @@
           lookup: {source: 'locations', keys: ['country']}
           // eval: {
           //   needsMeta: [
-          //     ['@if', ['@getMeta', 'locations', {country: ['@get', 'country']}], null, ['locations', {country: ['@get', 'country']}]]
+          //     ['@if', ['@getCachedSource', 'locations', {country: ['@get', 'country']}], null, ['locations', {country: ['@get', 'country']}]]
           //   ],
-          //   choices: ['@getMeta', 'locations', {country: ['@get', 'country']}]
+          //   choices: ['@getCachedSource', 'locations', {country: ['@get', 'country']}]
           // }
         },
         {
@@ -195,9 +195,9 @@
           lookup: {source: 'locations', keys: ['country', 'state']}
           // eval: {
           //   needsMeta: [
-          //     ['@if', ['@getMeta', 'locations', {country: ['@get', 'country'], state: ['@get', 'state']}], null, ['locations', {country: ['@get', 'country'], state: ['@get', 'state']}]]
+          //     ['@if', ['@getCachedSource', 'locations', {country: ['@get', 'country'], state: ['@get', 'state']}], null, ['locations', {country: ['@get', 'country'], state: ['@get', 'state']}]]
           //   ],
-          //   choices: ['@getMeta', 'locations', {country: ['@get', 'country'], state: ['@get', 'state']}]
+          //   choices: ['@getCachedSource', 'locations', {country: ['@get', 'country'], state: ['@get', 'state']}]
           // }
         },
         {
@@ -230,12 +230,12 @@
           //   needsMeta: [
           //     '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
           //     ['names', {first: ['@get', 'alias', 'first']}],
-          //     ['@not', ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}]],
+          //     ['@not', ['@getCachedSource', 'names', {first: ['@get', 'alias', 'first']}]],
           //   ],
           //   choices: [
           //     '@forEach', 'alias', ['@getGroupValues', 'fullNames'],
-          //     ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}],
-          //     ['@getMeta', 'names', {first: ['@get', 'alias', 'first']}]
+          //     ['@getCachedSource', 'names', {first: ['@get', 'alias', 'first']}],
+          //     ['@getCachedSource', 'names', {first: ['@get', 'alias', 'first']}]
           //   ]
           // }
         },

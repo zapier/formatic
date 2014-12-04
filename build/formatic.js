@@ -118,15 +118,15 @@ the following evaluation.
   key: 'states',
   choices: [],
   eval: {
-    needsMeta: [
-      ['@if', ['@getMeta', 'locations', {country: ['@get', 'country']}], null, ['locations', {country: ['@get', 'country']}]]
+    needsSource: [
+      ['@if', ['@getCachedSource', 'locations', {country: ['@get', 'country']}], null, ['locations', {country: ['@get', 'country']}]]
     ],
-    choices: ['@getMeta', 'locations', {country: ['@get', 'country']}]
+    choices: ['@getCachedSource', 'locations', {country: ['@get', 'country']}]
   }
 }
 ```
 
-The above says to add a `needsMeta` property if necessary and add a `choices`
+The above says to add a `needsSource` property if necessary and add a `choices`
 array if it's available. Otherwise, choices will default to an empty array.
 */
 
@@ -144,8 +144,8 @@ module.exports = function (plugin) {
       if (!def.eval) {
         def.eval = {};
       }
-      if (!def.eval.needsMeta) {
-        def.eval.needsMeta = [];
+      if (!def.eval.needsSource) {
+        def.eval.needsSource = [];
       }
       if (!def.eval.refreshMeta) {
         def.eval.refreshMeta = [];
@@ -160,9 +160,9 @@ module.exports = function (plugin) {
           params[key] = ['@get', 'item', key];
         });
         metaArgs = [lookup.source].concat(params);
-        metaGet = ['@getMeta'].concat(metaArgs);
+        metaGet = ['@getCachedSource'].concat(metaArgs);
         var metaForEach = ['@forEach', 'item', ['@getGroupValues', lookup.group]];
-        def.eval.needsMeta.push(metaForEach.concat([
+        def.eval.needsSource.push(metaForEach.concat([
           metaArgs,
           ['@not', metaGet]
         ]));
@@ -178,10 +178,10 @@ module.exports = function (plugin) {
           params[key] = ['@get', key];
         });
         metaArgs = [lookup.source].concat(params);
-        metaGet = ['@getMeta'].concat(metaArgs);
+        metaGet = ['@getCachedSource'].concat(metaArgs);
         metaHasError = ['@hasMetaError'].concat(metaArgs);
         var metaGetOrLoading = ['@if', metaHasError, ['///error///'], ['@or', metaGet, ['///loading///']]];
-        def.eval.needsMeta.push(['@if', metaGet, null, metaArgs]);
+        def.eval.needsSource.push(['@if', metaGet, null, metaArgs]);
         def.eval.refreshMeta.push(metaArgs);
         def.eval[choicesPropName] = metaGetOrLoading;
         if (keys.length > 0) {
@@ -3878,6 +3878,13 @@ var plugins = {
   },
 
   getMeta: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      args = field.eval(args, context);
+      return field.form.meta(args[0]);
+    };
+  },
+
+  getCachedSource: function (plugin) {
     var util = plugin.require('util');
     plugin.exports = function (args, field, context) {
       args = field.eval(args, context);
@@ -3887,6 +3894,13 @@ var plugins = {
   },
 
   getMetaStatus: function (plugin) {
+    plugin.exports = function (args, field, context) {
+      args = field.eval(args, context);
+      return field.form.metaStatus(args[0]);
+    };
+  },
+
+  getCachedSourceStatus: function (plugin) {
     var util = plugin.require('util');
     plugin.exports = function (args, field, context) {
       args = field.eval(args, context);
@@ -5249,7 +5263,7 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 module.exports = function (plugin) {
 
   var normalizeMeta = function (meta) {
-    var needsMeta = [];
+    var needsSource = [];
 
     meta.forEach(function (args) {
 
@@ -5257,31 +5271,31 @@ module.exports = function (plugin) {
       if (_.isArray(args) && args.length > 0) {
         if (_.isArray(args[0])) {
           args.forEach(function (args) {
-            needsMeta.push(args);
+            needsSource.push(args);
           });
         } else {
-          needsMeta.push(args);
+          needsSource.push(args);
         }
       }
     });
 
-    if (needsMeta.length === 0) {
+    if (needsSource.length === 0) {
       // Must just be a single need, and not an array.
-      needsMeta = [meta];
+      needsSource = [meta];
     }
 
-    return needsMeta;
+    return needsSource;
   };
 
   plugin.exports = {
 
     loadNeededMeta: function (props) {
       if (props.field && props.field.form) {
-        if (props.field.def.needsMeta && props.field.def.needsMeta.length > 0) {
+        if (props.field.def.needsSource && props.field.def.needsSource.length > 0) {
 
-          var needsMeta = normalizeMeta(props.field.def.needsMeta);
+          var needsSource = normalizeMeta(props.field.def.needsSource);
 
-          needsMeta.forEach(function (needs) {
+          needsSource.forEach(function (needs) {
             if (needs) {
               props.field.form.loadMeta.apply(props.field.form, needs);
             }
