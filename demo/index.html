@@ -23,10 +23,35 @@
 
     var Form = React.createFactory(Formatic);
 
+    var config = Formatic.createConfig(Formatic.plugins.bootstrap);
+
+    var fields = [
+      {label: 'Name', type: 'string', key: 'name'},
+      {type: 'copy', help_text_html: 'What the hey?'}
+    ];
+
+    // Controlled version:
+
+    // var render = function (value) {
+    //   React.render(Form({
+    //     config: config,
+    //     fields: fields,
+    //     value: value,
+    //     onChange: function (newValue, info) {
+    //       console.log(newValue, info);
+    //       render(newValue);
+    //     }
+    //   }), document.getElementById('user'));
+    // };
+    //
+    // render({});
+
+    // Uncontrolled version:
+
     React.render(Form({
-      fields: [
-        {label: 'Name', type: 'string', key: 'name'}
-      ],
+      config: config,
+      fields: fields,
+      defaultValue: {},
       onChange: function (newValue, info) {
         console.log(newValue, info);
       }
