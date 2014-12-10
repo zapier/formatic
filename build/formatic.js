@@ -762,7 +762,7 @@ module.exports = function (plugin) {
       },
         R.fieldset({className: this.props.className},
           field.fields().map(function (field, i) {
-            return field.component({key: field.def.key || i, onFocus: this.props.onFocus, onBlur: this.props.onBlur});
+            return field.component({key: field.def.key || i, onFocus: this.props.onFocus, onBlur: this.props.onBlur, onClick: this.props.onClick});
           }.bind(this))
         )
       );
@@ -2231,8 +2231,6 @@ module.exports = function (plugin) {
       return newPos;
     },
 
-
-
     onSelect: function (event) {
       var node = event.target;
 
@@ -2448,6 +2446,9 @@ module.exports = function (plugin) {
     },
 
     onToggleChoices: function () {
+      if (!this.state.isChoicesOpen) {
+          this.onClick({section: 'insert-field-button'});
+      }
       this.setState({
         isChoicesOpen: !this.state.isChoicesOpen
       });
@@ -2546,7 +2547,8 @@ module.exports = function (plugin) {
           onCut: this.onCut,
           onMouseMove: this.onMouseMove,
           onFocus: this.onFocus,
-          onBlur: this.onBlur
+          onBlur: this.onBlur,
+          onClick: this.onClick.bind(this, {section: 'text-area'})
         }, plugin.config.attributes)),
 
         R.a({ref: 'toggle', href: 'JavaScript' + ':', onClick: this.onToggleChoices}, 'Insert...'),
@@ -2638,7 +2640,7 @@ module.exports = function (plugin) {
         className: this.props.className
       },
         field.fields().map(function (field, i) {
-          return field.component({key: field.def.key || i, onFocus: this.props.onFocus, onBlur: this.props.onBlur});
+          return field.component({key: field.def.key || i, onFocus: this.props.onFocus, onBlur: this.props.onBlur, onClick: this.props.onClick});
         }.bind(this))
       );
     }
@@ -5104,7 +5106,7 @@ var createFormaticComponentClass = function (config) {
 
     render: function () {
       return R.div({className: 'formatic'},
-        this.state.field.component({onFocus: this.props.onFocus, onBlur: this.props.onBlur})
+        this.state.field.component({onFocus: this.props.onFocus, onBlur: this.props.onBlur, onClick: this.props.onClick})
       );
     }
   });
@@ -5339,6 +5341,15 @@ module.exports = function (plugin) {
     onBlur: function () {
       if (this.props.onBlur) {
         this.props.onBlur({path: this.props.field.valuePath(), field: this.props.field.def});
+      }
+    },
+
+    onClick: function (extras) {
+      if (this.props.onClick) {
+        extras = extras || {};
+        extras.path = this.props.field.valuePath();
+        extras.field = this.props.field.def;
+        this.props.onClick(extras);
       }
     }
   };
