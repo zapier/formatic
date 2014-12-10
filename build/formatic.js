@@ -2780,7 +2780,7 @@ module.exports = function (plugin) {
               key: i,
               value: choice.choiceValue
             }, choice.label);
-          }.bind(this))
+          })
         );
       }
 
@@ -5460,10 +5460,10 @@ var removeResizeIntervalHandlers = function (element) {
   if (!('__resizeId' in element)) {
     return;
   }
-  var id = element.__resizeId;
+  var elementId = element.__resizeId;
   delete element.__resizeId;
   delete element.__resizeHandlers;
-  delete resizeIntervalElements[id];
+  delete resizeIntervalElements[elementId];
   resizeIntervalElementsCount--;
   if (resizeIntervalElementsCount < 1) {
     clearInterval(resizeIntervalTimer);
@@ -5589,7 +5589,7 @@ var UndoStack = {
     }
 
     this.setStateSnapshot(snapshot);
-    this.setState({undo:undo, redo:redo});
+    this.setState({undo: undo, redo: redo});
   }
 };
 
