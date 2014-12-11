@@ -26,9 +26,27 @@
     var config = Formatic.createConfig(Formatic.plugins.bootstrap);
 
     var fields = [
-      {label: 'Name', type: 'string', key: 'name'},
-      {type: 'copy', help_text_html: 'What the hey?'}
+      {label: 'Name', type: 'unicode', key: 'name'},
+      {label: 'Note', type: 'text', key: 'note'},
+      {id: 'silly', type: 'copy', help_text_html: 'What the hey?'}
     ];
+
+    var value = {};
+
+    var createField = config.createField;
+
+    config.createField = function (props) {
+      if (props.field.id === 'silly' && value.name === 'Joe') {
+        props = _.extend({}, props);
+        field = _.extend({}, props.field);
+        field.help_text_html = 'What a nice name!';
+        props.field = field;
+      }
+
+      return createField.call(config, props);
+    };
+
+    //console.log(config);
 
     // Controlled version:
 
@@ -54,6 +72,7 @@
       defaultValue: {},
       onChange: function (newValue, info) {
         console.log(newValue, info);
+        value = newValue;
       }
     }), document.getElementById('user'));
   </script>
