@@ -30,7 +30,8 @@
       {label: 'Note', type: 'text', key: 'note'},
       {id: 'silly', type: 'copy', help_text_html: 'What the hey?'},
       {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},
-      {label: 'Groceries', type: 'pretty-textarea', key: 'groceries', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']}
+      {label: 'Groceries', type: 'pretty-textarea', key: 'groceries', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
+      {label: 'Names', type: 'list', key: 'names', items: {type: 'unicode'}}
     ];
 
     var value = {};
@@ -52,31 +53,36 @@
 
     // Controlled version:
 
-    // var render = function (value) {
-    //   React.render(Form({
-    //     config: config,
-    //     fields: fields,
-    //     value: value,
-    //     onChange: function (newValue, info) {
-    //       console.log(newValue, info);
-    //       render(newValue);
-    //     }
-    //   }), document.getElementById('user'));
-    // };
-    //
-    // render({});
+    var render = function (value) {
+      React.render(Form({
+        config: config,
+        fields: fields,
+        value: value,
+        onChange: function (newValue, info) {
+          console.log(newValue, info);
+          render(newValue);
+        }
+      }), document.getElementById('user'));
+    };
+
+    var setValue = function (value) {
+      value = value;
+      render(value);
+    };
+
+    setValue({});
 
     // Uncontrolled version:
 
-    React.render(Form({
-      config: config,
-      fields: fields,
-      defaultValue: {},
-      onChange: function (newValue, info) {
-        console.log(newValue, info);
-        value = newValue;
-      }
-    }), document.getElementById('user'));
+    // React.render(Form({
+    //   config: config,
+    //   fields: fields,
+    //   defaultValue: {},
+    //   onChange: function (newValue, info) {
+    //     console.log(newValue, info);
+    //     value = newValue;
+    //   }
+    // }), document.getElementById('user'));
   </script>
 </body>
 </html>
