@@ -21,25 +21,29 @@
   <script src="./lib/formatic.js"></script>
   <script>
 
+    var R = React.DOM;
+
     var Form = React.createFactory(Formatic);
 
     var config = Formatic.createConfig(Formatic.plugins.bootstrap);
 
     var fields = [
       {label: 'Name', type: 'unicode', key: 'name'},
-      {label: 'Note', type: 'text', key: 'note'},
       {id: 'silly', type: 'copy', help_text_html: 'What the hey?'},
+      {label: 'Note', type: 'text', key: 'note'},
       {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},
       {label: 'Groceries', type: 'pretty-textarea', key: 'groceries', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
       {label: 'Names', type: 'list', key: 'names', items: {type: 'unicode'}}
     ];
 
-    var value = {};
+    var formValue = {};
 
     var createField = config.createField;
 
     config.createField = function (props) {
-      if (props.field.id === 'silly' && value.name === 'Joe') {
+      var config = this;
+
+      if (props.field.id === 'silly' && formValue.name === 'Joe') {
         props = _.extend({}, props);
         field = _.extend({}, props.field);
         field.help_text_html = 'What a nice name!';
@@ -47,6 +51,16 @@
       }
 
       return createField.call(config, props);
+    };
+
+    var renderFieldComponent = config.renderComponent;
+
+    config.renderFieldComponent = function (component) {
+      var config = this;
+
+      return R.div({style: {border: 'red solid 2px'}},
+        renderFieldComponent.call(config, component)
+      );
     };
 
     //console.log(config);
@@ -60,6 +74,7 @@
         value: value,
         onChange: function (newValue, info) {
           console.log(newValue, info);
+          formValue = newValue;
           render(newValue);
         }
       }), document.getElementById('user'));
@@ -70,7 +85,7 @@
       render(value);
     };
 
-    setValue({});
+    setValue(formValue);
 
     // Uncontrolled version:
 
@@ -80,7 +95,7 @@
     //   defaultValue: {},
     //   onChange: function (newValue, info) {
     //     console.log(newValue, info);
-    //     value = newValue;
+    //     formValue = newValue;
     //   }
     // }), document.getElementById('user'));
   </script>
