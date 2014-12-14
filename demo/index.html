@@ -33,7 +33,25 @@
       {label: 'Note', type: 'text', key: 'note'},
       {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},
       {label: 'Groceries', type: 'pretty-textarea', key: 'groceries', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
-      {label: 'Names', type: 'list', key: 'names', items: {type: 'unicode'}}
+      {
+        label: 'Robots', type: 'list', key: 'robots',
+        items: [{
+          label: 'Simple',
+          match: {type: 'simple'},
+          type: 'fields',
+          fields: [
+            {label: 'Name', type: 'unicode', key: 'name'}
+          ]
+        },{
+          label: 'Complex',
+          match: {type: 'complex'},
+          type: 'fields',
+          fields: [
+            {label: 'Name', type: 'unicode', key: 'name'},
+            {label: 'Description', type: 'text', key: 'description'}
+          ]
+        }]
+      }
     ];
 
     var formValue = {};
