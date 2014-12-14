@@ -53,13 +53,21 @@
       return createField.call(config, props);
     };
 
-    var renderFieldComponent = config.renderComponent;
+    var renderFieldComponent = config.renderFieldComponent;
 
     config.renderFieldComponent = function (component) {
       var config = this;
 
       return R.div({style: {border: 'red solid 2px'}},
         renderFieldComponent.call(config, component)
+      );
+    };
+
+    config.renderComponent_Text = function (component) {
+      var config = this;
+
+      return R.div({style: {border: 'blue solid 2px'}},
+        component.renderDefault()
       );
     };
 
