@@ -94,6 +94,18 @@
 
     //console.log(config);
 
+    var onFocus = function (event) {
+      console.log('focus:', event.path, event.field);
+    };
+
+    var onBlur = function (event) {
+      console.log('blur:', event.path, event.field);
+    };
+
+    var onOpenReplacements = function (info) {
+      console.log('opening replacements:', info);
+    }
+
     // Controlled version:
 
     var render = function (value) {
@@ -105,7 +117,10 @@
           console.log(newValue, info);
           formValue = newValue;
           render(newValue);
-        }
+        },
+        onFocus: onFocus,
+        onBlur: onBlur,
+        onOpenReplacements: onOpenReplacements
       }), document.getElementById('user'));
     };
 
