@@ -853,7 +853,7 @@ module.exports = React.createClass({
   // },
 
   getReplaceState: function (props) {
-    var replaceChoices = props.config.fieldReplaceChoices(this.props.field);
+    var replaceChoices = props.config.fieldReplaceChoices(props.field);
     var replaceChoicesLabels = {};
     replaceChoices.forEach(function (choice) {
       replaceChoicesLabels[choice.value] = choice.label;
@@ -1426,6 +1426,7 @@ module.exports = React.createClass({
     this.setState({
       isChoicesOpen: false
     });
+    this.onStartAction('close-replacements');
   },
 
   getCloseIgnoreNodes: function () {
