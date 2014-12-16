@@ -107,6 +107,10 @@
       console.log('opening replacements:', info);
     }
 
+    var onCloseReplacements = function (info) {
+      console.log('closing replacements:', info);
+    }
+
     // Controlled version:
 
     var render = function (value) {
@@ -122,7 +126,8 @@
         },
         onFocus: onFocus,
         onBlur: onBlur,
-        onOpenReplacements: onOpenReplacements
+        onOpenReplacements: onOpenReplacements,
+        onCloseReplacements: onCloseReplacements
       }), document.getElementById('user'));
     };
 
