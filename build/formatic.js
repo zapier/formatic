@@ -550,16 +550,28 @@ module.exports = React.createClass({
     var keyToId = {};
     var keys = Object.keys(this.props.value);
     var keyOrder = [];
+    // Temp keys keeps the key to display, which sometimes may be different
+    // than the actual key. For example, duplicate keys are not allowed,
+    // but we may temporarily show duplicate keys.
+    var tempDisplayKeys = {};
 
     // Keys don't make good react keys, since we're allowing them to be
     // changed here, so we'll have to create fake keys and
     // keep track of the mapping of real keys to fake keys. Yuck.
     keys.forEach(function (key) {
-      this.nextLookupId++;
+      var id = ++this.nextLookupId;
       // Map the real key to the id.
-      keyToId[key] = this.nextLookupId;
+      keyToId[key] = id;
       // Keep the ordering of the keys so we don't shuffle things around later.
       keyOrder.push(key);
+      // If this is a temporary key that was persisted, best we can do is display
+      // a blank.
+      // TODO: Probably just not send temporary keys back through. This behavior
+      // is actually leftover from an earlier incarnation of formatic where
+      // values had to go back to the root.
+      if (isTempKey(key)) {
+        tempDisplayKeys[id] = '';
+      }
     }.bind(this));
 
     return {
@@ -568,7 +580,7 @@ module.exports = React.createClass({
       // Temp keys keeps the key to display, which sometimes may be different
       // than the actual key. For example, duplicate keys are not allowed,
       // but we may temporarily show duplicate keys.
-      tempDisplayKeys: {}
+      tempDisplayKeys: tempDisplayKeys
     };
   },
 
