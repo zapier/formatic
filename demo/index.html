@@ -32,7 +32,8 @@
       {id: 'silly', type: 'copy', help_text_html: 'What the hey?'},
       {label: 'Note', type: 'text', key: 'note'},
       {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},
-      {label: 'Groceries', type: 'pretty-textarea', key: 'groceries', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
+      {label: 'Groceries', type: 'text', key: 'groceries', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
+      {label: 'Path', type: 'unicode', key: 'path', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
       {
         label: 'Robots', type: 'list', key: 'robots',
         items: [{
@@ -55,7 +56,8 @@
       {label: 'Mapping', type: 'object', key: 'mapping'},
       {label: 'The Blob', type: 'json', key: 'blob'},
       {label: 'Do you like cookies?', type: 'boolean', key: 'likesCookies'},
-      {label: 'Colors', type: 'checkbox-list', key: 'colors', choices: ['red', 'green', 'blue']}
+      {label: 'Colors', type: 'checkbox-list', key: 'colors', choices: ['red', 'green', 'blue']},
+      {label: 'Junk', type: 'junk'}
     ];
 
     var formValue = {};

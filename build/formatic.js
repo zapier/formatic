@@ -1,4 +1,7 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Formatic=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = require('./lib/formatic');
+
+},{"./lib/formatic":34}],2:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -44,7 +47,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],2:[function(require,module,exports){
+},{"../../mixins/field":36}],3:[function(require,module,exports){
 (function (global){
 // # component.checkbox-list
 
@@ -147,7 +150,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],3:[function(require,module,exports){
+},{"../../mixins/field":36}],4:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -177,7 +180,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],4:[function(require,module,exports){
+},{"../../mixins/field":36}],5:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -231,7 +234,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],5:[function(require,module,exports){
+},{"../../mixins/field":36}],6:[function(require,module,exports){
 (function (global){
 // # component.json
 
@@ -324,7 +327,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],6:[function(require,module,exports){
+},{"../../mixins/field":36}],7:[function(require,module,exports){
 (function (global){
 // # component.list
 
@@ -510,7 +513,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],7:[function(require,module,exports){
+},{"../../mixins/field":36}],8:[function(require,module,exports){
 (function (global){
 // # component.object
 
@@ -742,7 +745,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],8:[function(require,module,exports){
+},{"../../mixins/field":36}],9:[function(require,module,exports){
 (function (global){
 // # component.pretty-textarea
 
@@ -841,7 +844,7 @@ var parseTextWithTags = function (value) {
 
 module.exports = React.createClass({
 
-  displayName: 'PrettyTextarea',
+  displayName: 'TaggedText',
 
   mixins: [require('../../mixins/field'), require('../../mixins/undo-stack'), require('../../mixins/resize')],
 
@@ -1213,7 +1216,9 @@ module.exports = React.createClass({
         node.selectionStart = leftPos;
         node.selectionEnd = rightPos;
 
-        this.setState({isChoicesOpen: true});
+        if (!this.state.isChoicesOpen) {
+          this.setChoicesOpen(true);
+        }
 
         return;
       }
@@ -1411,22 +1416,28 @@ module.exports = React.createClass({
   },
 
   onToggleChoices: function () {
-    var isNowChoicesOpen = !this.state.isChoicesOpen;
-    this.setState({
-      isChoicesOpen: isNowChoicesOpen
-    });
-    if (isNowChoicesOpen) {
+    this.setChoicesOpen(!this.state.isChoicesOpen);
+  },
+
+  onCloseChoices: function () {
+    if (this.state.isChoicesOpen) {
+      this.setChoicesOpen(false);
+    }
+  },
+
+  setChoicesOpen: function (isOpen) {
+    if (isOpen) {
       this.onStartAction('open-replacements');
     } else {
       this.onStartAction('close-replacements');
     }
+    this.setState({
+      isChoicesOpen: isOpen
+    });
   },
 
-  onCloseChoices: function () {
-    this.setState({
-      isChoicesOpen: false
-    });
-    this.onStartAction('close-replacements');
+  closeChoices: function () {
+
   },
 
   getCloseIgnoreNodes: function () {
@@ -1499,7 +1510,8 @@ module.exports = React.createClass({
         this.prettyValue(this.props.value)
       ),
 
-      R.textarea({
+      (config.fieldIsSingleLine(field) ? R.input : R.textarea)({
+        type: 'text',
         className: cx(_.extend({}, this.props.classes, {'pretty-content': true})),
         ref: 'content',
         rows: field.rows || this.props.rows,
@@ -1536,7 +1548,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35,"../../mixins/resize":37,"../../mixins/undo-stack":38,"../../utils":40}],9:[function(require,module,exports){
+},{"../../mixins/field":36,"../../mixins/resize":38,"../../mixins/undo-stack":39,"../../utils":41}],10:[function(require,module,exports){
 (function (global){
 // # component.select
 
@@ -1586,7 +1598,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],10:[function(require,module,exports){
+},{"../../mixins/field":36}],11:[function(require,module,exports){
 (function (global){
 // # component.string
 
@@ -1642,7 +1654,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],11:[function(require,module,exports){
+},{"../../mixins/field":36}],12:[function(require,module,exports){
 (function (global){
 // # component.string
 
@@ -1698,7 +1710,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],12:[function(require,module,exports){
+},{"../../mixins/field":36}],13:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1718,14 +1730,14 @@ module.exports = React.createClass({
   renderDefault: function () {
     return R.div({},
       R.div({}, 'Component not found for: '),
-      R.pre({}, JSON.stringify(this.props.field))
+      R.pre({}, JSON.stringify(this.props.field, null, 2))
     );
   }
 
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],13:[function(require,module,exports){
+},{"../../mixins/field":36}],14:[function(require,module,exports){
 (function (global){
 // # component.add-item
 
@@ -1761,7 +1773,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],14:[function(require,module,exports){
+},{"../../mixins/helper":37}],15:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1912,7 +1924,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/click-outside":34,"../../mixins/helper":36}],15:[function(require,module,exports){
+},{"../../mixins/click-outside":35,"../../mixins/helper":37}],16:[function(require,module,exports){
 (function (global){
 // # component.field
 
@@ -1986,7 +1998,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],16:[function(require,module,exports){
+},{"../../mixins/helper":37}],17:[function(require,module,exports){
 (function (global){
 // # component.help
 
@@ -2023,7 +2035,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],17:[function(require,module,exports){
+},{"../../mixins/helper":37}],18:[function(require,module,exports){
 (function (global){
 // # component.item-choices
 
@@ -2071,7 +2083,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],18:[function(require,module,exports){
+},{"../../mixins/helper":37}],19:[function(require,module,exports){
 (function (global){
 // # component.label
 
@@ -2132,7 +2144,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],19:[function(require,module,exports){
+},{"../../mixins/helper":37}],20:[function(require,module,exports){
 (function (global){
 // # component.list-control
 
@@ -2192,7 +2204,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],20:[function(require,module,exports){
+},{"../../mixins/helper":37}],21:[function(require,module,exports){
 (function (global){
 // # component.list-item-control
 
@@ -2241,7 +2253,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],21:[function(require,module,exports){
+},{"../../mixins/helper":37}],22:[function(require,module,exports){
 (function (global){
 // # component.list-item-value
 
@@ -2282,7 +2294,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],22:[function(require,module,exports){
+},{"../../mixins/helper":37}],23:[function(require,module,exports){
 (function (global){
 // # component.list-item
 
@@ -2320,7 +2332,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],23:[function(require,module,exports){
+},{"../../mixins/helper":37}],24:[function(require,module,exports){
 (function (global){
 // # component.move-item-back
 
@@ -2356,7 +2368,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],24:[function(require,module,exports){
+},{"../../mixins/helper":37}],25:[function(require,module,exports){
 (function (global){
 // # component.move-item-forward
 
@@ -2392,7 +2404,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],25:[function(require,module,exports){
+},{"../../mixins/helper":37}],26:[function(require,module,exports){
 (function (global){
 // # component.object-control
 
@@ -2451,7 +2463,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],26:[function(require,module,exports){
+},{"../../mixins/helper":37}],27:[function(require,module,exports){
 (function (global){
 // # component.object-item-control
 
@@ -2490,7 +2502,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],27:[function(require,module,exports){
+},{"../../mixins/helper":37}],28:[function(require,module,exports){
 (function (global){
 // # component.object-item-key
 
@@ -2535,7 +2547,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],28:[function(require,module,exports){
+},{"../../mixins/helper":37}],29:[function(require,module,exports){
 (function (global){
 // # component.object-item-value
 
@@ -2575,7 +2587,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],29:[function(require,module,exports){
+},{"../../mixins/helper":37}],30:[function(require,module,exports){
 (function (global){
 // # component.object-item
 
@@ -2617,7 +2629,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],30:[function(require,module,exports){
+},{"../../mixins/helper":37}],31:[function(require,module,exports){
 (function (global){
 // # component.remove-item
 
@@ -2653,7 +2665,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],31:[function(require,module,exports){
+},{"../../mixins/helper":37}],32:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2743,7 +2755,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],32:[function(require,module,exports){
+},{"../../mixins/helper":37}],33:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2776,7 +2788,7 @@ module.exports = {
   createElement_Unicode: React.createFactory(require('./components/fields/unicode')),
   createElement_Select: React.createFactory(require('./components/fields/select')),
   createElement_Boolean: React.createFactory(require('./components/fields/boolean')),
-  createElement_PrettyTextarea: React.createFactory(require('./components/fields/pretty-textarea')),
+  createElement_PrettyText: React.createFactory(require('./components/fields/pretty-text')),
   createElement_List: React.createFactory(require('./components/fields/list')),
   createElement_CheckboxList: React.createFactory(require('./components/fields/checkbox-list')),
   createElement_Object: React.createFactory(require('./components/fields/object')),
@@ -2880,6 +2892,19 @@ module.exports = {
 
   alias_Dict: 'Object',
   alias_Bool: 'Boolean',
+  alias_PrettyTextarea: 'PrettyText',
+  alias_Unicode: function (field) {
+    if (field.replaceChoices) {
+      return 'PrettyText';
+    }
+    return 'Unicode';
+  },
+  alias_Text: function (field) {
+    if (field.replaceChoices) {
+      return 'PrettyText';
+    }
+    return 'Text';
+  },
 
   // Field helpers
   fieldTypeName: function (field) {
@@ -2987,6 +3012,9 @@ module.exports = {
       // Fallback to a text value.
       return '';
     }
+  },
+  fieldIsSingleLine: function (field) {
+    return field.isSingleLine || field.is_single_line || field.type === 'unicode' || field.type === 'Unicode';
   },
 
   itemMatchesValue: function (item, value) {
@@ -3103,7 +3131,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./components/fields/boolean":1,"./components/fields/checkbox-list":2,"./components/fields/copy":3,"./components/fields/fields":4,"./components/fields/json":5,"./components/fields/list":6,"./components/fields/object":7,"./components/fields/pretty-textarea":8,"./components/fields/select":9,"./components/fields/text":10,"./components/fields/unicode":11,"./components/fields/unknown":12,"./components/helpers/add-item":13,"./components/helpers/choices":14,"./components/helpers/field":15,"./components/helpers/help":16,"./components/helpers/item-choices":17,"./components/helpers/label":18,"./components/helpers/list-control":19,"./components/helpers/list-item":22,"./components/helpers/list-item-control":20,"./components/helpers/list-item-value":21,"./components/helpers/move-item-back":23,"./components/helpers/move-item-forward":24,"./components/helpers/object-control":25,"./components/helpers/object-item":29,"./components/helpers/object-item-control":26,"./components/helpers/object-item-key":27,"./components/helpers/object-item-value":28,"./components/helpers/remove-item":30,"./components/helpers/select-value":31,"./utils":40}],33:[function(require,module,exports){
+},{"./components/fields/boolean":2,"./components/fields/checkbox-list":3,"./components/fields/copy":4,"./components/fields/fields":5,"./components/fields/json":6,"./components/fields/list":7,"./components/fields/object":8,"./components/fields/pretty-text":9,"./components/fields/select":10,"./components/fields/text":11,"./components/fields/unicode":12,"./components/fields/unknown":13,"./components/helpers/add-item":14,"./components/helpers/choices":15,"./components/helpers/field":16,"./components/helpers/help":17,"./components/helpers/item-choices":18,"./components/helpers/label":19,"./components/helpers/list-control":20,"./components/helpers/list-item":23,"./components/helpers/list-item-control":21,"./components/helpers/list-item-value":22,"./components/helpers/move-item-back":24,"./components/helpers/move-item-forward":25,"./components/helpers/object-control":26,"./components/helpers/object-item":30,"./components/helpers/object-item-control":27,"./components/helpers/object-item-key":28,"./components/helpers/object-item-value":29,"./components/helpers/remove-item":31,"./components/helpers/select-value":32,"./utils":41}],34:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -3275,7 +3303,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./default-config":32,"./plugins/bootstrap":39,"./utils":40}],34:[function(require,module,exports){
+},{"./default-config":33,"./plugins/bootstrap":40,"./utils":41}],35:[function(require,module,exports){
 (function (global){
 // # mixin.click-outside
 
@@ -3405,7 +3433,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 (function (global){
 // # mixin.field
 
@@ -3554,7 +3582,7 @@ module.exports = {
 // };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -3590,7 +3618,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 // # mixin.resize
 
 /*
@@ -3708,7 +3736,7 @@ module.exports = {
   }
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 // # mixin.undo-stack
 
 /*
@@ -3774,7 +3802,7 @@ module.exports = {
   }
 };
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function (global){
 // # bootstrap
 
@@ -3798,7 +3826,7 @@ var modifiers = {
 
   'Unicode': {classes: {'form-control': true}},
   'Text': {classes: {'form-control': true}},
-  'PrettyTextarea': {classes: {'form-control': true}},
+  'PrettyText': {classes: {'form-control': true}},
   'Json': {classes: {'form-control': true}},
   'Select': {classes: {'form-control': true}}
   //'list': {classes: 'well'}
@@ -3827,7 +3855,7 @@ module.exports = function (config) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -3914,8 +3942,5 @@ if(ua.indexOf('Chrome') > -1) {
 utils.browser = browser;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"formatic":[function(require,module,exports){
-module.exports = require('./lib/formatic');
-
-},{"./lib/formatic":33}]},{},[])("formatic")
+},{}]},{},[1])(1)
 });
