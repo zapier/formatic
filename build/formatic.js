@@ -23,22 +23,13 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
 
-    var choices = config.fieldChoices(field);
-
-    if (choices.length === 0) {
-      choices = [{
-        label: 'Yes',
-        value: true
-      }, {
-        label: 'No',
-        value: false
-      }];
-    }
+    var choices = config.fieldBooleanChoices(field);
+    var value = config.stringToBoolean(this.props.value);
 
     return config.createElement('field', {
       config: config, field: field, plain: this.props.plain
     }, config.createElement('select-value', {
-      choices: choices, value: this.props.value, onChange: this.onChange, onAction: this.onBubbleAction
+      choices: choices, value: value, onChange: this.onChange, onAction: this.onBubbleAction
     }));
   }
 });
@@ -1571,7 +1562,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35,"../../mixins/resize":37,"../../mixins/undo-stack":38,"../../utils":40}],9:[function(require,module,exports){
+},{"../../mixins/field":35,"../../mixins/resize":38,"../../mixins/undo-stack":40,"../../utils":42}],9:[function(require,module,exports){
 (function (global){
 // # component.select
 
@@ -2961,6 +2952,30 @@ module.exports = {
 
     return config.normalizeChoices(field.choices);
   },
+  fieldBooleanChoices: function (field) {
+    var config = this;
+
+    var choices = config.fieldChoices(field);
+
+    if (choices.length === 0) {
+      return [{
+        label: 'Yes',
+        value: true
+      },{
+        label: 'No',
+        value: false
+      }];
+    }
+
+    return choices.map(function (choice) {
+      if (_.isBoolean(choice.value)) {
+        return choice;
+      }
+      return _.extend({}, choice, {
+        value: config.stringToBoolean(choice.value)
+      });
+    });
+  },
   fieldReplaceChoices: function (field) {
     var config = this;
 
@@ -3137,11 +3152,24 @@ module.exports = {
     });
 
     return choices;
+  },
+
+  // Coerce a string representation of a boolean to a boolean
+  stringToBoolean: function (s) {
+    if (!_.isString(s)) {
+      // Just use the default truthiness.
+      return s ? true : false;
+    }
+    s = s.toLowerCase();
+    if (s === '' || s === 'no' || s === 'off' || s === 'false') {
+      return false;
+    }
+    return true;
   }
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./components/fields/boolean":1,"./components/fields/checkbox-list":2,"./components/fields/copy":3,"./components/fields/fields":4,"./components/fields/json":5,"./components/fields/list":6,"./components/fields/object":7,"./components/fields/pretty-text":8,"./components/fields/select":9,"./components/fields/text":10,"./components/fields/unicode":11,"./components/fields/unknown":12,"./components/helpers/add-item":13,"./components/helpers/choices":14,"./components/helpers/field":15,"./components/helpers/help":16,"./components/helpers/item-choices":17,"./components/helpers/label":18,"./components/helpers/list-control":19,"./components/helpers/list-item":22,"./components/helpers/list-item-control":20,"./components/helpers/list-item-value":21,"./components/helpers/move-item-back":23,"./components/helpers/move-item-forward":24,"./components/helpers/object-control":25,"./components/helpers/object-item":29,"./components/helpers/object-item-control":26,"./components/helpers/object-item-key":27,"./components/helpers/object-item-value":28,"./components/helpers/remove-item":30,"./components/helpers/select-value":31,"./utils":40}],33:[function(require,module,exports){
+},{"./components/fields/boolean":1,"./components/fields/checkbox-list":2,"./components/fields/copy":3,"./components/fields/fields":4,"./components/fields/json":5,"./components/fields/list":6,"./components/fields/object":7,"./components/fields/pretty-text":8,"./components/fields/select":9,"./components/fields/text":10,"./components/fields/unicode":11,"./components/fields/unknown":12,"./components/helpers/add-item":13,"./components/helpers/choices":14,"./components/helpers/field":15,"./components/helpers/help":16,"./components/helpers/item-choices":17,"./components/helpers/label":18,"./components/helpers/list-control":19,"./components/helpers/list-item":22,"./components/helpers/list-item-control":20,"./components/helpers/list-item-value":21,"./components/helpers/move-item-back":23,"./components/helpers/move-item-forward":24,"./components/helpers/object-control":25,"./components/helpers/object-item":29,"./components/helpers/object-item-control":26,"./components/helpers/object-item-key":27,"./components/helpers/object-item-value":28,"./components/helpers/remove-item":30,"./components/helpers/select-value":31,"./utils":42}],33:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -3242,6 +3270,15 @@ module.exports = React.createClass({
         return _.extend(prev, curr);
       });
     },
+    availableMixins: {
+      clickOutside: require('./mixins/click-outside.js'),
+      field: require('./mixins/field.js'),
+      helper: require('./mixins/helper.js'),
+      inputActions: require('./mixins/input-actions.js'),
+      resize: require('./mixins/resize.js'),
+      scroll: require('./mixins/scroll.js'),
+      undoStack: require('./mixins/undo-stack.js')
+    },
     plugins: {
       bootstrap: require('./plugins/bootstrap')
     },
@@ -3313,7 +3350,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./default-config":32,"./plugins/bootstrap":39,"./utils":40}],34:[function(require,module,exports){
+},{"./default-config":32,"./mixins/click-outside.js":34,"./mixins/field.js":35,"./mixins/helper.js":36,"./mixins/input-actions.js":37,"./mixins/resize.js":38,"./mixins/scroll.js":39,"./mixins/undo-stack.js":40,"./plugins/bootstrap":41,"./utils":42}],34:[function(require,module,exports){
 (function (global){
 // # mixin.click-outside
 
@@ -3629,6 +3666,33 @@ module.exports = {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],37:[function(require,module,exports){
+// # mixin.input-actions
+
+/*
+Currently unused.
+*/
+
+'use strict';
+
+module.exports = function (plugin) {
+
+  plugin.exports = {
+
+    onFocus: function () {
+
+    },
+
+    onBlur: function () {
+
+    },
+
+    onChange: function () {
+
+    }
+  };
+};
+
+},{}],38:[function(require,module,exports){
 // # mixin.resize
 
 /*
@@ -3746,7 +3810,30 @@ module.exports = {
   }
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
+// # mixin.scroll
+
+'use strict';
+
+module.exports = function (plugin) {
+
+  plugin.exports = {
+
+    componentDidMount: function () {
+      if (this.onScrollWindow) {
+        window.addEventListener('scroll', this.onScrollWindow);
+      }
+    },
+
+    componentWillUnmount: function () {
+      if (this.onScrollWindow) {
+        window.removeEventListener('scroll', this.onScrollWindow);
+      }
+    }
+  };
+};
+
+},{}],40:[function(require,module,exports){
 // # mixin.undo-stack
 
 /*
@@ -3812,7 +3899,7 @@ module.exports = {
   }
 };
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 (function (global){
 // # bootstrap
 
@@ -3865,7 +3952,7 @@ module.exports = function (config) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (global){
 'use strict';
 
