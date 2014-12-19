@@ -28,7 +28,7 @@
     var config = Formatic.createConfig(Formatic.plugins.bootstrap);
 
     var fields = [
-      {label: 'Name', type: 'unicode', key: 'name'},
+      {label: 'Name', type: 'unicode', key: 'name', required: true},
       {id: 'silly', type: 'copy', help_text_html: 'What the hey?'},
       {label: 'Note', type: 'text', key: 'note'},
       {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},

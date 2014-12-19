@@ -21,23 +21,22 @@
   color: #777;
 }
 
-.formatic .required-text {
+.formatic .required-text, .formatic .not-required-text {
   font-size: 80%;
   color: #aaa;
 }
 
-.formatic .required .required-text:after {
+.formatic .required-text:after {
   content: '(required)'
 }
 
-.formatic .not-required .required-text:after {
+.formatic .not-required-text:after {
   content: ''
 }
 
 .formatic .validation-error-required .required-text:after {
   color: #ff4a00;
 }
-
 
 .formatic .dropdown-field {
   position: relative;
