@@ -57,7 +57,35 @@
       {label: 'The Blob', type: 'json', key: 'blob'},
       {label: 'Do you like cookies?', type: 'boolean', key: 'likesCookies'},
       {label: 'Colors', type: 'checkbox-list', key: 'colors', choices: ['red', 'green', 'blue']},
-      {label: 'Junk', type: 'junk'}
+      {label: 'Junk', type: 'junk'},
+      {
+        label: 'Folder',
+        type: 'fields',
+        key: 'folder',
+        match: {type: 'folder'},
+        fields: [
+          {type: 'unicode', key: 'type', hidden: true, default: 'folder'},
+          {label: 'Name', type: 'unicode', key: 'name'},
+          {
+            label: 'Children',
+            type: 'array',
+            key: 'children',
+            items: [
+              {
+                label: 'File',
+                type: 'fields',
+                match: {type: 'file'},
+                fields: [
+                  {type: 'unicode', key: 'type', hidden: true, default: 'file'},
+                  {label: 'Name', type: 'unicode', key: 'name'},
+                  {label: 'Content', type: 'text', key: 'content'}
+                ]
+              },
+              'folder'
+            ]
+          }
+        ]
+      }
     ];
 
     var formValue = {};
@@ -134,8 +162,8 @@
     };
 
     var setValue = function (value) {
-      value = value;
-      render(value);
+      formValue = value;
+      render(formValue);
     };
 
     setValue(formValue);
