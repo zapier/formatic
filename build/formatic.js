@@ -693,17 +693,35 @@ module.exports = React.createClass({
         tempDisplayKeys[keyToId[fromKey]] = '';
       }
       keyToId[toKey] = keyToId[fromKey];
+      delete keyToId[fromKey];
       keyOrder[keyOrder.indexOf(fromKey)] = toKey;
 
       this.setState({
         keyToId: keyToId,
-        keyOrder: keyOrder
+        keyOrder: keyOrder,
+        tempDisplayKeys: tempDisplayKeys
       });
 
       newObj[toKey] = newObj[fromKey];
       delete newObj[fromKey];
 
       this.onChangeValue(newObj);
+
+      // Check if our fromKey has opened up a spot.
+      if (fromKey && fromKey !== toKey) {
+        if (!(fromKey in newObj)) {
+          Object.keys(newObj).forEach(function (key) {
+            if (!(isTempKey(key))) {
+              return;
+            }
+            var id = keyToId[key];
+            var displayKey = tempDisplayKeys[id];
+            if (fromKey === displayKey) {
+              this.onMove(key, displayKey);
+            }
+          }.bind(this));
+        }
+      }
     }
   },
 
