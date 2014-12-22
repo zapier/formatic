@@ -198,7 +198,7 @@ module.exports = React.createClass({
   renderDefault: function () {
     var config = this.props.config;
     var field = this.props.field;
-    var obj = this.props.value;
+    var obj = this.props.value || {};
 
     return config.createElement('field', {
       config: config, field: field, value: obj, plain: this.props.plain
@@ -213,7 +213,7 @@ module.exports = React.createClass({
               value = config.fieldDefaultValue(field);
             }
           }
-          return config.createField({config: config, key: key || i, field: field, value: value, onChange: this.onChangeField.bind(this, key), onAction: this.onBubbleAction});
+          return config.createField({key: key || i, field: field, value: value, onChange: this.onChangeField.bind(this, key), onAction: this.onBubbleAction});
         }.bind(this))
       )
     );
@@ -729,6 +729,7 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
     var fields = this.getFields();
+    var obj = this.props.value;
 
     return config.createElement('field', {
       field: field, value: this.props.value, plain: this.props.plain
@@ -743,6 +744,7 @@ module.exports = React.createClass({
             return config.createElement('object-item', {
               key: this.state.keyToId[child.key],
               field: child,
+              value: obj[child.key],
               onMove: this.onMove,
               onRemove: this.onRemove,
               onChange: this.onChange,
@@ -2602,7 +2604,7 @@ module.exports = React.createClass({
     var field = this.props.field;
 
     return R.div({className: cx(this.props.className)},
-      config.createField({field: field, onChange: this.onChangeField, plain: true})
+      config.createField({field: field, value: this.props.value, onChange: this.onChangeField, plain: true})
     );
   }
 });
@@ -2642,7 +2644,7 @@ module.exports = React.createClass({
 
     return R.div({className: cx(this.props.className)},
       config.createElement('object-item-key', {field: field, onChange: this.onChangeKey, displayKey: this.props.displayKey, itemKey: this.props.itemKey}),
-      config.createElement('object-item-value', {field: field, onChange: this.props.onChange, itemKey: this.props.itemKey}),
+      config.createElement('object-item-value', {field: field, value: this.props.value, onChange: this.props.onChange, itemKey: this.props.itemKey}),
       config.createElement('object-item-control', {field: field, onRemove: this.props.onRemove, itemKey: this.props.itemKey})
     );
   }
@@ -2925,6 +2927,7 @@ module.exports = {
     }
     return 'Text';
   },
+  alias_Array: 'List',
 
   // Field helpers
   fieldTypeName: function (field) {
@@ -3074,7 +3077,7 @@ module.exports = {
   fieldIsSingleLine: function (field) {
     return field.isSingleLine || field.is_single_line || field.type === 'unicode' || field.type === 'Unicode';
   },
-
+  
   itemMatchesValue: function (item, value) {
     var match = item.match;
     if (!match) {
