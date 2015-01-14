@@ -1933,7 +1933,7 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
 
-    return R.div({className: cx(this.props.className)},
+    return R.div({className: cx(this.props.classes)},
       config.createElement('array-item-value', {field: field, index: this.props.index,
         onChange: this.props.onChange, onAction: this.onBubbleAction}),
       config.createElement('array-item-control', {field: field, index: this.props.index, numItems: this.props.numItems,
@@ -3019,6 +3019,8 @@ module.exports = {
 
   alias_List: 'Array',
 
+  alias_Fieldset: 'Fields',
+
   // Field factory
 
   initField: function (field) {
@@ -3198,7 +3200,7 @@ module.exports = {
   fieldTemplateTypeName: function (fieldTemplate) {
     var config = this;
 
-    var typeName = utils.dashToPascal(fieldTemplate.type);
+    var typeName = utils.dashToPascal(fieldTemplate.type || 'undefined');
 
     var alias = config['alias_' + typeName];
 
@@ -4123,6 +4125,10 @@ module.exports = function (config) {
 },{}],43:[function(require,module,exports){
 (function (global){
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+
+// This plugin allows fields to be strings and reference other fields by key or
+// id. It also allows a field to extend another field with
+// extends: ['foo', 'bar'].
 
 module.exports = function (config) {
 
