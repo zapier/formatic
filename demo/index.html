@@ -25,7 +25,10 @@
 
     var Form = React.createFactory(Formatic);
 
-    var config = Formatic.createConfig(Formatic.plugins.bootstrap);
+    var config = Formatic.createConfig(
+      Formatic.plugins.reference,
+      Formatic.plugins.bootstrap
+    );
 
     var fields = [
       {label: 'Name', type: 'unicode', key: 'name', required: true},
@@ -90,19 +93,17 @@
 
     var formValue = {};
 
-    var createChildField = config.createChildField;
+    var initField = config.initField;
 
-    config.createChildField = function (field, options) {
+    config.initField = function (field) {
 
-      var field = createChildField.apply(this, arguments);
+      initField.apply(this, arguments);
 
       if (field.id === 'silly') {
         if ((field.parent.value.name || '').toLowerCase() === 'joe') {
           field.help_text_html = 'What a nice name!';
         }
       }
-
-      return field;
     };
 
     // var createField = config.createField;
