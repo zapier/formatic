@@ -36,7 +36,7 @@
       {label: 'Path', type: 'unicode', key: 'path', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
       {
         label: 'Robots', type: 'list', key: 'robots',
-        items: [{
+        itemFields: [{
           label: 'Simple',
           match: {type: 'simple'},
           type: 'fields',
@@ -70,7 +70,7 @@
             label: 'Children',
             type: 'array',
             key: 'children',
-            items: [
+            itemFields: [
               {
                 label: 'File',
                 type: 'fields',
@@ -90,20 +90,35 @@
 
     var formValue = {};
 
-    var createField = config.createField;
+    var createChildField = config.createChildField;
 
-    config.createField = function (props) {
-      var config = this;
+    config.createChildField = function (field, options) {
 
-      if (props.field.id === 'silly' && formValue.name === 'Joe') {
-        props = _.extend({}, props);
-        field = _.extend({}, props.field);
-        field.help_text_html = 'What a nice name!';
-        props.field = field;
+      var field = createChildField.apply(this, arguments);
+
+      if (field.id === 'silly') {
+        if ((field.parent.value.name || '').toLowerCase() === 'joe') {
+          field.help_text_html = 'What a nice name!';
+        }
       }
 
-      return createField.call(config, props);
+      return field;
     };
+
+    // var createField = config.createField;
+    //
+    // config.createField = function (props) {
+    //   var config = this;
+    //
+    //   if (props.field.id === 'silly' && formValue.name === 'Joe') {
+    //     props = _.extend({}, props);
+    //     field = _.extend({}, props.field);
+    //     field.help_text_html = 'What a nice name!';
+    //     props.field = field;
+    //   }
+    //
+    //   return createField.call(config, props);
+    // };
 
     var renderFieldComponent = config.renderFieldComponent;
 
