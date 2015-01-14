@@ -1,4 +1,161 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Formatic=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = require('./lib/formatic');
+
+},{"./lib/formatic":34}],2:[function(require,module,exports){
+(function (global){
+// # component.list
+
+/*
+Render a list.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var cx = React.addons.classSet;
+
+var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
+
+module.exports = React.createClass({
+
+  displayName: 'Array',
+
+  mixins: [require('../../mixins/field')],
+
+  // getDefaultProps: function () {
+  //   return {
+  //     className: plugin.config.className
+  //   };
+  // },
+
+  nextLookupId: 0,
+
+  getInitialState: function () {
+
+    // Need to create artificial keys for the array. Indexes are not good keys,
+    // since they change. So, map each position to an artificial key
+    var lookups = [];
+
+    var items = this.props.field.value;
+
+    items.forEach(function (item, i) {
+      lookups[i] = '_' + this.nextLookupId;
+      this.nextLookupId++;
+    }.bind(this));
+
+    return {
+      lookups: lookups
+    };
+  },
+
+  componentWillReceiveProps: function (newProps) {
+
+    var lookups = this.state.lookups;
+
+    var items = newProps.field.value;
+
+    // Need to set artificial keys for new array items.
+    if (items.length > lookups.length) {
+      for (var i = lookups.length; i < items.length; i++) {
+        lookups[i] = '_' + this.nextLookupId;
+        this.nextLookupId++;
+      }
+    }
+
+    this.setState({
+      lookups: lookups
+    });
+  },
+
+  onChange: function (i, newValue, info) {
+    var newArrayValue = this.props.field.value.slice(0);
+    newArrayValue[i] = newValue;
+    this.onBubbleValue(newArrayValue, info);
+  },
+
+  onAppend: function (itemChoiceIndex) {
+    var config = this.props.config;
+    var field = this.props.field;
+
+    var childFieldTemplate = config.fieldItemFieldTemplates(field)[itemChoiceIndex];
+    var newValue = config.fieldTemplateValue(childFieldTemplate);
+
+    var items = this.props.field.value;
+
+    items = items.concat(newValue);
+
+    this.onChangeValue(items);
+  },
+
+  onRemove: function (i) {
+    var lookups = this.state.lookups;
+    lookups.splice(i, 1);
+    this.setState({
+      lookups: lookups
+    });
+    var newItems = this.props.field.value.slice(0);
+    newItems.splice(i, 1);
+    this.onChangeValue(newItems);
+  },
+
+  onMove: function (fromIndex, toIndex) {
+    var lookups = this.state.lookups;
+    var fromId = lookups[fromIndex];
+    var toId = lookups[toIndex];
+    lookups[fromIndex] = toId;
+    lookups[toIndex] = fromId;
+    this.setState({
+      lookups: lookups
+    });
+
+    var newItems = this.props.field.value.slice(0);
+    if (fromIndex !== toIndex &&
+      fromIndex >= 0 && fromIndex < newItems.length &&
+      toIndex >= 0 && toIndex < newItems.length
+    ) {
+      newItems.splice(toIndex, 0, newItems.splice(fromIndex, 1)[0]);
+    }
+    this.onChangeValue(newItems);
+  },
+
+  render: function () {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function () {
+
+    var config = this.props.config;
+    var field = this.props.field;
+
+    var fields = config.createChildFields(field);
+
+    var numItems = field.value.length;
+    return config.createElement('field', {
+      field: field, plain: this.props.plain
+    },
+      R.div({className: cx(this.props.classes)},
+        CSSTransitionGroup({transitionName: 'reveal'},
+        fields.map(function (childField, i) {
+          return config.createElement('array-item', {
+            key: this.state.lookups[i],
+            field: childField,
+            index: i,
+            numItems: numItems,
+            onMove: this.onMove,
+            onRemove: this.onRemove,
+            onChange: this.onChange,
+            onAction: this.onBubbleAction
+          });
+        }.bind(this))),
+        config.createElement('array-control', {field: field, onAppend: this.onAppend})
+      )
+    );
+  }
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../mixins/field":36}],3:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -24,18 +181,17 @@ module.exports = React.createClass({
     var field = this.props.field;
 
     var choices = config.fieldBooleanChoices(field);
-    var value = config.stringToBoolean(this.props.value);
 
     return config.createElement('field', {
-      config: config, field: field, value: value, plain: this.props.plain
+      field: field, plain: this.props.plain
     }, config.createElement('select-value', {
-      choices: choices, value: value, onChange: this.onChange, onAction: this.onBubbleAction
+      choices: choices, field: field, onChange: this.onChange, onAction: this.onBubbleAction
     }));
   }
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],2:[function(require,module,exports){
+},{"../../mixins/field":36}],4:[function(require,module,exports){
 (function (global){
 // # component.checkbox-list
 
@@ -88,7 +244,6 @@ module.exports = React.createClass({
   renderDefault: function () {
 
     var config = this.props.config;
-
     var field = this.props.field;
 
     var choices = this.state.choices || [];
@@ -97,20 +252,18 @@ module.exports = React.createClass({
       return choice.sample;
     });
 
-    var value = this.props.value || [];
-
     return config.createElement('field', {
-      field: field, value: value
+      field: field
     },
       R.div({className: cx(this.props.classes), ref: 'choices'},
         choices.map(function (choice, i) {
 
           var inputField = R.span({style: {whiteSpace: 'nowrap'}},
             R.input({
-              name: config.fieldKey(field),
+              name: field.key,
               type: 'checkbox',
               value: choice.value,
-              checked: value.indexOf(choice.value) >= 0 ? true : false,
+              checked: field.value.indexOf(choice.value) >= 0 ? true : false,
               onChange: this.onChange,
               onFocus: this.onFocusAction,
               onBlur: this.onBlurAction
@@ -138,7 +291,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],3:[function(require,module,exports){
+},{"../../mixins/field":36}],5:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -158,17 +311,14 @@ module.exports = React.createClass({
 
   renderDefault: function () {
 
-    var config = this.props.config;
-    var field = this.props.field;
-
     return R.div({className: cx(this.props.classes)},
-      config.fieldHelpText(field)
+      this.props.config.fieldHelpText(this.props.field)
     );
   }
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],4:[function(require,module,exports){
+},{"../../mixins/field":36}],6:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -185,7 +335,7 @@ module.exports = React.createClass({
 
   onChangeField: function (key, newValue, info) {
     if (key) {
-      var newObjectValue = _.extend({}, this.props.value);
+      var newObjectValue = _.extend({}, this.props.field.value);
       newObjectValue[key] = newValue;
       this.onBubbleValue(newObjectValue, info);
     }
@@ -198,22 +348,20 @@ module.exports = React.createClass({
   renderDefault: function () {
     var config = this.props.config;
     var field = this.props.field;
-    var obj = this.props.value || {};
+
+    var fields = config.createChildFields(field);
 
     return config.createElement('field', {
-      config: config, field: field, value: obj, plain: this.props.plain
+      config: config, field: field, plain: this.props.plain
     },
       R.fieldset({className: cx(this.props.classes)},
-        field.fields.map(function (field, i) {
-          var value;
-          var key = config.fieldKey(field);
-          if (key) {
-            value = obj[key];
-            if (_.isUndefined(value)) {
-              value = config.fieldDefaultValue(field);
-            }
-          }
-          return config.createField({key: key || i, field: field, value: value, onChange: this.onChangeField.bind(this, key), onAction: this.onBubbleAction});
+        fields.map(function (childField, i) {
+          var key = childField.key || i;
+          return config.createFieldElement({
+            key: key || i,
+            field: childField,
+            onChange: this.onChangeField.bind(this, key), onAction: this.onBubbleAction
+          });
         }.bind(this))
       )
     );
@@ -222,7 +370,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],5:[function(require,module,exports){
+},{"../../mixins/field":36}],7:[function(require,module,exports){
 (function (global){
 // # component.json
 
@@ -262,7 +410,7 @@ module.exports = React.createClass({
   getInitialState: function () {
     return {
       isValid: true,
-      value: JSON.stringify(this.props.value, null, 2)
+      value: JSON.stringify(this.props.field.value, null, 2)
     };
   },
 
@@ -300,13 +448,13 @@ module.exports = React.createClass({
     var field = this.props.field;
 
     return config.createElement('field', {
-      field: field, value: this.state.value, plain: this.props.plain
+      field: config.fieldWithValue(field, this.state.value), plain: this.props.plain
     }, R.textarea({
         className: cx(this.props.classes),
         value: this.state.value,
         onChange: this.onChange,
         style: {backgroundColor: this.state.isValid ? '' : 'rgb(255,200,200)'},
-        rows: field.rows || this.props.rows,
+        rows: config.fieldRows(field) || this.props.rows,
         onFocus: this.onFocusAction,
         onBlur: this.onBlurAction
       })
@@ -315,193 +463,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],6:[function(require,module,exports){
-(function (global){
-// # component.list
-
-/*
-Render a list.
-*/
-
-'use strict';
-
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
-var R = React.DOM;
-var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
-var cx = React.addons.classSet;
-
-var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
-
-module.exports = React.createClass({
-
-  displayName: 'List',
-
-  mixins: [require('../../mixins/field')],
-
-  // getDefaultProps: function () {
-  //   return {
-  //     className: plugin.config.className
-  //   };
-  // },
-
-  nextLookupId: 0,
-
-  getInitialState: function () {
-
-    // Need to create artificial keys for the array. Indexes are not good keys,
-    // since they change. So, map each position to an artificial key
-    var lookups = [];
-
-    var items = this.props.value;
-
-    items.forEach(function (item, i) {
-      lookups[i] = '_' + this.nextLookupId;
-      this.nextLookupId++;
-    }.bind(this));
-
-    return {
-      lookups: lookups
-    };
-  },
-
-  componentWillReceiveProps: function (newProps) {
-
-    var lookups = this.state.lookups;
-
-    var items = newProps.value;
-
-    // Need to set artificial keys for new array items.
-    if (items.length > lookups.length) {
-      for (var i = lookups.length; i < items.length; i++) {
-        lookups[i] = '_' + this.nextLookupId;
-        this.nextLookupId++;
-      }
-    }
-
-    this.setState({
-      lookups: lookups
-    });
-  },
-
-  onChange: function (i, newValue, info) {
-    var newArrayValue = this.props.value.slice(0);
-    newArrayValue[i] = newValue;
-    this.onBubbleValue(newArrayValue, info);
-  },
-
-  onAppend: function (itemChoiceIndex) {
-    var config = this.props.config;
-    var newValue = config.fieldItemValue(this.props.field, itemChoiceIndex);
-    var items = this.props.value;
-
-    items = items.concat(newValue);
-
-    this.onChangeValue(items);
-  },
-  //
-  // onClickLabel: function (i) {
-  //   if (this.props.field.collapsableItems) {
-  //     var collapsed;
-  //     // if (!this.state.collapsed[i]) {
-  //     //   collapsed = this.state.collapsed;
-  //     //   collapsed[i] = true;
-  //     //   this.setState({collapsed: collapsed});
-  //     // } else {
-  //     //   collapsed = this.props.field.fields.map(function () {
-  //     //     return true;
-  //     //   });
-  //     //   collapsed[i] = false;
-  //     //   this.setState({collapsed: collapsed});
-  //     // }
-  //     collapsed = this.state.collapsed;
-  //     collapsed[i] = !collapsed[i];
-  //     this.setState({collapsed: collapsed});
-  //   }
-  // },
-  //
-  onRemove: function (i) {
-    var lookups = this.state.lookups;
-    lookups.splice(i, 1);
-    this.setState({
-      lookups: lookups
-    });
-    var newItems = this.props.value.slice(0);
-    newItems.splice(i, 1);
-    this.onChangeValue(newItems);
-  },
-  //
-  onMove: function (fromIndex, toIndex) {
-    var lookups = this.state.lookups;
-    var fromId = lookups[fromIndex];
-    var toId = lookups[toIndex];
-    lookups[fromIndex] = toId;
-    lookups[toIndex] = fromId;
-    this.setState({
-      lookups: lookups
-    });
-
-    var newItems = this.props.value.slice(0);
-    if (fromIndex !== toIndex &&
-      fromIndex >= 0 && fromIndex < newItems.length &&
-      toIndex >= 0 && toIndex < newItems.length
-    ) {
-      newItems.splice(toIndex, 0, newItems.splice(fromIndex, 1)[0]);
-    }
-    this.onChangeValue(newItems);
-  },
-
-  getFields: function () {
-    var config = this.props.config;
-    var items = this.props.value;
-    var field = this.props.field;
-
-    return items.map(function (item, i) {
-      var childField = config.fieldItemForValue(field, item);
-      childField = _.extend({}, childField);
-      childField.key = i;
-      return childField;
-    });
-  },
-
-  render: function () {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function () {
-
-    var config = this.props.config;
-    var field = this.props.field;
-    var fields = this.getFields();
-    var items = this.props.value;
-
-    var numItems = fields.length;
-    return config.createElement('field', {
-      field: field, value: items, plain: this.props.plain
-    },
-      R.div({className: cx(this.props.classes)},
-        CSSTransitionGroup({transitionName: 'reveal'},
-          fields.map(function (childField, i) {
-            return config.createElement('list-item', {
-              key: this.state.lookups[i],
-              field: childField,
-              value: items[i],
-              index: i,
-              numItems: numItems,
-              onMove: this.onMove,
-              onRemove: this.onRemove,
-              onChange: this.onChange,
-              onAction: this.onBubbleAction
-            });
-          }.bind(this))
-        ),
-        config.createElement('list-control', {field: field, onAppend: this.onAppend})
-      )
-    );
-  }
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],7:[function(require,module,exports){
+},{"../../mixins/field":36}],8:[function(require,module,exports){
 (function (global){
 // # component.object
 
@@ -528,6 +490,9 @@ var isTempKey = function (key) {
   return key.substring(0, tempKeyPrefix.length) === tempKeyPrefix;
 };
 
+// TODO: keep invalid keys as state and don't send in onChange; clone context
+// and use clone to create child contexts
+
 module.exports = React.createClass({
 
   displayName: 'Object',
@@ -539,7 +504,7 @@ module.exports = React.createClass({
   getInitialState: function () {
 
     var keyToId = {};
-    var keys = Object.keys(this.props.value);
+    var keys = Object.keys(this.props.field.value);
     var keyOrder = [];
     // Temp keys keeps the key to display, which sometimes may be different
     // than the actual key. For example, duplicate keys are not allowed,
@@ -582,7 +547,7 @@ module.exports = React.createClass({
     var tempDisplayKeys = this.state.tempDisplayKeys;
     var newTempDisplayKeys = {};
     var keyOrder = this.state.keyOrder;
-    var keys = Object.keys(newProps.value);
+    var keys = Object.keys(newProps.field.value);
     var addedKeys = [];
 
     // Look at the new keys.
@@ -622,13 +587,14 @@ module.exports = React.createClass({
   },
 
   onChange: function (key, newValue, info) {
-    var newObj = _.extend({}, this.props.value);
+    var newObj = _.extend({}, this.props.field.value);
     newObj[key] = newValue;
     this.onBubbleValue(newObj, info);
   },
 
   onAppend: function (itemChoiceIndex) {
     var config = this.props.config;
+    var field = this.props.field;
     this.nextLookupId++;
 
     var keyToId = this.state.keyToId;
@@ -649,14 +615,18 @@ module.exports = React.createClass({
       keyOrder: keyOrder
     });
 
-    var newObj = _.extend(this.props.value);
-    newObj[newKey] = config.fieldItemValue(this.props.field, itemChoiceIndex);
+    var newObj = _.extend(this.props.field.value);
+
+    var childFieldTemplate = config.fieldItemFieldTemplates(field)[itemChoiceIndex];
+    var newValue = config.fieldTemplateValue(childFieldTemplate);
+
+    newObj[newKey] = newValue;
 
     this.onChangeValue(newObj);
   },
 
   onRemove: function (key) {
-    var newObj = _.extend(this.props.value);
+    var newObj = _.extend(this.props.field.value);
     delete newObj[key];
     this.onChangeValue(newObj);
   },
@@ -667,7 +637,7 @@ module.exports = React.createClass({
       var keyOrder = this.state.keyOrder;
       var tempDisplayKeys = this.state.tempDisplayKeys;
 
-      var newObj = _.extend(this.props.value);
+      var newObj = _.extend(this.props.field.value);
 
       // If we already have the key we're moving to, then we have to change that
       // key to something else.
@@ -727,14 +697,18 @@ module.exports = React.createClass({
 
   getFields: function () {
     var config = this.props.config;
-    var obj = this.props.value;
     var field = this.props.field;
 
+    var fields = config.createChildFields(field);
+
+    var keyToField = {};
+
+    _.each(fields, function (field) {
+      keyToField[field.key] = field;
+    });
+
     return this.state.keyOrder.map(function (key) {
-      var childField = config.fieldItemForValue(field, obj[key]);
-      childField = _.extend({}, childField);
-      childField.key = key;
-      return childField;
+      return keyToField[key];
     });
   },
 
@@ -746,29 +720,28 @@ module.exports = React.createClass({
 
     var config = this.props.config;
     var field = this.props.field;
+
     var fields = this.getFields();
-    var obj = this.props.value;
 
     return config.createElement('field', {
-      field: field, value: this.props.value, plain: this.props.plain
+      field: field, plain: this.props.plain
     },
       R.div({className: cx(this.props.classes)},
         CSSTransitionGroup({transitionName: 'reveal'},
-          fields.map(function (child) {
-            var displayKey = this.state.tempDisplayKeys[this.state.keyToId[child.key]];
+          fields.map(function (childField) {
+            var displayKey = this.state.tempDisplayKeys[this.state.keyToId[childField.key]];
             if (_.isUndefined(displayKey)) {
-              displayKey = child.key;
+              displayKey = childField.key;
             }
             return config.createElement('object-item', {
-              key: this.state.keyToId[child.key],
-              field: child,
-              value: obj[child.key],
+              key: this.state.keyToId[childField.key],
+              field: childField,
               onMove: this.onMove,
               onRemove: this.onRemove,
               onChange: this.onChange,
               onAction: this.onBubbleAction,
               displayKey: displayKey,
-              itemKey: child.key
+              itemKey: childField.key
             });
           }.bind(this))
         ),
@@ -779,7 +752,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],8:[function(require,module,exports){
+},{"../../mixins/field":36}],9:[function(require,module,exports){
 (function (global){
 // # component.pretty-textarea
 
@@ -921,7 +894,7 @@ module.exports = React.createClass({
     // Not quite state, this is for tracking selection info.
     this.tracking = {};
 
-    var parts = parseTextWithTags(this.props.value);
+    var parts = parseTextWithTags(this.props.field.value);
     var tokens = this.tokens(parts);
     var indexMap = this.indexMap(tokens);
 
@@ -933,7 +906,7 @@ module.exports = React.createClass({
 
   getStateSnapshot: function () {
     return {
-      value: this.props.value,
+      value: this.props.field.value,
       pos: this.tracking.pos,
       range: this.tracking.range
     };
@@ -1050,7 +1023,7 @@ module.exports = React.createClass({
   },
 
   componentDidUpdate: function () {
-    var value = this.props.value || '';
+    var value = this.props.field.value || '';
     var parts = parseTextWithTags(value);
     this.tracking.tokens = this.tokens(parts);
     this.tracking.indexMap = this.indexMap(this.tracking.tokens);
@@ -1534,14 +1507,14 @@ module.exports = React.createClass({
     // }].concat(replaceChoices);
 
     return config.createElement('field', {
-      field: field, value: this.props.value, plain: this.props.plain
+      field: field, plain: this.props.plain
     }, R.div({style: {position: 'relative'}},
 
       R.pre({
         className: 'pretty-highlight',
         ref: 'highlight'
       },
-        this.prettyValue(this.props.value)
+        this.prettyValue(this.props.field.value)
       ),
 
       (config.fieldIsSingleLine(field) ? R.input : R.textarea)({
@@ -1549,8 +1522,8 @@ module.exports = React.createClass({
         className: cx(_.extend({}, this.props.classes, {'pretty-content': true})),
         ref: 'content',
         rows: field.rows || this.props.rows,
-        name: config.fieldKey(field),
-        value: this.plainValue(this.props.value),
+        name: field.key,
+        value: this.plainValue(this.props.field.value),
         onChange: this.onChange,
         onScroll: this.onScroll,
         style: {
@@ -1582,7 +1555,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35,"../../mixins/resize":38,"../../mixins/undo-stack":40,"../../utils":42}],9:[function(require,module,exports){
+},{"../../mixins/field":36,"../../mixins/resize":39,"../../mixins/undo-stack":41,"../../utils":44}],10:[function(require,module,exports){
 (function (global){
 // # component.select
 
@@ -1624,15 +1597,15 @@ module.exports = React.createClass({
     var field = this.props.field;
 
     return config.createElement('field', {
-      config: config, field: field, value: this.props.value, plain: this.props.plain
+      config: config, field: field, plain: this.props.plain
     }, config.createElement('select-value', {
-      choices: this.state.choices, value: this.props.value, onChange: this.onChangeValue, onAction: this.onBubbleAction
+      choices: this.state.choices, field: field, onChange: this.onChangeValue, onAction: this.onBubbleAction
     }));
   }
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],10:[function(require,module,exports){
+},{"../../mixins/field":36}],11:[function(require,module,exports){
 (function (global){
 // # component.string
 
@@ -1644,7 +1617,7 @@ var cx = React.addons.classSet;
 
 module.exports = React.createClass({
 
-  displayName: 'Text',
+  displayName: 'String',
 
   mixins: [require('../../mixins/field')],
 
@@ -1662,33 +1635,20 @@ module.exports = React.createClass({
     var field = this.props.field;
 
     return config.createElement('field', {
-      config: config, field: field, value: this.props.value, plain: this.props.plain
+      config: config, field: field, plain: this.props.plain
     }, R.textarea({
-      value: this.props.value,
+      value: this.props.field.value,
       className: cx(this.props.classes),
       rows: field.rows || this.props.rows,
       onChange: this.onChange,
       onFocus: this.onFocusAction,
       onBlur: this.onBlurAction
     }));
-
-    // var field = this.props.field;
-    //
-    // return plugin.component('field')({
-    //   field: field, plain: this.props.plain
-    // }, R.textarea({
-    //   className: this.props.className,
-    //   value: field.value,
-    //   rows: field.def.rows || this.props.rows,
-    //   onChange: this.onChange,
-    //   onFocus: this.onFocus,
-    //   onBlur: this.onBlur
-    // }));
   }
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],11:[function(require,module,exports){
+},{"../../mixins/field":36}],12:[function(require,module,exports){
 (function (global){
 // # component.string
 
@@ -1718,33 +1678,20 @@ module.exports = React.createClass({
     var field = this.props.field;
 
     return config.createElement('field', {
-      config: config, field: field, value: this.props.value, plain: this.props.plain
+      config: config, field: field, plain: this.props.plain
     }, R.input({
       type: 'text',
-      value: this.props.value,
+      value: this.props.field.value,
       className: cx(this.props.classes),
       onChange: this.onChange,
       onFocus: this.onFocusAction,
       onBlur: this.onBlurAction
     }));
-
-    // var field = this.props.field;
-    //
-    // return plugin.component('field')({
-    //   field: field, plain: this.props.plain
-    // }, R.textarea({
-    //   className: this.props.className,
-    //   value: field.value,
-    //   rows: field.def.rows || this.props.rows,
-    //   onChange: this.onChange,
-    //   onFocus: this.onFocus,
-    //   onBlur: this.onBlur
-    // }));
   }
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],12:[function(require,module,exports){
+},{"../../mixins/field":36}],13:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1764,14 +1711,14 @@ module.exports = React.createClass({
   renderDefault: function () {
     return R.div({},
       R.div({}, 'Component not found for: '),
-      R.pre({}, JSON.stringify(this.props.field, null, 2))
+      R.pre({}, JSON.stringify(this.props.field.rawFieldTemplate, null, 2))
     );
   }
 
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":35}],13:[function(require,module,exports){
+},{"../../mixins/field":36}],14:[function(require,module,exports){
 (function (global){
 // # component.add-item
 
@@ -1807,7 +1754,196 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],14:[function(require,module,exports){
+},{"../../mixins/helper":37}],15:[function(require,module,exports){
+(function (global){
+// # component.list-control
+
+/*
+Render the item type choices and the add button.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var cx = React.addons.classSet;
+
+module.exports = React.createClass({
+
+  displayName: 'ArrayControl',
+
+  mixins: [require('../../mixins/helper')],
+
+  getInitialState: function () {
+    return {
+      fieldTemplateIndex: 0
+    };
+  },
+
+  onSelect: function (index) {
+    this.setState({
+      fieldTemplateIndex: index
+    });
+  },
+
+  onAppend: function () {
+    this.props.onAppend(this.state.fieldTemplateIndex);
+  },
+
+  render: function () {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function () {
+
+    var config = this.props.config;
+
+    var field = this.props.field;
+    var fieldTemplates = config.fieldItemFieldTemplates(field);
+
+    var typeChoices = null;
+
+    if (fieldTemplates.length > 0) {
+      typeChoices = config.createElement('field-template-choices', {
+        field: field, fieldTemplateIndex: this.state.fieldTemplateIndex, onSelect: this.onSelect
+      });
+    }
+
+    return R.div({className: cx(this.props.classes)},
+      typeChoices, ' ',
+      config.createElement('add-item', {field: field, onClick: this.onAppend})
+    );
+  }
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../mixins/helper":37}],16:[function(require,module,exports){
+(function (global){
+// # component.list-item-control
+
+/*
+Render the remove and move buttons for a field.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var cx = React.addons.classSet;
+
+module.exports = React.createClass({
+
+  displayName: 'ArrayItemControl',
+
+  mixins: [require('../../mixins/helper')],
+
+  onMoveBack: function () {
+    this.props.onMove(this.props.index, this.props.index - 1);
+  },
+
+  onMoveForward: function () {
+    this.props.onMove(this.props.index, this.props.index + 1);
+  },
+
+  onRemove: function () {
+    this.props.onRemove(this.props.index);
+  },
+
+  render: function () {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function () {
+    var config = this.props.config;
+    var field = this.props.field;
+
+    return R.div({className: cx(this.props.classes)},
+      config.createElement('remove-item', {field: field, onClick: this.onRemove}),
+      this.props.index > 0 ? config.createElement('move-item-back', {field: field, onClick: this.onMoveBack}) : null,
+      this.props.index < (this.props.numItems - 1) ? config.createElement('move-item-forward', {field: field, onClick: this.onMoveForward}) : null
+    );
+  }
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../mixins/helper":37}],17:[function(require,module,exports){
+(function (global){
+// # component.list-item-value
+
+/*
+Render the value of a list item.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var cx = React.addons.classSet;
+
+module.exports = React.createClass({
+
+  displayName: 'ArrayItemValue',
+
+  mixins: [require('../../mixins/helper')],
+
+  onChangeField: function (newValue, info) {
+    this.props.onChange(this.props.index, newValue, info);
+  },
+
+  render: function () {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function () {
+    var config = this.props.config;
+    var field = this.props.field;
+
+    return R.div({className: cx(this.props.classes)},
+      config.createFieldElement({field: field, onChange: this.onChangeField, onAction: this.onBubbleAction})
+    );
+  }
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../mixins/helper":37}],18:[function(require,module,exports){
+(function (global){
+// # component.list-item
+
+/*
+Render a list item.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var cx = React.addons.classSet;
+
+module.exports = React.createClass({
+
+  displayName: 'ArrayItem',
+
+  mixins: [require('../../mixins/helper')],
+
+  render: function () {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function () {
+    var config = this.props.config;
+    var field = this.props.field;
+
+    return R.div({className: cx(this.props.className)},
+      config.createElement('array-item-value', {field: field, index: this.props.index,
+        onChange: this.props.onChange, onAction: this.onBubbleAction}),
+      config.createElement('array-item-control', {field: field, index: this.props.index, numItems: this.props.numItems,
+        onMove: this.props.onMove, onRemove: this.props.onRemove})
+    );
+  }
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../mixins/helper":37}],19:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1958,7 +2094,55 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/click-outside":34,"../../mixins/helper":36}],15:[function(require,module,exports){
+},{"../../mixins/click-outside":35,"../../mixins/helper":37}],20:[function(require,module,exports){
+(function (global){
+// # component.item-choices
+
+/*
+Give a list of choices of item types to create as children of an field.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var cx = React.addons.classSet;
+
+module.exports = React.createClass({
+
+  displayName: 'FieldTemplateChoices',
+
+  mixins: [require('../../mixins/helper')],
+
+  onChange: function (event) {
+    this.props.onSelect(parseInt(event.target.value));
+  },
+
+  render: function () {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function () {
+
+    var config = this.props.config;
+    var field = this.props.field;
+
+    var fieldTemplates = config.fieldItemFieldTemplates(field);
+
+    var typeChoices = null;
+    if (fieldTemplates.length > 1) {
+      typeChoices = R.select({className: cx(this.props.classes), value: this.fieldTemplateIndex, onChange: this.onChange},
+      fieldTemplates.map(function (fieldTemplate, i) {
+        return R.option({key: i, value: i}, fieldTemplate.label || i);
+      }));
+    }
+
+    return typeChoices ? typeChoices : R.span(null);
+  }
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../mixins/helper":37}],21:[function(require,module,exports){
 (function (global){
 // # component.field
 
@@ -1983,14 +2167,8 @@ module.exports = React.createClass({
 
   getInitialState: function () {
     return {
-      collapsed: this.props.field.collapsed ? true : false
+      collapsed: this.props.config.fieldIsCollapsed(this.props.field) ? true : false
     };
-  },
-
-  isCollapsible: function () {
-    var field = this.props.field;
-
-    return !_.isUndefined(field.collapsed) || !_.isUndefined(field.collapsible);
   },
 
   onClickLabel: function () {
@@ -2015,16 +2193,16 @@ module.exports = React.createClass({
 
     var index = this.props.index;
     if (!_.isNumber(index)) {
-      var key = config.fieldKey(field);
+      var key = this.props.field.key;
       index = _.isNumber(key) ? key : undefined;
     }
 
     var classes = _.extend({}, this.props.classes);
 
-    if (config.fieldRequired(field)) {
+    if (config.fieldIsRequired(field)) {
       classes.required = true;
 
-      if (_.isUndefined(this.props.value) || this.props.value === '') {
+      if (_.isUndefined(this.props.field.value) || this.props.field.value === '') {
         classes['validation-error-required'] = true;
       }
 
@@ -2033,10 +2211,16 @@ module.exports = React.createClass({
     }
 
     return R.div({className: cx(classes), style: {display: (field.hidden ? 'none' : '')}},
-      config.createElement('label', {config: config, field: field, index: index, onClick: this.isCollapsible() ? this.onClickLabel : null}),
+      config.createElement('label', {
+        config: config, field: field,
+        index: index, onClick: config.fieldIsCollapsible(field) ? this.onClickLabel : null
+      }),
       CSSTransitionGroup({transitionName: 'reveal'},
         this.state.collapsed ? [] : [
-          config.createElement('help', {config: config, key: 'help', field: field}),
+          config.createElement('help', {
+            config: config, field: field,
+            key: 'help'
+          }),
           this.props.children
         ]
       )
@@ -2045,7 +2229,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],16:[function(require,module,exports){
+},{"../../mixins/helper":37}],22:[function(require,module,exports){
 (function (global){
 // # component.help
 
@@ -2071,9 +2255,7 @@ module.exports = React.createClass({
 
   renderDefault: function () {
 
-    var config = this.props.config;
-    var field = this.props.field;
-    var helpText = config.fieldHelpText(field);
+    var helpText = this.props.config.fieldHelpText(this.props.field);
 
     return helpText ?
       R.div({className: cx(this.props.classes), dangerouslySetInnerHTML: {__html: helpText}}) :
@@ -2082,55 +2264,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],17:[function(require,module,exports){
-(function (global){
-// # component.item-choices
-
-/*
-Give a list of choices of item types to create as children of an field.
-*/
-
-'use strict';
-
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
-var R = React.DOM;
-var cx = React.addons.classSet;
-
-module.exports = React.createClass({
-
-  displayName: 'ItemChoices',
-
-  mixins: [require('../../mixins/helper')],
-
-  onChange: function (event) {
-    this.props.onSelect(parseInt(event.target.value));
-  },
-
-  render: function () {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function () {
-
-    var config = this.props.config;
-    var field = this.props.field;
-    var items = config.fieldItems(field);
-
-    var typeChoices = null;
-    if (items.length > 1) {
-      typeChoices = R.select({className: cx(this.props.classes), value: this.value, onChange: this.onChange},
-        items.map(function (item, i) {
-          return R.option({key: i, value: i}, item.label || i);
-        })
-      );
-    }
-
-    return typeChoices ? typeChoices : R.span(null);
-  }
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],18:[function(require,module,exports){
+},{"../../mixins/helper":37}],23:[function(require,module,exports){
 (function (global){
 // # component.label
 
@@ -2155,9 +2289,7 @@ module.exports = React.createClass({
   },
 
   renderDefault: function () {
-
     var config = this.props.config;
-
     var field = this.props.field;
 
     var fieldLabel = config.fieldLabel(field);
@@ -2182,7 +2314,7 @@ module.exports = React.createClass({
 
     if (!config.fieldHasValueChildren(field)) {
       requiredOrNot = R.span({
-        className: config.fieldRequired(field) ? 'required-text' : 'not-required-text'
+        className: config.fieldIsRequired(field) ? 'required-text' : 'not-required-text'
       });
     }
 
@@ -2197,195 +2329,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],19:[function(require,module,exports){
-(function (global){
-// # component.list-control
-
-/*
-Render the item type choices and the add button.
-*/
-
-'use strict';
-
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
-var R = React.DOM;
-var cx = React.addons.classSet;
-
-module.exports = React.createClass({
-
-  displayName: 'ListControl',
-
-  mixins: [require('../../mixins/helper')],
-
-  getInitialState: function () {
-    return {
-      itemIndex: 0
-    };
-  },
-
-  onSelect: function (index) {
-    this.setState({
-      itemIndex: index
-    });
-  },
-
-  onAppend: function () {
-    this.props.onAppend(this.state.itemIndex);
-  },
-
-  render: function () {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function () {
-
-    var config = this.props.config;
-    var field = this.props.field;
-    var items = config.fieldItems(field);
-
-    var typeChoices = null;
-
-    if (items.length > 0) {
-      typeChoices = config.createElement('item-choices', {field: field, value: this.state.itemIndex, onSelect: this.onSelect});
-    }
-
-    return R.div({className: cx(this.props.classes)},
-      typeChoices, ' ',
-      config.createElement('add-item', {onClick: this.onAppend})
-    );
-  }
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],20:[function(require,module,exports){
-(function (global){
-// # component.list-item-control
-
-/*
-Render the remove and move buttons for a field.
-*/
-
-'use strict';
-
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
-var R = React.DOM;
-var cx = React.addons.classSet;
-
-module.exports = React.createClass({
-
-  displayName: 'ListItemControl',
-
-  mixins: [require('../../mixins/helper')],
-
-  onMoveBack: function () {
-    this.props.onMove(this.props.index, this.props.index - 1);
-  },
-
-  onMoveForward: function () {
-    this.props.onMove(this.props.index, this.props.index + 1);
-  },
-
-  onRemove: function () {
-    this.props.onRemove(this.props.index);
-  },
-
-  render: function () {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function () {
-    var config = this.props.config;
-    var field = this.props.field;
-
-    return R.div({className: cx(this.props.classes)},
-      config.createElement('remove-item', {field: field, onClick: this.onRemove}),
-      this.props.index > 0 ? config.createElement('move-item-back', {onClick: this.onMoveBack}) : null,
-      this.props.index < (this.props.numItems - 1) ? config.createElement('move-item-forward', {onClick: this.onMoveForward}) : null
-    );
-  }
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],21:[function(require,module,exports){
-(function (global){
-// # component.list-item-value
-
-/*
-Render the value of a list item.
-*/
-
-'use strict';
-
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
-var R = React.DOM;
-var cx = React.addons.classSet;
-
-module.exports = React.createClass({
-
-  displayName: 'ListItemValue',
-
-  mixins: [require('../../mixins/helper')],
-
-  onChangeField: function (newValue, info) {
-    this.props.onChange(this.props.index, newValue, info);
-  },
-
-  render: function () {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function () {
-    var config = this.props.config;
-    var field = this.props.field;
-    var value = this.props.value;
-
-    return R.div({className: cx(this.props.classes)},
-
-      config.createField({field: field, value: value, onChange: this.onChangeField, onAction: this.onBubbleAction})
-    );
-  }
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],22:[function(require,module,exports){
-(function (global){
-// # component.list-item
-
-/*
-Render a list item.
-*/
-
-'use strict';
-
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
-var R = React.DOM;
-var cx = React.addons.classSet;
-
-module.exports = React.createClass({
-
-  displayName: 'ListItem',
-
-  mixins: [require('../../mixins/helper')],
-
-  render: function () {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function () {
-    var config = this.props.config;
-    var field = this.props.field;
-
-    return R.div({className: cx(this.props.className)},
-      config.createElement('list-item-value', {field: field, value: this.props.value, index: this.props.index,
-        onChange: this.props.onChange, onAction: this.onBubbleAction}),
-      config.createElement('list-item-control', {field: field, index: this.props.index, numItems: this.props.numItems,
-        onMove: this.props.onMove, onRemove: this.props.onRemove})
-    );
-  }
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],23:[function(require,module,exports){
+},{"../../mixins/helper":37}],24:[function(require,module,exports){
 (function (global){
 // # component.move-item-back
 
@@ -2421,7 +2365,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],24:[function(require,module,exports){
+},{"../../mixins/helper":37}],25:[function(require,module,exports){
 (function (global){
 // # component.move-item-forward
 
@@ -2457,7 +2401,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],25:[function(require,module,exports){
+},{"../../mixins/helper":37}],26:[function(require,module,exports){
 (function (global){
 // # component.object-control
 
@@ -2479,18 +2423,18 @@ module.exports = React.createClass({
 
   getInitialState: function () {
     return {
-      itemIndex: 0
+      fieldTemplateIndex: 0
     };
   },
 
   onSelect: function (index) {
     this.setState({
-      itemIndex: index
+      fieldTemplateIndex: index
     });
   },
 
   onAppend: function () {
-    this.props.onAppend(this.state.itemIndex);
+    this.props.onAppend(this.state.fieldTemplateIndex);
   },
 
   render: function () {
@@ -2500,12 +2444,15 @@ module.exports = React.createClass({
   renderDefault: function () {
     var config = this.props.config;
     var field = this.props.field;
-    var items = config.fieldItems(field);
+    var fieldTemplates = config.fieldChildFieldTemplates(field);
 
     var typeChoices = null;
 
-    if (items.length > 0) {
-      typeChoices = config.createElement('item-choices', {field: field, value: this.state.itemIndex, onSelect: this.onSelect});
+    if (fieldTemplates.length > 0) {
+      typeChoices = config.createElement('field-template-choices', {
+        field: field,
+        fieldTemplateIndex: this.state.fieldTemplateIndex, onSelect: this.onSelect
+      });
     }
 
     return R.div({className: cx(this.props.classes)},
@@ -2516,7 +2463,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],26:[function(require,module,exports){
+},{"../../mixins/helper":37}],27:[function(require,module,exports){
 (function (global){
 // # component.object-item-control
 
@@ -2555,7 +2502,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],27:[function(require,module,exports){
+},{"../../mixins/helper":37}],28:[function(require,module,exports){
 (function (global){
 // # component.object-item-key
 
@@ -2589,7 +2536,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],28:[function(require,module,exports){
+},{"../../mixins/helper":37}],29:[function(require,module,exports){
 (function (global){
 // # component.object-item-value
 
@@ -2622,13 +2569,13 @@ module.exports = React.createClass({
     var field = this.props.field;
 
     return R.div({className: cx(this.props.className)},
-      config.createField({field: field, value: this.props.value, onChange: this.onChangeField, plain: true})
+      config.createFieldElement({field: field, onChange: this.onChangeField, plain: true})
     );
   }
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],29:[function(require,module,exports){
+},{"../../mixins/helper":37}],30:[function(require,module,exports){
 (function (global){
 // # component.object-item
 
@@ -2662,14 +2609,14 @@ module.exports = React.createClass({
 
     return R.div({className: cx(this.props.className)},
       config.createElement('object-item-key', {field: field, onChange: this.onChangeKey, displayKey: this.props.displayKey, itemKey: this.props.itemKey}),
-      config.createElement('object-item-value', {field: field, value: this.props.value, onChange: this.props.onChange, itemKey: this.props.itemKey}),
+      config.createElement('object-item-value', {field: field, onChange: this.props.onChange, itemKey: this.props.itemKey}),
       config.createElement('object-item-control', {field: field, onRemove: this.props.onRemove, itemKey: this.props.itemKey})
     );
   }
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],30:[function(require,module,exports){
+},{"../../mixins/helper":37}],31:[function(require,module,exports){
 (function (global){
 // # component.remove-item
 
@@ -2705,7 +2652,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],31:[function(require,module,exports){
+},{"../../mixins/helper":37}],32:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2746,7 +2693,7 @@ module.exports = React.createClass({
       );
     } else {
 
-      var value = this.props.value !== undefined ? this.props.value : '';
+      var value = this.props.field.value !== undefined ? this.props.field.value : '';
 
       choices = choices.map(function (choice, i) {
         return {
@@ -2795,7 +2742,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":36}],32:[function(require,module,exports){
+},{"../../mixins/helper":37}],33:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2804,76 +2751,190 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 
 var utils = require('./utils');
 
-var createString = function () {
-  return '';
-};
-
-var createObject = function () {
-  return {};
-};
-
-var createArray = function () {
-  return [];
-};
-
-var createBoolean = function () {
-  return false;
+var delegateTo = function (name) {
+  return function () {
+    return this[name].apply(this, arguments);
+  };
 };
 
 module.exports = {
 
-  // Field element factories
+  // Field element factories. Create field elements.
+
   createElement_Fields: React.createFactory(require('./components/fields/fields')),
-  createElement_Text: React.createFactory(require('./components/fields/text')),
+
+  createElement_String: React.createFactory(require('./components/fields/string')),
+
   createElement_Unicode: React.createFactory(require('./components/fields/unicode')),
+
   createElement_Select: React.createFactory(require('./components/fields/select')),
+
   createElement_Boolean: React.createFactory(require('./components/fields/boolean')),
+
   createElement_PrettyText: React.createFactory(require('./components/fields/pretty-text')),
-  createElement_List: React.createFactory(require('./components/fields/list')),
+
+  createElement_Array: React.createFactory(require('./components/fields/array')),
+
   createElement_CheckboxList: React.createFactory(require('./components/fields/checkbox-list')),
+
   createElement_Object: React.createFactory(require('./components/fields/object')),
+
   createElement_Json: React.createFactory(require('./components/fields/json')),
+
   createElement_UnknownField: React.createFactory(require('./components/fields/unknown')),
+
   createElement_Copy: React.createFactory(require('./components/fields/copy')),
 
-  // Other element factories
+
+  // Other element factories. Create helper elements used by field components.
+
   createElement_Field: React.createFactory(require('./components/helpers/field')),
+
   createElement_Label: React.createFactory(require('./components/helpers/label')),
+
   createElement_Help: React.createFactory(require('./components/helpers/help')),
+
   createElement_Choices: React.createFactory(require('./components/helpers/choices')),
-  createElement_ListControl: React.createFactory(require('./components/helpers/list-control')),
-  createElement_ListItemControl: React.createFactory(require('./components/helpers/list-item-control')),
-  createElement_ListItemValue: React.createFactory(require('./components/helpers/list-item-value')),
-  createElement_ListItem: React.createFactory(require('./components/helpers/list-item')),
-  createElement_ItemChoices: React.createFactory(require('./components/helpers/item-choices')),
+
+  createElement_ArrayControl: React.createFactory(require('./components/helpers/array-control')),
+
+  createElement_ArrayItemControl: React.createFactory(require('./components/helpers/array-item-control')),
+
+  createElement_ArrayItemValue: React.createFactory(require('./components/helpers/array-item-value')),
+
+  createElement_ArrayItem: React.createFactory(require('./components/helpers/array-item')),
+
+  createElement_FieldTemplateChoices: React.createFactory(require('./components/helpers/field-template-choices')),
+
   createElement_AddItem: React.createFactory(require('./components/helpers/add-item')),
+
   createElement_RemoveItem: React.createFactory(require('./components/helpers/remove-item')),
+
   createElement_MoveItemForward: React.createFactory(require('./components/helpers/move-item-forward')),
+
   createElement_MoveItemBack: React.createFactory(require('./components/helpers/move-item-back')),
+
   createElement_ObjectControl: React.createFactory(require('./components/helpers/object-control')),
+
   createElement_ObjectItemControl: React.createFactory(require('./components/helpers/object-item-control')),
+
   createElement_ObjectItemValue: React.createFactory(require('./components/helpers/object-item-value')),
+
   createElement_ObjectItemKey: React.createFactory(require('./components/helpers/object-item-key')),
+
   createElement_ObjectItem: React.createFactory(require('./components/helpers/object-item')),
+
   createElement_SelectValue: React.createFactory(require('./components/helpers/select-value')),
 
-  // Field default values
-  defaultValue_Fields: createObject,
-  defaultValue_Text: createString,
-  defaultValue_Unicode: createString,
-  defaultValue_Select: createString,
-  defaultValue_List: createArray,
-  defaultValue_Object: createObject,
-  defaultValue_Json: createObject,
-  defaultValue_Boolean: createBoolean,
-  defaultValue_CheckboxList: createArray,
 
+  // Field default value factories. Give a default value for a specific type.
+
+  createDefaultValue_String: function (/* fieldTemplate */) {
+    return '';
+  },
+
+  createDefaultValue_Object: function (/* fieldTemplate */) {
+    return {};
+  },
+
+  createDefaultValue_Array: function (/* fieldTemplate */) {
+    return [];
+  },
+
+  createDefaultValue_Boolean: function (/* fieldTemplate */) {
+    return false;
+  },
+
+  createDefaultValue_Fields: delegateTo('createDefaultValue_Object'),
+
+  createDefaultValue_Unicode: delegateTo('createDefaultValue_String'),
+
+  createDefaultValue_Select: delegateTo('createDefaultValue_String'),
+
+  createDefaultValue_Json: delegateTo('createDefaultValue_Object'),
+
+  createDefaultValue_CheckboxList: delegateTo('createDefaultValue_Array'),
+
+
+  // Field value coercers. Coerce a value into a value appropriate for a specific type.
+
+  coerceValue_String: function (fieldTemplate, value) {
+    if (_.isString(value)) {
+      return value;
+    }
+    if (_.isUndefined(value) || value === null) {
+      return '';
+    }
+    return JSON.stringify(value);
+  },
+
+  coerceValue_Object: function (fieldTemplate, value) {
+    if (!_.isObject(value)) {
+      return {};
+    }
+    return value;
+  },
+
+  coerceValue_Array: function (fieldTemplate, value) {
+    if (!_.isArray(value)) {
+      return [value];
+    }
+    return value;
+  },
+
+  coerceValue_Boolean: function (fieldTemplate, value) {
+    return this.coerceValueToBoolean(value);
+  },
+
+  coerceValue_Fields: delegateTo('coerceValue_Object'),
+
+  coerceValue_Unicode: delegateTo('coerceValue_String'),
+
+  coerceValue_Select: delegateTo('coerceValue_String'),
+
+  coerceValue_Json: delegateTo('coerceValue_Object'),
+
+  coerceValue_CheckboxList: delegateTo('coerceValue_Array'),
+
+
+  // Field child fields factories, so some types can have dynamic children.
+
+  createChildFields_Array: function (field) {
+    var config = this;
+
+    return field.value.map(function (arrayItem, i) {
+      var childFieldTemplate = config.childFieldTemplateForValue(field, arrayItem);
+
+      var childField = config.createChildField(field, {
+        fieldTemplate: childFieldTemplate, key: i, fieldIndex: i, value: arrayItem
+      });
+
+      return childField;
+    });
+  },
+
+  createChildFields_Object: function (field) {
+    var config = this;
+
+    return Object.keys(field.value).map(function (key, i) {
+      var childFieldTemplate = config.childFieldTemplateForValue(field, field.value[key]);
+
+      var childField = config.createChildField(field, {
+        fieldTemplate: childFieldTemplate, key: key, fieldIndex: i, value: field.value[key]
+      });
+
+      return childField;
+    });
+  },
+
+  // Check if there is a factory for the name.
   hasElementFactory: function (name) {
     var config = this;
 
     return config['createElement_' + name] ? true : false;
   },
 
+  // Create an element given a name, props, and children.
   createElement: function (name, props, children) {
     var config = this;
 
@@ -2896,7 +2957,8 @@ module.exports = {
     throw new Error('Factory not found for: ' + name);
   },
 
-  createField: function (props) {
+  // Create a field element given some props. Use context to determine name.
+  createFieldElement: function (props) {
     var config = this;
 
     var name = config.fieldTypeName(props.field);
@@ -2908,6 +2970,7 @@ module.exports = {
     return config.createElement('UnknownField', props);
   },
 
+  // Render any component.
   renderComponent: function (component) {
     var config = this;
 
@@ -2920,78 +2983,293 @@ module.exports = {
     return component.renderDefault();
   },
 
+  // Render field components.
   renderFieldComponent: function (component) {
     var config = this;
 
     return config.renderComponent(component);
   },
 
+  // Normalize an element name.
   elementName: function (name) {
     return utils.dashToPascal(name);
   },
 
+  // Type aliases.
+
   alias_Dict: 'Object',
+
   alias_Bool: 'Boolean',
+
   alias_PrettyTextarea: 'PrettyText',
-  alias_Unicode: function (field) {
-    if (field.replaceChoices) {
+
+  alias_Unicode: function (fieldTemplate) {
+    if (fieldTemplate.replaceChoices) {
       return 'PrettyText';
     }
     return 'Unicode';
   },
-  alias_Text: function (field) {
-    if (field.replaceChoices) {
+
+  alias_Text: function (fieldTemplate) {
+    if (fieldTemplate.replaceChoices) {
       return 'PrettyText';
     }
-    return 'Text';
+    return 'String';
   },
-  alias_Array: 'List',
 
-  // Field helpers
-  fieldTypeName: function (field) {
+  alias_List: 'Array',
+
+  // Field factory
+
+  initField: function (field) {
+  },
+
+  createRootField: function (fieldTemplate, value) {
     var config = this;
 
-    var fieldType = utils.dashToPascal(field.type);
+    if (!fieldTemplate) {
+      fieldTemplate = config.createFieldTemplateFromValue(value);
+    }
 
-    var alias = config['alias_' + fieldType];
+    var field = _.extend({}, fieldTemplate, {rawFieldTemplate: fieldTemplate});
+    if (config.hasValue(fieldTemplate, value)) {
+      field.value = value;
+    } else {
+      field.value = config.createDefaultValue(fieldTemplate);
+    }
+
+    config.initField(field);
+
+    return field;
+  },
+
+  createChildFields: function (field) {
+    var config = this;
+
+    var typeName = config.fieldTypeName(field);
+
+    if (config['createChildFields_' + typeName]) {
+      return config['createChildFields_' + typeName](field);
+    }
+
+    return config.fieldChildFieldTemplates(field).map(function (childField, i) {
+      return config.createChildField(field, {
+        fieldTemplate: childField, key: childField.key, fieldIndex: i, value: field.value[childField.key]
+      });
+    });
+  },
+
+  createChildField: function (parentField, options) {
+    var config = this;
+
+    var childValue = options.value;
+
+    var childField = _.extend({}, options.fieldTemplate, {
+      key: options.key, parent: parentField, fieldIndex: options.fieldIndex,
+      rawFieldTemplate: options.fieldTemplate
+    });
+
+    if (config.hasValue(options.fieldTemplate, childValue)) {
+      childField.value = childValue;
+    } else {
+      childField.value = config.createDefaultValue(options.fieldTemplate);
+    }
+
+    config.initField(childField);
+
+    return childField;
+  },
+
+  createFieldTemplateFromValue: function (value) {
+    var config = this;
+
+    var field = {
+      type: 'json'
+    };
+    if (_.isString(value)) {
+      field = {
+        type: 'string'
+      };
+    } else if (_.isNumber(value)) {
+      field = {
+        type: 'number'
+      };
+    } else if (_.isBoolean(value)) {
+      field = {
+        type: 'boolean'
+      };
+    } else if (_.isArray(value)) {
+      var arrayItemFields = value.map(function (value, i) {
+        var childField = config.createFieldTemplateFromValue(value);
+        childField.key = i;
+        return childField;
+      });
+      field = {
+        type: 'array',
+        fields: arrayItemFields
+      };
+    } else if (_.isObject(value)) {
+      var objectItemFields = Object.keys(value).map(function (key) {
+        var childField = config.createFieldTemplateFromValue(value[key]);
+        childField.key = key;
+        childField.label = config.humanize(key);
+        return childField;
+      });
+      field = {
+        type: 'object',
+        fields: objectItemFields
+      };
+    } else if (_.isNull(value)) {
+      field = {
+        type: 'json'
+      };
+    }
+    return field;
+  },
+
+  // Default value factory
+
+  createDefaultValue: function (fieldTemplate) {
+    var config = this;
+
+    var defaultValue = config.fieldTemplateDefaultValue(fieldTemplate);
+
+    if (!_.isUndefined(defaultValue)) {
+      return utils.deepCopy(defaultValue);
+    }
+
+    var typeName = config.fieldTypeName(fieldTemplate);
+
+    if (config['createDefaultValue_' + typeName]) {
+      return config['createDefaultValue_' + typeName](fieldTemplate);
+    }
+
+    return '';
+  },
+
+  // Field helpers
+
+  hasValue: function (fieldTemplate, value) {
+    return value !== null && !_.isUndefined(value) && value !== '';
+  },
+
+  coerceValue: function (field, value) {
+    var config = this;
+
+    var typeName = config.fieldTypeName(field);
+
+    if (config['coerceValue_' + typeName]) {
+      return config['coerceValue_' + typeName](field, value);
+    }
+
+    return value;
+  },
+
+  childFieldTemplateForValue: function (field, childValue) {
+    var config = this;
+
+    var fieldTemplate;
+
+    var fieldTemplates = config.fieldItemFieldTemplates(field);
+
+    fieldTemplate = _.find(fieldTemplates, function (fieldTemplate) {
+      return config.matchesFieldTemplateToValue(fieldTemplate, childValue);
+    });
+
+    if (fieldTemplate) {
+      return fieldTemplate;
+    } else {
+      return config.createFieldTemplateFromValue(childValue);
+    }
+  },
+
+  matchesFieldTemplateToValue: function (fieldTemplate, value) {
+    var match = fieldTemplate.match;
+    if (!match) {
+      return true;
+    }
+    return _.every(_.keys(match), function (key) {
+      return _.isEqual(match[key], value[key]);
+    });
+  },
+
+  // Field template helpers
+
+  fieldTemplateTypeName: function (fieldTemplate) {
+    var config = this;
+
+    var typeName = utils.dashToPascal(fieldTemplate.type);
+
+    var alias = config['alias_' + typeName];
 
     if (alias) {
       if (_.isFunction(alias)) {
-        return alias(field);
+        return alias(fieldTemplate);
       } else {
         return alias;
       }
     }
 
-    if (field.list) {
-      fieldType = 'List';
+    if (fieldTemplate.list) {
+      typeName = 'Array';
     }
 
-    return fieldType;
+    return typeName;
   },
-  fieldKey: function (field) {
-    return field.key;
+
+  fieldTemplateDefaultValue: function (fieldTemplate) {
+
+    return fieldTemplate.default;
   },
-  fieldDefaultValue: function (field) {
+
+  fieldTemplateValue: function (fieldTemplate) {
     var config = this;
 
-    if (!_.isUndefined(field.default)) {
-      return utils.deepCopy(field.default);
+    // This logic might be brittle.
+
+    var defaultValue = config.fieldTemplateDefaultValue(fieldTemplate);
+
+    var match = config.fieldTemplateMatch(fieldTemplate);
+
+    if (_.isUndefined(defaultValue) && !_.isUndefined(match)) {
+      return utils.deepCopy(match);
+    } else {
+      return config.createDefaultValue(fieldTemplate);
     }
-
-    var typeName = config.fieldTypeName(field);
-
-    if (config['defaultValue_' + typeName]) {
-      return config['defaultValue_' + typeName](field);
-    }
-
-    return '';
   },
+
+  fieldTemplateMatch: function (fieldTemplate) {
+    return fieldTemplate.match;
+  },
+
+  // Field helpers
+
+  fieldValuePath: function (field) {
+    var config = this;
+
+    var parentPath = [];
+
+    if (field.parent) {
+      parentPath = config.fieldValuePath(field.parent);
+    }
+
+    return parentPath.concat(field.key).filter(function (key) {
+      return !_.isUndefined(key) && key !== '';
+    });
+  },
+
+  fieldWithValue: function (field, value) {
+    return _.extend({}, field, {value: value});
+  },
+
+  fieldTypeName: delegateTo('fieldTemplateTypeName'),
+
   fieldChoices: function (field) {
     var config = this;
 
     return config.normalizeChoices(field.choices);
   },
+
   fieldBooleanChoices: function (field) {
     var config = this;
 
@@ -3012,29 +3290,34 @@ module.exports = {
         return choice;
       }
       return _.extend({}, choice, {
-        value: config.stringToBoolean(choice.value)
+        value: config.coerceValueToBoolean(choice.value)
       });
     });
   },
+
   fieldReplaceChoices: function (field) {
     var config = this;
 
     return config.normalizeChoices(field.replaceChoices);
   },
+
   fieldLabel: function (field) {
     return field.label;
   },
+
   fieldHelpText: function (field) {
     return field.help_text_html || field.help_text || field.helpText || field.helpTextHtml;
   },
-  fieldRequired: function (field) {
+
+  fieldIsRequired: function (field) {
     return field.required;
   },
+
   // Determine if value for this field is not a leaf value.
   fieldHasValueChildren: function (field) {
     var config = this;
 
-    var defaultValue = config.fieldDefaultValue(field);
+    var defaultValue = config.createDefaultValue(field);
 
     if (_.isObject(defaultValue) || _.isArray(defaultValue)) {
       return true;
@@ -3042,118 +3325,41 @@ module.exports = {
 
     return false;
   },
-  fieldItems: function (field) {
-    if (!field.items) {
-      return [];
-    }
-    if (!_.isArray(field.items)) {
-      return [field.items];
-    }
-    return field.items;
+
+  fieldChildFieldTemplates: function (field) {
+    return field.fields || [];
   },
-  fieldItemForValue: function (field, value) {
-    var config = this;
 
-    var item;
-
-    if (field.items) {
-      if (!_.isArray(field.items)) {
-        item = field.items;
-      } else if (field.items.length === 0) {
-        item = field.items[0];
-      } else {
-        item = _.find(field.items, function (item) {
-          return config.itemMatchesValue(item, value);
-        });
-      }
+  fieldItemFieldTemplates: function (field) {
+    if (!field.itemFields) {
+      return [{type: 'text'}];
     }
-
-    if (item) {
-      return item;
-    } else {
-      return config.fieldForValue(value);
+    if (!_.isArray(field.itemFields)) {
+      return [field.itemFields];
     }
+    return field.itemFields;
   },
-  fieldItemValue: function (field, itemIndex) {
-    var config = this;
 
-    var item = config.fieldItems(field)[itemIndex];
-
-    if (item) {
-
-      if (_.isUndefined(item.default) && !_.isUndefined(item.match)) {
-        return utils.deepCopy(item.match);
-      } else {
-        return config.fieldDefaultValue(item);
-      }
-
-    } else {
-      // Fallback to a text value.
-      return '';
-    }
-  },
   fieldIsSingleLine: function (field) {
     return field.isSingleLine || field.is_single_line || field.type === 'unicode' || field.type === 'Unicode';
   },
-  
-  itemMatchesValue: function (item, value) {
-    var match = item.match;
-    if (!match) {
-      return true;
-    }
-    return _.every(_.keys(match), function (key) {
-      return _.isEqual(match[key], value[key]);
-    });
+
+  fieldIsCollapsed: function (field) {
+    return field.collapsed ? true : false;
   },
 
-  fieldForValue: function (value) {
-    var config = this;
-
-    var def = {
-      type: 'json'
-    };
-    if (_.isString(value)) {
-      def = {
-        type: 'text'
-      };
-    } else if (_.isNumber(value)) {
-      def = {
-        type: 'number'
-      };
-    } else if (_.isBoolean(value)) {
-      def = {
-        type: 'boolean'
-      };
-    } else if (_.isArray(value)) {
-      var arrayItemFields = value.map(function (value, i) {
-        var childDef = config.fieldForValue(value);
-        childDef.key = i;
-        return childDef;
-      });
-      def = {
-        type: 'list',
-        fields: arrayItemFields
-      };
-    } else if (_.isObject(value)) {
-      var objectItemFields = Object.keys(value).map(function (key) {
-        var childDef = config.fieldForValue(value[key]);
-        childDef.key = key;
-        childDef.label = config.humanize(key);
-        return childDef;
-      });
-      def = {
-        type: 'object',
-        fields: objectItemFields
-      };
-    } else if (_.isNull(value)) {
-      def = {
-        type: 'json'
-      };
-    }
-    return def;
+  fieldIsCollapsible: function (field) {
+    return field.collapsible || !_.isUndefined(field.collapsed);
   },
+
+  fieldRows: function (field) {
+    return field.rows;
+  },
+
+  fieldMatch: delegateTo('fieldTemplateMatch'),
 
   // Other helpers
+
   humanize: function(property) {
     property = property.replace(/\{\{/g, '');
     property = property.replace(/\}\}/g, '');
@@ -3208,14 +3414,14 @@ module.exports = {
     return choices;
   },
 
-  // Coerce a string representation of a boolean to a boolean
-  stringToBoolean: function (s) {
-    if (!_.isString(s)) {
+  // Coerce a value to a boolean
+  coerceValueToBoolean: function (value) {
+    if (!_.isString(value)) {
       // Just use the default truthiness.
-      return s ? true : false;
+      return value ? true : false;
     }
-    s = s.toLowerCase();
-    if (s === '' || s === 'no' || s === 'off' || s === 'false') {
+    value = value.toLowerCase();
+    if (value === '' || value === 'no' || value === 'off' || value === 'false') {
       return false;
     }
     return true;
@@ -3223,7 +3429,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./components/fields/boolean":1,"./components/fields/checkbox-list":2,"./components/fields/copy":3,"./components/fields/fields":4,"./components/fields/json":5,"./components/fields/list":6,"./components/fields/object":7,"./components/fields/pretty-text":8,"./components/fields/select":9,"./components/fields/text":10,"./components/fields/unicode":11,"./components/fields/unknown":12,"./components/helpers/add-item":13,"./components/helpers/choices":14,"./components/helpers/field":15,"./components/helpers/help":16,"./components/helpers/item-choices":17,"./components/helpers/label":18,"./components/helpers/list-control":19,"./components/helpers/list-item":22,"./components/helpers/list-item-control":20,"./components/helpers/list-item-value":21,"./components/helpers/move-item-back":23,"./components/helpers/move-item-forward":24,"./components/helpers/object-control":25,"./components/helpers/object-item":29,"./components/helpers/object-item-control":26,"./components/helpers/object-item-key":27,"./components/helpers/object-item-value":28,"./components/helpers/remove-item":30,"./components/helpers/select-value":31,"./utils":42}],33:[function(require,module,exports){
+},{"./components/fields/array":2,"./components/fields/boolean":3,"./components/fields/checkbox-list":4,"./components/fields/copy":5,"./components/fields/fields":6,"./components/fields/json":7,"./components/fields/object":8,"./components/fields/pretty-text":9,"./components/fields/select":10,"./components/fields/string":11,"./components/fields/unicode":12,"./components/fields/unknown":13,"./components/helpers/add-item":14,"./components/helpers/array-control":15,"./components/helpers/array-item":18,"./components/helpers/array-item-control":16,"./components/helpers/array-item-value":17,"./components/helpers/choices":19,"./components/helpers/field":21,"./components/helpers/field-template-choices":20,"./components/helpers/help":22,"./components/helpers/label":23,"./components/helpers/move-item-back":24,"./components/helpers/move-item-forward":25,"./components/helpers/object-control":26,"./components/helpers/object-item":30,"./components/helpers/object-item-control":27,"./components/helpers/object-item-key":28,"./components/helpers/object-item-value":29,"./components/helpers/remove-item":31,"./components/helpers/select-value":32,"./utils":44}],34:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -3235,14 +3441,6 @@ var utils = require('./utils');
 
 var defaultConfig = require('./default-config');
 
-var valuePath = function (fields) {
-  return fields.map(function (field) {
-    return field.key;
-  }).filter(function (key) {
-    return !_.isUndefined(key);
-  });
-};
-
 var FormaticControlledClass = React.createClass({
 
   displayName: 'FormaticControlled',
@@ -3251,13 +3449,14 @@ var FormaticControlledClass = React.createClass({
     if (!this.props.onChange) {
       return;
     }
-    var isWrapped = !this.props.field;
+    //var isWrapped = !this.props.field;
     info = _.extend({}, info);
-    if (isWrapped) {
-      info.fields = info.fields.slice(1);
-      info.field = info.fields[0];
-    }
-    info.path = valuePath(info.fields);
+    // if (isWrapped) {
+    //   info.fields = info.fields.slice(1);
+    //   info.field = info.fields[0];
+    // }
+    //info.path = valuePath(info.fields);
+    info.path = this.props.config.fieldValuePath(info.field);
     this.props.onChange(newValue, info);
   },
 
@@ -3265,30 +3464,33 @@ var FormaticControlledClass = React.createClass({
     if (!this.props.onAction) {
       return;
     }
-    var isWrapped = !this.props.field;
+    //var isWrapped = !this.props.field;
     info = _.extend({}, info);
-    if (isWrapped) {
-      info.fields = info.fields.slice(1);
-      info.field = info.fields[0];
-    }
-    info.path = valuePath(info.fields);
+    // if (isWrapped) {
+    //   info.fields = info.fields.slice(1);
+    //   info.field = info.fields[0];
+    // }
+    //info.path = valuePath(info.fields);
+    info.path = this.props.config.fieldValuePath(info.field);
     this.props.onAction(info);
   },
 
   render: function () {
     var config = this.props.config;
-    var field = this.props.field;
+    var fieldTemplate = this.props.fieldTemplate;
     var value = this.props.value;
 
-    if (!field) {
-      var fields = this.props.fields;
-      if (!fields) {
+    if (!fieldTemplate) {
+      var fieldTemplates = this.props.fieldTemplates;
+      if (!fieldTemplates) {
         throw new Error('Must specify field or fields.');
       }
-      field = {
+      // Field components only work with individual fields, so wrap array of
+      // fields in root field.
+      fieldTemplate = {
         type: 'fields',
         plain: true,
-        fields: fields
+        fields: fieldTemplates
       };
     }
 
@@ -3296,8 +3498,10 @@ var FormaticControlledClass = React.createClass({
       throw new Error('You must supply a value to the root Formatic component.');
     }
 
+    var field = config.createRootField(fieldTemplate, value);
+
     return R.div({className: 'formatic'},
-      config.createField({config: config, field: field, value: value, onChange: this.onChange, onAction: this.onAction})
+      config.createFieldElement({field: field, onChange: this.onChange, onAction: this.onAction})
     );
   }
 
@@ -3334,7 +3538,8 @@ module.exports = React.createClass({
       undoStack: require('./mixins/undo-stack.js')
     },
     plugins: {
-      bootstrap: require('./plugins/bootstrap')
+      bootstrap: require('./plugins/bootstrap'),
+      reference: require('./plugins/reference')
     },
     utils: utils
   },
@@ -3393,8 +3598,10 @@ module.exports = React.createClass({
 
     return FormaticControlled({
       config: config,
-      field: this.props.field,
-      fields: this.props.fields,
+      // Allow field templates to be passed in as `field` or `fields`. After this, stop
+      // calling them fields.
+      fieldTemplate: this.props.field,
+      fieldTemplates: this.props.fields,
       value: value,
       onChange: this.onChange,
       onAction: this.onAction
@@ -3404,7 +3611,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./default-config":32,"./mixins/click-outside.js":34,"./mixins/field.js":35,"./mixins/helper.js":36,"./mixins/input-actions.js":37,"./mixins/resize.js":38,"./mixins/scroll.js":39,"./mixins/undo-stack.js":40,"./plugins/bootstrap":41,"./utils":42}],34:[function(require,module,exports){
+},{"./default-config":33,"./mixins/click-outside.js":35,"./mixins/field.js":36,"./mixins/helper.js":37,"./mixins/input-actions.js":38,"./mixins/resize.js":39,"./mixins/scroll.js":40,"./mixins/undo-stack.js":41,"./plugins/bootstrap":42,"./plugins/reference":43,"./utils":44}],35:[function(require,module,exports){
 (function (global){
 // # mixin.click-outside
 
@@ -3534,7 +3741,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 (function (global){
 // # mixin.field
 
@@ -3552,14 +3759,11 @@ module.exports = {
 
   onChangeValue: function (value) {
     this.props.onChange(value, {
-      field: this.props.field,
-      fields: [this.props.field]
+      field: this.props.field
     });
   },
 
   onBubbleValue: function (value, info) {
-    info = _.extend({}, info);
-    info.fields = [this.props.field].concat(info.fields);
     this.props.onChange(value, info);
   },
 
@@ -3568,7 +3772,6 @@ module.exports = {
       var info = _.extend({}, props);
       info.action = action;
       info.field = this.props.field;
-      info.fields = [this.props.field];
       this.props.onAction(info);
     }
   },
@@ -3583,12 +3786,6 @@ module.exports = {
 
   onBubbleAction: function (info) {
     if (this.props.onAction) {
-      info = _.extend({}, info);
-      if (!info.field) {
-        info.field = this.props.field;
-        info.fields = [];
-      }
-      info.fields = [this.props.field].concat(info.fields);
       this.props.onAction(info);
     }
   },
@@ -3598,92 +3795,8 @@ module.exports = {
   }
 };
 
-// module.exports = function (plugin) {
-//
-//   var normalizeMeta = function (meta) {
-//     var needsSource = [];
-//
-//     meta.forEach(function (args) {
-//
-//
-//       if (_.isArray(args) && args.length > 0) {
-//         if (_.isArray(args[0])) {
-//           args.forEach(function (args) {
-//             needsSource.push(args);
-//           });
-//         } else {
-//           needsSource.push(args);
-//         }
-//       }
-//     });
-//
-//     if (needsSource.length === 0) {
-//       // Must just be a single need, and not an array.
-//       needsSource = [meta];
-//     }
-//
-//     return needsSource;
-//   };
-//
-//   plugin.exports = {
-//
-//     loadNeededMeta: function (props) {
-//       if (props.field && props.field.form) {
-//         if (props.field.def.needsSource && props.field.def.needsSource.length > 0) {
-//
-//           var needsSource = normalizeMeta(props.field.def.needsSource);
-//
-//           needsSource.forEach(function (needs) {
-//             if (needs) {
-//               props.field.form.loadMeta.apply(props.field.form, needs);
-//             }
-//           });
-//         }
-//       }
-//     },
-//
-//     // currently unused; will use to unload metadata on change
-//     unloadOtherMeta: function () {
-//       var props = this.props;
-//       if (props.field.def.refreshMeta) {
-//         var refreshMeta = normalizeMeta(props.field.def.refreshMeta);
-//         props.field.form.unloadOtherMeta(refreshMeta);
-//       }
-//     },
-//
-//     componentDidMount: function () {
-//       this.loadNeededMeta(this.props);
-//     },
-//
-//     componentWillReceiveProps: function (nextProps) {
-//       this.loadNeededMeta(nextProps);
-//     },
-//
-//     componentWillUnmount: function () {
-//       // Removing this as it's a bad idea, because unmounting a component is not
-//       // always a signal to remove the field. Will have to find a better way.
-//
-//       // if (this.props.field) {
-//       //   this.props.field.erase();
-//       // }
-//     },
-//
-//     onFocus: function () {
-//       if (this.props.onFocus) {
-//         this.props.onFocus({path: this.props.field.valuePath(), field: this.props.field.def});
-//       }
-//     },
-//
-//     onBlur: function () {
-//       if (this.props.onBlur) {
-//         this.props.onBlur({path: this.props.field.valuePath(), field: this.props.field.def});
-//       }
-//     }
-//   };
-// };
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -3699,6 +3812,7 @@ module.exports = {
     if (this.props.onAction) {
       var info = _.extend({}, props);
       info.action = action;
+      info.field = this.props.field;
       this.props.onAction(info);
     }
   },
@@ -3719,7 +3833,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 // # mixin.input-actions
 
 /*
@@ -3746,7 +3860,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 // # mixin.resize
 
 /*
@@ -3864,7 +3978,7 @@ module.exports = {
   }
 };
 
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 // # mixin.scroll
 
 'use strict';
@@ -3887,7 +4001,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 // # mixin.undo-stack
 
 /*
@@ -3953,7 +4067,7 @@ module.exports = {
   }
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (global){
 // # bootstrap
 
@@ -3966,9 +4080,9 @@ var modifiers = {
   'Field': {classes: {'form-group': true}},
   'Help': {classes: {'help-block': true}},
   'Sample': {classes: {'help-block': true}},
-  'ListControl': {classes: {'form-inline': true}},
-  'ListItem': {classes: {'well': true}},
-  'ItemChoices': {classes: {'form-control': true}},
+  'ArrayControl': {classes: {'form-inline': true}},
+  'ArrayItem': {classes: {'well': true}},
+  'FieldTemplateChoices': {classes: {'form-control': true}},
   'AddItem': {classes: {'glyphicon glyphicon-plus': true}, label: ''},
   'RemoveItem': {classes: {'glyphicon glyphicon-remove': true}, label: ''},
   'MoveItemBack': {classes: {'glyphicon glyphicon-arrow-up': true}, label: ''},
@@ -3976,11 +4090,11 @@ var modifiers = {
   'ObjectItemKey': {classes: {'form-control': true}},
 
   'Unicode': {classes: {'form-control': true}},
-  'Text': {classes: {'form-control': true}},
+  'String': {classes: {'form-control': true}},
   'PrettyText': {classes: {'form-control': true}},
   'Json': {classes: {'form-control': true}},
   'Select': {classes: {'form-control': true}}
-  //'list': {classes: 'well'}
+  //'Array': {classes: {'well': true}}
 };
 
 module.exports = function (config) {
@@ -4006,7 +4120,118 @@ module.exports = function (config) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
+(function (global){
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+
+module.exports = function (config) {
+
+  var initField = config.initField;
+
+  config.findFieldTemplate = function (field, name) {
+    var config = this;
+
+    if (field.templates[name]) {
+      return field.templates[name];
+    }
+
+    if (field.parent) {
+      return config.findFieldTemplate(field.parent, name);
+    }
+
+    return null;
+  };
+
+  config.resolveFieldTemplate = function (field, fieldTemplate) {
+    var config = this;
+
+    if (!fieldTemplate.extends) {
+      return fieldTemplate;
+    }
+
+    var ext = fieldTemplate.extends;
+
+    if (!_.isArray(ext)) {
+      ext = [ext];
+    }
+
+    var bases = ext.map(function (base) {
+      var template = config.findFieldTemplate(field, base);
+      if (!template) {
+        throw new Error('Template ' + base + ' not found.');
+      }
+      return template;
+    });
+
+    var chain = [{}].concat(bases.reverse().concat([fieldTemplate]));
+    fieldTemplate = _.extend.apply(_, chain);
+
+    return fieldTemplate;
+  };
+
+  config.initField = function (field) {
+
+    var config = this;
+
+    var templates = field.templates = {};
+
+    var childFieldTemplates = config.fieldChildFieldTemplates(field);
+
+    childFieldTemplates.forEach(function (fieldTemplate) {
+
+      if (_.isString(fieldTemplate)) {
+        return;
+      }
+
+      var key = fieldTemplate.key;
+      var id = fieldTemplate.id;
+
+      if (fieldTemplate.template) {
+        fieldTemplate = _.extend({}, fieldTemplate, {template: false});
+      }
+
+      if (!_.isUndefined(key) && key !== '') {
+        templates[key] = fieldTemplate;
+      }
+
+      if (!_.isUndefined(id) && id !== '') {
+        templates[id] = fieldTemplate;
+      }
+    });
+
+    if (childFieldTemplates.length > 0) {
+      field.fields = childFieldTemplates.map(function (fieldTemplate) {
+        if (_.isString(fieldTemplate)) {
+          fieldTemplate = config.findFieldTemplate(field, fieldTemplate);
+        }
+
+        return config.resolveFieldTemplate(field, fieldTemplate);
+      });
+
+      field.fields = field.fields.filter(function (fieldTemplate) {
+        return !fieldTemplate.template;
+      });
+    }
+
+    var itemFieldTemplates = config.fieldItemFieldTemplates(field);
+
+    if (itemFieldTemplates.length > 0) {
+      field.itemFields = itemFieldTemplates.map(function (itemFieldTemplate) {
+        if (_.isString(itemFieldTemplate)) {
+          itemFieldTemplate = config.findFieldTemplate(field, itemFieldTemplate);
+        }
+
+        return config.resolveFieldTemplate(field, itemFieldTemplate);
+      });
+    }
+
+    initField.call(config, arguments);
+  };
+
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],44:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -4093,8 +4318,5 @@ if(ua.indexOf('Chrome') > -1) {
 utils.browser = browser;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"formatic":[function(require,module,exports){
-module.exports = require('./lib/formatic');
-
-},{"./lib/formatic":33}]},{},[])("formatic")
+},{}]},{},[1])(1)
 });
