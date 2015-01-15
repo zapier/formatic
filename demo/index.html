@@ -27,6 +27,7 @@
 
     var config = Formatic.createConfig(
       Formatic.plugins.reference,
+      Formatic.plugins.meta,
       Formatic.plugins.bootstrap
     );
 
@@ -101,8 +102,9 @@
       initField.apply(this, arguments);
 
       if (field.id === 'silly') {
+
         if ((field.parent.value.name || '').toLowerCase() === 'joe') {
-          field.help_text_html = 'What a nice name!';
+          field.help_text_html = field.meta.msg;
         }
       }
     };
@@ -162,6 +164,7 @@
 
     var render = function (value) {
       React.render(Form({
+        meta: {msg: "That's a fine name you have there!"},
         config: config,
         fields: fields,
         value: value,
