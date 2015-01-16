@@ -280,6 +280,10 @@
   padding-right: 1em;
 }
 
+.formatic .maybe-removing {
+  background: rgba(255, 0, 0, 0.25);
+}
+
 .formatic .move-item-back {
   cursor: pointer;
   padding-right: 1em;

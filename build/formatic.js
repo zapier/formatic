@@ -1855,7 +1855,7 @@ module.exports = React.createClass({
     var field = this.props.field;
 
     return R.div({className: cx(this.props.classes)},
-      config.createElement('remove-item', {field: field, onClick: this.onRemove}),
+      config.createElement('remove-item', {field: field, onClick: this.onRemove, onMaybeRemove: this.props.onMaybeRemove}),
       this.props.index > 0 ? config.createElement('move-item-back', {field: field, onClick: this.onMoveBack}) : null,
       this.props.index < (this.props.numItems - 1) ? config.createElement('move-item-forward', {field: field, onClick: this.onMoveForward}) : null
     );
@@ -1915,6 +1915,7 @@ Render a list item.
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 var R = React.DOM;
 var cx = React.addons.classSet;
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = React.createClass({
 
@@ -1922,19 +1923,37 @@ module.exports = React.createClass({
 
   mixins: [require('../../mixins/helper')],
 
+  getInitialState: function () {
+    return {
+      isMaybeRemoving: false
+    };
+  },
+
   render: function () {
     return this.renderWithConfig();
+  },
+
+  onMaybeRemove: function (isMaybeRemoving) {
+    this.setState({
+      isMaybeRemoving: isMaybeRemoving
+    });
   },
 
   renderDefault: function () {
     var config = this.props.config;
     var field = this.props.field;
 
-    return R.div({className: cx(this.props.classes)},
+    var classes = _.extend({}, this.props.classes);
+
+    if (this.state.isMaybeRemoving) {
+      classes['maybe-removing'] = true;
+    }
+
+    return R.div({className: cx(classes)},
       config.createElement('array-item-value', {field: field, index: this.props.index,
         onChange: this.props.onChange, onAction: this.onBubbleAction}),
       config.createElement('array-item-control', {field: field, index: this.props.index, numItems: this.props.numItems,
-        onMove: this.props.onMove, onRemove: this.props.onRemove})
+        onMove: this.props.onMove, onRemove: this.props.onRemove, onMaybeRemove: this.onMaybeRemove})
     );
   }
 });
@@ -2643,8 +2662,23 @@ module.exports = React.createClass({
     return this.renderWithConfig();
   },
 
+  onMouseOverRemove: function () {
+    if (this.props.onMaybeRemove) {
+      this.props.onMaybeRemove(true);
+    }
+  },
+
+  onMouseOutRemove: function () {
+    if (this.props.onMaybeRemove) {
+      this.props.onMaybeRemove(false);
+    }
+  },
+
   renderDefault: function () {
-    return R.span({className: cx(this.props.classes), onClick: this.props.onClick}, this.props.label);
+    return R.span({
+      className: cx(this.props.classes), onClick: this.props.onClick,
+      onMouseOver: this.onMouseOverRemove, onMouseOut: this.onMouseOutRemove
+    }, this.props.label);
   }
 });
 
