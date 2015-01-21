@@ -75,10 +75,9 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
 
-    var childFieldTemplate = config.fieldItemFieldTemplates(field)[itemChoiceIndex];
-    var newValue = config.fieldTemplateValue(childFieldTemplate);
+    var newValue = config.createNewChildFieldValue(field, itemChoiceIndex);
 
-    var items = this.props.field.value;
+    var items = field.value;
 
     items = items.concat(newValue);
 
@@ -614,8 +613,7 @@ module.exports = React.createClass({
 
     var newObj = _.extend(this.props.field.value);
 
-    var childFieldTemplate = config.fieldItemFieldTemplates(field)[itemChoiceIndex];
-    var newValue = config.fieldTemplateValue(childFieldTemplate);
+    var newValue = config.createNewChildFieldValue(field, itemChoiceIndex);
 
     newObj[newKey] = newValue;
 
@@ -2815,6 +2813,7 @@ module.exports = React.createClass({
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 var utils = require('./utils');
@@ -3040,6 +3039,18 @@ module.exports = {
     return config.createElement('UnknownField', props);
   },
 
+  // Render the root formatic component
+  renderFormaticComponent: function (component) {
+    var config = this;
+    var props = component.props;
+
+    var field = config.createRootField(props);
+
+    return R.div({className: 'formatic'},
+      config.createFieldElement({field: field, onChange: component.onChange, onAction: component.onAction})
+    );
+  },
+
   // Render any component.
   renderComponent: function (component) {
     var config = this;
@@ -3099,17 +3110,51 @@ module.exports = {
 
   // Field factory
 
+  inflateFieldValue: function (field) {
+    var config = this;
+
+    if (config.fieldHasValueChildren(field)) {
+      var value = _.clone(field.value);
+      var childFields = config.createChildFields(field);
+      childFields.forEach(function (childField) {
+        if (config.isKey(childField.key)) {
+          value[childField.key] = config.inflateFieldValue(childField);
+        }
+      });
+      return value;
+    } else {
+      return field.value;
+    }
+  },
+
   initRootField: function (/* field, props */) {
   },
 
   initField: function (/* field */) {
   },
 
-  createRootField: function (fieldTemplate, value, props) {
+  wrapFieldTemplates: function (fieldTemplates) {
+    // Field components only work with individual fields, so wrap array of
+    // field templates in root field template.
+    return {
+      type: 'fields',
+      plain: true,
+      fields: fieldTemplates
+    };
+  },
+
+  createRootField: function (props) {
     var config = this;
+
+    var fieldTemplate = props.fieldTemplate || props.fieldTemplates || props.field || props.fields;
+    var value = props.value;
 
     if (!fieldTemplate) {
       fieldTemplate = config.createFieldTemplateFromValue(value);
+    }
+
+    if (_.isArray(fieldTemplate)) {
+      fieldTemplate = config.wrapFieldTemplates(fieldTemplate);
     }
 
     var field = _.extend({}, fieldTemplate, {rawFieldTemplate: fieldTemplate});
@@ -3122,7 +3167,19 @@ module.exports = {
     config.initRootField(field, props);
     config.initField(field);
 
+    if (value === null || config.isEmptyObject(value) || _.isUndefined(value)) {
+      field.value = config.inflateFieldValue(field);
+    }
+
     return field;
+  },
+
+  createRootValue: function (props) {
+    var config = this;
+
+    var field = config.createRootField(props);
+
+    return config.inflateFieldValue(field);
   },
 
   createChildFields: function (field) {
@@ -3160,6 +3217,37 @@ module.exports = {
     config.initField(childField);
 
     return childField;
+  },
+
+  // Create a temporary field and extract its value.
+  createNewChildFieldValue: function (parentField, itemFieldIndex) {
+    var config = this;
+
+    var childFieldTemplate = config.fieldItemFieldTemplates(parentField)[itemFieldIndex];
+
+    var newValue = config.fieldTemplateValue(childFieldTemplate);
+
+    // Just a placeholder key. Should not be important.
+    var key = '__unknown_key__';
+
+    if (_.isArray(parentField.value)) {
+      // Just a placeholder position for an array.
+      key = parentField.value.length;
+    }
+
+    // Just a placeholder field index. Should not be important.
+    var fieldIndex = 0;
+    if (_.isObject(parentField.value)) {
+      fieldIndex = Object.keys(parentField.value).length;
+    }
+
+    var childField = config.createChildField(parentField, {
+      fieldTemplate: childFieldTemplate, key: key, fieldIndex: fieldIndex, value: newValue
+    });
+
+    newValue = config.inflateFieldValue(childField);
+
+    return newValue;
   },
 
   createFieldTemplateFromValue: function (value) {
@@ -3313,11 +3401,15 @@ module.exports = {
 
     var match = config.fieldTemplateMatch(fieldTemplate);
 
+    var value;
+
     if (_.isUndefined(defaultValue) && !_.isUndefined(match)) {
       return utils.deepCopy(match);
     } else {
       return config.createDefaultValue(fieldTemplate);
     }
+
+    return value;
   },
 
   fieldTemplateMatch: function (fieldTemplate) {
@@ -3507,6 +3599,20 @@ module.exports = {
       return false;
     }
     return true;
+  },
+
+  isKey: function (key) {
+    return (_.isNumber(key) && key >= 0) || (_.isString(key) && key !== '');
+  },
+
+  // Fast way to check for empty object.
+  isEmptyObject: function (obj) {
+    for(var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        return false;
+      }
+    }
+    return true;
   }
 };
 
@@ -3560,34 +3666,9 @@ var FormaticControlledClass = React.createClass({
   render: function () {
 
     var config = this.props.config;
-    var fieldTemplate = this.props.fieldTemplate;
-    var value = this.props.value;
 
-    if (!fieldTemplate) {
-      var fieldTemplates = this.props.fieldTemplates;
-      if (!fieldTemplates) {
-        throw new Error('Must specify field or fields.');
-      }
-      // Field components only work with individual fields, so wrap array of
-      // fields in root field.
-      fieldTemplate = {
-        type: 'fields',
-        plain: true,
-        fields: fieldTemplates
-      };
-    }
-
-    if (_.isUndefined(value)) {
-      throw new Error('You must supply a value to the root Formatic component.');
-    }
-
-    var field = config.createRootField(fieldTemplate, value, this.props);
-
-    return R.div({className: 'formatic'},
-      config.createFieldElement({field: field, onChange: this.onChange, onAction: this.onAction})
-    );
+    return config.renderFormaticComponent(this);
   }
-
 });
 
 var FormaticControlled = React.createFactory(FormaticControlledClass);
