@@ -63,8 +63,8 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 2,
-                "title": "Using formatic (quick version)",
-                "slug": "using-formatic-quick-version"
+                "title": "Using formatic",
+                "slug": "using-formatic"
               },
               "depth": 2
             }
@@ -110,140 +110,10 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 2,
-            "title": "Using formatic (quick version)",
-            "slug": "using-formatic-quick-version"
+            "title": "Using formatic",
+            "slug": "using-formatic"
           },
           "depth": 2
-        }
-      ]
-    }, {
-      "type": "folder",
-      "data": {
-        "path": "compilers",
-        "title": "compilers"
-      },
-      "depth": 1,
-      "children": [
-        {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/compilers/choices.js",
-            "projectPath": "lib/compilers/choices.js",
-            "targetPath": "compilers/choices",
-            "pageTitle": "compilers/choices",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "compiler.choices",
-                "slug": "compilerchoices",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "compiler.choices"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/compilers/lookup.js",
-            "projectPath": "lib/compilers/lookup.js",
-            "targetPath": "compilers/lookup",
-            "pageTitle": "compilers/lookup",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "compiler.lookup",
-                "slug": "compilerlookup",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "compiler.lookup"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/compilers/prop-aliases.js",
-            "projectPath": "lib/compilers/prop-aliases.js",
-            "targetPath": "compilers/prop-aliases",
-            "pageTitle": "compilers/prop-aliases",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "compilers.prop-aliases",
-                "slug": "compilersprop-aliases",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "compilers.prop-aliases"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/compilers/types.js",
-            "projectPath": "lib/compilers/types.js",
-            "targetPath": "compilers/types",
-            "pageTitle": "compilers/types",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "compilers.types",
-                "slug": "compilerstypes",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "compilers.types"
-          },
-          "depth": 2,
-          "outline": []
         }
       ]
     }, {
@@ -255,1098 +125,997 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
       "depth": 1,
       "children": [
         {
-          "type": "file",
+          "type": "folder",
           "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/add-item.js",
-            "projectPath": "lib/components/add-item.js",
-            "targetPath": "components/add-item",
-            "pageTitle": "components/add-item",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.add-item",
-                "slug": "componentadd-item",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.add-item"
+            "path": "components/fields",
+            "title": "fields"
           },
           "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/checkbox-list.js",
-            "projectPath": "lib/components/checkbox-list.js",
-            "targetPath": "components/checkbox-list",
-            "pageTitle": "components/checkbox-list",
-            "firstHeader": {
-              "type": "heading",
+          "children": [
+            {
+              "type": "file",
               "data": {
-                "level": 1,
-                "title": "component.checkbox-list",
-                "slug": "componentcheckbox-list",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.checkbox-list"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/field.js",
-            "projectPath": "lib/components/field.js",
-            "targetPath": "components/field",
-            "pageTitle": "components/field",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.field",
-                "slug": "componentfield",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.field"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fieldset.js",
-            "projectPath": "lib/components/fieldset.js",
-            "targetPath": "components/fieldset",
-            "pageTitle": "components/fieldset",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.fieldset",
-                "slug": "componentfieldset",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.fieldset"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/formatic.js",
-            "projectPath": "lib/components/formatic.js",
-            "targetPath": "components/formatic",
-            "pageTitle": "components/formatic",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.formatic",
-                "slug": "componentformatic",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.formatic"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/help.js",
-            "projectPath": "lib/components/help.js",
-            "targetPath": "components/help",
-            "pageTitle": "components/help",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.help",
-                "slug": "componenthelp",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.help"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/item-choices.js",
-            "projectPath": "lib/components/item-choices.js",
-            "targetPath": "components/item-choices",
-            "pageTitle": "components/item-choices",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.item-choices",
-                "slug": "componentitem-choices",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.item-choices"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/json.js",
-            "projectPath": "lib/components/json.js",
-            "targetPath": "components/json",
-            "pageTitle": "components/json",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.json",
-                "slug": "componentjson",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.json"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/label.js",
-            "projectPath": "lib/components/label.js",
-            "targetPath": "components/label",
-            "pageTitle": "components/label",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.label",
-                "slug": "componentlabel",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.label"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/list.js",
-            "projectPath": "lib/components/list.js",
-            "targetPath": "components/list",
-            "pageTitle": "components/list",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.list",
-                "slug": "componentlist",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.list"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/list-control.js",
-            "projectPath": "lib/components/list-control.js",
-            "targetPath": "components/list-control",
-            "pageTitle": "components/list-control",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.list-control",
-                "slug": "componentlist-control",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.list-control"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/list-item.js",
-            "projectPath": "lib/components/list-item.js",
-            "targetPath": "components/list-item",
-            "pageTitle": "components/list-item",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.list-item",
-                "slug": "componentlist-item",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.list-item"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/list-item-control.js",
-            "projectPath": "lib/components/list-item-control.js",
-            "targetPath": "components/list-item-control",
-            "pageTitle": "components/list-item-control",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.list-item-control",
-                "slug": "componentlist-item-control",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.list-item-control"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/list-item-value.js",
-            "projectPath": "lib/components/list-item-value.js",
-            "targetPath": "components/list-item-value",
-            "pageTitle": "components/list-item-value",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.list-item-value",
-                "slug": "componentlist-item-value",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.list-item-value"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/move-item-back.js",
-            "projectPath": "lib/components/move-item-back.js",
-            "targetPath": "components/move-item-back",
-            "pageTitle": "components/move-item-back",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.move-item-back",
-                "slug": "componentmove-item-back",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.move-item-back"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/move-item-forward.js",
-            "projectPath": "lib/components/move-item-forward.js",
-            "targetPath": "components/move-item-forward",
-            "pageTitle": "components/move-item-forward",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.move-item-forward",
-                "slug": "componentmove-item-forward",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.move-item-forward"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/pretty-textarea.js",
-            "projectPath": "lib/components/pretty-textarea.js",
-            "targetPath": "components/pretty-textarea",
-            "pageTitle": "components/pretty-textarea",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.pretty-textarea",
-                "slug": "componentpretty-textarea",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.pretty-textarea"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/remove-item.js",
-            "projectPath": "lib/components/remove-item.js",
-            "targetPath": "components/remove-item",
-            "pageTitle": "components/remove-item",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.remove-item",
-                "slug": "componentremove-item",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.remove-item"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/root.js",
-            "projectPath": "lib/components/root.js",
-            "targetPath": "components/root",
-            "pageTitle": "components/root",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.root",
-                "slug": "componentroot",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.root"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/select.js",
-            "projectPath": "lib/components/select.js",
-            "targetPath": "components/select",
-            "pageTitle": "components/select",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.select",
-                "slug": "componentselect",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.select"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/text.js",
-            "projectPath": "lib/components/text.js",
-            "targetPath": "components/text",
-            "pageTitle": "components/text",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.text",
-                "slug": "componenttext",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.text"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/textarea.js",
-            "projectPath": "lib/components/textarea.js",
-            "targetPath": "components/textarea",
-            "pageTitle": "components/textarea",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component.textarea",
-                "slug": "componenttextarea",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component.textarea"
-          },
-          "depth": 2,
-          "outline": []
-        }
-      ]
-    }, {
-      "type": "folder",
-      "data": {
-        "path": "core",
-        "title": "core"
-      },
-      "depth": 1,
-      "children": [
-        {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/core/field.js",
-            "projectPath": "lib/core/field.js",
-            "targetPath": "core/field",
-            "pageTitle": "core/field",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "core.field",
-                "slug": "corefield",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "core.field"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/core/form.js",
-            "projectPath": "lib/core/form.js",
-            "targetPath": "core/form",
-            "pageTitle": "core/form",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "core.form",
-                "slug": "coreform",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "core.form"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/core/form-init.js",
-            "projectPath": "lib/core/form-init.js",
-            "targetPath": "core/form-init",
-            "pageTitle": "core/form-init",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "core.form-init",
-                "slug": "coreform-init",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "core.form-init"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/core/formatic.js",
-            "projectPath": "lib/core/formatic.js",
-            "targetPath": "core/formatic",
-            "pageTitle": "core/formatic",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "core.formatic",
-                "slug": "coreformatic",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "core.formatic"
-          },
-          "depth": 2,
-          "outline": []
-        }
-      ]
-    }, {
-      "type": "folder",
-      "data": {
-        "path": "default",
-        "title": "default"
-      },
-      "depth": 1,
-      "children": [
-        {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/compiler.js",
-            "projectPath": "lib/default/compiler.js",
-            "targetPath": "default/compiler",
-            "pageTitle": "default/compiler",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "compiler",
-                "slug": "compiler",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "compiler"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/component.js",
-            "projectPath": "lib/default/component.js",
-            "targetPath": "default/component",
-            "pageTitle": "default/component",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "component",
-                "slug": "component",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "component"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/core.js",
-            "projectPath": "lib/default/core.js",
-            "targetPath": "default/core",
-            "pageTitle": "default/core",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "core",
-                "slug": "core",
-                "isFileHeader": true
-              },
-              "depth": 1,
-              "children": [
-                {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/array.js",
+                "projectPath": "lib/components/fields/array.js",
+                "targetPath": "components/fields/array",
+                "pageTitle": "components/fields/array",
+                "firstHeader": {
                   "type": "heading",
                   "data": {
-                    "level": 2,
-                    "title": "Form prototype",
-                    "slug": "form-prototype"
+                    "level": 1,
+                    "title": "array component",
+                    "slug": "array-component",
+                    "isFileHeader": true
                   },
-                  "depth": 2
-                }
-              ]
-            },
-            "title": "core"
-          },
-          "depth": 2,
-          "outline": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Form prototype",
-                "slug": "form-prototype"
+                  "depth": 1
+                },
+                "title": "array component"
               },
-              "depth": 2
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/boolean.js",
+                "projectPath": "lib/components/fields/boolean.js",
+                "targetPath": "components/fields/boolean",
+                "pageTitle": "components/fields/boolean",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "boolean component",
+                    "slug": "boolean-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "boolean component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/checkbox-list.js",
+                "projectPath": "lib/components/fields/checkbox-list.js",
+                "targetPath": "components/fields/checkbox-list",
+                "pageTitle": "components/fields/checkbox-list",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "checkbox-list component",
+                    "slug": "checkbox-list-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "checkbox-list component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/copy.js",
+                "projectPath": "lib/components/fields/copy.js",
+                "targetPath": "components/fields/copy",
+                "pageTitle": "components/fields/copy",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "copy component",
+                    "slug": "copy-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "copy component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/fields.js",
+                "projectPath": "lib/components/fields/fields.js",
+                "targetPath": "components/fields/fields",
+                "pageTitle": "components/fields/fields",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "fields component",
+                    "slug": "fields-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "fields component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/json.js",
+                "projectPath": "lib/components/fields/json.js",
+                "targetPath": "components/fields/json",
+                "pageTitle": "components/fields/json",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "json component",
+                    "slug": "json-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "json component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/object.js",
+                "projectPath": "lib/components/fields/object.js",
+                "targetPath": "components/fields/object",
+                "pageTitle": "components/fields/object",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "object component",
+                    "slug": "object-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "object component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/pretty-text.js",
+                "projectPath": "lib/components/fields/pretty-text.js",
+                "targetPath": "components/fields/pretty-text",
+                "pageTitle": "components/fields/pretty-text",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "pretty-textarea component",
+                    "slug": "pretty-textarea-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "pretty-textarea component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/select.js",
+                "projectPath": "lib/components/fields/select.js",
+                "targetPath": "components/fields/select",
+                "pageTitle": "components/fields/select",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "select component",
+                    "slug": "select-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "select component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/single-line-string.js",
+                "projectPath": "lib/components/fields/single-line-string.js",
+                "targetPath": "components/fields/single-line-string",
+                "pageTitle": "components/fields/single-line-string",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "single-line-string component",
+                    "slug": "single-line-string-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "single-line-string component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/string.js",
+                "projectPath": "lib/components/fields/string.js",
+                "targetPath": "components/fields/string",
+                "pageTitle": "components/fields/string",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "string component",
+                    "slug": "string-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "string component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/unknown.js",
+                "projectPath": "lib/components/fields/unknown.js",
+                "targetPath": "components/fields/unknown",
+                "pageTitle": "components/fields/unknown",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "unknown component",
+                    "slug": "unknown-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "unknown component"
+              },
+              "depth": 3,
+              "outline": []
             }
           ]
         }, {
-          "type": "file",
+          "type": "folder",
           "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/eval.js",
-            "projectPath": "lib/default/eval.js",
-            "targetPath": "default/eval",
-            "pageTitle": "default/eval",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "eval",
-                "slug": "eval",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "eval"
+            "path": "components/helpers",
+            "title": "helpers"
           },
           "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/eval-functions.js",
-            "projectPath": "lib/default/eval-functions.js",
-            "targetPath": "default/eval-functions",
-            "pageTitle": "default/eval-functions",
-            "firstHeader": {
-              "type": "heading",
+          "children": [
+            {
+              "type": "file",
               "data": {
-                "level": 1,
-                "title": "eval-functions",
-                "slug": "eval-functions",
-                "isFileHeader": true
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/add-item.js",
+                "projectPath": "lib/components/helpers/add-item.js",
+                "targetPath": "components/helpers/add-item",
+                "pageTitle": "components/helpers/add-item",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.add-item",
+                    "slug": "componentadd-item",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.add-item"
               },
-              "depth": 1
-            },
-            "title": "eval-functions"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/field-router.js",
-            "projectPath": "lib/default/field-router.js",
-            "targetPath": "default/field-router",
-            "pageTitle": "default/field-router",
-            "firstHeader": {
-              "type": "heading",
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
               "data": {
-                "level": 1,
-                "title": "field-router",
-                "slug": "field-router",
-                "isFileHeader": true
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/array-control.js",
+                "projectPath": "lib/components/helpers/array-control.js",
+                "targetPath": "components/helpers/array-control",
+                "pageTitle": "components/helpers/array-control",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.list-control",
+                    "slug": "componentlist-control",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.list-control"
               },
-              "depth": 1
-            },
-            "title": "field-router"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/field-routes.js",
-            "projectPath": "lib/default/field-routes.js",
-            "targetPath": "default/field-routes",
-            "pageTitle": "default/field-routes",
-            "firstHeader": {
-              "type": "heading",
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
               "data": {
-                "level": 1,
-                "title": "field-routes",
-                "slug": "field-routes",
-                "isFileHeader": true
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/array-item.js",
+                "projectPath": "lib/components/helpers/array-item.js",
+                "targetPath": "components/helpers/array-item",
+                "pageTitle": "components/helpers/array-item",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.list-item",
+                    "slug": "componentlist-item",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.list-item"
               },
-              "depth": 1
-            },
-            "title": "field-routes"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/loader.js",
-            "projectPath": "lib/default/loader.js",
-            "targetPath": "default/loader",
-            "pageTitle": "default/loader",
-            "firstHeader": {
-              "type": "heading",
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
               "data": {
-                "level": 1,
-                "title": "loader",
-                "slug": "loader",
-                "isFileHeader": true
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/array-item-control.js",
+                "projectPath": "lib/components/helpers/array-item-control.js",
+                "targetPath": "components/helpers/array-item-control",
+                "pageTitle": "components/helpers/array-item-control",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.list-item-control",
+                    "slug": "componentlist-item-control",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.list-item-control"
               },
-              "depth": 1
-            },
-            "title": "loader"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default/util.js",
-            "projectPath": "lib/default/util.js",
-            "targetPath": "default/util",
-            "pageTitle": "default/util",
-            "firstHeader": {
-              "type": "heading",
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
               "data": {
-                "level": 1,
-                "title": "util",
-                "slug": "util",
-                "isFileHeader": true
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/array-item-value.js",
+                "projectPath": "lib/components/helpers/array-item-value.js",
+                "targetPath": "components/helpers/array-item-value",
+                "pageTitle": "components/helpers/array-item-value",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.list-item-value",
+                    "slug": "componentlist-item-value",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.list-item-value"
               },
-              "depth": 1
-            },
-            "title": "util"
-          },
-          "depth": 2,
-          "outline": []
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/choices.js",
+                "projectPath": "lib/components/helpers/choices.js",
+                "targetPath": "components/helpers/choices",
+                "pageTitle": "components/helpers/choices",
+                "title": "choices"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/field.js",
+                "projectPath": "lib/components/helpers/field.js",
+                "targetPath": "components/helpers/field",
+                "pageTitle": "components/helpers/field",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.field",
+                    "slug": "componentfield",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.field"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/field-template-choices.js",
+                "projectPath": "lib/components/helpers/field-template-choices.js",
+                "targetPath": "components/helpers/field-template-choices",
+                "pageTitle": "components/helpers/field-template-choices",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.item-choices",
+                    "slug": "componentitem-choices",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.item-choices"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/help.js",
+                "projectPath": "lib/components/helpers/help.js",
+                "targetPath": "components/helpers/help",
+                "pageTitle": "components/helpers/help",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.help",
+                    "slug": "componenthelp",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.help"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/label.js",
+                "projectPath": "lib/components/helpers/label.js",
+                "targetPath": "components/helpers/label",
+                "pageTitle": "components/helpers/label",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.label",
+                    "slug": "componentlabel",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.label"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/move-item-back.js",
+                "projectPath": "lib/components/helpers/move-item-back.js",
+                "targetPath": "components/helpers/move-item-back",
+                "pageTitle": "components/helpers/move-item-back",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.move-item-back",
+                    "slug": "componentmove-item-back",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.move-item-back"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/move-item-forward.js",
+                "projectPath": "lib/components/helpers/move-item-forward.js",
+                "targetPath": "components/helpers/move-item-forward",
+                "pageTitle": "components/helpers/move-item-forward",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.move-item-forward",
+                    "slug": "componentmove-item-forward",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.move-item-forward"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/object-control.js",
+                "projectPath": "lib/components/helpers/object-control.js",
+                "targetPath": "components/helpers/object-control",
+                "pageTitle": "components/helpers/object-control",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.object-control",
+                    "slug": "componentobject-control",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.object-control"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/object-item.js",
+                "projectPath": "lib/components/helpers/object-item.js",
+                "targetPath": "components/helpers/object-item",
+                "pageTitle": "components/helpers/object-item",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.object-item",
+                    "slug": "componentobject-item",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.object-item"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/object-item-control.js",
+                "projectPath": "lib/components/helpers/object-item-control.js",
+                "targetPath": "components/helpers/object-item-control",
+                "pageTitle": "components/helpers/object-item-control",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.object-item-control",
+                    "slug": "componentobject-item-control",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.object-item-control"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/object-item-key.js",
+                "projectPath": "lib/components/helpers/object-item-key.js",
+                "targetPath": "components/helpers/object-item-key",
+                "pageTitle": "components/helpers/object-item-key",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.object-item-key",
+                    "slug": "componentobject-item-key",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.object-item-key"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/object-item-value.js",
+                "projectPath": "lib/components/helpers/object-item-value.js",
+                "targetPath": "components/helpers/object-item-value",
+                "pageTitle": "components/helpers/object-item-value",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.object-item-value",
+                    "slug": "componentobject-item-value",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.object-item-value"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/remove-item.js",
+                "projectPath": "lib/components/helpers/remove-item.js",
+                "targetPath": "components/helpers/remove-item",
+                "pageTitle": "components/helpers/remove-item",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.remove-item",
+                    "slug": "componentremove-item",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.remove-item"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/sample.js",
+                "projectPath": "lib/components/helpers/sample.js",
+                "targetPath": "components/helpers/sample",
+                "pageTitle": "components/helpers/sample",
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "component.help",
+                    "slug": "componenthelp",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "component.help"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/select-value.js",
+                "projectPath": "lib/components/helpers/select-value.js",
+                "targetPath": "components/helpers/select-value",
+                "pageTitle": "components/helpers/select-value",
+                "title": "select-value"
+              },
+              "depth": 3,
+              "outline": []
+            }
+          ]
         }
       ]
+    }, {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "multiLineComment": ["/*", "*", "*/"],
+          "singleLineComment": ["//"],
+          "ignorePrefix": "}",
+          "foldPrefix": "^",
+          "name": "JavaScript"
+        },
+        "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/default-config.js",
+        "projectPath": "lib/default-config.js",
+        "targetPath": "default-config",
+        "pageTitle": "default-config",
+        "firstHeader": {
+          "type": "heading",
+          "data": {
+            "level": 1,
+            "title": "default-config",
+            "slug": "default-config",
+            "isFileHeader": true
+          },
+          "depth": 1
+        },
+        "title": "default-config"
+      },
+      "depth": 1,
+      "outline": []
     }, {
       "type": "file",
       "data": {
@@ -1426,69 +1195,16 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 1,
-            "title": "Formatic plugin core",
-            "slug": "formatic-plugin-core",
+            "title": "formatic",
+            "slug": "formatic",
             "isFileHeader": true
           },
-          "depth": 1,
-          "children": [
-            {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Formatic factory",
-                "slug": "formatic-factory"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Plugin prototype",
-                "slug": "plugin-prototype"
-              },
-              "depth": 2
-            }, {
-              "type": "heading",
-              "data": {
-                "level": 2,
-                "title": "Formatic factory, continued...",
-                "slug": "formatic-factory-continued"
-              },
-              "depth": 2
-            }
-          ]
+          "depth": 1
         },
-        "title": "Formatic plugin core"
+        "title": "formatic"
       },
       "depth": 1,
-      "outline": [
-        {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Formatic factory",
-            "slug": "formatic-factory"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Plugin prototype",
-            "slug": "plugin-prototype"
-          },
-          "depth": 2
-        }, {
-          "type": "heading",
-          "data": {
-            "level": 2,
-            "title": "Formatic factory, continued...",
-            "slug": "formatic-factory-continued"
-          },
-          "depth": 2
-        }
-      ]
+      "outline": []
     }, {
       "type": "folder",
       "data": {
@@ -1517,13 +1233,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "mixin.click-outside",
-                "slug": "mixinclick-outside",
+                "title": "click-outside mixin",
+                "slug": "click-outside-mixin",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "mixin.click-outside"
+            "title": "click-outside mixin"
           },
           "depth": 2,
           "outline": []
@@ -1547,13 +1263,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "mixin.field",
-                "slug": "mixinfield",
+                "title": "field mixin",
+                "slug": "field-mixin",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "mixin.field"
+            "title": "field mixin"
           },
           "depth": 2,
           "outline": []
@@ -1569,21 +1285,21 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "foldPrefix": "^",
               "name": "JavaScript"
             },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/input-actions.js",
-            "projectPath": "lib/mixins/input-actions.js",
-            "targetPath": "mixins/input-actions",
-            "pageTitle": "mixins/input-actions",
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/helper.js",
+            "projectPath": "lib/mixins/helper.js",
+            "targetPath": "mixins/helper",
+            "pageTitle": "mixins/helper",
             "firstHeader": {
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "mixin.input-actions",
-                "slug": "mixininput-actions",
+                "title": "helper mixin",
+                "slug": "helper-mixin",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "mixin.input-actions"
+            "title": "helper mixin"
           },
           "depth": 2,
           "outline": []
@@ -1629,6 +1345,36 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "foldPrefix": "^",
               "name": "JavaScript"
             },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/scroll.js",
+            "projectPath": "lib/mixins/scroll.js",
+            "targetPath": "mixins/scroll",
+            "pageTitle": "mixins/scroll",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "scroll mixin",
+                "slug": "scroll-mixin",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "scroll mixin"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
             "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/mixins/undo-stack.js",
             "projectPath": "lib/mixins/undo-stack.js",
             "targetPath": "mixins/undo-stack",
@@ -1637,13 +1383,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "mixin.undo-stack",
-                "slug": "mixinundo-stack",
+                "title": "undo-stack mixin",
+                "slug": "undo-stack-mixin",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "mixin.undo-stack"
+            "title": "undo-stack mixin"
           },
           "depth": 2,
           "outline": []
@@ -1677,248 +1423,108 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "bootstrap",
-                "slug": "bootstrap",
+                "title": "bootstrap plugin",
+                "slug": "bootstrap-plugin",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "bootstrap"
+            "title": "bootstrap plugin"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/plugins/meta.js",
+            "projectPath": "lib/plugins/meta.js",
+            "targetPath": "plugins/meta",
+            "pageTitle": "plugins/meta",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "meta plugin",
+                "slug": "meta-plugin",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "meta plugin"
+          },
+          "depth": 2,
+          "outline": []
+        }, {
+          "type": "file",
+          "data": {
+            "language": {
+              "nameMatchers": [".js"],
+              "pygmentsLexer": "javascript",
+              "multiLineComment": ["/*", "*", "*/"],
+              "singleLineComment": ["//"],
+              "ignorePrefix": "}",
+              "foldPrefix": "^",
+              "name": "JavaScript"
+            },
+            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/plugins/reference.js",
+            "projectPath": "lib/plugins/reference.js",
+            "targetPath": "plugins/reference",
+            "pageTitle": "plugins/reference",
+            "firstHeader": {
+              "type": "heading",
+              "data": {
+                "level": 1,
+                "title": "reference plugin",
+                "slug": "reference-plugin",
+                "isFileHeader": true
+              },
+              "depth": 1
+            },
+            "title": "reference plugin"
           },
           "depth": 2,
           "outline": []
         }
       ]
     }, {
-      "type": "folder",
+      "type": "file",
       "data": {
-        "path": "store",
-        "title": "store"
+        "language": {
+          "nameMatchers": [".js"],
+          "pygmentsLexer": "javascript",
+          "multiLineComment": ["/*", "*", "*/"],
+          "singleLineComment": ["//"],
+          "ignorePrefix": "}",
+          "foldPrefix": "^",
+          "name": "JavaScript"
+        },
+        "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/utils.js",
+        "projectPath": "lib/utils.js",
+        "targetPath": "utils",
+        "pageTitle": "utils",
+        "firstHeader": {
+          "type": "heading",
+          "data": {
+            "level": 1,
+            "title": "utils",
+            "slug": "utils",
+            "isFileHeader": true
+          },
+          "depth": 1
+        },
+        "title": "utils"
       },
       "depth": 1,
-      "children": [
-        {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/store/memory.js",
-            "projectPath": "lib/store/memory.js",
-            "targetPath": "store/memory",
-            "pageTitle": "store/memory",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "store.memory",
-                "slug": "storememory",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "store.memory"
-          },
-          "depth": 2,
-          "outline": []
-        }
-      ]
-    }, {
-      "type": "folder",
-      "data": {
-        "path": "types",
-        "title": "types"
-      },
-      "depth": 1,
-      "children": [
-        {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/types/array.js",
-            "projectPath": "lib/types/array.js",
-            "targetPath": "types/array",
-            "pageTitle": "types/array",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "type.array",
-                "slug": "typearray",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "type.array"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/types/boolean.js",
-            "projectPath": "lib/types/boolean.js",
-            "targetPath": "types/boolean",
-            "pageTitle": "types/boolean",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "type.boolean",
-                "slug": "typeboolean",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "type.boolean"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/types/json.js",
-            "projectPath": "lib/types/json.js",
-            "targetPath": "types/json",
-            "pageTitle": "types/json",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "type.json",
-                "slug": "typejson",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "type.json"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/types/object.js",
-            "projectPath": "lib/types/object.js",
-            "targetPath": "types/object",
-            "pageTitle": "types/object",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "type.object",
-                "slug": "typeobject",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "type.object"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/types/root.js",
-            "projectPath": "lib/types/root.js",
-            "targetPath": "types/root",
-            "pageTitle": "types/root",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "type.root",
-                "slug": "typeroot",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "type.root"
-          },
-          "depth": 2,
-          "outline": []
-        }, {
-          "type": "file",
-          "data": {
-            "language": {
-              "nameMatchers": [".js"],
-              "pygmentsLexer": "javascript",
-              "multiLineComment": ["/*", "*", "*/"],
-              "singleLineComment": ["//"],
-              "ignorePrefix": "}",
-              "foldPrefix": "^",
-              "name": "JavaScript"
-            },
-            "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/types/string.js",
-            "projectPath": "lib/types/string.js",
-            "targetPath": "types/string",
-            "pageTitle": "types/string",
-            "firstHeader": {
-              "type": "heading",
-              "data": {
-                "level": 1,
-                "title": "type.string",
-                "slug": "typestring",
-                "isFileHeader": true
-              },
-              "depth": 1
-            },
-            "title": "type.string"
-          },
-          "depth": 2,
-          "outline": []
-        }
-      ]
+      "outline": []
     }
   ];
 

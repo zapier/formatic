@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="en"><head><title>components/helpers/select-value</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="components/helpers/select-value"><meta name="groc-project-path" content="lib/components/helpers/select-value.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/components/helpers/select-value.js">lib/components/helpers/select-value.js</a></div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
+<span class="hljs-keyword">var</span> R = React.DOM;
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+<span class="hljs-keyword">var</span> cx = React.addons.classSet;
+
+module.exports = React.createClass({
+
+  displayName: <span class="hljs-string">'SelectValue'</span>,
+
+  mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/helper'</span>)],
+
+  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> {</span>
+    <span class="hljs-keyword">var</span> choiceValue = event.target.value;
+    <span class="hljs-keyword">var</span> choiceType = choiceValue.substring(<span class="hljs-number">0</span>, choiceValue.indexOf(<span class="hljs-string">':'</span>));
+    <span class="hljs-keyword">if</span> (choiceType === <span class="hljs-string">'choice'</span>) {
+      <span class="hljs-keyword">var</span> choiceIndex = choiceValue.substring(choiceValue.indexOf(<span class="hljs-string">':'</span>) + <span class="hljs-number">1</span>);
+      choiceIndex = <span class="hljs-built_in">parseInt</span>(choiceIndex);
+      <span class="hljs-keyword">this</span>.props.onChange(<span class="hljs-keyword">this</span>.props.choices[choiceIndex].value);
+    }
+  },
+
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
+  },
+
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+
+    <span class="hljs-keyword">var</span> choices = <span class="hljs-keyword">this</span>.props.choices || [];
+
+    <span class="hljs-keyword">var</span> choicesOrLoading;
+
+    <span class="hljs-keyword">if</span> (choices.length === <span class="hljs-number">1</span> &amp;&amp; choices[<span class="hljs-number">0</span>].value === <span class="hljs-string">'///loading///'</span>) {
+      choicesOrLoading = R.div({},
+        <span class="hljs-string">'Loading choices...'</span>
+      );
+    } <span class="hljs-keyword">else</span> {
+
+      <span class="hljs-keyword">var</span> value = <span class="hljs-keyword">this</span>.props.field.value !== <span class="hljs-literal">undefined</span> ? <span class="hljs-keyword">this</span>.props.field.value : <span class="hljs-string">''</span>;
+
+      choices = choices.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> {</span>
+        <span class="hljs-keyword">return</span> {
+          choiceValue: <span class="hljs-string">'choice:'</span> + i,
+          value: choice.value,
+          label: choice.label
+        };
+      });
+
+      <span class="hljs-keyword">var</span> valueChoice = _.find(choices, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice)</span> {</span>
+        <span class="hljs-keyword">return</span> choice.value === value;
+      });
+
+      <span class="hljs-keyword">if</span> (valueChoice === <span class="hljs-literal">undefined</span>) {
+
+        <span class="hljs-keyword">var</span> label = value;
+        <span class="hljs-keyword">if</span> (!_.isString(value)) {
+          label = <span class="hljs-built_in">JSON</span>.stringify(value);
+        }
+        valueChoice = {
+          choiceValue: <span class="hljs-string">'value:'</span>,
+          value: value,
+          label: label
+        };
+        choices = [valueChoice].concat(choices);
+      }
+
+      choicesOrLoading = R.select({
+        className: cx(<span class="hljs-keyword">this</span>.props.classes),
+        onChange: <span class="hljs-keyword">this</span>.onChange,
+        value: valueChoice.choiceValue,
+        onFocus: <span class="hljs-keyword">this</span>.onFocusAction,
+        onBlur: <span class="hljs-keyword">this</span>.onBlurAction
+      },
+      choices.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> {</span>
+        <span class="hljs-keyword">return</span> R.option({
+          key: i,
+          value: choice.choiceValue
+        }, choice.label);
+      }.bind(<span class="hljs-keyword">this</span>))
+    );
+  }
+
+  <span class="hljs-keyword">return</span> choicesOrLoading;
+}
+});</div></div></div></div></body></html>

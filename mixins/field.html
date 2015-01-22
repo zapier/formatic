@@ -1,39 +1,34 @@
-<!DOCTYPE html><html lang="en"><head><title>mixins/field</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="mixins/field"><meta name="groc-project-path" content="lib/mixins/field.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/mixins/field.js">lib/mixins/field.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="mixinfield">mixin.field</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap up your fields with this mixin to get:</p>
-<ul>
-<li>Automatic metadata loading.</li>
-<li>Automatic erasing of values when the field disappears.</li>
-<li>Anything else decided later.</li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+<!DOCTYPE html><html lang="en"><head><title>mixins/field</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="mixins/field"><meta name="groc-project-path" content="lib/mixins/field.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/mixins/field.js">lib/mixins/field.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="field-mixin">field mixin</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This mixin gets mixed into all field components.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
 'use strict'</span>;
 
-module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(plugin)</span> {</span>
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 
-  plugin.exports = {
-
-    loadNeededMeta: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> {</span>
-      <span class="hljs-keyword">if</span> (props.field &amp;&amp; props.field.form) {
-        <span class="hljs-keyword">if</span> (props.field.def.needsMeta &amp;&amp; props.field.def.needsMeta.length &gt; <span class="hljs-number">0</span>) {
-          props.field.def.needsMeta.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(keys)</span> {</span>
-            <span class="hljs-keyword">if</span> (keys) {
-              props.field.form.loadMeta(keys);
-            }
-          });
-        }
-      }
-    },
-
-    componentDidMount: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
-      <span class="hljs-keyword">this</span>.loadNeededMeta(<span class="hljs-keyword">this</span>.props);
-    },
-
-    componentWillReceiveProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(nextProps)</span> {</span>
-      <span class="hljs-keyword">this</span>.loadNeededMeta(nextProps);
-    },
-
-    componentWillUnmount: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
-      <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.props.field) {
-        <span class="hljs-keyword">this</span>.props.field.erase();
-      }
+module.exports = {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Signal a change in value.</p></div></div><div class="code"><div class="wrapper">  onChangeValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+    <span class="hljs-keyword">this</span>.props.onChange(value, {
+      field: <span class="hljs-keyword">this</span>.props.field
+    });
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Bubble up a value.</p></div></div><div class="code"><div class="wrapper">  onBubbleValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value, info)</span> {</span>
+    <span class="hljs-keyword">this</span>.props.onChange(value, info);
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Start an action bubbling up through parent components.</p></div></div><div class="code"><div class="wrapper">  onStartAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(action, props)</span> {</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.props.onAction) {
+      <span class="hljs-keyword">var</span> info = _.extend({}, props);
+      info.action = action;
+      info.field = <span class="hljs-keyword">this</span>.props.field;
+      <span class="hljs-keyword">this</span>.props.onAction(info);
     }
-  };
+  },
+
+  onFocusAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">this</span>.onStartAction(<span class="hljs-string">'focus'</span>);
+  },
+
+  onBlurAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">this</span>.onStartAction(<span class="hljs-string">'blur'</span>);
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Bubble up an action.</p></div></div><div class="code"><div class="wrapper">  onBubbleAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(info)</span> {</span>
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.props.onAction) {
+      <span class="hljs-keyword">this</span>.props.onAction(info);
+    }
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Delegate rendering back to config so it can be wrapped.</p></div></div><div class="code"><div class="wrapper">  renderWithConfig: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.props.config.renderFieldComponent(<span class="hljs-keyword">this</span>);
+  }
 };</div></div></div></div></body></html>

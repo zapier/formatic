@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><title>utils</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="utils"><meta name="groc-project-path" content="lib/utils.js"><meta name="groc-github-url" content="https://github.com/zapier/formatic"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path"><a href="https://github.com/zapier/formatic/blob/master/lib/utils.js">lib/utils.js</a></div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="utils">utils</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Just some shared utility functions.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+'use strict'</span>;
+
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+
+<span class="hljs-keyword">var</span> utils = exports;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Copy obj recursing deeply.</p></div></div><div class="code"><div class="wrapper">utils.deepCopy = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(obj)</span> {</span>
+  <span class="hljs-keyword">if</span> (_.isArray(obj)) {
+    <span class="hljs-keyword">return</span> obj.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(item)</span> {</span>
+      <span class="hljs-keyword">return</span> utils.deepCopy(item);
+    });
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isFunction(obj)) {
+    <span class="hljs-keyword">return</span> obj;
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isNull(obj)) {
+    <span class="hljs-keyword">return</span> obj;
+  } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isObject(obj)) {
+    <span class="hljs-keyword">var</span> copy = {};
+    _.each(obj, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value, key)</span> {</span>
+      copy[key] = utils.deepCopy(value);
+    });
+    <span class="hljs-keyword">return</span> copy;
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-keyword">return</span> obj;
+  }
+};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Cache for strings converted to Pascal Case. This should be a finite list, so
+not much fear that we will run out of memory.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> dashToPascalCache = {};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert foo-bar to FooBar.</p></div></div><div class="code"><div class="wrapper">utils.dashToPascal = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(s)</span> {</span>
+  <span class="hljs-keyword">if</span> (!dashToPascalCache[s]) {
+    dashToPascalCache[s] = s.split(<span class="hljs-string">'-'</span>).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(part)</span> {</span>
+      <span class="hljs-keyword">return</span> part[<span class="hljs-number">0</span>].toUpperCase() + part.substring(<span class="hljs-number">1</span>);
+    }).join(<span class="hljs-string">''</span>);
+  }
+  <span class="hljs-keyword">return</span> dashToPascalCache[s];
+};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Copy all computed styles from one DOM element to another.</p></div></div><div class="code"><div class="wrapper">utils.copyElementStyle = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fromElement, toElement)</span> {</span>
+  <span class="hljs-keyword">var</span> fromStyle = window.getComputedStyle(fromElement, <span class="hljs-string">''</span>);
+
+  <span class="hljs-keyword">if</span> (fromStyle.cssText !== <span class="hljs-string">''</span>) {
+    toElement.style.cssText = fromStyle.cssText;
+    <span class="hljs-keyword">return</span>;
+  }
+
+  <span class="hljs-keyword">var</span> cssRules = [];
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; fromStyle.length; i++) {
+    cssRules.push(fromStyle[i] + <span class="hljs-string">':'</span> + fromStyle.getPropertyValue(fromStyle[i]) + <span class="hljs-string">';'</span>);
+  }
+  <span class="hljs-keyword">var</span> cssText = cssRules.join(<span class="hljs-string">''</span>);
+
+  toElement.style.cssText = cssText;
+};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Object to hold browser sniffing info.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> browser = {
+  isChrome: <span class="hljs-literal">false</span>,
+  isMozilla: <span class="hljs-literal">false</span>,
+  isOpera: <span class="hljs-literal">false</span>,
+  isIe: <span class="hljs-literal">false</span>,
+  isSafari: <span class="hljs-literal">false</span>
+};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Sniff the browser.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> ua = navigator.userAgent;
+<span class="hljs-keyword">if</span>(ua.indexOf(<span class="hljs-string">'Chrome'</span>) &gt; -<span class="hljs-number">1</span>) {
+  browser.isChrome = <span class="hljs-literal">true</span>;
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ua.indexOf(<span class="hljs-string">'Safari'</span>) &gt; -<span class="hljs-number">1</span>) {
+  browser.isSafari = <span class="hljs-literal">true</span>;
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ua.indexOf(<span class="hljs-string">'Opera'</span>) &gt; -<span class="hljs-number">1</span>) {
+  browser.isOpera = <span class="hljs-literal">true</span>;
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ua.indexOf(<span class="hljs-string">'Firefox'</span>) &gt; -<span class="hljs-number">1</span>) {
+  browser.isMozilla = <span class="hljs-literal">true</span>;
+} <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ua.indexOf(<span class="hljs-string">'MSIE'</span>) &gt; -<span class="hljs-number">1</span>) {
+  browser.isIe = <span class="hljs-literal">true</span>;
+}</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Export sniffed browser info.</p></div></div><div class="code"><div class="wrapper">utils.browser = browser;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a method that delegates to another method on the same object. The
+default configuration uses this function to delegate one method to another.</p></div></div><div class="code"><div class="wrapper">utils.delegateTo = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> {</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>[name].apply(<span class="hljs-keyword">this</span>, <span class="hljs-built_in">arguments</span>);
+  };
+};</div></div></div></div></body></html>

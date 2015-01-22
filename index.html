@@ -20,38 +20,45 @@ from elsewhere.</p>
 cd formatic
 npm install
 gulp build</code></pre>
-<p>This will build two files in the build directory: formatic-min.js (minified) and
-formatic-dev.js (not minified and includes source maps for development).</p>
+<p>This will build three files in the build directory: formatic-min.js (minified),
+formatic.js (not minified) and formatic-dev.js (not minified and includes
+source maps for development).</p>
 <h2 id="what-is-formatic">What is formatic?</h2>
-<p>Formatic is a configurable, pluggable forms builder.</p>
-<h2 id="using-formatic-quick-version">Using formatic (quick version)</h2>
-<p>If you don&#39;t want to extend formatic, you&#39;ll use it like this:</p>
-<pre><code class="lang-js"><span class="hljs-comment">// Get the default formatic instance.</span>
-<span class="hljs-keyword">var</span> formatic = <span class="hljs-built_in">require</span>(<span class="hljs-string">'formatic'</span>);
+<p>Formatic is a configurable, pluggable forms library for React. Pass in JSON
+fields that define your form, along with a value to be edited, and Formatic
+gives you a form to edit your value.</p>
+<h2 id="using-formatic">Using formatic</h2>
+<p>If you&#39;re happy with the default configuration, you can use it like this:</p>
+<pre><code class="lang-js"><span class="hljs-comment">// Get the formatic class.</span>
+<span class="hljs-keyword">var</span> Formatic = <span class="hljs-built_in">require</span>(<span class="hljs-string">'formatic'</span>);
 
-<span class="hljs-comment">// Get a new form.</span>
-<span class="hljs-keyword">var</span> form = formatic();
+<span class="hljs-comment">// Create an element factory.</span>
+<span class="hljs-keyword">var</span> Form = React.createFactory(Formatic);
 
-<span class="hljs-comment">// Add some fields.</span>
-form.fields([
+<span class="hljs-comment">// Create some fields.</span>
+<span class="hljs-keyword">var</span> fields = [
   {
-    type: <span class="hljs-string">'text'</span>,
-    key: <span class="hljs-string">'firstName'</span>
+    type: <span class="hljs-string">'string'</span>,
+    isSingleLine: <span class="hljs-literal">true</span>,
+    key: <span class="hljs-string">'firstName'</span>,
+    label: <span class="hljs-string">'First Name'</span>
   },
   {
-    type: <span class="hljs-string">'text'</span>,
-    key: <span class="hljs-string">'lastName'</span>
+    type: <span class="hljs-string">'str'</span>,
+    isSingleLine: <span class="hljs-literal">true</span>,
+    key: <span class="hljs-string">'lastName'</span>,
+    label: <span class="hljs-string">'Last Name'</span>
   }
-]);
+];
 
-<span class="hljs-comment">// Give the form some data.</span>
-form.val({
-  firstName: <span class="hljs-string">'Joe'</span>,
-  lastName: <span class="hljs-string">'Foo'</span>
-});
-
-<span class="hljs-comment">// Get a React component</span>
-<span class="hljs-keyword">var</span> component = form.component();
-
-<span class="hljs-comment">// Render the form to some node.</span>
-formatic.render(component, document.body)</code></pre></div></div></div></div></body></html>
+<span class="hljs-comment">// Render the form.</span>
+React.render(Form({
+  fields: fields,
+  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(newValue)</span> {</span>
+    console.log(newValue);
+  }
+}), document.body);</code></pre>
+<p>This creates a simple form like this (assuming you&#39;re using formatic.css):</p>
+<p><img src="images/simple-form.png" alt="simple-form"></p>
+<p>The above assumes you&#39;re using a CommonJS build tool like browserify or webpack.
+If you use the standalone build, you can just the global `Formatic&#39;.</p></div></div></div></div></body></html>
