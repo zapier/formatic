@@ -115,15 +115,9 @@ describe('types', function() {
     var msg = 'Just something to read.';
 
     var formaticConfig = Formatic.createConfig(
+      Formatic.plugins.elementClasses,
       function (config) {
-        var createElement_Copy = config.createElement_Copy;
-
-        config.createElement_Copy = function (props) {
-          props = _.extend({}, props);
-          props.classes = _.extend({}, props.classes, {copy: true});
-
-          return createElement_Copy.call(this, props);
-        };
+        config.addElementClass('copy', 'copy');
       }
     );
 
