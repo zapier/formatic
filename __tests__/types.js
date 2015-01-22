@@ -16,6 +16,7 @@ describe('types', function() {
 
   var React = require('react/addons');
   var TestUtils = React.addons.TestUtils;
+  var _ = require('underscore');
 
   var mounted = function (element) {
     var rendered = TestUtils.renderIntoDocument(element);
@@ -26,32 +27,57 @@ describe('types', function() {
 
   var Form = React.createFactory(Formatic);
 
-  it('should change value of string field', function () {
+  var testValueType = function (options) {
 
-    var formValue;
+    var types = options.type;
 
-    var component = mounted(Form({
-      fields: [
-        {
-          type: 'string',
-          key: 'name',
-          default: 'Joe'
-        }
-      ],
-      onChange: function (newValue) {
-        formValue = newValue;
-      }
-    }));
+    if (!_.isArray(types)) {
+      types = [types];
+    }
 
-    var node = component.getDOMNode().getElementsByTagName('textarea')[0];
+    types.forEach(function (type) {
+      it('should change value of ' + type + ' field', function () {
 
-    expect(node.value).toEqual('Joe');
+        var formValue;
 
-    node.value = 'Mary';
+        var component = mounted(Form({
+          fields: [
+            {
+              type: type,
+              key: 'myValue',
+              default: options.from
+            }
+          ],
+          onChange: function (newValue) {
+            formValue = newValue;
+          }
+        }));
 
-    TestUtils.Simulate.change(node);
+        var node = component.getDOMNode().getElementsByTagName(options.tagName)[0];
 
-    expect(formValue.name).toEqual('Mary');
+        expect(node.value).toEqual(options.from);
+
+        node.value = options.to;
+
+        TestUtils.Simulate.change(node);
+
+        expect(formValue.myValue).toEqual(options.to);
+      });
+    });
+  };
+
+  testValueType({
+    type: ['string', 'text'],
+    from: 'Joe',
+    to: 'Mary',
+    tagName: 'textarea'
+  });
+
+  testValueType({
+    type: ['single-line-string', 'str', 'unicode'],
+    from: 'Joe',
+    to: 'Mary',
+    tagName: 'input'
   });
 
   // var testWithFormatic = function (formatic) {
