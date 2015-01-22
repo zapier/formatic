@@ -1,15 +1,58 @@
 /*global describe, it, expect*/
 'use strict';
 
+var printTree = function (node, indent) {
+  indent = indent || '';
+  if (node && node.childNodes) {
+    for (var i = 0; i < node.childNodes.length; i++) {
+      var childNode = node.childNodes[i];
+      console.log(indent + node.tagName);
+      printTree(childNode, indent + '  ');
+    }
+  }
+};
+
 describe('types', function() {
 
-  // var React = require('react/addons');
-  // var TestUtils = React.addons.TestUtils;
-  //
-  // var mounted = function (component) {
-  //   var rendered = TestUtils.renderIntoDocument(component);
-  //   return rendered;
-  // };
+  var React = require('react/addons');
+  var TestUtils = React.addons.TestUtils;
+
+  var mounted = function (element) {
+    var rendered = TestUtils.renderIntoDocument(element);
+    return rendered;
+  };
+
+  var Formatic = require('../');
+
+  var Form = React.createFactory(Formatic);
+
+  it('should change value of string field', function () {
+
+    var formValue;
+
+    var component = mounted(Form({
+      fields: [
+        {
+          type: 'string',
+          key: 'name',
+          default: 'Joe'
+        }
+      ],
+      onChange: function (newValue) {
+        formValue = newValue;
+      }
+    }));
+
+    var node = component.getDOMNode().getElementsByTagName('textarea')[0];
+
+    expect(node.value).toEqual('Joe');
+
+    node.value = 'Mary';
+
+    TestUtils.Simulate.change(node);
+
+    expect(formValue.name).toEqual('Mary');
+  });
 
   // var testWithFormatic = function (formatic) {
   //
