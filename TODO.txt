@@ -1,3 +1,5 @@
 - get some tests working again
 - bower
 - gulpify docs home
+- need hideLabel
+- json value on demo

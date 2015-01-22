@@ -25,6 +25,8 @@ describe('types', function() {
 
   var Formatic = require('../');
 
+  var config = Formatic.createConfig();
+
   var Form = React.createFactory(Formatic);
 
   var testValueType = function (options) {
@@ -55,9 +57,17 @@ describe('types', function() {
 
         var node = component.getDOMNode().getElementsByTagName(options.tagName)[0];
 
-        expect(node.value).toEqual(options.from);
+        var nodeValue = node.value;
+        if (options.getNodeValue) {
+          nodeValue = options.getNodeValue(node);
+        }
+        expect(nodeValue).toEqual(options.from);
 
-        node.value = options.to;
+        if (options.setNodeValue) {
+          options.setNodeValue(node, options.to);
+        } else {
+          node.value = options.to;
+        }
 
         TestUtils.Simulate.change(node);
 
@@ -68,8 +78,8 @@ describe('types', function() {
 
   testValueType({
     type: ['string', 'text'],
-    from: 'Joe',
-    to: 'Mary',
+    from: 'hello\ngood-bye',
+    to: 'hello\ngood-day',
     tagName: 'textarea'
   });
 
@@ -79,6 +89,67 @@ describe('types', function() {
     to: 'Mary',
     tagName: 'input'
   });
+
+  testValueType({
+    type: 'boolean',
+    from: false,
+    getNodeValue: function (node) {
+      var optionNode = node.childNodes[node.selectedIndex];
+      return config.coerceValueToBoolean(optionNode.textContent);
+    },
+    to: true,
+    setNodeValue: function (node, value) {
+      var optionNodes = node.childNodes;
+      for (var i = 0; i < optionNodes.length; i++) {
+        var optionValue = config.coerceValueToBoolean(optionNodes[i].textContent);
+        if (optionValue === value) {
+          node.selectedIndex = i;
+        }
+      }
+    },
+    tagName: 'select'
+  });
+
+  it('should set value for copy field', function () {
+
+    var msg = 'Just something to read.';
+
+    var formaticConfig = Formatic.createConfig(
+      function (config) {
+        var createElement_Copy = config.createElement_Copy;
+
+        config.createElement_Copy = function (props) {
+          props = _.extend({}, props);
+          props.classes = _.extend({}, props.classes, {copy: true});
+
+          return createElement_Copy.call(this, props);
+        };
+      }
+    );
+
+    var component = mounted(Form({
+      fields: [
+        {
+          type: 'copy',
+          help_text: msg
+        }
+      ],
+      config: formaticConfig
+    }));
+
+    var node = component.getDOMNode().getElementsByClassName('copy')[0];
+
+    expect(node.textContent).toEqual(msg);
+  });
+
+  // testValueType({
+  //   type: 'checkbox-array',
+  //   from: [],
+  //   nodeValue: function (node) {
+  //     return [];
+  //   },
+  //   to: ['foo', 'bar']
+  // })
 
   // var testWithFormatic = function (formatic) {
   //
