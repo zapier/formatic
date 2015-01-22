@@ -35,45 +35,55 @@ npm install
 gulp build
 ```
 
-This will build two files in the build directory: formatic-min.js (minified) and
-formatic-dev.js (not minified and includes source maps for development).
+This will build three files in the build directory: formatic-min.js (minified),
+formatic.js (not minified) and formatic-dev.js (not minified and includes
+source maps for development).
 
 ## What is formatic?
 
-Formatic is a configurable, pluggable forms builder.
+Formatic is a configurable, pluggable forms library for React. Pass in JSON
+fields that define your form, along with a value to be edited, and Formatic
+gives you a form to edit your value.
 
-## Using formatic (quick version)
+## Using formatic
 
-If you don't want to extend formatic, you'll use it like this:
+If you're happy with the default configuration, you can use it like this:
 
 ```js
-// Get the default formatic instance.
-var formatic = require('formatic');
+// Get the formatic class.
+var Formatic = require('formatic');
 
-// Get a new form.
-var form = formatic();
+// Create an element factory.
+var Form = React.createFactory(Formatic);
 
-// Add some fields.
-form.fields([
+// Create some fields.
+var fields = [
   {
-    type: 'text',
-    key: 'firstName'
+    type: 'string',
+    isSingleLine: true,
+    key: 'firstName',
+    label: 'First Name'
   },
   {
-    type: 'text',
-    key: 'lastName'
+    type: 'str',
+    isSingleLine: true,
+    key: 'lastName',
+    label: 'Last Name'
   }
-]);
+];
 
-// Give the form some data.
-form.val({
-  firstName: 'Joe',
-  lastName: 'Foo'
-});
-
-// Get a React component
-var component = form.component();
-
-// Render the form to some node.
-formatic.render(component, document.body)
+// Render the form.
+React.render(Form({
+  fields: fields,
+  onChange: function (newValue) {
+    console.log(newValue);
+  }
+}), document.body);
 ```
+
+This creates a simple form like this (assuming you're using formatic.css):
+
+![simple-form](images/simple-form.png)
+
+The above assumes you're using a CommonJS build tool like browserify or webpack.
+If you use the standalone build, you can just the global `Formatic'.
