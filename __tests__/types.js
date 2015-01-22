@@ -46,10 +46,12 @@ describe('types', function() {
           fields: [
             {
               type: type,
-              key: 'myValue',
-              default: options.from
+              key: 'myValue'
             }
           ],
+          value: {
+            myValue: options.from
+          },
           onChange: function (newValue) {
             formValue = newValue;
           }
@@ -88,6 +90,19 @@ describe('types', function() {
     from: 'Joe',
     to: 'Mary',
     tagName: 'input'
+  });
+
+  testValueType({
+    type: 'json',
+    from: {foo: 'bar'},
+    getNodeValue: function (node) {
+      return JSON.parse(node.value);
+    },
+    to: {foo: 'baz'},
+    setNodeValue: function (node, value) {
+      node.value = JSON.stringify(value);
+    },
+    tagName: 'textarea'
   });
 
   testValueType({
