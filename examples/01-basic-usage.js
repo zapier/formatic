@@ -1,37 +1,32 @@
 // # 1. Basic usage
 
-// Grab the default formatic instance.
-var formatic = require('formatic');
+// Get the formatic class.
+var Formatic = require('formatic');
 
-// Create a form.
-var form = formatic({
+// Create an element factory.
+var Form = React.createFactory(Formatic);
 
-  // Giving it some fields.
-  fields: [
-    {
-      type: 'text',
-      key: 'firstName'
-    },
-    {
-      type: 'text',
-      key: 'lastName'
-    }
-  ],
+// Create some fields.
+var fields = [
+{
+  type: 'string',
+  isSingleLine: true,
+  key: 'firstName',
+  label: 'First Name'
+},
+{
+  type: 'str',
+  isSingleLine: true,
+  key: 'lastName',
+  label: 'Last Name'
+}
+];
 
-  // And a value.
-  value: {
-    firstName: 'Joe',
-    lastName: 'Foo'
+// Render the form.
+React.render(Form({
+  fields: fields,
+  onChange: function (newValue) {
+    // Recieve new values.
+    console.log(newValue);
   }
-});
-
-// Get a React component.
-var component = form.component({
-  onChange: function (value) {
-    // Do something interesting with the value.
-    console.log(value);
-  }
-});
-
-// Render the component to a DOM element.
-formatic.render(component, document.body);
+}), document.body);
