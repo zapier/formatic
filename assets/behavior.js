@@ -522,13 +522,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.add-item",
-                    "slug": "componentadd-item",
+                    "title": "add-item component",
+                    "slug": "add-item-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.add-item"
+                "title": "add-item component"
               },
               "depth": 3,
               "outline": []
@@ -552,13 +552,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.list-control",
-                    "slug": "componentlist-control",
+                    "title": "array-control component",
+                    "slug": "array-control-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.list-control"
+                "title": "array-control component"
               },
               "depth": 3,
               "outline": []
@@ -582,13 +582,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.list-item",
-                    "slug": "componentlist-item",
+                    "title": "array-item component",
+                    "slug": "array-item-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.list-item"
+                "title": "array-item component"
               },
               "depth": 3,
               "outline": []
@@ -612,13 +612,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.list-item-control",
-                    "slug": "componentlist-item-control",
+                    "title": "array-item-control component",
+                    "slug": "array-item-control-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.list-item-control"
+                "title": "array-item-control component"
               },
               "depth": 3,
               "outline": []
@@ -642,13 +642,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.list-item-value",
-                    "slug": "componentlist-item-value",
+                    "title": "array-item-value component",
+                    "slug": "array-item-value-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.list-item-value"
+                "title": "array-item-value component"
               },
               "depth": 3,
               "outline": []
@@ -668,7 +668,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "projectPath": "lib/components/helpers/choices.js",
                 "targetPath": "components/helpers/choices",
                 "pageTitle": "components/helpers/choices",
-                "title": "choices"
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "choices component",
+                    "slug": "choices-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "choices component"
               },
               "depth": 3,
               "outline": []
@@ -692,13 +702,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.field",
-                    "slug": "componentfield",
+                    "title": "field component",
+                    "slug": "field-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.field"
+                "title": "field component"
               },
               "depth": 3,
               "outline": []
@@ -722,13 +732,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.item-choices",
-                    "slug": "componentitem-choices",
+                    "title": "field-template-choices component",
+                    "slug": "field-template-choices-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.item-choices"
+                "title": "field-template-choices component"
               },
               "depth": 3,
               "outline": []
@@ -752,13 +762,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.help",
-                    "slug": "componenthelp",
+                    "title": "help component",
+                    "slug": "help-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.help"
+                "title": "help component"
               },
               "depth": 3,
               "outline": []
@@ -782,13 +792,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.label",
-                    "slug": "componentlabel",
+                    "title": "label component",
+                    "slug": "label-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.label"
+                "title": "label component"
               },
               "depth": 3,
               "outline": []
@@ -812,13 +822,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.move-item-back",
-                    "slug": "componentmove-item-back",
+                    "title": "move-item-back component",
+                    "slug": "move-item-back-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.move-item-back"
+                "title": "move-item-back component"
               },
               "depth": 3,
               "outline": []
@@ -842,13 +852,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.move-item-forward",
-                    "slug": "componentmove-item-forward",
+                    "title": "move-item-forward component",
+                    "slug": "move-item-forward-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.move-item-forward"
+                "title": "move-item-forward component"
               },
               "depth": 3,
               "outline": []
@@ -872,13 +882,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.object-control",
-                    "slug": "componentobject-control",
+                    "title": "object-control component",
+                    "slug": "object-control-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.object-control"
+                "title": "object-control component"
               },
               "depth": 3,
               "outline": []
@@ -902,13 +912,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.object-item",
-                    "slug": "componentobject-item",
+                    "title": "object-item component",
+                    "slug": "object-item-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.object-item"
+                "title": "object-item component"
               },
               "depth": 3,
               "outline": []
@@ -932,13 +942,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.object-item-control",
-                    "slug": "componentobject-item-control",
+                    "title": "object-item-control component",
+                    "slug": "object-item-control-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.object-item-control"
+                "title": "object-item-control component"
               },
               "depth": 3,
               "outline": []
@@ -962,13 +972,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.object-item-key",
-                    "slug": "componentobject-item-key",
+                    "title": "object-item-key component",
+                    "slug": "object-item-key-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.object-item-key"
+                "title": "object-item-key component"
               },
               "depth": 3,
               "outline": []
@@ -992,13 +1002,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.object-item-value",
-                    "slug": "componentobject-item-value",
+                    "title": "object-item-value component",
+                    "slug": "object-item-value-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.object-item-value"
+                "title": "object-item-value component"
               },
               "depth": 3,
               "outline": []
@@ -1022,13 +1032,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.remove-item",
-                    "slug": "componentremove-item",
+                    "title": "remove-item component",
+                    "slug": "remove-item-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.remove-item"
+                "title": "remove-item component"
               },
               "depth": 3,
               "outline": []
@@ -1052,13 +1062,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "type": "heading",
                   "data": {
                     "level": 1,
-                    "title": "component.help",
-                    "slug": "componenthelp",
+                    "title": "help component",
+                    "slug": "help-component",
                     "isFileHeader": true
                   },
                   "depth": 1
                 },
-                "title": "component.help"
+                "title": "help component"
               },
               "depth": 3,
               "outline": []
@@ -1078,7 +1088,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                 "projectPath": "lib/components/helpers/select-value.js",
                 "targetPath": "components/helpers/select-value",
                 "pageTitle": "components/helpers/select-value",
-                "title": "select-value"
+                "firstHeader": {
+                  "type": "heading",
+                  "data": {
+                    "level": 1,
+                    "title": "select-value component",
+                    "slug": "select-value-component",
+                    "isFileHeader": true
+                  },
+                  "depth": 1
+                },
+                "title": "select-value component"
               },
               "depth": 3,
               "outline": []
@@ -1323,13 +1343,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
               "type": "heading",
               "data": {
                 "level": 1,
-                "title": "mixin.resize",
-                "slug": "mixinresize",
+                "title": "resize mixin",
+                "slug": "resize-mixin",
                 "isFileHeader": true
               },
               "depth": 1
             },
-            "title": "mixin.resize"
+            "title": "resize mixin"
           },
           "depth": 2,
           "outline": []
