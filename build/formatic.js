@@ -3,10 +3,10 @@ module.exports = require('./lib/formatic');
 
 },{"./lib/formatic":35}],2:[function(require,module,exports){
 (function (global){
-// # component.list
+// # array component
 
 /*
-Render a list.
+Render a field to edit array values.
 */
 
 'use strict';
@@ -156,6 +156,12 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],3:[function(require,module,exports){
 (function (global){
+// # boolean component
+
+/*
+Render a dropdown to handle yes/no boolean values.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -192,7 +198,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],4:[function(require,module,exports){
 (function (global){
-// # component.checkbox-list
+// # checkbox-array component
 
 /*
 Used with array values to supply multiple checkboxes for adding multiple
@@ -208,7 +214,7 @@ var cx = React.addons.classSet;
 
 module.exports = React.createClass({
 
-  displayName: 'CheckboxList',
+  displayName: 'CheckboxArray',
 
   mixins: [require('../../mixins/field')],
 
@@ -292,6 +298,12 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],5:[function(require,module,exports){
 (function (global){
+// # copy component
+
+/*
+Render non-editable html/text (think article copy).
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -319,6 +331,12 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],6:[function(require,module,exports){
 (function (global){
+// # fields component
+
+/*
+Render a field to edit the values of an object with static properties.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -371,7 +389,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],7:[function(require,module,exports){
 (function (global){
-// # component.json
+// # json component
 
 /*
 Textarea editor for JSON. Will validate the JSON before setting the value, so
@@ -464,10 +482,10 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],8:[function(require,module,exports){
 (function (global){
-// # component.object
+// # object component
 
 /*
-Render an object.
+Render a field to edit an object with dynamic child fields.
 */
 
 'use strict';
@@ -752,7 +770,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],9:[function(require,module,exports){
 (function (global){
-// # component.pretty-textarea
+// # pretty-textarea component
 
 /*
 Textarea that will display highlights behind "tags". Tags currently mean text
@@ -1553,9 +1571,9 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":37,"../../mixins/resize":40,"../../mixins/undo-stack":42,"../../utils":46}],10:[function(require,module,exports){
+},{"../../mixins/field":37,"../../mixins/resize":39,"../../mixins/undo-stack":41,"../../utils":46}],10:[function(require,module,exports){
 (function (global){
-// # component.select
+// # select component
 
 /*
 Render select element to give a user choices for the value of a field. Note
@@ -1605,7 +1623,58 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],11:[function(require,module,exports){
 (function (global){
-// # component.string
+// # single-line-string component
+
+/*
+Render a single line text input.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var cx = React.addons.classSet;
+
+module.exports = React.createClass({
+
+  displayName: 'SingleLineString',
+
+  mixins: [require('../../mixins/field')],
+
+  onChange: function (event) {
+    this.onChangeValue(event.target.value);
+  },
+
+  render: function () {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function () {
+
+    var config = this.props.config;
+    var field = this.props.field;
+
+    return config.createElement('field', {
+      config: config, field: field, plain: this.props.plain
+    }, R.input({
+      type: 'text',
+      value: this.props.field.value,
+      className: cx(this.props.classes),
+      onChange: this.onChange,
+      onFocus: this.onFocusAction,
+      onBlur: this.onBlurAction
+    }));
+  }
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../mixins/field":37}],12:[function(require,module,exports){
+(function (global){
+// # string component
+
+/*
+Render a field that can edit a string value.
+*/
 
 'use strict';
 
@@ -1646,51 +1715,14 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":37}],12:[function(require,module,exports){
-(function (global){
-// # component.string
-
-'use strict';
-
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
-var R = React.DOM;
-var cx = React.addons.classSet;
-
-module.exports = React.createClass({
-
-  displayName: 'Unicode',
-
-  mixins: [require('../../mixins/field')],
-
-  onChange: function (event) {
-    this.onChangeValue(event.target.value);
-  },
-
-  render: function () {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function () {
-
-    var config = this.props.config;
-    var field = this.props.field;
-
-    return config.createElement('field', {
-      config: config, field: field, plain: this.props.plain
-    }, R.input({
-      type: 'text',
-      value: this.props.field.value,
-      className: cx(this.props.classes),
-      onChange: this.onChange,
-      onFocus: this.onFocusAction,
-      onBlur: this.onBlurAction
-    }));
-  }
-});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],13:[function(require,module,exports){
 (function (global){
+// # unknown component
+
+/*
+Render a field with an unknown type.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -1718,7 +1750,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/field":37}],14:[function(require,module,exports){
 (function (global){
-// # component.add-item
+// # add-item component
 
 /*
 The add button to append an item to a field.
@@ -1754,10 +1786,10 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],15:[function(require,module,exports){
 (function (global){
-// # component.list-control
+// # array-control component
 
 /*
-Render the item type choices and the add button.
+Render the item type choices and the add button for an array.
 */
 
 'use strict';
@@ -1817,10 +1849,10 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],16:[function(require,module,exports){
 (function (global){
-// # component.list-item-control
+// # array-item-control component
 
 /*
-Render the remove and move buttons for a field.
+Render the remove and move buttons for an array field.
 */
 
 'use strict';
@@ -1866,10 +1898,10 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],17:[function(require,module,exports){
 (function (global){
-// # component.list-item-value
+// # array-item-value component
 
 /*
-Render the value of a list item.
+Render the value of an array item.
 */
 
 'use strict';
@@ -1905,10 +1937,10 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],18:[function(require,module,exports){
 (function (global){
-// # component.list-item
+// # array-item component
 
 /*
-Render a list item.
+Render an array item.
 */
 
 'use strict';
@@ -1962,6 +1994,12 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],19:[function(require,module,exports){
 (function (global){
+// # choices component
+
+/*
+Render customized (non-native) dropdown choices.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -2113,7 +2151,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/click-outside":36,"../../mixins/helper":38}],20:[function(require,module,exports){
 (function (global){
-// # component.item-choices
+// # field-template-choices component
 
 /*
 Give a list of choices of item types to create as children of an field.
@@ -2161,7 +2199,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],21:[function(require,module,exports){
 (function (global){
-// # component.field
+// # field component
 
 /*
 Used by any fields to put the label and help text around the field.
@@ -2248,7 +2286,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],22:[function(require,module,exports){
 (function (global){
-// # component.help
+// # help component
 
 /*
 Just the help text block.
@@ -2283,7 +2321,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],23:[function(require,module,exports){
 (function (global){
-// # component.label
+// # label component
 
 /*
 Just the label for a field.
@@ -2348,7 +2386,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],24:[function(require,module,exports){
 (function (global){
-// # component.move-item-back
+// # move-item-back component
 
 /*
 Button to move an item backwards in list.
@@ -2384,7 +2422,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],25:[function(require,module,exports){
 (function (global){
-// # component.move-item-forward
+// # move-item-forward component
 
 /*
 Button to move an item forward in a list.
@@ -2420,7 +2458,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],26:[function(require,module,exports){
 (function (global){
-// # component.object-control
+// # object-control component
 
 /*
 Render the item type choices and the add button.
@@ -2482,7 +2520,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],27:[function(require,module,exports){
 (function (global){
-// # component.object-item-control
+// # object-item-control component
 
 /*
 Render the remove buttons for an object item.
@@ -2521,7 +2559,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],28:[function(require,module,exports){
 (function (global){
-// # component.object-item-key
+// # object-item-key component
 
 /*
 Render an object item key editor.
@@ -2555,7 +2593,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],29:[function(require,module,exports){
 (function (global){
-// # component.object-item-value
+// # object-item-value component
 
 /*
 Render the value of an object item.
@@ -2594,7 +2632,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],30:[function(require,module,exports){
 (function (global){
-// # component.object-item
+// # object-item component
 
 /*
 Render an object item.
@@ -2635,7 +2673,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],31:[function(require,module,exports){
 (function (global){
-// # component.remove-item
+// # remove-item component
 
 /*
 Remove an item.
@@ -2686,7 +2724,7 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],32:[function(require,module,exports){
 (function (global){
-// # component.help
+// # help component
 
 /*
 Just the help text block.
@@ -2723,6 +2761,13 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],33:[function(require,module,exports){
 (function (global){
+// # select-value component
+
+/*
+Render a select dropdown for a list of choices. Choices values can be of any
+type.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -2813,6 +2858,15 @@ module.exports = React.createClass({
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../../mixins/helper":38}],34:[function(require,module,exports){
 (function (global){
+// # default-config
+
+/*
+This is the default configuration for formatic. It's just an object with a bunch
+of behavior functions that are passed into all the components. So to change
+formatic's behavior, it's simple matter of cloning this object and overriding
+the methods.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -2820,12 +2874,6 @@ var R = React.DOM;
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 var utils = require('./utils');
-
-var delegateTo = function (name) {
-  return function () {
-    return this[name].apply(this, arguments);
-  };
-};
 
 module.exports = {
 
@@ -2835,7 +2883,7 @@ module.exports = {
 
   createElement_String: React.createFactory(require('./components/fields/string')),
 
-  createElement_Unicode: React.createFactory(require('./components/fields/unicode')),
+  createElement_SingleLineString: React.createFactory(require('./components/fields/single-line-string')),
 
   createElement_Select: React.createFactory(require('./components/fields/select')),
 
@@ -2845,7 +2893,7 @@ module.exports = {
 
   createElement_Array: React.createFactory(require('./components/fields/array')),
 
-  createElement_CheckboxList: React.createFactory(require('./components/fields/checkbox-list')),
+  createElement_CheckboxArray: React.createFactory(require('./components/fields/checkbox-array')),
 
   createElement_Object: React.createFactory(require('./components/fields/object')),
 
@@ -2917,15 +2965,15 @@ module.exports = {
     return false;
   },
 
-  createDefaultValue_Fields: delegateTo('createDefaultValue_Object'),
+  createDefaultValue_Fields: utils.delegateTo('createDefaultValue_Object'),
 
-  createDefaultValue_Unicode: delegateTo('createDefaultValue_String'),
+  createDefaultValue_SingleLineString: utils.delegateTo('createDefaultValue_String'),
 
-  createDefaultValue_Select: delegateTo('createDefaultValue_String'),
+  createDefaultValue_Select: utils.delegateTo('createDefaultValue_String'),
 
-  createDefaultValue_Json: delegateTo('createDefaultValue_Object'),
+  createDefaultValue_Json: utils.delegateTo('createDefaultValue_Object'),
 
-  createDefaultValue_CheckboxList: delegateTo('createDefaultValue_Array'),
+  createDefaultValue_CheckboxArray: utils.delegateTo('createDefaultValue_Array'),
 
 
   // Field value coercers. Coerce a value into a value appropriate for a specific type.
@@ -2958,15 +3006,15 @@ module.exports = {
     return this.coerceValueToBoolean(value);
   },
 
-  coerceValue_Fields: delegateTo('coerceValue_Object'),
+  coerceValue_Fields: utils.delegateTo('coerceValue_Object'),
 
-  coerceValue_Unicode: delegateTo('coerceValue_String'),
+  coerceValue_SingleLineString: utils.delegateTo('coerceValue_String'),
 
-  coerceValue_Select: delegateTo('coerceValue_String'),
+  coerceValue_Select: utils.delegateTo('coerceValue_String'),
 
-  coerceValue_Json: delegateTo('coerceValue_Object'),
+  coerceValue_Json: utils.delegateTo('coerceValue_Object'),
 
-  coerceValue_CheckboxList: delegateTo('coerceValue_Array'),
+  coerceValue_CheckboxArray: utils.delegateTo('coerceValue_Array'),
 
 
   // Field child fields factories, so some types can have dynamic children.
@@ -3087,32 +3135,44 @@ module.exports = {
 
   alias_PrettyTextarea: 'PrettyText',
 
-  alias_Unicode: function (fieldTemplate) {
+  alias_SingleLineString: function (fieldTemplate) {
     if (fieldTemplate.replaceChoices) {
       return 'PrettyText';
     } else if (fieldTemplate.choices) {
       return 'Select';
     }
-    return 'Unicode';
+    return 'SingleLineString';
   },
 
   alias_String: function (fieldTemplate) {
+    var config = this;
+
     if (fieldTemplate.replaceChoices) {
       return 'PrettyText';
     } else if (fieldTemplate.choices) {
       return 'Select';
+    } else if (config.fieldTemplateIsSingleLine(fieldTemplate)) {
+      return 'SingleLineString';
     }
     return 'String';
   },
 
-  alias_Text: delegateTo('alias_String'),
+  alias_Text: utils.delegateTo('alias_String'),
+
+  alias_Unicode: utils.delegateTo('alias_SingleLineString'),
+
+  alias_Str: utils.delegateTo('alias_SingleLineString'),
 
   alias_List: 'Array',
+
+  alias_CheckboxArray: 'CheckboxArray',
 
   alias_Fieldset: 'Fields',
 
   // Field factory
 
+  // Given a field, expand all child fields recursively to get the default
+  // values of all fields.
   inflateFieldValue: function (field) {
     var config = this;
 
@@ -3130,15 +3190,17 @@ module.exports = {
     }
   },
 
+  // Initialize the root field.
   initRootField: function (/* field, props */) {
   },
 
+  // Initialize every field.
   initField: function (/* field */) {
   },
 
+  // If an array of field templates are passed in, this method is used to
+  // wrap the fields inside a single root field template.
   wrapFieldTemplates: function (fieldTemplates) {
-    // Field components only work with individual fields, so wrap array of
-    // field templates in root field template.
     return {
       type: 'fields',
       plain: true,
@@ -3146,6 +3208,7 @@ module.exports = {
     };
   },
 
+  // Given the props that are passed in, create the root field.
   createRootField: function (props) {
     var config = this;
 
@@ -3177,6 +3240,8 @@ module.exports = {
     return field;
   },
 
+  // Given the props that are passed in, create the value that will be displayed
+  // by all the components.
   createRootValue: function (props) {
     var config = this;
 
@@ -3185,6 +3250,7 @@ module.exports = {
     return config.inflateFieldValue(field);
   },
 
+  // Create dynamic child fields for a field.
   createChildFields: function (field) {
     var config = this;
 
@@ -3201,6 +3267,7 @@ module.exports = {
     });
   },
 
+  // Create a single child field for a parent field.
   createChildField: function (parentField, options) {
     var config = this;
 
@@ -3253,6 +3320,7 @@ module.exports = {
     return newValue;
   },
 
+  // Given a value, create a field template for that value.
   createFieldTemplateFromValue: function (value) {
     var config = this;
 
@@ -3322,10 +3390,12 @@ module.exports = {
 
   // Field helpers
 
+  // Determine if a value "exists".
   hasValue: function (fieldTemplate, value) {
     return value !== null && !_.isUndefined(value);
   },
 
+  // Coerce a value to value appropriate for a field.
   coerceValue: function (field, value) {
     var config = this;
 
@@ -3338,6 +3408,8 @@ module.exports = {
     return value;
   },
 
+  // Given a field and a child value, find the appropriate field template for
+  // that child value.
   childFieldTemplateForValue: function (field, childValue) {
     var config = this;
 
@@ -3356,6 +3428,7 @@ module.exports = {
     }
   },
 
+  // Determine if a value is a match for a field template.
   matchesFieldTemplateToValue: function (fieldTemplate, value) {
     var match = fieldTemplate.match;
     if (!match) {
@@ -3368,6 +3441,7 @@ module.exports = {
 
   // Field template helpers
 
+  // Normalized (PascalCase) type name for a field.
   fieldTemplateTypeName: function (fieldTemplate) {
     var config = this;
 
@@ -3390,11 +3464,14 @@ module.exports = {
     return typeName;
   },
 
+  // Default value for a field template.
   fieldTemplateDefaultValue: function (fieldTemplate) {
 
     return fieldTemplate.default;
   },
 
+  // Value for a field template. Used to determine the value of a new child
+  // field.
   fieldTemplateValue: function (fieldTemplate) {
     var config = this;
 
@@ -3415,12 +3492,20 @@ module.exports = {
     return value;
   },
 
+  // Match rule for a field template.
   fieldTemplateMatch: function (fieldTemplate) {
     return fieldTemplate.match;
   },
 
+  // Determine if a field template has a single-line value.
+  fieldTemplateIsSingleLine: function (fieldTemplate) {
+    return fieldTemplate.isSingleLine || fieldTemplate.is_single_line ||
+            fieldTemplate.type === 'single-line-string' || fieldTemplate.type === 'SingleLineString';
+  },
+
   // Field helpers
 
+  // Get an array of keys representing the path to a value.
   fieldValuePath: function (field) {
     var config = this;
 
@@ -3435,18 +3520,21 @@ module.exports = {
     });
   },
 
+  // Clone a field with a different value.
   fieldWithValue: function (field, value) {
     return _.extend({}, field, {value: value});
   },
 
-  fieldTypeName: delegateTo('fieldTemplateTypeName'),
+  fieldTypeName: utils.delegateTo('fieldTemplateTypeName'),
 
+  // Get the choices for a dropdown field.
   fieldChoices: function (field) {
     var config = this;
 
     return config.normalizeChoices(field.choices);
   },
 
+  // Get a set of boolean choices for a field.
   fieldBooleanChoices: function (field) {
     var config = this;
 
@@ -3472,22 +3560,26 @@ module.exports = {
     });
   },
 
+  // Get a set of replacement choices for a field.
   fieldReplaceChoices: function (field) {
     var config = this;
 
     return config.normalizeChoices(field.replaceChoices);
   },
 
+  // Get a label for a field.
   fieldLabel: function (field) {
     return field.label;
   },
 
+  // Get the help text for a field.
   fieldHelpText: function (field) {
     return field.help_text_html || field.help_text || field.helpText || field.helpTextHtml;
   },
 
+  // Get whether or not a field is required.
   fieldIsRequired: function (field) {
-    return field.required;
+    return field.required ? true : false;
   },
 
   // Determine if value for this field is not a leaf value.
@@ -3503,10 +3595,13 @@ module.exports = {
     return false;
   },
 
+  // Get the child field templates for this field.
   fieldChildFieldTemplates: function (field) {
     return field.fields || [];
   },
 
+  // Get the field templates for each item of this field. (For dynamic children,
+  // like arrays.)
   fieldItemFieldTemplates: function (field) {
     if (!field.itemFields) {
       return [{type: 'text'}];
@@ -3517,26 +3612,28 @@ module.exports = {
     return field.itemFields;
   },
 
-  fieldIsSingleLine: function (field) {
-    return field.isSingleLine || field.is_single_line || field.type === 'unicode' || field.type === 'Unicode';
-  },
+  fieldIsSingleLine: utils.delegateTo('fieldTemplateIsSingleLine'),
 
+  // Get whether or not a field is collapsed.
   fieldIsCollapsed: function (field) {
     return field.collapsed ? true : false;
   },
 
+  // Get wheter or not a field can be collapsed.
   fieldIsCollapsible: function (field) {
     return field.collapsible || !_.isUndefined(field.collapsed);
   },
 
+  // Get the number of rows for a field.
   fieldRows: function (field) {
     return field.rows;
   },
 
-  fieldMatch: delegateTo('fieldTemplateMatch'),
+  fieldMatch: utils.delegateTo('fieldTemplateMatch'),
 
   // Other helpers
 
+  // Convert a key to a nice human-readable version.
   humanize: function(property) {
     property = property.replace(/\{\{/g, '');
     property = property.replace(/\}\}/g, '');
@@ -3546,6 +3643,7 @@ module.exports = {
     });
   },
 
+  // Normalize some choices for a drop-down.
   normalizeChoices: function (choices) {
     var config = this;
 
@@ -3604,6 +3702,7 @@ module.exports = {
     return true;
   },
 
+  // Determine if a value is a valid key.
   isKey: function (key) {
     return (_.isNumber(key) && key >= 0) || (_.isString(key) && key !== '');
   },
@@ -3620,8 +3719,20 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./components/fields/array":2,"./components/fields/boolean":3,"./components/fields/checkbox-list":4,"./components/fields/copy":5,"./components/fields/fields":6,"./components/fields/json":7,"./components/fields/object":8,"./components/fields/pretty-text":9,"./components/fields/select":10,"./components/fields/string":11,"./components/fields/unicode":12,"./components/fields/unknown":13,"./components/helpers/add-item":14,"./components/helpers/array-control":15,"./components/helpers/array-item":18,"./components/helpers/array-item-control":16,"./components/helpers/array-item-value":17,"./components/helpers/choices":19,"./components/helpers/field":21,"./components/helpers/field-template-choices":20,"./components/helpers/help":22,"./components/helpers/label":23,"./components/helpers/move-item-back":24,"./components/helpers/move-item-forward":25,"./components/helpers/object-control":26,"./components/helpers/object-item":30,"./components/helpers/object-item-control":27,"./components/helpers/object-item-key":28,"./components/helpers/object-item-value":29,"./components/helpers/remove-item":31,"./components/helpers/sample":32,"./components/helpers/select-value":33,"./utils":46}],35:[function(require,module,exports){
+},{"./components/fields/array":2,"./components/fields/boolean":3,"./components/fields/checkbox-array":4,"./components/fields/copy":5,"./components/fields/fields":6,"./components/fields/json":7,"./components/fields/object":8,"./components/fields/pretty-text":9,"./components/fields/select":10,"./components/fields/single-line-string":11,"./components/fields/string":12,"./components/fields/unknown":13,"./components/helpers/add-item":14,"./components/helpers/array-control":15,"./components/helpers/array-item":18,"./components/helpers/array-item-control":16,"./components/helpers/array-item-value":17,"./components/helpers/choices":19,"./components/helpers/field":21,"./components/helpers/field-template-choices":20,"./components/helpers/help":22,"./components/helpers/label":23,"./components/helpers/move-item-back":24,"./components/helpers/move-item-forward":25,"./components/helpers/object-control":26,"./components/helpers/object-item":30,"./components/helpers/object-item-control":27,"./components/helpers/object-item-key":28,"./components/helpers/object-item-value":29,"./components/helpers/remove-item":31,"./components/helpers/sample":32,"./components/helpers/select-value":33,"./utils":46}],35:[function(require,module,exports){
 (function (global){
+// # formatic
+
+/*
+The root formatic component.
+
+The root formatic component is actually two components. The main component is
+a controlled component where you must pass the value in with each render. This
+is actually wrapped in another component which allows you to use formatic as
+an uncontrolled component where it retains the state of the value. The wrapper
+is what is actually exported.
+*/
+
 'use strict';
 
 var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
@@ -3631,40 +3742,33 @@ var utils = require('./utils');
 
 var defaultConfig = require('./default-config');
 
+// The main formatic component that renders the form.
 var FormaticControlledClass = React.createClass({
 
   displayName: 'FormaticControlled',
 
+  // Respond to any value changes.
   onChange: function (newValue, info) {
     if (!this.props.onChange) {
       return;
     }
-    //var isWrapped = !this.props.field;
     info = _.extend({}, info);
-    // if (isWrapped) {
-    //   info.fields = info.fields.slice(1);
-    //   info.field = info.fields[0];
-    // }
-    //info.path = valuePath(info.fields);
     info.path = this.props.config.fieldValuePath(info.field);
     this.props.onChange(newValue, info);
   },
 
+  // Respond to any actions other than value changes. (For example, focus and
+  // blur.)
   onAction: function (info) {
     if (!this.props.onAction) {
       return;
     }
-    //var isWrapped = !this.props.field;
     info = _.extend({}, info);
-    // if (isWrapped) {
-    //   info.fields = info.fields.slice(1);
-    //   info.field = info.fields[0];
-    // }
-    //info.path = valuePath(info.fields);
     info.path = this.props.config.fieldValuePath(info.field);
     this.props.onAction(info);
   },
 
+  // Render the root component by delegating to the config.
   render: function () {
 
     var config = this.props.config;
@@ -3675,8 +3779,12 @@ var FormaticControlledClass = React.createClass({
 
 var FormaticControlled = React.createFactory(FormaticControlledClass);
 
+// A wrapper component that is actually exported and can allow formatic to be
+// used in an "uncontrolled" manner. (See uncontrolled components in the React
+// documentation for an explanation of the difference.)
 module.exports = React.createClass({
 
+  // Export some stuff as statics.
   statics: {
     createConfig: function () {
       var args = _.toArray(arguments);
@@ -3698,7 +3806,6 @@ module.exports = React.createClass({
       clickOutside: require('./mixins/click-outside.js'),
       field: require('./mixins/field.js'),
       helper: require('./mixins/helper.js'),
-      inputActions: require('./mixins/input-actions.js'),
       resize: require('./mixins/resize.js'),
       scroll: require('./mixins/scroll.js'),
       undoStack: require('./mixins/undo-stack.js')
@@ -3706,13 +3813,16 @@ module.exports = React.createClass({
     plugins: {
       bootstrap: require('./plugins/bootstrap'),
       meta: require('./plugins/meta'),
-      reference: require('./plugins/reference')
+      reference: require('./plugins/reference'),
+      elementClasses: require('./plugins/element-classes')
     },
     utils: utils
   },
 
   displayName: 'Formatic',
 
+  // If we got a value, treat this component as controlled. Either way, retain
+  // the value in the state.
   getInitialState: function () {
     return {
       isControlled: !_.isUndefined(this.props.value),
@@ -3720,6 +3830,8 @@ module.exports = React.createClass({
     };
   },
 
+  // If this is a controlled component, change our state to reflect the new
+  // value. For uncontrolled components, ignore any value changes.
   componentWillReceiveProps: function (newProps) {
     if (this.state.isControlled) {
       if (!_.isUndefined(newProps.value)) {
@@ -3730,6 +3842,8 @@ module.exports = React.createClass({
     }
   },
 
+  // If this is an uncontrolled component, set our state to reflect the new
+  // value. Either way, call the onChange callback.
   onChange: function (newValue, info) {
     if (!this.state.isControlled) {
       this.setState({
@@ -3742,6 +3856,8 @@ module.exports = React.createClass({
     this.props.onChange(newValue, info);
   },
 
+  // Any actions should be sent to the generic onAction callback but also split
+  // into discreet callbacks per action.
   onAction: function (info) {
     if (this.props.onAction) {
       this.props.onAction(info);
@@ -3752,6 +3868,7 @@ module.exports = React.createClass({
     }
   },
 
+  // Render the wrapper component (by just delegating to the main component).
   render: function () {
 
     var config = this.props.config || defaultConfig;
@@ -3786,9 +3903,9 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./default-config":34,"./mixins/click-outside.js":36,"./mixins/field.js":37,"./mixins/helper.js":38,"./mixins/input-actions.js":39,"./mixins/resize.js":40,"./mixins/scroll.js":41,"./mixins/undo-stack.js":42,"./plugins/bootstrap":43,"./plugins/meta":44,"./plugins/reference":45,"./utils":46}],36:[function(require,module,exports){
+},{"./default-config":34,"./mixins/click-outside.js":36,"./mixins/field.js":37,"./mixins/helper.js":38,"./mixins/resize.js":39,"./mixins/scroll.js":40,"./mixins/undo-stack.js":41,"./plugins/bootstrap":42,"./plugins/element-classes":43,"./plugins/meta":44,"./plugins/reference":45,"./utils":46}],36:[function(require,module,exports){
 (function (global){
-// # mixin.click-outside
+// # click-outside mixin
 
 /*
 There's no native React way to detect clicking outside an element. Sometimes
@@ -3796,26 +3913,24 @@ this is useful, so that's what this mixin does. To use it, mix it in and use it
 from your component like this:
 
 ```js
-module.exports = function (plugin) {
-  plugin.exports = React.createClass({
+module.exports = React.createClass({
 
-    mixins: [plugin.require('mixin.click-outside')],
+  mixins: [require('../..mixins/click-outside')],
 
-    onClickOutside: function () {
-      console.log('clicked outside!');
-    },
+  onClickOutside: function () {
+    console.log('clicked outside!');
+  },
 
-    componentDidMount: function () {
-      this.setOnClickOutside('myDiv', this.onClickOutside);
-    },
+  componentDidMount: function () {
+    this.setOnClickOutside('myDiv', this.onClickOutside);
+  },
 
-    render: function () {
-      return React.DOM.div({ref: 'myDiv'},
-        'Hello!'
-      )
-    }
-  });
-};
+  render: function () {
+    return React.DOM.div({ref: 'myDiv'},
+      'Hello!'
+    )
+  }
+});
 ```
 */
 
@@ -3835,19 +3950,6 @@ var hasAncestor = function (child, parent) {
 
 module.exports = {
 
-  // _onClickDocument: function(event) {
-  //   console.log('click doc')
-  //   if (this._didMouseDown) {
-  //     _.each(this.clickOutsideHandlers, function (funcs, ref) {
-  //       if (isOutside(event.target, this.refs[ref].getDOMNode())) {
-  //         funcs.forEach(function (fn) {
-  //           fn.call(this);
-  //         }.bind(this));
-  //       }
-  //     }.bind(this));
-  //   }
-  // },
-
   isNodeOutside: function (nodeOut, nodeIn) {
     if (nodeOut === nodeIn) {
       return false;
@@ -3863,7 +3965,6 @@ module.exports = {
   },
 
   _onClickMousedown: function() {
-    //this._didMouseDown = true;
     _.each(this.clickOutsideHandlers, function (funcs, ref) {
       if (this.refs[ref]) {
         this._mousedownRefs[ref] = true;
@@ -3883,13 +3984,6 @@ module.exports = {
       this._mousedownRefs[ref] = false;
     }.bind(this));
   },
-
-  // _onClickDocument: function () {
-  //   console.log('clickety')
-  //   _.each(this.clickOutsideHandlers, function (funcs, ref) {
-  //     console.log('clickety', ref, this.refs[ref])
-  //   }.bind(this));
-  // },
 
   setOnClickOutside: function (ref, fn) {
     if (!this.clickOutsideHandlers[ref]) {
@@ -3918,12 +4012,10 @@ module.exports = {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],37:[function(require,module,exports){
 (function (global){
-// # mixin.field
+// # field mixin
 
 /*
-Wrap up your fields with this mixin to get:
-- Automatic metadata loading.
-- Anything else decided later.
+This mixin gets mixed into all field components.
 */
 
 'use strict';
@@ -3932,16 +4024,19 @@ var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined
 
 module.exports = {
 
+  // Signal a change in value.
   onChangeValue: function (value) {
     this.props.onChange(value, {
       field: this.props.field
     });
   },
 
+  // Bubble up a value.
   onBubbleValue: function (value, info) {
     this.props.onChange(value, info);
   },
 
+  // Start an action bubbling up through parent components.
   onStartAction: function (action, props) {
     if (this.props.onAction) {
       var info = _.extend({}, props);
@@ -3959,12 +4054,14 @@ module.exports = {
     this.onStartAction('blur');
   },
 
+  // Bubble up an action.
   onBubbleAction: function (info) {
     if (this.props.onAction) {
       this.props.onAction(info);
     }
   },
 
+  // Delegate rendering back to config so it can be wrapped.
   renderWithConfig: function () {
     return this.props.config.renderFieldComponent(this);
   }
@@ -3973,16 +4070,24 @@ module.exports = {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],38:[function(require,module,exports){
 (function (global){
+// # helper mixin
+
+/*
+This gets mixed into all helper components.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = {
 
+  // Delegate rendering back to config so it can be wrapped.
   renderWithConfig: function () {
     return this.props.config.renderComponent(this);
   },
 
+  // Start an action bubbling up through parent components.
   onStartAction: function (action, props) {
     if (this.props.onAction) {
       var info = _.extend({}, props);
@@ -3992,6 +4097,7 @@ module.exports = {
     }
   },
 
+  // Bubble up an action.
   onBubbleAction: function (info) {
     if (this.props.onAction) {
       this.props.onAction(info);
@@ -4009,34 +4115,7 @@ module.exports = {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],39:[function(require,module,exports){
-// # mixin.input-actions
-
-/*
-Currently unused.
-*/
-
-'use strict';
-
-module.exports = function (plugin) {
-
-  plugin.exports = {
-
-    onFocus: function () {
-
-    },
-
-    onBlur: function () {
-
-    },
-
-    onChange: function () {
-
-    }
-  };
-};
-
-},{}],40:[function(require,module,exports){
-// # mixin.resize
+// # resize mixin
 
 /*
 You'd think it would be pretty easy to detect when a DOM element is resized.
@@ -4045,28 +4124,26 @@ So, using good ol' polling here. To try to be as efficient as possible, there
 is only a single setInterval used for all elements. To use:
 
 ```js
-module.exports = function (plugin) {
-  plugin.exports = React.createClass({
+module.exports = React.createClass({
 
-    mixins: [plugin.require('mixin.resize')],
+  mixins: [require('../../mixins/resize')],
 
-    onResize: function () {
-      console.log('resized!');
-    },
+  onResize: function () {
+    console.log('resized!');
+  },
 
-    componentDidMount: function () {
-      this.setOnResize('myText', this.onResize);
-    },
+  componentDidMount: function () {
+    this.setOnResize('myText', this.onResize);
+  },
 
-    onChange: function () {
-      ...
-    },
+  onChange: function () {
+    ...
+  },
 
-    render: function () {
-      return React.DOM.textarea({ref: 'myText', value: this.props.value, onChange: ...})
-    }
-  });
-};
+  render: function () {
+    return React.DOM.textarea({ref: 'myText', value: this.props.value, onChange: ...})
+  }
+});
 ```
 */
 
@@ -4153,8 +4230,12 @@ module.exports = {
   }
 };
 
-},{}],41:[function(require,module,exports){
-// # mixin.scroll
+},{}],40:[function(require,module,exports){
+// # scroll mixin
+
+/*
+Currently unused.
+*/
 
 'use strict';
 
@@ -4176,8 +4257,8 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],42:[function(require,module,exports){
-// # mixin.undo-stack
+},{}],41:[function(require,module,exports){
+// # undo-stack mixin
 
 /*
 Gives your component an undo stack.
@@ -4242,14 +4323,20 @@ module.exports = {
   }
 };
 
-},{}],43:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (global){
-// # bootstrap
+// # bootstrap plugin
+
+/*
+The bootstrap plugin sneaks in some classes to elements so that it plays well
+with Twitter Bootstrap.
+*/
 
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
+// Declare some classes and labels for each element.
 var modifiers = {
 
   'Field': {classes: {'form-group': true}},
@@ -4264,18 +4351,18 @@ var modifiers = {
   'MoveItemForward': {classes: {'glyphicon glyphicon-arrow-down': true}, label: ''},
   'ObjectItemKey': {classes: {'form-control': true}},
 
-  'Unicode': {classes: {'form-control': true}},
+  'SingleLineString': {classes: {'form-control': true}},
   'String': {classes: {'form-control': true}},
   'PrettyText': {classes: {'form-control': true}},
   'Json': {classes: {'form-control': true}},
   'SelectValue': {classes: {'form-control': true}}
-  //'Array': {classes: {'well': true}}
 };
 
 module.exports = function (config) {
 
   var defaultCreateElement = config.createElement;
 
+  // Wrap the createElement method.
   config.createElement = function (name, props, children) {
 
     name = config.elementName(name);
@@ -4283,6 +4370,7 @@ module.exports = function (config) {
     var modifier = modifiers[name];
 
     if (modifier) {
+      // If there is a modifier for this element, add the classes and label.
       props = _.extend({}, props);
       props.classes = _.extend({}, props.classes, modifier.classes);
       if ('label' in modifier) {
@@ -4295,11 +4383,60 @@ module.exports = function (config) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],44:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
+(function (global){
+// # element-classes plugin
+
+/*
+This plugins provides a config method addElementClass that lets you add on a
+class to an element.
+*/
+
 'use strict';
 
-// Allows you to pass meta prop into formatic, and that gets passed through as
-// a property to each field.
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+
+module.exports = function (config) {
+
+  var defaultCreateElement = config.createElement;
+
+  var elementClasses = {};
+
+  config.addElementClass = function (name, className) {
+
+    name = config.elementName(name);
+
+    if (!elementClasses[name]) {
+      elementClasses[name] = {};
+    }
+
+    elementClasses[name][className] = true;
+  };
+
+  // Wrap the createElement method.
+  config.createElement = function (name, props, children) {
+
+    name = config.elementName(name);
+
+    if (elementClasses[name]) {
+      props = _.extend({}, props, {classes: elementClasses[name]});
+    }
+
+    return defaultCreateElement.call(this, name, props, children);
+  };
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],44:[function(require,module,exports){
+// # meta plugin
+
+/*
+The meta plugin lets you pass in a meta prop to formatic. The prop then gets
+passed through as a property for every field. You can then wrap `initField` to
+get your meta values.
+*/
+
+'use strict';
 
 module.exports = function (config) {
 
@@ -4329,16 +4466,23 @@ module.exports = function (config) {
 
 },{}],45:[function(require,module,exports){
 (function (global){
-var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
+// # reference plugin
 
-// This plugin allows fields to be strings and reference other fields by key or
-// id. It also allows a field to extend another field with
-// extends: ['foo', 'bar'].
+/*
+This plugin allows fields to be strings and reference other fields by key or
+id. It also allows a field to extend another field with
+extends: ['foo', 'bar'] where 'foo' and 'bar' refer to other keys or ids.
+*/
+
+'use strict';
+
+var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
 
 module.exports = function (config) {
 
   var initField = config.initField;
 
+  // Look for a template in this field or any of its parents.
   config.findFieldTemplate = function (field, name) {
     var config = this;
 
@@ -4353,6 +4497,8 @@ module.exports = function (config) {
     return null;
   };
 
+  // Inherit from any field templates that this field template
+  // extends.
   config.resolveFieldTemplate = function (field, fieldTemplate) {
     var config = this;
 
@@ -4380,6 +4526,7 @@ module.exports = function (config) {
     return fieldTemplate;
   };
 
+  // Wrap the initField method.
   config.initField = function (field) {
 
     var config = this;
@@ -4388,6 +4535,7 @@ module.exports = function (config) {
 
     var childFieldTemplates = config.fieldChildFieldTemplates(field);
 
+    // Add each of the child field templates to our template map.
     childFieldTemplates.forEach(function (fieldTemplate) {
 
       if (_.isString(fieldTemplate)) {
@@ -4410,6 +4558,7 @@ module.exports = function (config) {
       }
     });
 
+    // Resolve any references to other field templates.
     if (childFieldTemplates.length > 0) {
       field.fields = childFieldTemplates.map(function (fieldTemplate) {
         if (_.isString(fieldTemplate)) {
@@ -4426,6 +4575,8 @@ module.exports = function (config) {
 
     var itemFieldTemplates = config.fieldItemFieldTemplates(field);
 
+    // Resolve any of our item field templates. (Field templates for dynamic
+    // child fields.)
     if (itemFieldTemplates.length > 0) {
       field.itemFields = itemFieldTemplates.map(function (itemFieldTemplate) {
         if (_.isString(itemFieldTemplate)) {
@@ -4444,6 +4595,12 @@ module.exports = function (config) {
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],46:[function(require,module,exports){
 (function (global){
+// # utils
+
+/*
+Just some shared utility functions.
+*/
+
 'use strict';
 
 var _ = (typeof window !== "undefined" ? window._ : typeof global !== "undefined" ? global._ : null);
@@ -4471,10 +4628,15 @@ utils.deepCopy = function (obj) {
   }
 };
 
+// Cache for strings converted to Pascal Case. This should be a finite list, so
+// not much fear that we will run out of memory.
 var dashToPascalCache = {};
 
-// Convert foo-bar to FooBar
+// Convert foo-bar to FooBar.
 utils.dashToPascal = function (s) {
+  if (s === '') {
+    return '';
+  }
   if (!dashToPascalCache[s]) {
     dashToPascalCache[s] = s.split('-').map(function (part) {
       return part[0].toUpperCase() + part.substring(1);
@@ -4494,8 +4656,6 @@ utils.copyElementStyle = function (fromElement, toElement) {
 
   var cssRules = [];
   for (var i = 0; i < fromStyle.length; i++) {
-    //console.log(i, fromStyle[i], fromStyle.getPropertyValue(fromStyle[i]))
-    //toElement.style[fromStyle[i]] = fromStyle.getPropertyValue(fromStyle[i]);
     cssRules.push(fromStyle[i] + ':' + fromStyle.getPropertyValue(fromStyle[i]) + ';');
   }
   var cssText = cssRules.join('');
@@ -4526,7 +4686,16 @@ if(ua.indexOf('Chrome') > -1) {
   browser.isIe = true;
 }
 
+// Export sniffed browser info.
 utils.browser = browser;
+
+// Create a method that delegates to another method on the same object. The
+// default configuration uses this function to delegate one method to another.
+utils.delegateTo = function (name) {
+  return function () {
+    return this[name].apply(this, arguments);
+  };
+};
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}]},{},[1])(1)

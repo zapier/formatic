@@ -25,11 +25,18 @@ describe('types', function() {
 
   var Formatic = require('../');
 
-  var config = Formatic.createConfig();
+  var formaticConfig = Formatic.createConfig(
+    Formatic.plugins.elementClasses,
+    function (config) {
+      config.addElementClass('single-line-string', 'single-line-string');
+      config.addElementClass('string', 'string');
+      config.addElementClass('copy', 'copy');
+    }
+  );
 
   var Form = React.createFactory(Formatic);
 
-  var testValueType = function (options) {
+  var testValuteType = function (options) {
 
     var types = options.type;
 
@@ -78,21 +85,21 @@ describe('types', function() {
     });
   };
 
-  testValueType({
+  testValuteType({
     type: ['string', 'text'],
     from: 'hello\ngood-bye',
     to: 'hello\ngood-day',
     tagName: 'textarea'
   });
 
-  testValueType({
+  testValuteType({
     type: ['single-line-string', 'str', 'unicode'],
     from: 'Joe',
     to: 'Mary',
     tagName: 'input'
   });
 
-  testValueType({
+  testValuteType({
     type: 'json',
     from: {foo: 'bar'},
     getNodeValue: function (node) {
@@ -105,18 +112,18 @@ describe('types', function() {
     tagName: 'textarea'
   });
 
-  testValueType({
+  testValuteType({
     type: 'boolean',
     from: false,
     getNodeValue: function (node) {
       var optionNode = node.childNodes[node.selectedIndex];
-      return config.coerceValueToBoolean(optionNode.textContent);
+      return formaticConfig.coerceValueToBoolean(optionNode.textContent);
     },
     to: true,
     setNodeValue: function (node, value) {
       var optionNodes = node.childNodes;
       for (var i = 0; i < optionNodes.length; i++) {
-        var optionValue = config.coerceValueToBoolean(optionNodes[i].textContent);
+        var optionValue = formaticConfig.coerceValueToBoolean(optionNodes[i].textContent);
         if (optionValue === value) {
           node.selectedIndex = i;
         }
@@ -128,13 +135,6 @@ describe('types', function() {
   it('should set value for copy field', function () {
 
     var msg = 'Just something to read.';
-
-    var formaticConfig = Formatic.createConfig(
-      Formatic.plugins.elementClasses,
-      function (config) {
-        config.addElementClass('copy', 'copy');
-      }
-    );
 
     var component = mounted(Form({
       fields: [
@@ -149,6 +149,31 @@ describe('types', function() {
     var node = component.getDOMNode().getElementsByClassName('copy')[0];
 
     expect(node.textContent).toEqual(msg);
+  });
+
+  it('should set value for an array', function () {
+
+    var component = mounted(Form({
+      fields: [
+        {
+          type: 'array',
+          key: 'myArray',
+          itemFields: [
+            {
+              type: 'string'
+            }
+          ]
+        }
+      ],
+      value: {myArray: ['red', 'green']},
+      config: formaticConfig
+    }));
+
+    var node = component.getDOMNode().getElementsByClassName('string')[0];
+
+    expect(node.value).toEqual('red');
+
+    TestUtils.Simulate.change(node);
   });
 
   // testValueType({
