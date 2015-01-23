@@ -2586,7 +2586,7 @@ module.exports = React.createClass({
   },
 
   renderDefault: function () {
-    return R.input({className: cx(this.props.className), type: 'text', value: this.props.displayKey, onChange: this.onChange});
+    return R.input({className: cx(this.props.classes), type: 'text', value: this.props.displayKey, onChange: this.onChange});
   }
 });
 
@@ -2623,7 +2623,7 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
 
-    return R.div({className: cx(this.props.className)},
+    return R.div({className: cx(this.props.classes)},
       config.createFieldElement({field: field, onChange: this.onChangeField, plain: true})
     );
   }
@@ -3165,7 +3165,7 @@ module.exports = {
 
   alias_List: 'Array',
 
-  alias_CheckboxArray: 'CheckboxArray',
+  alias_CheckboxList: 'CheckboxArray',
 
   alias_Fieldset: 'Fields',
 

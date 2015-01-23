@@ -31,6 +31,7 @@ describe('types', function() {
       config.addElementClass('single-line-string', 'single-line-string');
       config.addElementClass('string', 'string');
       config.addElementClass('copy', 'copy');
+      config.addElementClass('object-item-key', 'object-item-key');
     }
   );
 
@@ -56,7 +57,7 @@ describe('types', function() {
               key: 'myValue'
             }
           ],
-          value: {
+          defaultValue: {
             myValue: options.from
           },
           onChange: function (newValue) {
@@ -153,6 +154,8 @@ describe('types', function() {
 
   it('should set value for an array', function () {
 
+    var formValue;
+
     var component = mounted(Form({
       fields: [
         {
@@ -165,15 +168,64 @@ describe('types', function() {
           ]
         }
       ],
-      value: {myArray: ['red', 'green']},
-      config: formaticConfig
+      defaultValue: {myArray: ['red', 'green']},
+      config: formaticConfig,
+      onChange: function (newValue) {
+        formValue = newValue;
+      }
     }));
 
     var node = component.getDOMNode().getElementsByClassName('string')[0];
 
     expect(node.value).toEqual('red');
 
+    node.value = 'blue';
+
     TestUtils.Simulate.change(node);
+
+    expect(formValue.myArray).toEqual(['blue', 'green']);
+  });
+
+  it('should set value and key for an object', function () {
+
+    var formValue;
+
+    var component = mounted(Form({
+      fields: [
+        {
+          type: 'object',
+          key: 'myObject',
+          itemFields: [
+            {
+              type: 'string'
+            }
+          ]
+        }
+      ],
+      defaultValue: {myObject: {x: 'foo', y: 'bar'}},
+      config: formaticConfig,
+      onChange: function (newValue) {
+        formValue = newValue;
+      }
+    }));
+
+    var node = component.getDOMNode().getElementsByClassName('string')[0];
+
+    expect(node.value).toEqual('foo');
+
+    node.value = 'baz';
+
+    TestUtils.Simulate.change(node);
+
+    expect(formValue.myObject).toEqual({x: 'baz', y: 'bar'});
+
+    node = component.getDOMNode().getElementsByClassName('object-item-key')[0];
+
+    node.value = 'z';
+
+    TestUtils.Simulate.change(node);
+
+    expect(formValue.myObject).toEqual({z: 'baz', y: 'bar'});
   });
 
   // testValueType({
