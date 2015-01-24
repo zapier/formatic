@@ -1,24 +1,57 @@
 /*global describe, it, expect*/
 'use strict';
 
-describe('form data', function() {
+describe('actions', function() {
 
-  //var formatic = require('../').create('react');
+  var React = require('react/addons');
+  var TestUtils = React.addons.TestUtils;
+  var _ = require('underscore');
 
-  // it('form can send and receive action', function () {
-  //
-  //   formatic.action('greet');
-  //
-  //   var form = formatic();
-  //
-  //   var greeting = null;
-  //
-  //   form.on('greet', function (msg) {
-  //     greeting = msg;
-  //   });
-  //
-  //   form.actions.greet('hello');
-  //
-  //   expect(greeting).toEqual('hello');
-  // });
+  var mounted = function (element) {
+    var rendered = TestUtils.renderIntoDocument(element);
+    return rendered;
+  };
+
+  var Formatic = require('../');
+
+  var formaticConfig = Formatic.createConfig(
+    Formatic.plugins.elementClasses,
+    function (config) {
+      config.addElementClass('string', 'string');
+    }
+  );
+
+  var Form = React.createFactory(Formatic);
+
+  it('should send action on focus and blur', function () {
+
+    var wasFocused = false;
+    var wasBlurred = false;
+
+    var component = mounted(Form({
+      fields: [
+        {
+          type: 'text',
+          key: 'firstName'
+        }
+      ],
+      onFocus: function () {
+        wasFocused = true;
+      },
+      onBlur: function () {
+        wasBlurred = true;
+      },
+      config: formaticConfig
+    }));
+
+    var node = component.getDOMNode().getElementsByClassName('string')[0];
+
+    TestUtils.Simulate.focus(node);
+
+    expect(wasFocused).toEqual(true);
+
+    TestUtils.Simulate.blur(node);
+
+    expect(wasBlurred).toEqual(true);
+  });
 });
