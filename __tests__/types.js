@@ -152,79 +152,83 @@ describe('types and value changes', function() {
     expect(node.textContent).toEqual(msg);
   });
 
-  it('should set value for an array', function () {
+  ['array', 'list'].forEach(function (type) {
+    it('should set value for an ' + type, function () {
 
-    var formValue;
+      var formValue;
 
-    var component = mounted(Form({
-      fields: [
-        {
-          type: 'array',
-          key: 'myArray',
-          itemFields: [
-            {
-              type: 'string'
-            }
-          ]
+      var component = mounted(Form({
+        fields: [
+          {
+            type: type,
+            key: 'myArray',
+            itemFields: [
+              {
+                type: 'string'
+              }
+            ]
+          }
+        ],
+        defaultValue: {myArray: ['red', 'green']},
+        config: formaticConfig,
+        onChange: function (newValue) {
+          formValue = newValue;
         }
-      ],
-      defaultValue: {myArray: ['red', 'green']},
-      config: formaticConfig,
-      onChange: function (newValue) {
-        formValue = newValue;
-      }
-    }));
+      }));
 
-    var node = component.getDOMNode().getElementsByClassName('string')[0];
+      var node = component.getDOMNode().getElementsByClassName('string')[0];
 
-    expect(node.value).toEqual('red');
+      expect(node.value).toEqual('red');
 
-    node.value = 'blue';
+      node.value = 'blue';
 
-    TestUtils.Simulate.change(node);
+      TestUtils.Simulate.change(node);
 
-    expect(formValue.myArray).toEqual(['blue', 'green']);
+      expect(formValue.myArray).toEqual(['blue', 'green']);
+    });
   });
 
-  it('should set value and key for an object', function () {
+  ['object', 'dict'].forEach(function (type) {
+    it('should set value and key for an ' + type, function () {
 
-    var formValue;
+      var formValue;
 
-    var component = mounted(Form({
-      fields: [
-        {
-          type: 'object',
-          key: 'myObject',
-          itemFields: [
-            {
-              type: 'string'
-            }
-          ]
+      var component = mounted(Form({
+        fields: [
+          {
+            type: type,
+            key: 'myObject',
+            itemFields: [
+              {
+                type: 'string'
+              }
+            ]
+          }
+        ],
+        defaultValue: {myObject: {x: 'foo', y: 'bar'}},
+        config: formaticConfig,
+        onChange: function (newValue) {
+          formValue = newValue;
         }
-      ],
-      defaultValue: {myObject: {x: 'foo', y: 'bar'}},
-      config: formaticConfig,
-      onChange: function (newValue) {
-        formValue = newValue;
-      }
-    }));
+      }));
 
-    var node = component.getDOMNode().getElementsByClassName('string')[0];
+      var node = component.getDOMNode().getElementsByClassName('string')[0];
 
-    expect(node.value).toEqual('foo');
+      expect(node.value).toEqual('foo');
 
-    node.value = 'baz';
+      node.value = 'baz';
 
-    TestUtils.Simulate.change(node);
+      TestUtils.Simulate.change(node);
 
-    expect(formValue.myObject).toEqual({x: 'baz', y: 'bar'});
+      expect(formValue.myObject).toEqual({x: 'baz', y: 'bar'});
 
-    node = component.getDOMNode().getElementsByClassName('object-item-key')[0];
+      node = component.getDOMNode().getElementsByClassName('object-item-key')[0];
 
-    node.value = 'z';
+      node.value = 'z';
 
-    TestUtils.Simulate.change(node);
+      TestUtils.Simulate.change(node);
 
-    expect(formValue.myObject).toEqual({z: 'baz', y: 'bar'});
+      expect(formValue.myObject).toEqual({z: 'baz', y: 'bar'});
+    });
   });
 });
