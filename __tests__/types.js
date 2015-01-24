@@ -37,7 +37,7 @@ describe('types and value changes', function() {
 
   var Form = React.createFactory(Formatic);
 
-  var testValuteType = function (options) {
+  var testValueType = function (options) {
 
     var types = options.type;
 
@@ -86,21 +86,21 @@ describe('types and value changes', function() {
     });
   };
 
-  testValuteType({
+  testValueType({
     type: ['string', 'text'],
     from: 'hello\ngood-bye',
     to: 'hello\ngood-day',
     tagName: 'textarea'
   });
 
-  testValuteType({
+  testValueType({
     type: ['single-line-string', 'str', 'unicode'],
     from: 'Joe',
     to: 'Mary',
     tagName: 'input'
   });
 
-  testValuteType({
+  testValueType({
     type: 'json',
     from: {foo: 'bar'},
     getNodeValue: function (node) {
@@ -113,7 +113,7 @@ describe('types and value changes', function() {
     tagName: 'textarea'
   });
 
-  testValuteType({
+  testValueType({
     type: 'boolean',
     from: false,
     getNodeValue: function (node) {
