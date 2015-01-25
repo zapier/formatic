@@ -133,6 +133,19 @@ describe('types and value changes', function() {
     tagName: 'select'
   });
 
+  testValueType({
+    type: ['checkbox-boolean', 'checkbox'],
+    from: false,
+    getNodeValue: function (node) {
+      return node.checked;
+    },
+    to: true,
+    setNodeValue: function (node, value) {
+      node.checked = value;
+    },
+    tagName: 'input'
+  });
+
   it('should set value for copy field', function () {
 
     var msg = 'Just something to read.';
