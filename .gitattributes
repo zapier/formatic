@@ -1,0 +1,2 @@
+build/formatic*.js -diff
+build/* linguist-vendored

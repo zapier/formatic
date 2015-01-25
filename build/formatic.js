@@ -1,4 +1,7 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Formatic=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+module.exports = require('./lib/formatic');
+
+},{"./lib/formatic":36}],2:[function(require,module,exports){
 (function (global){
 // # array component
 
@@ -151,7 +154,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],2:[function(require,module,exports){
+},{"../../mixins/field":38}],3:[function(require,module,exports){
 (function (global){
 // # boolean component
 
@@ -193,7 +196,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],3:[function(require,module,exports){
+},{"../../mixins/field":38}],4:[function(require,module,exports){
 (function (global){
 // # checkbox-array component
 
@@ -293,7 +296,59 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],4:[function(require,module,exports){
+},{"../../mixins/field":38}],5:[function(require,module,exports){
+(function (global){
+// # checkbox-boolean component
+
+/*
+Render a field that can edit a boolean with a checkbox.
+*/
+
+'use strict';
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var R = React.DOM;
+var cx = React.addons.classSet;
+
+module.exports = React.createClass({
+
+  displayName: 'CheckboxBoolean',
+
+  mixins: [require('../../mixins/field')],
+
+  onChange: function (event) {
+    this.onChangeValue(event.target.checked);
+  },
+
+  render: function () {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function () {
+
+    var config = this.props.config;
+    var field = this.props.field;
+
+    return config.createElement('field', {
+      config: config, field: field, plain: true
+    },
+    R.span({style: {whiteSpace: 'nowrap'}},
+      R.input({
+        type: 'checkbox',
+        checked: field.value,
+        className: cx(this.props.classes),
+        onChange: this.onChange,
+        onFocus: this.onFocusAction,
+        onBlur: this.onBlurAction
+      }),
+      R.span({}, ' '),
+      R.span({}, config.fieldHelpText(field) || config.fieldLabel(field))
+    ));
+  }
+});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../../mixins/field":38}],6:[function(require,module,exports){
 (function (global){
 // # copy component
 
@@ -326,7 +381,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],5:[function(require,module,exports){
+},{"../../mixins/field":38}],7:[function(require,module,exports){
 (function (global){
 // # fields component
 
@@ -384,7 +439,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],6:[function(require,module,exports){
+},{"../../mixins/field":38}],8:[function(require,module,exports){
 (function (global){
 // # json component
 
@@ -477,7 +532,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],7:[function(require,module,exports){
+},{"../../mixins/field":38}],9:[function(require,module,exports){
 (function (global){
 // # object component
 
@@ -765,7 +820,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],8:[function(require,module,exports){
+},{"../../mixins/field":38}],10:[function(require,module,exports){
 (function (global){
 // # pretty-textarea component
 
@@ -1568,7 +1623,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36,"../../mixins/resize":38,"../../mixins/undo-stack":40,"../../utils":45}],9:[function(require,module,exports){
+},{"../../mixins/field":38,"../../mixins/resize":40,"../../mixins/undo-stack":42,"../../utils":47}],11:[function(require,module,exports){
 (function (global){
 // # select component
 
@@ -1618,7 +1673,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],10:[function(require,module,exports){
+},{"../../mixins/field":38}],12:[function(require,module,exports){
 (function (global){
 // # single-line-string component
 
@@ -1665,7 +1720,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],11:[function(require,module,exports){
+},{"../../mixins/field":38}],13:[function(require,module,exports){
 (function (global){
 // # string component
 
@@ -1712,7 +1767,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],12:[function(require,module,exports){
+},{"../../mixins/field":38}],14:[function(require,module,exports){
 (function (global){
 // # unknown component
 
@@ -1745,7 +1800,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/field":36}],13:[function(require,module,exports){
+},{"../../mixins/field":38}],15:[function(require,module,exports){
 (function (global){
 // # add-item component
 
@@ -1781,7 +1836,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],14:[function(require,module,exports){
+},{"../../mixins/helper":39}],16:[function(require,module,exports){
 (function (global){
 // # array-control component
 
@@ -1844,7 +1899,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],15:[function(require,module,exports){
+},{"../../mixins/helper":39}],17:[function(require,module,exports){
 (function (global){
 // # array-item-control component
 
@@ -1893,7 +1948,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],16:[function(require,module,exports){
+},{"../../mixins/helper":39}],18:[function(require,module,exports){
 (function (global){
 // # array-item-value component
 
@@ -1932,7 +1987,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],17:[function(require,module,exports){
+},{"../../mixins/helper":39}],19:[function(require,module,exports){
 (function (global){
 // # array-item component
 
@@ -1989,7 +2044,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],18:[function(require,module,exports){
+},{"../../mixins/helper":39}],20:[function(require,module,exports){
 (function (global){
 // # choices component
 
@@ -2146,7 +2201,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/click-outside":35,"../../mixins/helper":37}],19:[function(require,module,exports){
+},{"../../mixins/click-outside":37,"../../mixins/helper":39}],21:[function(require,module,exports){
 (function (global){
 // # field-template-choices component
 
@@ -2194,7 +2249,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],20:[function(require,module,exports){
+},{"../../mixins/helper":39}],22:[function(require,module,exports){
 (function (global){
 // # field component
 
@@ -2281,7 +2336,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],21:[function(require,module,exports){
+},{"../../mixins/helper":39}],23:[function(require,module,exports){
 (function (global){
 // # help component
 
@@ -2316,7 +2371,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],22:[function(require,module,exports){
+},{"../../mixins/helper":39}],24:[function(require,module,exports){
 (function (global){
 // # label component
 
@@ -2381,7 +2436,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],23:[function(require,module,exports){
+},{"../../mixins/helper":39}],25:[function(require,module,exports){
 (function (global){
 // # move-item-back component
 
@@ -2417,7 +2472,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],24:[function(require,module,exports){
+},{"../../mixins/helper":39}],26:[function(require,module,exports){
 (function (global){
 // # move-item-forward component
 
@@ -2453,7 +2508,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],25:[function(require,module,exports){
+},{"../../mixins/helper":39}],27:[function(require,module,exports){
 (function (global){
 // # object-control component
 
@@ -2515,7 +2570,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],26:[function(require,module,exports){
+},{"../../mixins/helper":39}],28:[function(require,module,exports){
 (function (global){
 // # object-item-control component
 
@@ -2554,7 +2609,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],27:[function(require,module,exports){
+},{"../../mixins/helper":39}],29:[function(require,module,exports){
 (function (global){
 // # object-item-key component
 
@@ -2588,7 +2643,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],28:[function(require,module,exports){
+},{"../../mixins/helper":39}],30:[function(require,module,exports){
 (function (global){
 // # object-item-value component
 
@@ -2627,7 +2682,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],29:[function(require,module,exports){
+},{"../../mixins/helper":39}],31:[function(require,module,exports){
 (function (global){
 // # object-item component
 
@@ -2668,7 +2723,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],30:[function(require,module,exports){
+},{"../../mixins/helper":39}],32:[function(require,module,exports){
 (function (global){
 // # remove-item component
 
@@ -2719,7 +2774,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],31:[function(require,module,exports){
+},{"../../mixins/helper":39}],33:[function(require,module,exports){
 (function (global){
 // # help component
 
@@ -2756,7 +2811,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],32:[function(require,module,exports){
+},{"../../mixins/helper":39}],34:[function(require,module,exports){
 (function (global){
 // # select-value component
 
@@ -2853,7 +2908,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../../mixins/helper":37}],33:[function(require,module,exports){
+},{"../../mixins/helper":39}],35:[function(require,module,exports){
 (function (global){
 // # default-config
 
@@ -2885,6 +2940,8 @@ module.exports = {
   createElement_Select: React.createFactory(require('./components/fields/select')),
 
   createElement_Boolean: React.createFactory(require('./components/fields/boolean')),
+
+  createElement_CheckboxBoolean: React.createFactory(require('./components/fields/checkbox-boolean')),
 
   createElement_PrettyText: React.createFactory(require('./components/fields/pretty-text')),
 
@@ -2972,6 +3029,8 @@ module.exports = {
 
   createDefaultValue_CheckboxArray: utils.delegateTo('createDefaultValue_Array'),
 
+  createDefaultValue_CheckboxBoolean: utils.delegateTo('createDefaultValue_Boolean'),
+
 
   // Field value coercers. Coerce a value into a value appropriate for a specific type.
 
@@ -3012,6 +3071,8 @@ module.exports = {
   coerceValue_Json: utils.delegateTo('coerceValue_Object'),
 
   coerceValue_CheckboxArray: utils.delegateTo('coerceValue_Array'),
+
+  coerceValue_CheckboxBoolean: utils.delegateTo('coerceValue_Boolean'),
 
 
   // Field child fields factories, so some types can have dynamic children.
@@ -3165,6 +3226,8 @@ module.exports = {
   alias_CheckboxList: 'CheckboxArray',
 
   alias_Fieldset: 'Fields',
+
+  alias_Checkbox: 'CheckboxBoolean',
 
   // Field factory
 
@@ -3716,7 +3779,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./components/fields/array":1,"./components/fields/boolean":2,"./components/fields/checkbox-array":3,"./components/fields/copy":4,"./components/fields/fields":5,"./components/fields/json":6,"./components/fields/object":7,"./components/fields/pretty-text":8,"./components/fields/select":9,"./components/fields/single-line-string":10,"./components/fields/string":11,"./components/fields/unknown":12,"./components/helpers/add-item":13,"./components/helpers/array-control":14,"./components/helpers/array-item":17,"./components/helpers/array-item-control":15,"./components/helpers/array-item-value":16,"./components/helpers/choices":18,"./components/helpers/field":20,"./components/helpers/field-template-choices":19,"./components/helpers/help":21,"./components/helpers/label":22,"./components/helpers/move-item-back":23,"./components/helpers/move-item-forward":24,"./components/helpers/object-control":25,"./components/helpers/object-item":29,"./components/helpers/object-item-control":26,"./components/helpers/object-item-key":27,"./components/helpers/object-item-value":28,"./components/helpers/remove-item":30,"./components/helpers/sample":31,"./components/helpers/select-value":32,"./utils":45}],34:[function(require,module,exports){
+},{"./components/fields/array":2,"./components/fields/boolean":3,"./components/fields/checkbox-array":4,"./components/fields/checkbox-boolean":5,"./components/fields/copy":6,"./components/fields/fields":7,"./components/fields/json":8,"./components/fields/object":9,"./components/fields/pretty-text":10,"./components/fields/select":11,"./components/fields/single-line-string":12,"./components/fields/string":13,"./components/fields/unknown":14,"./components/helpers/add-item":15,"./components/helpers/array-control":16,"./components/helpers/array-item":19,"./components/helpers/array-item-control":17,"./components/helpers/array-item-value":18,"./components/helpers/choices":20,"./components/helpers/field":22,"./components/helpers/field-template-choices":21,"./components/helpers/help":23,"./components/helpers/label":24,"./components/helpers/move-item-back":25,"./components/helpers/move-item-forward":26,"./components/helpers/object-control":27,"./components/helpers/object-item":31,"./components/helpers/object-item-control":28,"./components/helpers/object-item-key":29,"./components/helpers/object-item-value":30,"./components/helpers/remove-item":32,"./components/helpers/sample":33,"./components/helpers/select-value":34,"./utils":47}],36:[function(require,module,exports){
 (function (global){
 // # formatic
 
@@ -3900,7 +3963,7 @@ module.exports = React.createClass({
 });
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./default-config":33,"./mixins/click-outside.js":35,"./mixins/field.js":36,"./mixins/helper.js":37,"./mixins/resize.js":38,"./mixins/scroll.js":39,"./mixins/undo-stack.js":40,"./plugins/bootstrap":41,"./plugins/element-classes":42,"./plugins/meta":43,"./plugins/reference":44,"./utils":45}],35:[function(require,module,exports){
+},{"./default-config":35,"./mixins/click-outside.js":37,"./mixins/field.js":38,"./mixins/helper.js":39,"./mixins/resize.js":40,"./mixins/scroll.js":41,"./mixins/undo-stack.js":42,"./plugins/bootstrap":43,"./plugins/element-classes":44,"./plugins/meta":45,"./plugins/reference":46,"./utils":47}],37:[function(require,module,exports){
 (function (global){
 // # click-outside mixin
 
@@ -4007,7 +4070,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 (function (global){
 // # field mixin
 
@@ -4065,7 +4128,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 (function (global){
 // # helper mixin
 
@@ -4111,7 +4174,7 @@ module.exports = {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 // # resize mixin
 
 /*
@@ -4227,7 +4290,7 @@ module.exports = {
   }
 };
 
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 // # scroll mixin
 
 /*
@@ -4254,7 +4317,7 @@ module.exports = function (plugin) {
   };
 };
 
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 // # undo-stack mixin
 
 /*
@@ -4320,7 +4383,7 @@ module.exports = {
   }
 };
 
-},{}],41:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 (function (global){
 // # bootstrap plugin
 
@@ -4380,7 +4443,7 @@ module.exports = function (config) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],42:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 (function (global){
 // # element-classes plugin
 
@@ -4424,7 +4487,7 @@ module.exports = function (config) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // # meta plugin
 
 /*
@@ -4461,7 +4524,7 @@ module.exports = function (config) {
 
 };
 
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 (function (global){
 // # reference plugin
 
@@ -4590,7 +4653,7 @@ module.exports = function (config) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],45:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 (function (global){
 // # utils
 
@@ -4695,8 +4758,5 @@ utils.delegateTo = function (name) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],"formatic":[function(require,module,exports){
-module.exports = require('./lib/formatic');
-
-},{"./lib/formatic":34}]},{},[])("formatic")
+},{}]},{},[1])(1)
 });
