@@ -31,7 +31,8 @@
     "require-dir": "^0.1.0",
     "tiny-lr": "0.0.9",
     "vinyl-source-stream": "^0.1.1",
-    "watchify": "^2.1.1"
+    "watchify": "^2.1.1",
+    "gulp-gh-pages": "^0.4.0"
   },
   "dependencies": {
     "envify": "^1.2.1",
