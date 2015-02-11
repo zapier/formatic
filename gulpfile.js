@@ -27,4 +27,6 @@ gulp.task('test', ['lint'], plugins.shell.task([
   'npm test'
 ]));
 
+gulp.task('docs', ['docs-push']);
+
 gulp.task('default', ['build']);

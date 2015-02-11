@@ -1,4 +1,0 @@
-{
-  "glob": ["lib/**/*.js", "README.md", "examples/*.js", "examples.md"],
-  "github": true
-}

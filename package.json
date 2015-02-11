@@ -21,7 +21,10 @@
     "groc": "^0.7.0",
     "gulp": "^3.8.0",
     "gulp-changed": "^0.4.0",
+    "gulp-clean": "^0.3.1",
     "gulp-eslint": "^0.1.8",
+    "gulp-gh-pages": "^0.4.0",
+    "gulp-groc": "^0.4.1",
     "gulp-load-plugins": "^0.5.3",
     "gulp-rename": "^1.2.0",
     "gulp-shell": "^0.2.8",
@@ -31,8 +34,7 @@
     "require-dir": "^0.1.0",
     "tiny-lr": "0.0.9",
     "vinyl-source-stream": "^0.1.1",
-    "watchify": "^2.1.1",
-    "gulp-gh-pages": "^0.4.0"
+    "watchify": "^2.1.1"
   },
   "dependencies": {
     "envify": "^1.2.1",
