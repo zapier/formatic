@@ -25,13 +25,13 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "type": "heading",
           "data": {
             "level": 1,
-            "title": "formatic",
-            "slug": "formatic",
+            "title": "index",
+            "slug": "index",
             "isFileHeader": true
           },
           "depth": 1
         },
-        "title": "formatic"
+        "title": "index"
       },
       "depth": 1,
       "outline": []
