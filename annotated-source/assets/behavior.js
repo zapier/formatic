@@ -9,22 +9,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
       "type": "file",
       "data": {
         "language": {
-          "nameMatchers": [".md", ".markdown", ".mkd", ".mkdn", ".mdown"],
-          "commentsOnly": true,
-          "name": "Markdown"
-        },
-        "sourcePath": "/Users/justin/Dropbox/git/formatic/source-readme.md",
-        "projectPath": "source-readme.md",
-        "targetPath": "index",
-        "pageTitle": "index",
-        "title": "index"
-      },
-      "depth": 1,
-      "outline": []
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
           "nameMatchers": [".js"],
           "pygmentsLexer": "javascript",
           "multiLineComment": ["/*", "*", "*/"],
@@ -37,7 +21,17 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
         "projectPath": "index.js",
         "targetPath": "index",
         "pageTitle": "index",
-        "title": "index"
+        "firstHeader": {
+          "type": "heading",
+          "data": {
+            "level": 1,
+            "title": "formatic",
+            "slug": "formatic",
+            "isFileHeader": true
+          },
+          "depth": 1
+        },
+        "title": "formatic"
       },
       "depth": 1,
       "outline": []
