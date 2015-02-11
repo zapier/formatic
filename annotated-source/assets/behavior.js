@@ -6,6 +6,32 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
 
   tableOfContents = [
     {
+      "type": "file",
+      "data": {
+        "language": {
+          "nameMatchers": [".md", ".markdown", ".mkd", ".mkdn", ".mdown"],
+          "commentsOnly": true,
+          "name": "Markdown"
+        },
+        "sourcePath": "/Users/justin/Dropbox/git/formatic/source-readme.md",
+        "projectPath": "source-readme.md",
+        "targetPath": "index",
+        "pageTitle": "index",
+        "firstHeader": {
+          "type": "heading",
+          "data": {
+            "level": 1,
+            "title": "Formatic",
+            "slug": "formatic",
+            "isFileHeader": true
+          },
+          "depth": 1
+        },
+        "title": "Formatic"
+      },
+      "depth": 1,
+      "outline": []
+    }, {
       "type": "folder",
       "data": {
         "path": "lib",
@@ -1445,32 +1471,6 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
           "outline": []
         }
       ]
-    }, {
-      "type": "file",
-      "data": {
-        "language": {
-          "nameMatchers": [".md", ".markdown", ".mkd", ".mkdn", ".mdown"],
-          "commentsOnly": true,
-          "name": "Markdown"
-        },
-        "sourcePath": "/Users/justin/Dropbox/git/formatic/source-readme.md",
-        "projectPath": "source-readme.md",
-        "targetPath": "source-readme",
-        "pageTitle": "source-readme",
-        "firstHeader": {
-          "type": "heading",
-          "data": {
-            "level": 1,
-            "title": "Formatic",
-            "slug": "formatic",
-            "isFileHeader": true
-          },
-          "depth": 1
-        },
-        "title": "Formatic"
-      },
-      "depth": 1,
-      "outline": []
     }
   ];
 
