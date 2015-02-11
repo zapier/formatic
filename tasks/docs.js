@@ -5,7 +5,7 @@ var plugins = require('gulp-load-plugins')();
 
 gulp.task('docs-clean', function () {
   return gulp
-    .src([ './docs' ], {
+    .src([ './build-docs' ], {
       read: false
     })
     .pipe(plugins.clean());
@@ -14,16 +14,20 @@ gulp.task('docs-clean', function () {
 gulp.task('annotated-source-build', ['docs-clean'], function () {
   return gulp
     .src([
-      'lib/**/*.js', 'README.md', 'examples/*.js', 'examples.md'
+      'index.js',
+      'lib/**/*.js'
+
+      // , 'README.md'
+      //, 'examples/*.js', 'examples.md'
     ])
     .pipe(plugins.groc({
-        out: './docs/annotated-source'
+        out: './build-docs/annotated-source'
     }));
 });
 
 gulp.task('docs-build', ['annotated-source-build']);
 
 gulp.task('docs-push', ['annotated-source-build'], function () {
-  return gulp.src('./docs/**/*')
+  return gulp.src('./build-docs/**/*')
       .pipe(plugins.ghPages());
 });
