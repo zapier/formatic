@@ -5,7 +5,7 @@ var plugins = require('gulp-load-plugins')();
 
 gulp.task('build-dev', ['bundle-dev']);
 
-gulp.task('copy-build', ['bundle-prod'], function () {
+gulp.task('copy-build', ['bundle-prod-min'], function () {
   return gulp.src(['./build/formatic-min.js'])
     .pipe(plugins.rename(function (path) {
       if (path.basename.indexOf('-min')) {

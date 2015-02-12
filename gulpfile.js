@@ -21,7 +21,7 @@ gulp.task('test-watch', function () {
 
 gulp.task('watch', ['bundle-watch', 'test-watch', 'html-watch', 'css-watch']);
 
-gulp.task('build', ['build-dev', 'build-prod', 'build-prod-min']);
+gulp.task('build', ['build-dev', 'build-prod-min']);
 
 gulp.task('live', ['copy-watch', 'watch', 'server-live-app', 'server-live-reload']);
 
