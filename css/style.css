@@ -156,54 +156,69 @@ pre.prettyprint {
   padding: 9.5px;
 }
 
-// Solarized prettyprint
+/* Pretty printing styles. Used with prettify.js.
+ *
+ * Name:	Stanley Ng
+ * Email: 	stanleyhlng@googlegroups.com
+ *
+ */
+.pln {
+  color: #bd3613; }
 
-.prettyprint {
-  color: #839496;
-  background-color: #002b36;
-}
+.str {
+  color: #269186; }
 
-.prettyprint .pln {
-  color: inherit;
-}
+.kwd {
+  color: #859900; }
 
-.prettyprint .str,
-.prettyprint .lit,
-.prettyprint .atv {
-  color: #2aa198;
-}
+.com {
+  color: #586175;
+  font-style: italic; }
 
-.prettyprint .kwd {
-  color: #268bd2;
-}
+.typ {
+  color: #b58900; }
 
-.prettyprint .com,
-.prettyprint .dec {
-  color: #586e75;
-  font-style: italic;
-}
+.lit {
+  color: #2aa198; }
 
-.prettyprint .typ {
-  color: #b58900;
-}
+.pun {
+  color: #839496; }
 
-.prettyprint .pun {
-  color: inherit;
-}
+.opn {
+  color: #839496; }
 
-.prettyprint .opn {
-  color: inherit;
-}
+.clo {
+  color: #839496; }
 
-.prettyprint .clo {
-  color: inherit;
-}
+.tag {
+  color: #268bd2; }
 
-.prettyprint .tag {
-  color: #268bd2;
-  font-weight: bold;
-}
+.atn {
+  color: #586175; }
 
-.prettyprint .atn {
-  color: inherit;
-}
+.atv {
+  color: #2aa198; }
+
+.dec {
+  color: #268bd2; }
+
+.var {
+  color: #268bd2; }
+
+.fun {
+  color: #FF0000; }
+
+/* Put a border around prettyprinted code snippets. */
+pre.prettyprint {
+  background-color: #fdf6e3;
+  padding: 10px;
+  border: 1px solid #E1E1E8; }
+
+/* Specify class=linenums on a pre to get line numbering */
+ol.linenums {
+  color: #4c666c;
+  margin: 0 0 0 40px; }
+
+ol.linenums li {
+  line-height: 18px;
+  padding-left: 12px; }
