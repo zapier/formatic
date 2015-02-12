@@ -3,7 +3,6 @@
 var React = require('react');
 var R = React.DOM;
 var E = React.createElement;
-var Bootstrap = require('react-bootstrap');
 var NavMain = require('./nav-main');
 var Footer = require('./footer');
 

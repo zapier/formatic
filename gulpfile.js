@@ -10,7 +10,7 @@ var requireDir = require('require-dir');
 requireDir('./tasks');
 
 gulp.task('lint', function () {
-  return gulp.src(['gulpfile.js', 'lib/**/*.js'])
+  return gulp.src(['gulpfile.js', 'lib/**/*.js', 'docs/components/*.js', 'docs/index.js'])
     .pipe(plugins.eslint())
     .pipe(plugins.eslint.format());
 });

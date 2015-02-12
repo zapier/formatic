@@ -60,9 +60,28 @@ var pageTasks = Object.keys(RootClass.pages).map(function (name) {
 
 gulp.task('docs-site', pageTasks);
 
-gulp.task('docs-build', ['docs-site', 'docs-annotated-source-build']);
+// var pageFilenames = Object.keys(RootClass.pages).map(function (name) {
+//   var page = RootClass.pages[name];
+//   return './build-docs/' + page.filename;
+// });
+
+gulp.task('docs-favicons', ['docs-site'], function () {
+  // return gulp.src(pageFilenames)
+  //   .pipe(plugins.favicons({
+  //       files: { dest: './favicons/' }
+  //   }))
+  //   .pipe(gulp.dest('./build-docs'));
+
+});
+
+gulp.task('docs-build', ['docs-favicons', 'docs-annotated-source-build']);
 
 gulp.task('docs-push', ['docs-build'], function () {
+  return gulp.src('./build-docs/**/*')
+      .pipe(plugins.ghPages());
+});
+
+gulp.task('docs-site-push', ['docs-favicons'], function () {
   return gulp.src('./build-docs/**/*')
       .pipe(plugins.ghPages());
 });

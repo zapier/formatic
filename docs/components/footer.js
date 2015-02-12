@@ -20,8 +20,8 @@ module.exports = React.createClass({
             )
           ),
           R.p({},
-            'Code licensed under ',
-            R.a({href: 'https://github.com/zapier/formatic/blob/master/LICENSE', target: '_blank'}, 'MIT'),
+            'Code licensed by ',
+            R.a({href: 'https://github.com/zapier/formatic/blob/master/LICENSE', target: '_blank'}, 'Zapier, Inc.'),
             '.'
           ),
           R.ul({className: 'bs-docs-footer-links muted'},
