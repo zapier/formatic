@@ -394,7 +394,7 @@ corrected).</p></div></div><div class="code"><div class="wrapper">  <span class=
     <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
       <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">originalValue</span><span class="p">;</span>
       <span class="nx">node</span><span class="p">.</span><span class="nx">setSelectionRange</span><span class="p">(</span><span class="nx">start</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
-    <span class="p">},</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">0</span><span class="p">);</span>
   <span class="p">},</span>
 
   <span class="nx">onCut</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
@@ -421,7 +421,7 @@ corrected).</p></div></div><div class="code"><div class="wrapper">  <span class=
 become part of the raw value.</p></div></div><div class="code"><div class="wrapper">      <span class="kd">var</span> <span class="nx">rawValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rawValue</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Set the value to the new raw value.</p></div></div><div class="code"><div class="wrapper">      <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">rawValue</span><span class="p">);</span>
 
       <span class="k">this</span><span class="p">.</span><span class="nx">snapshot</span><span class="p">();</span>
-    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">),</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
   <span class="p">},</span>
 
   <span class="nx">onKeyDown</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>

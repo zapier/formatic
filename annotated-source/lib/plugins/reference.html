@@ -4,9 +4,9 @@ extends: ['foo', 'bar'] where 'foo' and 'bar' refer to other keys or ids.</p></d
 
 <span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;underscore&#39;</span><span class="p">);</span>
 
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">config</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">cfg</span><span class="p">)</span> <span class="p">{</span>
 
-  <span class="kd">var</span> <span class="nx">initField</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">initField</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look for a template in this field or any of its parents.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">config</span><span class="p">.</span><span class="nx">findFieldTemplate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">initField</span> <span class="o">=</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">initField</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look for a template in this field or any of its parents.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">cfg</span><span class="p">.</span><span class="nx">findFieldTemplate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">field</span><span class="p">.</span><span class="nx">templates</span><span class="p">[</span><span class="nx">name</span><span class="p">])</span> <span class="p">{</span>
@@ -19,7 +19,7 @@ extends: ['foo', 'bar'] where 'foo' and 'bar' refer to other keys or ids.</p></d
 
     <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
   <span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Inherit from any field templates that this field template
-extends.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">config</span><span class="p">.</span><span class="nx">resolveFieldTemplate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">fieldTemplate</span><span class="p">)</span> <span class="p">{</span>
+extends.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">cfg</span><span class="p">.</span><span class="nx">resolveFieldTemplate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">fieldTemplate</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">fieldTemplate</span><span class="p">.</span><span class="kr">extends</span><span class="p">)</span> <span class="p">{</span>
@@ -44,7 +44,7 @@ extends.</p></div></div><div class="code"><div class="wrapper">  <span class="nx
     <span class="nx">fieldTemplate</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">chain</span><span class="p">);</span>
 
     <span class="k">return</span> <span class="nx">fieldTemplate</span><span class="p">;</span>
-  <span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the initField method.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">config</span><span class="p">.</span><span class="nx">initField</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">)</span> <span class="p">{</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the initField method.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">cfg</span><span class="p">.</span><span class="nx">initField</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
 

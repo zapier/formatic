@@ -65,10 +65,10 @@ is only a single setInterval used for all elements. To use:</p>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="s1">&#39;__resizeId&#39;</span> <span class="k">in</span> <span class="nx">element</span><span class="p">))</span> <span class="p">{</span>
     <span class="k">return</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">element</span><span class="p">.</span><span class="nx">__resizeId</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">resizeId</span> <span class="o">=</span> <span class="nx">element</span><span class="p">.</span><span class="nx">__resizeId</span><span class="p">;</span>
   <span class="k">delete</span> <span class="nx">element</span><span class="p">.</span><span class="nx">__resizeId</span><span class="p">;</span>
   <span class="k">delete</span> <span class="nx">element</span><span class="p">.</span><span class="nx">__resizeHandlers</span><span class="p">;</span>
-  <span class="k">delete</span> <span class="nx">resizeIntervalElements</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+  <span class="k">delete</span> <span class="nx">resizeIntervalElements</span><span class="p">[</span><span class="nx">resizeId</span><span class="p">];</span>
   <span class="nx">resizeIntervalElementsCount</span><span class="o">--</span><span class="p">;</span>
   <span class="k">if</span> <span class="p">(</span><span class="nx">resizeIntervalElementsCount</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">resizeIntervalTimer</span><span class="p">);</span>

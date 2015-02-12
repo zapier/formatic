@@ -189,8 +189,8 @@ key to something else.</p></div></div><div class="code"><div class="wrapper">   
 
     <span class="kd">var</span> <span class="nx">keyToField</span> <span class="o">=</span> <span class="p">{};</span>
 
-    <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">fields</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">keyToField</span><span class="p">[</span><span class="nx">field</span><span class="p">.</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">field</span><span class="p">;</span>
+    <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">fields</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">childField</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">keyToField</span><span class="p">[</span><span class="nx">childField</span><span class="p">.</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">childField</span><span class="p">;</span>
     <span class="p">});</span>
 
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyOrder</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>

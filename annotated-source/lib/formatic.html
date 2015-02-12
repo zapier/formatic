@@ -127,9 +127,9 @@ calling them fields.</p></div></div><div class="code"><div class="wrapper">     
       <span class="nx">onAction</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onAction</span>
     <span class="p">};</span>
 
-    <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">propValue</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
       <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">props</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nx">props</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+        <span class="nx">props</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">propValue</span><span class="p">;</span>
       <span class="p">}</span>
     <span class="p">});</span>
 

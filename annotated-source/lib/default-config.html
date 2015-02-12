@@ -393,8 +393,8 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  <
         <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;boolean&#39;</span>
       <span class="p">};</span>
     <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
-      <span class="kd">var</span> <span class="nx">arrayItemFields</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">childField</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createFieldTemplateFromValue</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">arrayItemFields</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">childValue</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">childField</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createFieldTemplateFromValue</span><span class="p">(</span><span class="nx">childValue</span><span class="p">);</span>
         <span class="nx">childField</span><span class="p">.</span><span class="nx">key</span> <span class="o">=</span> <span class="nx">i</span><span class="p">;</span>
         <span class="k">return</span> <span class="nx">childField</span><span class="p">;</span>
       <span class="p">});</span>
@@ -455,8 +455,8 @@ that child value.</p></div></div><div class="code"><div class="wrapper">  <span 
 
     <span class="kd">var</span> <span class="nx">fieldTemplates</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">fieldItemFieldTemplates</span><span class="p">(</span><span class="nx">field</span><span class="p">);</span>
 
-    <span class="nx">fieldTemplate</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">fieldTemplates</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">matchesFieldTemplateToValue</span><span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">,</span> <span class="nx">childValue</span><span class="p">);</span>
+    <span class="nx">fieldTemplate</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="nx">fieldTemplates</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">itemFieldTemplate</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">matchesFieldTemplateToValue</span><span class="p">(</span><span class="nx">itemFieldTemplate</span><span class="p">,</span> <span class="nx">childValue</span><span class="p">);</span>
     <span class="p">});</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">)</span> <span class="p">{</span>
@@ -544,7 +544,7 @@ field.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">
       <span class="k">return</span> <span class="p">[{</span>
         <span class="nx">label</span><span class="o">:</span> <span class="s1">&#39;Yes&#39;</span><span class="p">,</span>
         <span class="nx">value</span><span class="o">:</span> <span class="kc">true</span>
-      <span class="p">},{</span>
+      <span class="p">},</span> <span class="p">{</span>
         <span class="nx">label</span><span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">,</span>
         <span class="nx">value</span><span class="o">:</span> <span class="kc">false</span>
       <span class="p">}];</span>
