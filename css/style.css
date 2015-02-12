@@ -87,7 +87,7 @@ body {
 }
 
 .bs-docs-booticon {
-  background: url('./logo.png') 0 0 no-repeat;
+  background: url('../images/logo.png') 0 0 no-repeat;
   background-size: contain;
   border: 0;
   width: 200px;
@@ -149,4 +149,3 @@ body {
 .modal-container .modal, .modal-container .modal-backdrop {
   position: absolute;
 }
-
