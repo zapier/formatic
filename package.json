@@ -12,6 +12,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "6to5": "^3.5.3",
     "body-parser": "^1.4.3",
     "browserify": "git+https://github.com/jdeal/node-browserify.git",
     "browserify-shim": "^3.8.0",
@@ -23,6 +24,7 @@
     "gulp-changed": "^0.4.0",
     "gulp-clean": "^0.3.1",
     "gulp-eslint": "^0.1.8",
+    "gulp-file": "^0.2.0",
     "gulp-gh-pages": "^0.4.0",
     "gulp-groc": "^0.4.1",
     "gulp-load-plugins": "^0.5.3",
@@ -31,6 +33,8 @@
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^0.3.1",
     "jest-cli": "^0.1.15",
+    "react-bootstrap": "^0.14.0",
+    "react-router": "^0.12.0",
     "require-dir": "^0.1.0",
     "tiny-lr": "0.0.9",
     "vinyl-source-stream": "^0.1.1",
@@ -40,6 +44,7 @@
     "envify": "^1.2.1",
     "eventemitter3": "^0.1.5",
     "funql": "0.0.15",
+    "jsnox": "^0.9.1",
     "react": "^0.12.0",
     "underscore": "^1.6.0"
   },

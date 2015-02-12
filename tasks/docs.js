@@ -11,7 +11,12 @@ gulp.task('docs-clean', function () {
     .pipe(plugins.clean());
 });
 
-gulp.task('annotated-source-build', ['docs-clean'], function () {
+gulp.task('docs-copy', ['docs-clean'], function () {
+  return gulp.src(['./docs/vendor/**/*.*'])
+    .pipe(gulp.dest('./build-docs/vendor'));
+});
+
+gulp.task('docs-annotated-source-build', ['docs-clean', 'docs-copy'], function () {
   return gulp
     .src([
       'index.js',
@@ -25,9 +30,28 @@ gulp.task('annotated-source-build', ['docs-clean'], function () {
     }));
 });
 
-gulp.task('docs-build', ['annotated-source-build']);
+var RootClass = require('../docs/components/root');
 
-gulp.task('docs-push', ['annotated-source-build'], function () {
+var DOCTYPE = '<!doctype html>';
+
+Object.keys(RootClass.pages).forEach(function (name) {
+  var page = RootClass.pages[name];
+  gulp.task('docs-site:' + name, ['docs-clean', 'docs-copy'], function () {
+    var html = RootClass.renderToString(name);
+    return plugins.file(page.filename, DOCTYPE + '\n' + html, {src: true})
+      .pipe(gulp.dest('./build-docs'));
+  });
+});
+
+var pageTasks = Object.keys(RootClass.pages).map(function (name) {
+  return 'docs-site:' + name;
+});
+
+gulp.task('docs-site', pageTasks);
+
+gulp.task('docs-build', ['docs-site', 'docs-annotated-source-build']);
+
+gulp.task('docs-push', ['docs-build'], function () {
   return gulp.src('./build-docs/**/*')
       .pipe(plugins.ghPages());
 });

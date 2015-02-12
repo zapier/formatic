@@ -1,5 +1,7 @@
 'use strict';
 
+require('6to5/register');
+
 var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
 
