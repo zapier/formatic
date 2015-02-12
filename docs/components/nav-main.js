@@ -12,13 +12,9 @@ var NAV_LINKS = {
     link: '/formatic/getting-started.html',
     title: 'Getting started'
   },
-  'components': {
+  'sandbox': {
     link: '/formatic/sandbox.html',
     title: 'Sandbox'
-  },
-  'annotated-source': {
-    link: '/formatic/annotated-source/index.html',
-    title: 'Annotated Source'
   }
 };
 
@@ -29,12 +25,16 @@ module.exports = React.createClass({
   },
 
   render: function () {
-    var brand = E(Router.Link, {to: '/formatic/index.html', className: 'navbar-brand'}, 'Formatic');
+    var brand = E(Router.Link, {to: '/formatic/', className: 'navbar-brand'}, 'Formatic');
 
     return (
       E(Bootstrap.Navbar, {componentClass: 'header', brand: brand, staticTop: true, className: 'bs-docs-nav', role: 'banner', toggleNavKey: 0},
         E(Bootstrap.Nav, {className: 'bs-navbar-collapse', role: 'navigation', eventKey: 0, id: 'top'},
-          Object.keys(NAV_LINKS).map(this.renderNavItem)
+          Object.keys(NAV_LINKS).map(this.renderNavItem).concat(
+            R.li({key: 'annotated-source'},
+              R.a({href: '/formatic/annotated-source/index.html'}, 'Annotated Source')
+            )
+          )
         )
       )
     );

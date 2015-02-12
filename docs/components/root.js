@@ -80,7 +80,7 @@ Object.keys(pages).forEach(function (name) {
     children.push(E(Route, {name: name, path: page.path, handler: page.class}));
   }
   //children.push(E(Route, {path: '/formatic/', handler: page.class}));
-  children.push(E(Route, {path: '/formatic/index.html', handler: page.class}));
+  children.push(E(Route, {path: '/formatic/', handler: page.class}));
 });
 
 routes = E.apply(null, [Route, {path: '/formatic/', handler: Root}].concat(children));
