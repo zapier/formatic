@@ -83,7 +83,7 @@ React.render(Form({
 
 This creates a simple form like this (assuming you're using formatic.css):
 
-![simple-form](docs/images/simple-form.png)
+![simple-form](docs/assets/images/simple-form.png)
 
 The above assumes you're using a CommonJS build tool like browserify or webpack.
 If you use the standalone build, you can just the global `Formatic'.

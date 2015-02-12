@@ -11,7 +11,8 @@ module.exports = React.createClass({
   render: function () {
     return (
       R.div({},
-        E(NavMain, {activePage: 'home'})
+        E(NavMain, {activePage: 'home'}),
+        'Formatic!'
       )
     );
   }

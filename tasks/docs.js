@@ -2,6 +2,8 @@
 
 var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
 
 gulp.task('docs-clean', function () {
   return gulp
@@ -12,8 +14,17 @@ gulp.task('docs-clean', function () {
 });
 
 gulp.task('docs-copy', ['docs-clean'], function () {
-  return gulp.src(['./docs/vendor/**/*.*'])
-    .pipe(gulp.dest('./build-docs/vendor'));
+  return gulp.src(['./docs/assets/**/*.*'])
+    .pipe(gulp.dest('./build-docs'));
+});
+
+gulp.task('docs-bundle', ['docs-clean'], function () {
+  return browserify({entries: ['./docs/index.js'], ignoreTransform: ['browserify-shim']})
+    .add('./docs/index.js')
+    .require('./docs/index.js')
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(gulp.dest('./build-docs/lib'));
 });
 
 gulp.task('docs-annotated-source-build', ['docs-clean', 'docs-copy'], function () {
@@ -36,7 +47,7 @@ var DOCTYPE = '<!doctype html>';
 
 Object.keys(RootClass.pages).forEach(function (name) {
   var page = RootClass.pages[name];
-  gulp.task('docs-site:' + name, ['docs-clean', 'docs-copy'], function () {
+  gulp.task('docs-site:' + name, ['docs-clean', 'docs-copy', 'docs-bundle'], function () {
     var html = RootClass.renderToString(name);
     return plugins.file(page.filename, DOCTYPE + '\n' + html, {src: true})
       .pipe(gulp.dest('./build-docs'));

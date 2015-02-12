@@ -12,7 +12,7 @@ var RouteHandler = Router.RouteHandler;
 var pages = {
   'home': {
     default: true,
-    path: '/formatic',
+    path: '/formatic/',
     filename: 'index.html',
     class: require('./home-page')
   },
@@ -44,17 +44,27 @@ var Root = module.exports = React.createClass({
     pages: pages
   },
 
+  mixins: [Router.State],
+
   render: function () {
+
+    var initScript = [
+      'window.INITIAL_PATH = ' + JSON.stringify(this.getPath()) + ';'
+    ].join('\n');
+
     return R.html({},
       R.head({},
         R.link({href: 'vendor/bootstrap/bootstrap.css', rel: 'stylesheet'}),
         R.link({href: 'vendor/bootstrap/docs.css', rel: 'stylesheet'}),
         R.link({href: 'vendor/codemirror/codemirror.css', rel: 'stylesheet'}),
         R.link({href: 'vendor/codemirror/solarized.css', rel: 'stylesheet'}),
-        R.link({href: 'vendor/codemirror/syntax.css', rel: 'stylesheet'})
+        R.link({href: 'vendor/codemirror/syntax.css', rel: 'stylesheet'}),
+        R.link({href: 'css/style.css', rel: 'stylesheet'})
       ),
       R.body({},
-        E(RouteHandler)
+        E(RouteHandler),
+        R.script({dangerouslySetInnerHTML: {__html: initScript}}),
+        R.script({src: 'lib/bundle.js'})
       )
     );
   }
@@ -69,6 +79,10 @@ Object.keys(pages).forEach(function (name) {
   } else {
     children.push(E(Route, {name: name, path: page.path, handler: page.class}));
   }
+  //children.push(E(Route, {path: '/formatic/', handler: page.class}));
+  children.push(E(Route, {path: '/formatic/index.html', handler: page.class}));
 });
 
-routes = E.apply(null, [Route, {path: '/formatic', handler: Root}].concat(children));
+routes = E.apply(null, [Route, {path: '/formatic/', handler: Root}].concat(children));
+
+Root.routes = routes;
