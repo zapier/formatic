@@ -1,0 +1,28 @@
+<script src="http://fb.me/react-0.10.0.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+<script src="path/to/bower/components/formatic-min.js"></script>
+<script>
+// Create some fields.
+var fields = [
+  {
+    type: 'string',
+    isSingleLine: true,
+    key: 'firstName',
+    label: 'First Name'
+  },
+  {
+    type: 'str',
+    isSingleLine: true,
+    key: 'lastName',
+    label: 'Last Name'
+  }
+];
+
+// Render the form.
+React.render(React.createElement(Formatic, {
+  fields: fields,
+  onChange: function (newValue) {
+    console.log(newValue);
+  }
+}), document.body);
+</script>
