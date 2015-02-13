@@ -82,7 +82,7 @@ var selfCleaningTimeout = {
 var ReactPlayground = React.createClass({
   mixins: [selfCleaningTimeout],
 
-  MODES: {JSX: 'JSX', JS: 'JS', NONE: null},
+  MODES: {JSX: 'JSX', JS: 'JS', OUTPUT: 'OUTPUT', NONE: null},
 
   propTypes: {
     codeText: React.PropTypes.string.isRequired,
@@ -101,7 +101,8 @@ var ReactPlayground = React.createClass({
   getInitialState: function() {
     return {
       mode: this.MODES.NONE,
-      code: this.props.codeText
+      code: this.props.codeText,
+      output: null
     };
   },
 
@@ -119,13 +120,24 @@ var ReactPlayground = React.createClass({
 
     e.preventDefault();
 
-    switch (this.state.mode) {
-      case this.MODES.NONE:
-        mode = this.MODES.JSX;
-        break;
-      case this.MODES.JSX:
-      default:
-        mode = this.MODES.NONE;
+    if (this.state.mode !== this.MODES.JSX) {
+      mode = this.MODES.JSX;
+    } else {
+      mode = this.MODES.NONE;
+    }
+
+    this.setState({mode: mode});
+  },
+
+  handleOutputModeToggle: function (e) {
+    var mode;
+
+    e.preventDefault();
+
+    if (this.state.mode !== this.MODES.OUTPUT) {
+      mode = this.MODES.OUTPUT;
+    } else {
+      mode = this.MODES.NONE;
     }
 
     this.setState({mode: mode});
@@ -140,31 +152,49 @@ var ReactPlayground = React.createClass({
       'bs-example': true
     };
     var toggleClasses = {
-      'code-toggle': true
+      code: {
+        'code-toggle': true
+      },
+      output: {
+        'code-toggle': true
+      }
     };
-    var editor;
+    var drawer;
 
     if (this.props.exampleClassName){
       classes[this.props.exampleClassName] = true;
     }
 
+    if (this.state.mode === this.MODES.JSX) {
+      drawer = (
+        <CodeMirrorEditor
+          key="jsx"
+          onChange={this.handleCodeChange}
+          className="highlight"
+          codeText={this.state.code}/>
+      );
+      toggleClasses.code.open = true;
+    } else if (this.state.mode === this.MODES.OUTPUT) {
+      drawer = (
+        <pre className="highlight">{JSON.stringify(this.state.output, null, 2)}</pre>
+      );
+      toggleClasses.output.open = true;
+    }
     if (this.state.mode !== this.MODES.NONE) {
-       editor = (
-           <CodeMirrorEditor
-             key="jsx"
-             onChange={this.handleCodeChange}
-             className="highlight"
-             codeText={this.state.code}/>
-        );
-       toggleClasses.open = true;
+      Object.keys(toggleClasses).forEach(function (toggleKey) {
+        if (!toggleClasses[toggleKey].open) {
+          toggleClasses[toggleKey].under = true;
+        }
+      });
     }
     return (
       <div className="playground">
         <div className={classSet(classes)}>
           <div ref="mount" />
         </div>
-        {editor}
-        <a className={classSet(toggleClasses)} onClick={this.handleCodeModeToggle} href="#">{this.state.mode === this.MODES.NONE ? 'show code' : 'hide code'}</a>
+        {drawer}
+        <a className={classSet(toggleClasses.code)} onClick={this.handleCodeModeToggle} href="#">{this.state.mode !== this.MODES.JSX ? 'show code' : 'hide code'}</a>
+        <a className={classSet(toggleClasses.output)} onClick={this.handleOutputModeToggle} href="#">{this.state.mode !== this.MODES.OUTPUT ? 'show value' : 'hide output'}</a>
       </div>
       );
   },
@@ -186,6 +216,12 @@ var ReactPlayground = React.createClass({
     try {
       React.unmountComponentAtNode(mountNode);
     } catch (e) { }
+  },
+
+  onChangeValue: function (newValue) {
+    this.setState({
+      output: newValue
+    });
   },
 
   executeCode: function() {

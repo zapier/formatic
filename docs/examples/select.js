@@ -34,5 +34,5 @@ var fields = [
 
 // Render the form.
 React.render(
-  <Formatic fields={fields} config={config}/>
+  <Formatic config={config} fields={fields} onChange={this.onChangeValue}/>
 , mountNode);

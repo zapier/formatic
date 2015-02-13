@@ -13,6 +13,7 @@ gulp.task('server-live-app', function (done) {
   app
     .use(require('connect-livereload')())
     .use('/', express.static('./live'))
+    .use('/formatic', express.static('./build-docs'))
     .listen(APP_PORT, function() {
       console.log('app server listening on %d', APP_PORT);
       done();
