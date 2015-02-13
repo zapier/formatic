@@ -12,7 +12,9 @@ var fields = [
   {
     type: 'text',
     key: 'description',
-    label: 'Description'
+    label: 'Description',
+    // Number of rows.
+    rows: 5
   }
 ];
 

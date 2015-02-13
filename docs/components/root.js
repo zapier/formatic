@@ -8,6 +8,7 @@ var Router = require('react-router');
 var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
+var NotFoundRoute = Router.NotFoundRoute;
 
 var pages = {
   'home': {
@@ -105,8 +106,6 @@ Object.keys(pages).forEach(function (name) {
   } else {
     children.push(E(Route, {name: name, path: page.path, handler: page.class}));
   }
-  //children.push(E(Route, {path: '/formatic/', handler: page.class}));
-  children.push(E(Route, {path: '/formatic/', handler: page.class}));
 });
 
 routes = E.apply(null, [Route, {path: '/formatic/', handler: Root}].concat(children));

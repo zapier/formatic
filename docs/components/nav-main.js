@@ -14,7 +14,7 @@ var NAV_LINKS = {
   },
   'field-types': {
     link: '/formatic/field-types.html',
-    title: 'Field Types'
+    title: 'Field types'
   }
 };
 

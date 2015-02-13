@@ -17,7 +17,7 @@ module.exports = React.createClass({
     return (
       <div>
         <NavMain activePage='field-types' ref='topNav'/>
-        <Header title='Field Types'/>
+        <Header title='Field types'/>
 
         <div className="container bs-docs-container">
           <div className="row">
@@ -40,6 +40,16 @@ module.exports = React.createClass({
                 <h2 id="buttons-options">Example</h2>
                 <p>This type is for a field that edits multi-line text.</p>
                 <ReactPlayground codeText={fs.readFileSync(path.join(__dirname, '../examples/string.js'), 'utf8')} />
+
+              </div>
+
+              <div className="bs-docs-section">
+
+                <h1 id="select" className="page-header">Select <small>select</small></h1>
+
+                <h2 id="buttons-options">Example</h2>
+                <p>This type is for a dropdown set of choices.</p>
+                <ReactPlayground codeText={fs.readFileSync(path.join(__dirname, '../examples/select.js'), 'utf8')} />
 
               </div>
 
