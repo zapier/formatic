@@ -1,0 +1,48 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/components/fields/fields</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../../"><meta name="groc-document-path" content="lib/components/fields/fields"><meta name="groc-project-path" content="lib/components/fields/fields.js"><link rel="stylesheet" type="text/css" media="all" href="../../../assets/style.css"><script type="text/javascript" src="../../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/components/fields/fields.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="fields-component">fields component</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render a field to edit the values of an object with static properties.</p></div></div><div class="code"><div class="wrapper"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">React</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;react/addons&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">R</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;underscore&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">cx</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">classSet</span><span class="p">;</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+
+  <span class="nx">displayName</span><span class="o">:</span> <span class="s1">&#39;Fields&#39;</span><span class="p">,</span>
+
+  <span class="nx">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../../mixins/field&#39;</span><span class="p">)],</span>
+
+  <span class="nx">onChangeField</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">newObjectValue</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+      <span class="nx">newObjectValue</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">;</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">onBubbleValue</span><span class="p">(</span><span class="nx">newObjectValue</span><span class="p">,</span> <span class="nx">info</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">renderWithConfig</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="nx">renderDefault</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createChildFields</span><span class="p">(</span><span class="nx">field</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;field&#39;</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">config</span><span class="o">:</span> <span class="nx">config</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">field</span><span class="p">,</span> <span class="nx">plain</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">plain</span>
+    <span class="p">},</span>
+      <span class="nx">R</span><span class="p">.</span><span class="nx">fieldset</span><span class="p">({</span><span class="nx">className</span><span class="o">:</span> <span class="nx">cx</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">classes</span><span class="p">)},</span>
+        <span class="nx">fields</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">childField</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+          <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">childField</span><span class="p">.</span><span class="nx">key</span> <span class="o">||</span> <span class="nx">i</span><span class="p">;</span>
+          <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createFieldElement</span><span class="p">({</span>
+            <span class="nx">key</span><span class="o">:</span> <span class="nx">key</span> <span class="o">||</span> <span class="nx">i</span><span class="p">,</span>
+            <span class="nx">field</span><span class="o">:</span> <span class="nx">childField</span><span class="p">,</span>
+            <span class="nx">onChange</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onChangeField</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">key</span><span class="p">),</span> <span class="nx">onAction</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onBubbleAction</span>
+          <span class="p">});</span>
+        <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">))</span>
+      <span class="p">)</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">});</span></div></div></div></div></body></html>

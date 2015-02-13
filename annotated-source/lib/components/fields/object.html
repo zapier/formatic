@@ -1,0 +1,238 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/components/fields/object</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../../"><meta name="groc-document-path" content="lib/components/fields/object"><meta name="groc-project-path" content="lib/components/fields/object.js"><link rel="stylesheet" type="text/css" media="all" href="../../../assets/style.css"><script type="text/javascript" src="../../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/components/fields/object.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="object-component">object component</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render a field to edit an object with dynamic child fields.</p></div></div><div class="code"><div class="wrapper"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">React</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;react/addons&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">R</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;underscore&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">cx</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">classSet</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">CSSTransitionGroup</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createFactory</span><span class="p">(</span><span class="nx">React</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">CSSTransitionGroup</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">tempKeyPrefix</span> <span class="o">=</span> <span class="s1">&#39;$$__temp__&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">tempKey</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">tempKeyPrefix</span> <span class="o">+</span> <span class="nx">id</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">isTempKey</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">key</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">tempKeyPrefix</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="o">===</span> <span class="nx">tempKeyPrefix</span><span class="p">;</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO: keep invalid keys as state and don't send in onChange; clone context
+and use clone to create child contexts</p></div></div><div class="code"><div class="wrapper"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+
+  <span class="nx">displayName</span><span class="o">:</span> <span class="s1">&#39;Object&#39;</span><span class="p">,</span>
+
+  <span class="nx">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../../mixins/field&#39;</span><span class="p">)],</span>
+
+  <span class="nx">nextLookupId</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">keyToId</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="kd">var</span> <span class="nx">keys</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">keyOrder</span> <span class="o">=</span> <span class="p">[];</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Temp keys keeps the key to display, which sometimes may be different
+than the actual key. For example, duplicate keys are not allowed,
+but we may temporarily show duplicate keys.</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">tempDisplayKeys</span> <span class="o">=</span> <span class="p">{};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Keys don't make good react keys, since we're allowing them to be
+changed here, so we'll have to create fake keys and
+keep track of the mapping of real keys to fake keys. Yuck.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">keys</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="o">++</span><span class="k">this</span><span class="p">.</span><span class="nx">nextLookupId</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Map the real key to the id.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">keyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Keep the ordering of the keys so we don't shuffle things around later.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">keyOrder</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If this is a temporary key that was persisted, best we can do is display
+a blank.
+TODO: Probably just not send temporary keys back through. This behavior
+is actually leftover from an earlier incarnation of formatic where
+values had to go back to the root.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">isTempKey</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">tempDisplayKeys</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">keyToId</span><span class="o">:</span> <span class="nx">keyToId</span><span class="p">,</span>
+      <span class="nx">keyOrder</span><span class="o">:</span> <span class="nx">keyOrder</span><span class="p">,</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Temp keys keeps the key to display, which sometimes may be different
+than the actual key. For example, duplicate keys are not allowed,
+but we may temporarily show duplicate keys.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">tempDisplayKeys</span><span class="o">:</span> <span class="nx">tempDisplayKeys</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="nx">componentWillReceiveProps</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">newProps</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">keyToId</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyToId</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">newKeyToId</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="kd">var</span> <span class="nx">tempDisplayKeys</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">tempDisplayKeys</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">newTempDisplayKeys</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="kd">var</span> <span class="nx">keyOrder</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyOrder</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">keys</span> <span class="o">=</span> <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">newProps</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">addedKeys</span> <span class="o">=</span> <span class="p">[];</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look at the new keys.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">keys</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add new lookup if this key wasn't here last time.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">keyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">nextLookupId</span><span class="o">++</span><span class="p">;</span>
+        <span class="nx">newKeyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">nextLookupId</span><span class="p">;</span>
+        <span class="nx">addedKeys</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">newKeyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">keyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+      <span class="p">}</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">isTempKey</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">newKeyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="k">in</span> <span class="nx">tempDisplayKeys</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">newTempDisplayKeys</span><span class="p">[</span><span class="nx">newKeyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">]]</span> <span class="o">=</span> <span class="nx">tempDisplayKeys</span><span class="p">[</span><span class="nx">newKeyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">]];</span>
+      <span class="p">}</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+
+    <span class="kd">var</span> <span class="nx">newKeyOrder</span> <span class="o">=</span> <span class="p">[];</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look at the old keys.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">keyOrder</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If the key is in the new keys, push it onto the order to retain the
+same order.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">newKeyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span> <span class="p">{</span>
+        <span class="nx">newKeyOrder</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">});</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Put added fields at the end. (So things don't get shuffled.)</p></div></div><div class="code"><div class="wrapper">    <span class="nx">newKeyOrder</span> <span class="o">=</span> <span class="nx">newKeyOrder</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">addedKeys</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="nx">keyToId</span><span class="o">:</span> <span class="nx">newKeyToId</span><span class="p">,</span>
+      <span class="nx">keyOrder</span><span class="o">:</span> <span class="nx">newKeyOrder</span><span class="p">,</span>
+      <span class="nx">tempDisplayKeys</span><span class="o">:</span> <span class="nx">newTempDisplayKeys</span>
+    <span class="p">});</span>
+  <span class="p">},</span>
+
+  <span class="nx">onChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">newObj</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+    <span class="nx">newObj</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">onBubbleValue</span><span class="p">(</span><span class="nx">newObj</span><span class="p">,</span> <span class="nx">info</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">onAppend</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">itemChoiceIndex</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">nextLookupId</span><span class="o">++</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">keyToId</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyToId</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">keyOrder</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyOrder</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">tempDisplayKeys</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">tempDisplayKeys</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">nextLookupId</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">newKey</span> <span class="o">=</span> <span class="nx">tempKey</span><span class="p">(</span><span class="nx">id</span><span class="p">);</span>
+
+    <span class="nx">keyToId</span><span class="p">[</span><span class="nx">newKey</span><span class="p">]</span> <span class="o">=</span> <span class="nx">id</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Temporarily, we'll show a blank key.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">tempDisplayKeys</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="nx">keyOrder</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">newKey</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="nx">keyToId</span><span class="o">:</span> <span class="nx">keyToId</span><span class="p">,</span>
+      <span class="nx">tempDisplayKeys</span><span class="o">:</span> <span class="nx">tempDisplayKeys</span><span class="p">,</span>
+      <span class="nx">keyOrder</span><span class="o">:</span> <span class="nx">keyOrder</span>
+    <span class="p">});</span>
+
+    <span class="kd">var</span> <span class="nx">newObj</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+
+    <span class="kd">var</span> <span class="nx">newValue</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createNewChildFieldValue</span><span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">itemChoiceIndex</span><span class="p">);</span>
+
+    <span class="nx">newObj</span><span class="p">[</span><span class="nx">newKey</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">;</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">newObj</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">onRemove</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">newObj</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+    <span class="k">delete</span> <span class="nx">newObj</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">newObj</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">onMove</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fromKey</span><span class="p">,</span> <span class="nx">toKey</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">fromKey</span> <span class="o">!==</span> <span class="nx">toKey</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">keyToId</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyToId</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">keyOrder</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyOrder</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">tempDisplayKeys</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">tempDisplayKeys</span><span class="p">;</span>
+
+      <span class="kd">var</span> <span class="nx">newObj</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If we already have the key we're moving to, then we have to change that
+key to something else.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">keyToId</span><span class="p">[</span><span class="nx">toKey</span><span class="p">])</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Make a new</p></div></div><div class="code"><div class="wrapper">        <span class="kd">var</span> <span class="nx">tempToKey</span> <span class="o">=</span> <span class="nx">tempKey</span><span class="p">(</span><span class="nx">keyToId</span><span class="p">[</span><span class="nx">toKey</span><span class="p">]);</span>
+        <span class="nx">tempDisplayKeys</span><span class="p">[</span><span class="nx">keyToId</span><span class="p">[</span><span class="nx">toKey</span><span class="p">]]</span> <span class="o">=</span> <span class="nx">toKey</span><span class="p">;</span>
+        <span class="nx">keyToId</span><span class="p">[</span><span class="nx">tempToKey</span><span class="p">]</span> <span class="o">=</span> <span class="nx">keyToId</span><span class="p">[</span><span class="nx">toKey</span><span class="p">];</span>
+        <span class="nx">keyOrder</span><span class="p">[</span><span class="nx">keyOrder</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">toKey</span><span class="p">)]</span> <span class="o">=</span> <span class="nx">tempToKey</span><span class="p">;</span>
+        <span class="k">delete</span> <span class="nx">keyToId</span><span class="p">[</span><span class="nx">toKey</span><span class="p">];</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+          <span class="nx">keyToId</span><span class="o">:</span> <span class="nx">keyToId</span><span class="p">,</span>
+          <span class="nx">tempDisplayKeys</span><span class="o">:</span> <span class="nx">tempDisplayKeys</span><span class="p">,</span>
+          <span class="nx">keyOrder</span><span class="o">:</span> <span class="nx">keyOrder</span>
+        <span class="p">});</span>
+
+        <span class="nx">newObj</span><span class="p">[</span><span class="nx">tempToKey</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newObj</span><span class="p">[</span><span class="nx">toKey</span><span class="p">];</span>
+        <span class="k">delete</span> <span class="nx">newObj</span><span class="p">[</span><span class="nx">toKey</span><span class="p">];</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">toKey</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">toKey</span> <span class="o">=</span> <span class="nx">tempKey</span><span class="p">(</span><span class="nx">keyToId</span><span class="p">[</span><span class="nx">fromKey</span><span class="p">]);</span>
+        <span class="nx">tempDisplayKeys</span><span class="p">[</span><span class="nx">keyToId</span><span class="p">[</span><span class="nx">fromKey</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="nx">keyToId</span><span class="p">[</span><span class="nx">toKey</span><span class="p">]</span> <span class="o">=</span> <span class="nx">keyToId</span><span class="p">[</span><span class="nx">fromKey</span><span class="p">];</span>
+      <span class="k">delete</span> <span class="nx">keyToId</span><span class="p">[</span><span class="nx">fromKey</span><span class="p">];</span>
+      <span class="nx">keyOrder</span><span class="p">[</span><span class="nx">keyOrder</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">fromKey</span><span class="p">)]</span> <span class="o">=</span> <span class="nx">toKey</span><span class="p">;</span>
+
+      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="nx">keyToId</span><span class="o">:</span> <span class="nx">keyToId</span><span class="p">,</span>
+        <span class="nx">keyOrder</span><span class="o">:</span> <span class="nx">keyOrder</span><span class="p">,</span>
+        <span class="nx">tempDisplayKeys</span><span class="o">:</span> <span class="nx">tempDisplayKeys</span>
+      <span class="p">});</span>
+
+      <span class="nx">newObj</span><span class="p">[</span><span class="nx">toKey</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newObj</span><span class="p">[</span><span class="nx">fromKey</span><span class="p">];</span>
+      <span class="k">delete</span> <span class="nx">newObj</span><span class="p">[</span><span class="nx">fromKey</span><span class="p">];</span>
+
+      <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">newObj</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Check if our fromKey has opened up a spot.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">fromKey</span> <span class="o">&amp;&amp;</span> <span class="nx">fromKey</span> <span class="o">!==</span> <span class="nx">toKey</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">fromKey</span> <span class="k">in</span> <span class="nx">newObj</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span><span class="p">(</span><span class="nx">newObj</span><span class="p">).</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">isTempKey</span><span class="p">(</span><span class="nx">key</span><span class="p">)))</span> <span class="p">{</span>
+              <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">keyToId</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+            <span class="kd">var</span> <span class="nx">displayKey</span> <span class="o">=</span> <span class="nx">tempDisplayKeys</span><span class="p">[</span><span class="nx">id</span><span class="p">];</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">fromKey</span> <span class="o">===</span> <span class="nx">displayKey</span><span class="p">)</span> <span class="p">{</span>
+              <span class="k">this</span><span class="p">.</span><span class="nx">onMove</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="nx">displayKey</span><span class="p">);</span>
+            <span class="p">}</span>
+          <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">getFields</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createChildFields</span><span class="p">(</span><span class="nx">field</span><span class="p">);</span>
+
+    <span class="kd">var</span> <span class="nx">keyToField</span> <span class="o">=</span> <span class="p">{};</span>
+
+    <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">fields</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">childField</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">keyToField</span><span class="p">[</span><span class="nx">childField</span><span class="p">.</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">childField</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyOrder</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">keyToField</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+    <span class="p">});</span>
+  <span class="p">},</span>
+
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">renderWithConfig</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="nx">renderDefault</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">fields</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getFields</span><span class="p">();</span>
+
+    <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;field&#39;</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">field</span><span class="o">:</span> <span class="nx">field</span><span class="p">,</span> <span class="nx">plain</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">plain</span>
+    <span class="p">},</span>
+      <span class="nx">R</span><span class="p">.</span><span class="nx">div</span><span class="p">({</span><span class="nx">className</span><span class="o">:</span> <span class="nx">cx</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">classes</span><span class="p">)},</span>
+        <span class="nx">CSSTransitionGroup</span><span class="p">({</span><span class="nx">transitionName</span><span class="o">:</span> <span class="s1">&#39;reveal&#39;</span><span class="p">},</span>
+          <span class="nx">fields</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">childField</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">displayKey</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">tempDisplayKeys</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyToId</span><span class="p">[</span><span class="nx">childField</span><span class="p">.</span><span class="nx">key</span><span class="p">]];</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nx">displayKey</span><span class="p">))</span> <span class="p">{</span>
+              <span class="nx">displayKey</span> <span class="o">=</span> <span class="nx">childField</span><span class="p">.</span><span class="nx">key</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;object-item&#39;</span><span class="p">,</span> <span class="p">{</span>
+              <span class="nx">key</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">keyToId</span><span class="p">[</span><span class="nx">childField</span><span class="p">.</span><span class="nx">key</span><span class="p">],</span>
+              <span class="nx">field</span><span class="o">:</span> <span class="nx">childField</span><span class="p">,</span>
+              <span class="nx">onMove</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onMove</span><span class="p">,</span>
+              <span class="nx">onRemove</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onRemove</span><span class="p">,</span>
+              <span class="nx">onChange</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onChange</span><span class="p">,</span>
+              <span class="nx">onAction</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onBubbleAction</span><span class="p">,</span>
+              <span class="nx">displayKey</span><span class="o">:</span> <span class="nx">displayKey</span><span class="p">,</span>
+              <span class="nx">itemKey</span><span class="o">:</span> <span class="nx">childField</span><span class="p">.</span><span class="nx">key</span>
+            <span class="p">});</span>
+          <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">))</span>
+        <span class="p">),</span>
+        <span class="nx">config</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;object-control&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">field</span><span class="o">:</span> <span class="nx">field</span><span class="p">,</span> <span class="nx">onAppend</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onAppend</span><span class="p">})</span>
+      <span class="p">)</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span></div></div></div></div></body></html>

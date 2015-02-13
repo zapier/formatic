@@ -1,0 +1,101 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/plugins/reference</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="lib/plugins/reference"><meta name="groc-project-path" content="lib/plugins/reference.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/plugins/reference.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="reference-plugin">reference plugin</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This plugin allows fields to be strings and reference other fields by key or
+id. It also allows a field to extend another field with
+extends: ['foo', 'bar'] where 'foo' and 'bar' refer to other keys or ids.</p></div></div><div class="code"><div class="wrapper"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;underscore&#39;</span><span class="p">);</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">cfg</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="kd">var</span> <span class="nx">initField</span> <span class="o">=</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">initField</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look for a template in this field or any of its parents.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">cfg</span><span class="p">.</span><span class="nx">findFieldTemplate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">field</span><span class="p">.</span><span class="nx">templates</span><span class="p">[</span><span class="nx">name</span><span class="p">])</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">field</span><span class="p">.</span><span class="nx">templates</span><span class="p">[</span><span class="nx">name</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">field</span><span class="p">.</span><span class="nx">parent</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">findFieldTemplate</span><span class="p">(</span><span class="nx">field</span><span class="p">.</span><span class="nx">parent</span><span class="p">,</span> <span class="nx">name</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Inherit from any field templates that this field template
+extends.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">cfg</span><span class="p">.</span><span class="nx">resolveFieldTemplate</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">fieldTemplate</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">fieldTemplate</span><span class="p">.</span><span class="kr">extends</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">fieldTemplate</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">ext</span> <span class="o">=</span> <span class="nx">fieldTemplate</span><span class="p">.</span><span class="kr">extends</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">ext</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">ext</span> <span class="o">=</span> <span class="p">[</span><span class="nx">ext</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">bases</span> <span class="o">=</span> <span class="nx">ext</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">base</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">template</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">findFieldTemplate</span><span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">base</span><span class="p">);</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">template</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Template &#39;</span> <span class="o">+</span> <span class="nx">base</span> <span class="o">+</span> <span class="s1">&#39; not found.&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="k">return</span> <span class="nx">template</span><span class="p">;</span>
+    <span class="p">});</span>
+
+    <span class="kd">var</span> <span class="nx">chain</span> <span class="o">=</span> <span class="p">[{}].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">bases</span><span class="p">.</span><span class="nx">reverse</span><span class="p">().</span><span class="nx">concat</span><span class="p">([</span><span class="nx">fieldTemplate</span><span class="p">]));</span>
+    <span class="nx">fieldTemplate</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">_</span><span class="p">,</span> <span class="nx">chain</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">fieldTemplate</span><span class="p">;</span>
+  <span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the initField method.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">cfg</span><span class="p">.</span><span class="nx">initField</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">field</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">templates</span> <span class="o">=</span> <span class="nx">field</span><span class="p">.</span><span class="nx">templates</span> <span class="o">=</span> <span class="p">{};</span>
+
+    <span class="kd">var</span> <span class="nx">childFieldTemplates</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">fieldChildFieldTemplates</span><span class="p">(</span><span class="nx">field</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add each of the child field templates to our template map.</p></div></div><div class="code"><div class="wrapper">    <span class="nx">childFieldTemplates</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">)</span> <span class="p">{</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="kd">var</span> <span class="nx">key</span> <span class="o">=</span> <span class="nx">fieldTemplate</span><span class="p">.</span><span class="nx">key</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="nx">fieldTemplate</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">.</span><span class="nx">template</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">fieldTemplate</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">fieldTemplate</span><span class="p">,</span> <span class="p">{</span><span class="nx">template</span><span class="o">:</span> <span class="kc">false</span><span class="p">});</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">key</span> <span class="o">!==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">templates</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">fieldTemplate</span><span class="p">;</span>
+      <span class="p">}</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">id</span> <span class="o">!==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">templates</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">fieldTemplate</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">});</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Resolve any references to other field templates.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">childFieldTemplates</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">field</span><span class="p">.</span><span class="nx">fields</span> <span class="o">=</span> <span class="nx">childFieldTemplates</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nx">fieldTemplate</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">findFieldTemplate</span><span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">fieldTemplate</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">resolveFieldTemplate</span><span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">fieldTemplate</span><span class="p">);</span>
+      <span class="p">});</span>
+
+      <span class="nx">field</span><span class="p">.</span><span class="nx">fields</span> <span class="o">=</span> <span class="nx">field</span><span class="p">.</span><span class="nx">fields</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">fieldTemplate</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="o">!</span><span class="nx">fieldTemplate</span><span class="p">.</span><span class="nx">template</span><span class="p">;</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">itemFieldTemplates</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">fieldItemFieldTemplates</span><span class="p">(</span><span class="nx">field</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Resolve any of our item field templates. (Field templates for dynamic
+child fields.)</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">itemFieldTemplates</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">field</span><span class="p">.</span><span class="nx">itemFields</span> <span class="o">=</span> <span class="nx">itemFieldTemplates</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">itemFieldTemplate</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isString</span><span class="p">(</span><span class="nx">itemFieldTemplate</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nx">itemFieldTemplate</span> <span class="o">=</span> <span class="nx">config</span><span class="p">.</span><span class="nx">findFieldTemplate</span><span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">itemFieldTemplate</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">resolveFieldTemplate</span><span class="p">(</span><span class="nx">field</span><span class="p">,</span> <span class="nx">itemFieldTemplate</span><span class="p">);</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="nx">initField</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">config</span><span class="p">,</span> <span class="nx">arguments</span><span class="p">);</span>
+  <span class="p">};</span>
+
+<span class="p">};</span></div></div></div></div></body></html>
