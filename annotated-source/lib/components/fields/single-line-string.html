@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/components/fields/single-line-string</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../../"><meta name="groc-document-path" content="lib/components/fields/single-line-string"><meta name="groc-project-path" content="lib/components/fields/single-line-string.js"><link rel="stylesheet" type="text/css" media="all" href="../../../assets/style.css"><script type="text/javascript" src="../../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/components/fields/single-line-string.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="single-line-string-component">single-line-string component</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render a single line text input.</p></div></div><div class="code"><div class="wrapper"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">React</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;react/addons&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">R</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">cx</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">classSet</span><span class="p">;</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+
+  <span class="nx">displayName</span><span class="o">:</span> <span class="s1">&#39;SingleLineString&#39;</span><span class="p">,</span>
+
+  <span class="nx">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../../mixins/field&#39;</span><span class="p">)],</span>
+
+  <span class="nx">onChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">renderWithConfig</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="nx">renderDefault</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;field&#39;</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">config</span><span class="o">:</span> <span class="nx">config</span><span class="p">,</span> <span class="nx">field</span><span class="o">:</span> <span class="nx">field</span><span class="p">,</span> <span class="nx">plain</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">plain</span>
+    <span class="p">},</span> <span class="nx">R</span><span class="p">.</span><span class="nx">input</span><span class="p">({</span>
+      <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+      <span class="nx">value</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span>
+      <span class="nx">className</span><span class="o">:</span> <span class="nx">cx</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">classes</span><span class="p">),</span>
+      <span class="nx">onChange</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onChange</span><span class="p">,</span>
+      <span class="nx">onFocus</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onFocusAction</span><span class="p">,</span>
+      <span class="nx">onBlur</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onBlurAction</span>
+    <span class="p">}));</span>
+  <span class="p">}</span>
+<span class="p">});</span></div></div></div></div></body></html>

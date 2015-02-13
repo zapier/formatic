@@ -1,0 +1,665 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/components/fields/pretty-text</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../../"><meta name="groc-document-path" content="lib/components/fields/pretty-text"><meta name="groc-project-path" content="lib/components/fields/pretty-text.js"><link rel="stylesheet" type="text/css" media="all" href="../../../assets/style.css"><script type="text/javascript" src="../../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/components/fields/pretty-text.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="pretty-textarea-component">pretty-textarea component</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Textarea that will display highlights behind "tags". Tags currently mean text
+that is enclosed in braces like <code>{{foo}}</code>. Tags are replaced with labels if
+available or humanized.</p>
+
+<p>This component is quite complicated because:
+- We are displaying text in the textarea but have to keep track of the real
+  text value in the background. We can't use a data attribute, because it's a
+  textarea, so we can't use any elements at all!
+- Because of the hidden data, we also have to do some interception of
+  copy, which is a little weird. We intercept copy and copy the real text
+  to the end of the textarea. Then we erase that text, which leaves the copied
+  data in the buffer.
+- React loses the caret position when you update the value to something
+  different than before. So we have to retain tracking information for when
+  that happens.
+- Because we monkey with copy, we also have to do our own undo/redo. Otherwise
+  the default undo will have weird states in it.</p>
+
+<p>So good luck!</p></div></div><div class="code"><div class="wrapper"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">React</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;react/addons&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">R</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">DOM</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;underscore&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">cx</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">addons</span><span class="p">.</span><span class="nx">classSet</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">utils</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../../utils&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">noBreak</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">value</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/ /g</span><span class="p">,</span> <span class="s1">&#39;\u00a0&#39;</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">LEFT_PAD</span> <span class="o">=</span> <span class="s1">&#39;\u00a0\u00a0&#39;</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Why this works, I'm not sure.</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">RIGHT_PAD</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span><span class="p">;</span> <span class="c1">//&#39;\u00a0\u00a0&#39;;</span>
+
+<span class="kd">var</span> <span class="nx">idPrefixRegEx</span> <span class="o">=</span> <span class="sr">/^[0-9]+__/</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Zapier specific stuff. Make a plugin for this later.</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">removeIdPrefix</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">idPrefixRegEx</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">key</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">key</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">idPrefixRegEx</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">key</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kd">var</span> <span class="nx">positionInNode</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">position</span><span class="p">,</span> <span class="nx">node</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">rect</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">getBoundingClientRect</span><span class="p">();</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">position</span><span class="p">.</span><span class="nx">x</span> <span class="o">&gt;=</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">left</span> <span class="o">&amp;&amp;</span> <span class="nx">position</span><span class="p">.</span><span class="nx">x</span> <span class="o">&lt;=</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">position</span><span class="p">.</span><span class="nx">y</span> <span class="o">&gt;=</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">top</span> <span class="o">&amp;&amp;</span> <span class="nx">position</span><span class="p">.</span><span class="nx">y</span> <span class="o">&lt;=</span> <span class="nx">rect</span><span class="p">.</span><span class="nx">bottom</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap a text value so it has a type. For parsing text with tags.</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">textPart</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="nx">type</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">type</span> <span class="o">=</span> <span class="nx">type</span> <span class="o">||</span> <span class="s1">&#39;text&#39;</span><span class="p">;</span>
+  <span class="k">return</span> <span class="p">{</span>
+    <span class="nx">type</span><span class="o">:</span> <span class="nx">type</span><span class="p">,</span>
+    <span class="nx">value</span><span class="o">:</span> <span class="nx">value</span>
+  <span class="p">};</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Parse text that has tags like {{tag}} into text and tags.</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">parseTextWithTags</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">value</span> <span class="o">=</span> <span class="nx">value</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">parts</span> <span class="o">=</span> <span class="nx">value</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/{{(?!{)/</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">frontPart</span> <span class="o">=</span> <span class="p">[];</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">frontPart</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="nx">textPart</span><span class="p">(</span><span class="nx">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">];</span>
+  <span class="p">}</span>
+  <span class="nx">parts</span> <span class="o">=</span> <span class="nx">frontPart</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span>
+    <span class="nx">parts</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">part</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;}}&#39;</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">[</span>
+        <span class="nx">textPart</span><span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">part</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;}}&#39;</span><span class="p">)),</span> <span class="s1">&#39;tag&#39;</span><span class="p">),</span>
+        <span class="nx">textPart</span><span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="s1">&#39;}}&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="p">];</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">textPart</span><span class="p">(</span><span class="s1">&#39;{{&#39;</span> <span class="o">+</span> <span class="nx">part</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">})</span>
+  <span class="p">);</span>
+  <span class="k">return</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">.</span><span class="nx">apply</span><span class="p">([],</span> <span class="nx">parts</span><span class="p">);</span>
+<span class="p">};</span>
+
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+
+  <span class="nx">displayName</span><span class="o">:</span> <span class="s1">&#39;TaggedText&#39;</span><span class="p">,</span>
+
+  <span class="nx">mixins</span><span class="o">:</span> <span class="p">[</span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../../mixins/field&#39;</span><span class="p">),</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../../mixins/undo-stack&#39;</span><span class="p">),</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;../../mixins/resize&#39;</span><span class="p">)],</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>getDefaultProps: function () {
+  return {
+    className: plugin.config.className
+  };</p></div></div><div class="code"><div class="wrapper">  <span class="c1">// ,</span>
+
+  <span class="nx">getReplaceState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">replaceChoices</span> <span class="o">=</span> <span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">fieldReplaceChoices</span><span class="p">(</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">replaceChoicesLabels</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="nx">replaceChoices</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">choice</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">replaceChoicesLabels</span><span class="p">[</span><span class="nx">choice</span><span class="p">.</span><span class="nx">value</span><span class="p">]</span> <span class="o">=</span> <span class="nx">choice</span><span class="p">.</span><span class="nx">label</span><span class="p">;</span>
+    <span class="p">});</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">replaceChoices</span><span class="o">:</span> <span class="nx">replaceChoices</span><span class="p">,</span>
+      <span class="nx">replaceChoicesLabels</span><span class="o">:</span> <span class="nx">replaceChoicesLabels</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">replaceState</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">getReplaceState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">undoDepth</span><span class="o">:</span> <span class="mi">100</span><span class="p">,</span>
+      <span class="nx">isChoicesOpen</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
+      <span class="nx">hoverPillRef</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+      <span class="nx">replaceChoices</span><span class="o">:</span> <span class="nx">replaceState</span><span class="p">.</span><span class="nx">replaceChoices</span><span class="p">,</span>
+      <span class="nx">replaceChoicesLabels</span><span class="o">:</span> <span class="nx">replaceState</span><span class="p">.</span><span class="nx">replaceChoicesLabels</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="nx">componentWillReceiveProps</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">newProps</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">getReplaceState</span><span class="p">(</span><span class="nx">newProps</span><span class="p">));</span>
+  <span class="p">},</span>
+
+  <span class="nx">componentWillMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Not quite state, this is for tracking selection info.</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span> <span class="o">=</span> <span class="p">{};</span>
+
+    <span class="kd">var</span> <span class="nx">parts</span> <span class="o">=</span> <span class="nx">parseTextWithTags</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokens</span><span class="p">(</span><span class="nx">parts</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">indexMap</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">=</span> <span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span> <span class="o">=</span> <span class="nx">indexMap</span><span class="p">;</span>
+  <span class="p">},</span>
+
+  <span class="nx">getStateSnapshot</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">value</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">,</span>
+      <span class="nx">pos</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span><span class="p">,</span>
+      <span class="nx">range</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span>
+    <span class="p">};</span>
+  <span class="p">},</span>
+
+  <span class="nx">setStateSnapshot</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">snapshot</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">=</span> <span class="nx">snapshot</span><span class="p">.</span><span class="nx">pos</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="nx">snapshot</span><span class="p">.</span><span class="nx">range</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">snapshot</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Turn into individual characters and tags</p></div></div><div class="code"><div class="wrapper">  <span class="nx">tokens</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">parts</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">[].</span><span class="nx">concat</span><span class="p">.</span><span class="nx">apply</span><span class="p">([],</span> <span class="nx">parts</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">part</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;tag&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">part</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">part</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}));</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Map each textarea index back to a token</p></div></div><div class="code"><div class="wrapper">  <span class="nx">indexMap</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tokens</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">indexMap</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">tokens</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">token</span><span class="p">,</span> <span class="nx">tokenIndex</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">token</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;tag&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">label</span> <span class="o">=</span> <span class="nx">LEFT_PAD</span> <span class="o">+</span> <span class="nx">noBreak</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">prettyLabel</span><span class="p">(</span><span class="nx">token</span><span class="p">.</span><span class="nx">value</span><span class="p">))</span> <span class="o">+</span> <span class="nx">RIGHT_PAD</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">labelChars</span> <span class="o">=</span> <span class="nx">label</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+        <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">labelChars</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+          <span class="nx">indexMap</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tokenIndex</span><span class="p">);</span>
+        <span class="p">});</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">indexMap</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">tokenIndex</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+    <span class="k">return</span> <span class="nx">indexMap</span><span class="p">;</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Make highlight scroll match textarea scroll</p></div></div><div class="code"><div class="wrapper">  <span class="nx">onScroll</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">highlight</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">scrollTop</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">scrollTop</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">highlight</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">scrollLeft</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">scrollLeft</span><span class="p">;</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given some postion, return the token index (position could be in the middle of a token)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">tokenIndex</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="nx">indexMap</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">pos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&gt;=</span> <span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span><span class="p">];</span>
+  <span class="p">},</span>
+
+  <span class="nx">onChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">//console.log(&#39;change:&#39;, event.target.value);</span>
+
+    <span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Tracking is holding previous position and range</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">prevPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">prevRange</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>New position</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">pos</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">selectionStart</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Going to mutate the tokens.</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Using the previous position and range, get the previous token position
+and range</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">prevTokenIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">prevPos</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">prevTokenEndIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">prevPos</span> <span class="o">+</span> <span class="nx">prevRange</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">prevTokenRange</span> <span class="o">=</span> <span class="nx">prevTokenEndIndex</span> <span class="o">-</span> <span class="nx">prevTokenIndex</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wipe out any tokens in the selected range because the change would have
+erased that selection.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">prevTokenRange</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">tokens</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">prevTokenIndex</span><span class="p">,</span> <span class="nx">prevTokenRange</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+    <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If cursor has moved forward, then text was added.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&gt;</span> <span class="nx">prevPos</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">addedText</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">prevPos</span><span class="p">,</span> <span class="nx">pos</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Insert the text into the tokens.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">tokens</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">prevTokenIndex</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">addedText</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If cursor has moved backward, then we deleted (backspaced) text</p></div></div><div class="code"><div class="wrapper">    <span class="p">}</span> <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&lt;</span> <span class="nx">prevPos</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">token</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenAt</span><span class="p">(</span><span class="nx">pos</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">tokenBefore</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenBefore</span><span class="p">(</span><span class="nx">pos</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If we moved back onto a token, then we should move back to beginning
+of token.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">token</span> <span class="o">===</span> <span class="nx">tokenBefore</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">pos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveOffTag</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">(</span><span class="nx">tokens</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+      <span class="p">}</span>
+      <span class="kd">var</span> <span class="nx">tokenIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Now we can remove the tokens that were deleted.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">tokens</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">tokenIndex</span><span class="p">,</span> <span class="nx">prevTokenIndex</span> <span class="o">-</span> <span class="nx">tokenIndex</span><span class="p">);</span>
+    <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert tokens back into raw value with tags. Newly formed tags will
+become part of the raw value.</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">rawValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rawValue</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">=</span> <span class="nx">pos</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Set the value to the new raw value.</p></div></div><div class="code"><div class="wrapper">    <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">rawValue</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">snapshot</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="nx">componentDidUpdate</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span> <span class="o">||</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">parts</span> <span class="o">=</span> <span class="nx">parseTextWithTags</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokens</span><span class="p">(</span><span class="nx">parts</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">);</span>
+
+    <span class="kd">var</span> <span class="nx">pos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">normalizePosition</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">range</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">endPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">normalizePosition</span><span class="p">(</span><span class="nx">pos</span> <span class="o">+</span> <span class="nx">range</span><span class="p">);</span>
+    <span class="nx">range</span> <span class="o">=</span> <span class="nx">endPos</span> <span class="o">-</span> <span class="nx">pos</span><span class="p">;</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">=</span> <span class="nx">pos</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="nx">range</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">activeElement</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">())</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>React can lose the selection, so put it back.</p></div></div><div class="code"><div class="wrapper">      <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">setSelectionRange</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="nx">pos</span> <span class="o">+</span> <span class="nx">range</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the label for a key.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">prettyLabel</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">replaceChoicesLabels</span><span class="p">[</span><span class="nx">key</span><span class="p">])</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">replaceChoicesLabels</span><span class="p">[</span><span class="nx">key</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">cleaned</span> <span class="o">=</span> <span class="nx">removeIdPrefix</span><span class="p">(</span><span class="nx">key</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">humanize</span><span class="p">(</span><span class="nx">cleaned</span><span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the actual value of the field (with tags), get the plain text that
+should show in the textarea.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">plainValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">parts</span> <span class="o">=</span> <span class="nx">parseTextWithTags</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">parts</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">part</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">part</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">LEFT_PAD</span> <span class="o">+</span> <span class="nx">noBreak</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">prettyLabel</span><span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">value</span><span class="p">))</span> <span class="o">+</span> <span class="nx">RIGHT_PAD</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">)).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the actual value of the field (with tags), get the html used to
+highlight the labels.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">prettyValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">parts</span> <span class="o">=</span> <span class="nx">parseTextWithTags</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">parts</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">part</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">i</span> <span class="o">===</span> <span class="p">(</span><span class="nx">parts</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">value</span><span class="p">[</span><span class="nx">part</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;\n&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">part</span><span class="p">.</span><span class="nx">value</span> <span class="o">+</span> <span class="s1">&#39;\u00a0&#39;</span><span class="p">;</span>
+          <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">part</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Make a pill</p></div></div><div class="code"><div class="wrapper">        <span class="kd">var</span> <span class="nx">pillRef</span> <span class="o">=</span> <span class="s1">&#39;prettyPart&#39;</span> <span class="o">+</span> <span class="nx">i</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;pretty-part&#39;</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hoverPillRef</span> <span class="o">&amp;&amp;</span> <span class="nx">pillRef</span> <span class="o">===</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hoverPillRef</span><span class="p">)</span> <span class="p">{</span>
+          <span class="nx">className</span> <span class="o">+=</span> <span class="s1">&#39; pretty-part-hover&#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">R</span><span class="p">.</span><span class="nx">span</span><span class="p">({</span><span class="nx">key</span><span class="o">:</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">className</span><span class="o">:</span> <span class="nx">className</span><span class="p">,</span> <span class="nx">ref</span><span class="o">:</span> <span class="nx">pillRef</span><span class="p">,</span> <span class="s1">&#39;data-pretty&#39;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="s1">&#39;data-ref&#39;</span><span class="o">:</span> <span class="nx">pillRef</span><span class="p">},</span>
+          <span class="nx">R</span><span class="p">.</span><span class="nx">span</span><span class="p">({</span><span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;pretty-part-left&#39;</span><span class="p">},</span> <span class="nx">LEFT_PAD</span><span class="p">),</span>
+          <span class="nx">R</span><span class="p">.</span><span class="nx">span</span><span class="p">({</span><span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;pretty-part-text&#39;</span><span class="p">},</span> <span class="nx">noBreak</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">prettyLabel</span><span class="p">(</span><span class="nx">part</span><span class="p">.</span><span class="nx">value</span><span class="p">))),</span>
+          <span class="nx">R</span><span class="p">.</span><span class="nx">span</span><span class="p">({</span><span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;pretty-part-right&#39;</span><span class="p">},</span> <span class="nx">RIGHT_PAD</span><span class="p">)</span>
+        <span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the tokens for a field, get the actual value of the field (with
+tags)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">rawValue</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tokens</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">tokens</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">token</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;tag&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">&#39;{{&#39;</span> <span class="o">+</span> <span class="nx">token</span><span class="p">.</span><span class="nx">value</span> <span class="o">+</span> <span class="s1">&#39;}}&#39;</span><span class="p">;</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">token</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a position, if it's on a label, get the position left or right of
+the label, based on direction and/or which side is closer</p></div></div><div class="code"><div class="wrapper">  <span class="nx">moveOffTag</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="nx">indexMap</span><span class="p">,</span> <span class="nx">dir</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">dir</span> <span class="o">===</span> <span class="s1">&#39;undefined&#39;</span> <span class="o">||</span> <span class="nx">dir</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">dir</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">dir</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">token</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">dir</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">token</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span><span class="p">]];</span>
+      <span class="k">while</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&lt;</span> <span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span><span class="p">]].</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;tag&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span><span class="p">]]</span> <span class="o">===</span> <span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">pos</span><span class="o">++</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">token</span> <span class="o">=</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]];</span>
+      <span class="k">while</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]].</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;tag&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">tokens</span><span class="p">[</span><span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">===</span> <span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">pos</span><span class="o">--</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">pos</span><span class="p">;</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the token at some position.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">tokenAt</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">pos</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">pos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span><span class="p">]];</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the token immediately before some position.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">tokenBefore</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">pos</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">pos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">[</span><span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">[</span><span class="nx">pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]];</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a position, get a corrected position (if necessary to be
+corrected).</p></div></div><div class="code"><div class="wrapper">  <span class="nx">normalizePosition</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="nx">prevPos</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nx">prevPos</span><span class="p">))</span> <span class="p">{</span>
+      <span class="nx">prevPos</span> <span class="o">=</span> <span class="nx">pos</span><span class="p">;</span>
+    <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>At start or end, so okay.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">pos</span> <span class="o">&gt;=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">pos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">&gt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">pos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="k">return</span> <span class="nx">pos</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">token</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenAt</span><span class="p">(</span><span class="nx">pos</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">tokenBefore</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenBefore</span><span class="p">(</span><span class="nx">pos</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Between two tokens, so okay.</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">token</span> <span class="o">!==</span> <span class="nx">tokenBefore</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="nx">pos</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">prevToken</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenAt</span><span class="p">(</span><span class="nx">prevPos</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">prevTokenBefore</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenBefore</span><span class="p">(</span><span class="nx">prevPos</span><span class="p">);</span>
+
+    <span class="kd">var</span> <span class="nx">rightPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveOffTag</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">leftPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveOffTag</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">prevToken</span> <span class="o">!==</span> <span class="nx">prevTokenBefore</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Moved from left edge.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">prevToken</span> <span class="o">===</span> <span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">rightPos</span><span class="p">;</span>
+      <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Moved from right edge.</p></div></div><div class="code"><div class="wrapper">      <span class="k">if</span> <span class="p">(</span><span class="nx">prevTokenBefore</span> <span class="o">===</span> <span class="nx">token</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">leftPos</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">newPos</span> <span class="o">=</span> <span class="nx">rightPos</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">===</span> <span class="nx">prevPos</span> <span class="o">||</span> <span class="nx">pos</span> <span class="o">&lt;</span> <span class="nx">prevPos</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">rightPos</span> <span class="o">-</span> <span class="nx">pos</span> <span class="o">&gt;</span> <span class="nx">pos</span> <span class="o">-</span> <span class="nx">leftPos</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">newPos</span> <span class="o">=</span> <span class="nx">leftPos</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">newPos</span><span class="p">;</span>
+  <span class="p">},</span>
+
+
+
+  <span class="nx">onSelect</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">pos</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">selectionStart</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">endPos</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">selectionEnd</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">pos</span> <span class="o">===</span> <span class="nx">endPos</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hoverPillRef</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">tokenAt</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenAt</span><span class="p">(</span><span class="nx">pos</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">tokenBefore</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenBefore</span><span class="p">(</span><span class="nx">pos</span><span class="p">);</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">tokenAt</span> <span class="o">&amp;&amp;</span> <span class="nx">tokenAt</span> <span class="o">===</span> <span class="nx">tokenBefore</span> <span class="o">&amp;&amp;</span> <span class="nx">tokenAt</span><span class="p">.</span><span class="nx">type</span> <span class="o">&amp;&amp;</span> <span class="nx">tokenAt</span><span class="p">.</span><span class="nx">type</span> <span class="o">===</span> <span class="s1">&#39;tag&#39;</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Clicked a tag.</p></div></div><div class="code"><div class="wrapper">        <span class="kd">var</span> <span class="nx">rightPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveOffTag</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">leftPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">moveOffTag</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">=</span> <span class="nx">leftPos</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="nx">rightPos</span> <span class="o">-</span> <span class="nx">leftPos</span><span class="p">;</span>
+        <span class="nx">node</span><span class="p">.</span><span class="nx">selectionStart</span> <span class="o">=</span> <span class="nx">leftPos</span><span class="p">;</span>
+        <span class="nx">node</span><span class="p">.</span><span class="nx">selectionEnd</span> <span class="o">=</span> <span class="nx">rightPos</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isChoicesOpen</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">this</span><span class="p">.</span><span class="nx">setChoicesOpen</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="nx">pos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">normalizePosition</span><span class="p">(</span><span class="nx">pos</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span><span class="p">);</span>
+    <span class="nx">endPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">normalizePosition</span><span class="p">(</span><span class="nx">endPos</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span><span class="p">);</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">=</span> <span class="nx">pos</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="nx">endPos</span> <span class="o">-</span> <span class="nx">pos</span><span class="p">;</span>
+
+    <span class="nx">node</span><span class="p">.</span><span class="nx">selectionStart</span> <span class="o">=</span> <span class="nx">pos</span><span class="p">;</span>
+    <span class="nx">node</span><span class="p">.</span><span class="nx">selectionEnd</span> <span class="o">=</span> <span class="nx">endPos</span><span class="p">;</span>
+  <span class="p">},</span>
+
+  <span class="nx">onCopy</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">start</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">selectionStart</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">end</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">selectionEnd</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">start</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">realStartIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">start</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">realEndIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">end</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">realStartIndex</span><span class="p">,</span> <span class="nx">realEndIndex</span><span class="p">);</span>
+    <span class="nx">text</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rawValue</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">originalValue</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+    <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">+</span> <span class="nx">text</span><span class="p">;</span>
+    <span class="nx">node</span><span class="p">.</span><span class="nx">setSelectionRange</span><span class="p">(</span><span class="nx">originalValue</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="nx">originalValue</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">originalValue</span><span class="p">;</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">setSelectionRange</span><span class="p">(</span><span class="nx">start</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
+    <span class="p">},</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">onCut</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">start</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">selectionStart</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">end</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">selectionEnd</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">text</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">start</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">realStartIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">start</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">realEndIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">end</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">realStartIndex</span><span class="p">,</span> <span class="nx">realEndIndex</span><span class="p">);</span>
+    <span class="nx">text</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rawValue</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">originalValue</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">cutValue</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">start</span><span class="p">)</span> <span class="o">+</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="nx">end</span><span class="p">);</span>
+    <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">+</span> <span class="nx">text</span><span class="p">;</span>
+    <span class="nx">node</span><span class="p">.</span><span class="nx">setSelectionRange</span><span class="p">(</span><span class="nx">originalValue</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span> <span class="nx">originalValue</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="nx">text</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">cutTokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">realStartIndex</span><span class="p">).</span><span class="nx">concat</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">realEndIndex</span><span class="p">));</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">cutValue</span><span class="p">;</span>
+      <span class="nx">node</span><span class="p">.</span><span class="nx">setSelectionRange</span><span class="p">(</span><span class="nx">start</span><span class="p">,</span> <span class="nx">start</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">=</span> <span class="nx">start</span><span class="p">;</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span> <span class="o">=</span> <span class="nx">cutTokens</span><span class="p">;</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert tokens back into raw value with tags. Newly formed tags will
+become part of the raw value.</p></div></div><div class="code"><div class="wrapper">      <span class="kd">var</span> <span class="nx">rawValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rawValue</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Set the value to the new raw value.</p></div></div><div class="code"><div class="wrapper">      <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">rawValue</span><span class="p">);</span>
+
+      <span class="k">this</span><span class="p">.</span><span class="nx">snapshot</span><span class="p">();</span>
+    <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">onKeyDown</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="mi">37</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">leftArrowDown</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="mi">39</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">rightArrowDown</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Cmd-Z or Ctrl-Z</p></div></div><div class="code"><div class="wrapper">    <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="mi">90</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">metaKey</span> <span class="o">||</span> <span class="nx">event</span><span class="p">.</span><span class="nx">ctrlKey</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">event</span><span class="p">.</span><span class="nx">shiftKey</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">event</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">undo</span><span class="p">();</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Cmd-Shift-Z or Ctrl-Y</p></div></div><div class="code"><div class="wrapper">    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span>
+      <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="mi">89</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span><span class="p">.</span><span class="nx">ctrlKey</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">event</span><span class="p">.</span><span class="nx">shiftKey</span><span class="p">)</span> <span class="o">||</span>
+      <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="mi">90</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span><span class="p">.</span><span class="nx">metaKey</span> <span class="o">&amp;&amp;</span> <span class="nx">event</span><span class="p">.</span><span class="nx">shiftKey</span><span class="p">)</span>
+    <span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">redo</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">onKeyUp</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="mi">37</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">leftArrowDown</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">===</span> <span class="mi">39</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">rightArrowDown</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Keep the highlight styles in sync with the textarea styles.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">adjustStyles</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">isMount</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">overlay</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">highlight</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+    <span class="kd">var</span> <span class="nx">content</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+
+    <span class="kd">var</span> <span class="nx">style</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">getComputedStyle</span><span class="p">(</span><span class="nx">content</span><span class="p">);</span>
+
+    <span class="kd">var</span> <span class="nx">backgroundColor</span> <span class="o">=</span> <span class="nx">style</span><span class="p">.</span><span class="nx">backgroundColor</span><span class="p">;</span>
+
+    <span class="nx">utils</span><span class="p">.</span><span class="nx">copyElementStyle</span><span class="p">(</span><span class="nx">content</span><span class="p">,</span> <span class="nx">overlay</span><span class="p">);</span>
+
+    <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">position</span> <span class="o">=</span> <span class="s1">&#39;absolute&#39;</span><span class="p">;</span>
+    <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">whiteSpace</span> <span class="o">=</span> <span class="s1">&#39;pre-wrap&#39;</span><span class="p">;</span>
+    <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">color</span> <span class="o">=</span> <span class="s1">&#39;rgba(0,0,0,0)&#39;</span><span class="p">;</span>
+    <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">webkitTextFillColor</span> <span class="o">=</span> <span class="s1">&#39;rgba(0,0,0,0)&#39;</span><span class="p">;</span>
+    <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">resize</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span><span class="p">;</span>
+    <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">borderColor</span> <span class="o">=</span> <span class="s1">&#39;rgba(0,0,0,0)&#39;</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">utils</span><span class="p">.</span><span class="nx">browser</span><span class="p">.</span><span class="nx">isMozilla</span><span class="p">)</span> <span class="p">{</span>
+
+      <span class="kd">var</span> <span class="nx">paddingTop</span> <span class="o">=</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">style</span><span class="p">.</span><span class="nx">paddingTop</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">paddingBottom</span> <span class="o">=</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">style</span><span class="p">.</span><span class="nx">paddingBottom</span><span class="p">);</span>
+
+      <span class="kd">var</span> <span class="nx">borderTop</span> <span class="o">=</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">style</span><span class="p">.</span><span class="nx">borderTopWidth</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">borderBottom</span> <span class="o">=</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="nx">style</span><span class="p">.</span><span class="nx">borderBottomWidth</span><span class="p">);</span>
+
+      <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">paddingTop</span> <span class="o">=</span> <span class="s1">&#39;0px&#39;</span><span class="p">;</span>
+      <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">paddingBottom</span> <span class="o">=</span> <span class="s1">&#39;0px&#39;</span><span class="p">;</span>
+
+      <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">height</span> <span class="o">=</span> <span class="p">(</span><span class="nx">content</span><span class="p">.</span><span class="nx">clientHeight</span> <span class="o">-</span> <span class="nx">paddingTop</span> <span class="o">-</span> <span class="nx">paddingBottom</span> <span class="o">+</span> <span class="nx">borderTop</span> <span class="o">+</span> <span class="nx">borderBottom</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;px&#39;</span><span class="p">;</span>
+      <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">top</span> <span class="o">=</span> <span class="nx">style</span><span class="p">.</span><span class="nx">paddingTop</span><span class="p">;</span>
+      <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">boxShadow</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">isMount</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">backgroundColor</span> <span class="o">=</span> <span class="nx">backgroundColor</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">overlay</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">backgroundColor</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">backgroundColor</span><span class="p">;</span>
+    <span class="nx">content</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">backgroundColor</span> <span class="o">=</span> <span class="s1">&#39;rgba(0,0,0,0)&#39;</span><span class="p">;</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If the textarea is resized, need to re-sync the styles.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">onResize</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">adjustStyles</span><span class="p">();</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If the window is resized, may need to re-sync the styles.
+Probably not necessary with element resize?</p></div></div><div class="code"><div class="wrapper">  <span class="nx">onResizeWindow</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">adjustStyles</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="nx">componentDidMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">adjustStyles</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setOnResize</span><span class="p">(</span><span class="s1">&#39;content&#39;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">onResize</span><span class="p">);</span>
+    <span class="c1">//this.setOnClickOutside(&#39;choices&#39;, this.onClickOutsideChoices);</span>
+  <span class="p">},</span>
+
+  <span class="nx">onInsertFromSelect</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">selectedIndex</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">tag</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+      <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">selectedIndex</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">pos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">insertPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">normalizePosition</span><span class="p">(</span><span class="nx">pos</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">;</span>
+      <span class="kd">var</span> <span class="nx">tokenIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">insertPos</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+      <span class="nx">tokens</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">tokenIndex</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;tag&#39;</span><span class="p">,</span>
+        <span class="nx">value</span><span class="o">:</span> <span class="nx">tag</span>
+      <span class="p">});</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">newValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rawValue</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">+=</span> <span class="k">this</span><span class="p">.</span><span class="nx">prettyLabel</span><span class="p">(</span><span class="nx">tag</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">newValue</span><span class="p">);</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">focus</span><span class="p">();</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">onInsert</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">tag</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">pos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">endPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">range</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">insertPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">normalizePosition</span><span class="p">(</span><span class="nx">pos</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">endInsertPos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">normalizePosition</span><span class="p">(</span><span class="nx">endPos</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">tokens</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">tokens</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">tokenIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">insertPos</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">tokenEndIndex</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">tokenIndex</span><span class="p">(</span><span class="nx">endInsertPos</span><span class="p">,</span> <span class="nx">tokens</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">);</span>
+    <span class="nx">tokens</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">tokenIndex</span><span class="p">,</span> <span class="nx">tokenEndIndex</span> <span class="o">-</span> <span class="nx">tokenIndex</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;tag&#39;</span><span class="p">,</span>
+      <span class="nx">value</span><span class="o">:</span> <span class="nx">tag</span>
+    <span class="p">});</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">indexMap</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">indexMap</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">newValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">rawValue</span><span class="p">(</span><span class="nx">tokens</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">tracking</span><span class="p">.</span><span class="nx">pos</span> <span class="o">+=</span> <span class="k">this</span><span class="p">.</span><span class="nx">prettyLabel</span><span class="p">(</span><span class="nx">tag</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">onChangeValue</span><span class="p">(</span><span class="nx">newValue</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="nx">isChoicesOpen</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">});</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">content</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">focus</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="nx">onToggleChoices</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setChoicesOpen</span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isChoicesOpen</span><span class="p">);</span>
+  <span class="p">},</span>
+
+  <span class="nx">onCloseChoices</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isChoicesOpen</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setChoicesOpen</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">setChoicesOpen</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">isOpen</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">isOpen</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">onStartAction</span><span class="p">(</span><span class="s1">&#39;open-replacements&#39;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">onStartAction</span><span class="p">(</span><span class="s1">&#39;close-replacements&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+      <span class="nx">isChoicesOpen</span><span class="o">:</span> <span class="nx">isOpen</span>
+    <span class="p">});</span>
+  <span class="p">},</span>
+
+  <span class="nx">closeChoices</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">},</span>
+
+  <span class="nx">getCloseIgnoreNodes</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">toggle</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="nx">onClickOutsideChoices</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>// If we didn't click on the toggle button, close the choices.
+if (this.isNodeOutside(this.refs.toggle.getDOMNode(), event.target)) {
+  console.log('not a toggle click')
+  this.setState({
+    isChoicesOpen: false
+  });</p></div></div><div class="code"><div class="wrapper">    <span class="c1">// </span>
+  <span class="p">},</span>
+
+  <span class="nx">onMouseMove</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Placeholder to get at pill under mouse position. Inefficient, but not
+sure there's another way.</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">position</span> <span class="o">=</span> <span class="p">{</span><span class="nx">x</span><span class="o">:</span> <span class="nx">event</span><span class="p">.</span><span class="nx">clientX</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="nx">event</span><span class="p">.</span><span class="nx">clientY</span><span class="p">};</span>
+    <span class="kd">var</span> <span class="nx">nodes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">highlight</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">childNodes</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">matchedNode</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">nodes</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nx">nodes</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+      <span class="k">if</span> <span class="p">(</span><span class="nx">nodes</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;data-pretty&#39;</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">positionInNode</span><span class="p">(</span><span class="nx">position</span><span class="p">,</span> <span class="nx">node</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nx">matchedNode</span> <span class="o">=</span> <span class="nx">node</span><span class="p">;</span>
+          <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nx">matchedNode</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hoverPillRef</span> <span class="o">!==</span> <span class="nx">matchedNode</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;data-ref&#39;</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+          <span class="nx">hoverPillRef</span><span class="o">:</span> <span class="nx">matchedNode</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;data-ref&#39;</span><span class="p">)</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hoverPillRef</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="nx">hoverPillRef</span><span class="o">:</span> <span class="kc">null</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">renderWithConfig</span><span class="p">();</span>
+  <span class="p">},</span>
+
+  <span class="nx">renderDefault</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">field</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">;</span>
+
+    <span class="kd">var</span> <span class="nx">replaceChoices</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">replaceChoices</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>var selectReplaceChoices = [{
+  value: '',
+  label: 'Insert...'</p></div></div><div class="code"><div class="wrapper">    <span class="c1">// ].concat(replaceChoices);</span>
+
+    <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;field&#39;</span><span class="p">,</span> <span class="p">{</span>
+      <span class="nx">field</span><span class="o">:</span> <span class="nx">field</span><span class="p">,</span> <span class="nx">plain</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">plain</span>
+    <span class="p">},</span> <span class="nx">R</span><span class="p">.</span><span class="nx">div</span><span class="p">({</span><span class="nx">style</span><span class="o">:</span> <span class="p">{</span><span class="nx">position</span><span class="o">:</span> <span class="s1">&#39;relative&#39;</span><span class="p">}},</span>
+
+      <span class="nx">R</span><span class="p">.</span><span class="nx">pre</span><span class="p">({</span>
+        <span class="nx">className</span><span class="o">:</span> <span class="s1">&#39;pretty-highlight&#39;</span><span class="p">,</span>
+        <span class="nx">ref</span><span class="o">:</span> <span class="s1">&#39;highlight&#39;</span>
+      <span class="p">},</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">prettyValue</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span>
+      <span class="p">),</span>
+
+      <span class="p">(</span><span class="nx">config</span><span class="p">.</span><span class="nx">fieldIsSingleLine</span><span class="p">(</span><span class="nx">field</span><span class="p">)</span> <span class="o">?</span> <span class="nx">R</span><span class="p">.</span><span class="nx">input</span> <span class="o">:</span> <span class="nx">R</span><span class="p">.</span><span class="nx">textarea</span><span class="p">)({</span>
+        <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+        <span class="nx">className</span><span class="o">:</span> <span class="nx">cx</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">classes</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;pretty-content&#39;</span><span class="o">:</span> <span class="kc">true</span><span class="p">})),</span>
+        <span class="nx">ref</span><span class="o">:</span> <span class="s1">&#39;content&#39;</span><span class="p">,</span>
+        <span class="nx">rows</span><span class="o">:</span> <span class="nx">field</span><span class="p">.</span><span class="nx">rows</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">rows</span><span class="p">,</span>
+        <span class="nx">name</span><span class="o">:</span> <span class="nx">field</span><span class="p">.</span><span class="nx">key</span><span class="p">,</span>
+        <span class="nx">value</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">plainValue</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">.</span><span class="nx">value</span><span class="p">),</span>
+        <span class="nx">onChange</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onChange</span><span class="p">,</span>
+        <span class="nx">onScroll</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onScroll</span><span class="p">,</span>
+        <span class="nx">style</span><span class="o">:</span> <span class="p">{</span>
+          <span class="nx">position</span><span class="o">:</span> <span class="s1">&#39;relative&#39;</span><span class="p">,</span>
+          <span class="nx">top</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="nx">left</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="nx">cursor</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">hoverPillRef</span> <span class="o">?</span> <span class="s1">&#39;pointer&#39;</span> <span class="o">:</span> <span class="kc">null</span>
+        <span class="p">},</span>
+        <span class="nx">onKeyPress</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onKeyPress</span><span class="p">,</span>
+        <span class="nx">onKeyDown</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onKeyDown</span><span class="p">,</span>
+        <span class="nx">onKeyUp</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onKeyUp</span><span class="p">,</span>
+        <span class="nx">onSelect</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onSelect</span><span class="p">,</span>
+        <span class="nx">onCopy</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onCopy</span><span class="p">,</span>
+        <span class="nx">onCut</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onCut</span><span class="p">,</span>
+        <span class="nx">onMouseMove</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onMouseMove</span><span class="p">,</span>
+        <span class="nx">onFocus</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onFocusAction</span><span class="p">,</span>
+        <span class="nx">onBlur</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onBlurAction</span>
+      <span class="p">}),</span>
+
+      <span class="nx">R</span><span class="p">.</span><span class="nx">a</span><span class="p">({</span><span class="nx">ref</span><span class="o">:</span> <span class="s1">&#39;toggle&#39;</span><span class="p">,</span> <span class="nx">href</span><span class="o">:</span> <span class="s1">&#39;JavaScript&#39;</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="nx">onClick</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onToggleChoices</span><span class="p">},</span> <span class="s1">&#39;Insert...&#39;</span><span class="p">),</span>
+
+      <span class="nx">config</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;choices&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">ref</span><span class="o">:</span> <span class="s1">&#39;choices&#39;</span><span class="p">,</span>
+        <span class="nx">choices</span><span class="o">:</span> <span class="nx">replaceChoices</span><span class="p">,</span> <span class="nx">open</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isChoicesOpen</span><span class="p">,</span>
+        <span class="nx">onSelect</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onInsert</span><span class="p">,</span> <span class="nx">onClose</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onCloseChoices</span><span class="p">,</span> <span class="nx">ignoreCloseNodes</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">getCloseIgnoreNodes</span>
+      <span class="p">})</span>
+    <span class="p">));</span>
+  <span class="p">}</span>
+<span class="p">});</span></div></div></div></div></body></html>

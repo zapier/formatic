@@ -1,0 +1,139 @@
+<!DOCTYPE html><html lang="en"><head><title>lib/formatic</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="lib/formatic"><meta name="groc-project-path" content="lib/formatic.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/formatic.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="formatic">formatic</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The root formatic component.</p>
+
+<p>The root formatic component is actually two components. The main component is
+a controlled component where you must pass the value in with each render. This
+is actually wrapped in another component which allows you to use formatic as
+an uncontrolled component where it retains the state of the value. The wrapper
+is what is actually exported.</p></div></div><div class="code"><div class="wrapper"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">React</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;react/addons&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">_</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;underscore&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">utils</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./utils&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">defaultConfig</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./default-config&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The main formatic component that renders the form.</p></div></div><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">FormaticControlledClass</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+
+  <span class="nx">displayName</span><span class="o">:</span> <span class="s1">&#39;FormaticControlled&#39;</span><span class="p">,</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Respond to any value changes.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">onChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onChange</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">info</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">info</span><span class="p">);</span>
+    <span class="nx">info</span><span class="p">.</span><span class="nx">path</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">fieldValuePath</span><span class="p">(</span><span class="nx">info</span><span class="p">.</span><span class="nx">field</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onChange</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">info</span><span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Respond to any actions other than value changes. (For example, focus and
+blur.)</p></div></div><div class="code"><div class="wrapper">  <span class="nx">onAction</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onAction</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">info</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">info</span><span class="p">);</span>
+    <span class="nx">info</span><span class="p">.</span><span class="nx">path</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">fieldValuePath</span><span class="p">(</span><span class="nx">info</span><span class="p">.</span><span class="nx">field</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onAction</span><span class="p">(</span><span class="nx">info</span><span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render the root component by delegating to the config.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="nx">config</span><span class="p">.</span><span class="nx">renderFormaticComponent</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">FormaticControlled</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createFactory</span><span class="p">(</span><span class="nx">FormaticControlledClass</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>A wrapper component that is actually exported and can allow formatic to be
+used in an "uncontrolled" manner. (See uncontrolled components in the React
+documentation for an explanation of the difference.)</p></div></div><div class="code"><div class="wrapper"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Export some stuff as statics.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">statics</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">createConfig</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">args</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">toArray</span><span class="p">(</span><span class="nx">arguments</span><span class="p">);</span>
+      <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">({},</span> <span class="nx">defaultConfig</span><span class="p">);</span>
+
+      <span class="k">if</span> <span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">config</span><span class="p">;</span>
+      <span class="p">}</span>
+      <span class="kd">var</span> <span class="nx">configs</span> <span class="o">=</span> <span class="p">[</span><span class="nx">config</span><span class="p">].</span><span class="nx">concat</span><span class="p">(</span><span class="nx">args</span><span class="p">);</span>
+      <span class="k">return</span> <span class="nx">configs</span><span class="p">.</span><span class="nx">reduce</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">curr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">isFunction</span><span class="p">(</span><span class="nx">curr</span><span class="p">))</span> <span class="p">{</span>
+          <span class="nx">curr</span><span class="p">(</span><span class="nx">prev</span><span class="p">);</span>
+          <span class="k">return</span> <span class="nx">prev</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">curr</span><span class="p">);</span>
+      <span class="p">});</span>
+    <span class="p">},</span>
+    <span class="nx">availableMixins</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">clickOutside</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./mixins/click-outside.js&#39;</span><span class="p">),</span>
+      <span class="nx">field</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./mixins/field.js&#39;</span><span class="p">),</span>
+      <span class="nx">helper</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./mixins/helper.js&#39;</span><span class="p">),</span>
+      <span class="nx">resize</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./mixins/resize.js&#39;</span><span class="p">),</span>
+      <span class="nx">scroll</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./mixins/scroll.js&#39;</span><span class="p">),</span>
+      <span class="nx">undoStack</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./mixins/undo-stack.js&#39;</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="nx">plugins</span><span class="o">:</span> <span class="p">{</span>
+      <span class="nx">bootstrap</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./plugins/bootstrap&#39;</span><span class="p">),</span>
+      <span class="nx">meta</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./plugins/meta&#39;</span><span class="p">),</span>
+      <span class="nx">reference</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./plugins/reference&#39;</span><span class="p">),</span>
+      <span class="nx">elementClasses</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./plugins/element-classes&#39;</span><span class="p">)</span>
+    <span class="p">},</span>
+    <span class="nx">utils</span><span class="o">:</span> <span class="nx">utils</span>
+  <span class="p">},</span>
+
+  <span class="nx">displayName</span><span class="o">:</span> <span class="s1">&#39;Formatic&#39;</span><span class="p">,</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If we got a value, treat this component as controlled. Either way, retain
+the value in the state.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nx">isControlled</span><span class="o">:</span> <span class="o">!</span><span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">value</span><span class="p">),</span>
+      <span class="nx">value</span><span class="o">:</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span> <span class="o">?</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">defaultValue</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">value</span>
+    <span class="p">};</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If this is a controlled component, change our state to reflect the new
+value. For uncontrolled components, ignore any value changes.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">componentWillReceiveProps</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">newProps</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isControlled</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">_</span><span class="p">.</span><span class="nx">isUndefined</span><span class="p">(</span><span class="nx">newProps</span><span class="p">.</span><span class="nx">value</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+          <span class="nx">value</span><span class="o">:</span> <span class="nx">newProps</span><span class="p">.</span><span class="nx">value</span>
+        <span class="p">});</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If this is an uncontrolled component, set our state to reflect the new
+value. Either way, call the onChange callback.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">onChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isControlled</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span>
+        <span class="nx">value</span><span class="o">:</span> <span class="nx">newValue</span>
+      <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onChange</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onChange</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">info</span><span class="p">);</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Any actions should be sent to the generic onAction callback but also split
+into discreet callbacks per action.</p></div></div><div class="code"><div class="wrapper">  <span class="nx">onAction</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onAction</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onAction</span><span class="p">(</span><span class="nx">info</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">action</span> <span class="o">=</span> <span class="nx">utils</span><span class="p">.</span><span class="nx">dashToPascal</span><span class="p">(</span><span class="nx">info</span><span class="p">.</span><span class="nx">action</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">[</span><span class="s1">&#39;on&#39;</span> <span class="o">+</span> <span class="nx">action</span><span class="p">])</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">[</span><span class="s1">&#39;on&#39;</span> <span class="o">+</span> <span class="nx">action</span><span class="p">](</span><span class="nx">info</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">},</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render the wrapper component (by just delegating to the main component).</p></div></div><div class="code"><div class="wrapper">  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">config</span> <span class="o">||</span> <span class="nx">defaultConfig</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">isControlled</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">onChange</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;You should supply an onChange handler if you supply a value.&#39;</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">props</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">config</span><span class="o">:</span> <span class="nx">config</span><span class="p">,</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Allow field templates to be passed in as <code>field</code> or <code>fields</code>. After this, stop
+calling them fields.</p></div></div><div class="code"><div class="wrapper">      <span class="nx">fieldTemplate</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">field</span><span class="p">,</span>
+      <span class="nx">fieldTemplates</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">fields</span><span class="p">,</span>
+      <span class="nx">value</span><span class="o">:</span> <span class="nx">value</span><span class="p">,</span>
+      <span class="nx">onChange</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onChange</span><span class="p">,</span>
+      <span class="nx">onAction</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">onAction</span>
+    <span class="p">};</span>
+
+    <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">propValue</span><span class="p">,</span> <span class="nx">key</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="nx">key</span> <span class="k">in</span> <span class="nx">props</span><span class="p">))</span> <span class="p">{</span>
+        <span class="nx">props</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">propValue</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">});</span>
+
+    <span class="k">return</span> <span class="nx">FormaticControlled</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">});</span></div></div></div></div></body></html>
