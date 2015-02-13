@@ -12,9 +12,9 @@ var NAV_LINKS = {
     link: '/formatic/getting-started.html',
     title: 'Getting started'
   },
-  'sandbox': {
-    link: '/formatic/sandbox.html',
-    title: 'Sandbox'
+  'field-types': {
+    link: '/formatic/field-types.html',
+    title: 'Field Types'
   }
 };
 

@@ -1,4 +1,4 @@
-<script src="http://fb.me/react-0.10.0.js"></script>
+<script src="https://fb.me/react-0.12.2.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
 <script src="path/to/bower/components/formatic-min.js"></script>
 <script>

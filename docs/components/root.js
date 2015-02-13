@@ -21,10 +21,10 @@ var pages = {
     filename: 'getting-started.html',
     class: require('./getting-started-page')
   },
-  'sandbox': {
-    path: '/formatic/sandbox.html',
-    filename: 'sandbox.html',
-    class: require('./sandbox-page')
+  'field-types': {
+    path: '/formatic/field-types.html',
+    filename: 'field-types.html',
+    class: require('./field-types-page')
   }
 };
 
@@ -87,6 +87,9 @@ var Root = module.exports = React.createClass({
         <RouteHandler/>
         <script dangerouslySetInnerHTML={{__html: initScript}}/>
         <script src="vendor/prettify/prettify.js"/>
+        <script src="vendor/codemirror/codemirror.js" />
+        <script src="vendor/codemirror/javascript.js" />
+        <script src="vendor/JSXTransformer.js" />
         <script src='lib/bundle.js'/>
       </body>
     );
