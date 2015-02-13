@@ -17,15 +17,17 @@ gulp.task('bundle-dev', function () {
     .pipe(gulp.dest('./build'));
 });
 
-gulp.task('bundle-prod', ['lint'], function () {
-  return browserify({entries: ['./index.js'], standalone: 'Formatic'})
-    .add('./index.js')
-    .require('./index.js', {expose: 'formatic'})
-    .external(['underscore', 'react', 'react/addons'])
-    .bundle()
-    .pipe(source('formatic.js'))
-    .pipe(gulp.dest('./build'));
-});
+// Currently unused, probably can delete.
+
+// gulp.task('bundle-prod', ['lint'], function () {
+//   return browserify({entries: ['./index.js'], standalone: 'Formatic'})
+//     .add('./index.js')
+//     .require('./index.js', {expose: 'formatic'})
+//     .external(['underscore', 'react', 'react/addons'])
+//     .bundle()
+//     .pipe(source('formatic.js'))
+//     .pipe(gulp.dest('./build'));
+// });
 
 gulp.task('bundle-prod-min', ['lint'], function () {
   return browserify({entries: ['./index.js'], standalone: 'Formatic'})
