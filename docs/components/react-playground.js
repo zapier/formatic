@@ -194,7 +194,7 @@ var ReactPlayground = React.createClass({
         </div>
         {drawer}
         <a className={classSet(toggleClasses.code)} onClick={this.handleCodeModeToggle} href="#">{this.state.mode !== this.MODES.JSX ? 'show code' : 'hide code'}</a>
-        <a className={classSet(toggleClasses.output)} onClick={this.handleOutputModeToggle} href="#">{this.state.mode !== this.MODES.OUTPUT ? 'show value' : 'hide output'}</a>
+        <a className={classSet(toggleClasses.output)} onClick={this.handleOutputModeToggle} href="#">{this.state.mode !== this.MODES.OUTPUT ? 'show value' : 'hide value'}</a>
       </div>
       );
   },
