@@ -37,8 +37,12 @@ module.exports = React.createClass({
 
               <FieldType title="Select" type="select" aliases={['string[choices]', 'single-line-string[choices]']}
                 codeText={fs.readFileSync(path.join(__dirname, '../examples/select.js'), 'utf8')}>
-                This type is for a dropdown set of choices. If you add <code>choices</code> to a string or single-line-string type, it will become
+                Select fields give you a dropdown set of choices. If you add <code>choices</code> to a string or single-line-string type, it will become
                 a select type.
+              </FieldType>
+
+              <FieldType title="Boolean" type="boolean" codeText={fs.readFileSync(path.join(__dirname, '../examples/boolean.js'), 'utf8')}>
+                Boolean fields are for true/false values.
               </FieldType>
 
             </div>

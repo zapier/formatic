@@ -11,5 +11,6 @@ module.exports = {
 
   'string-field': fs.readFileSync(path.join(__dirname, './string-field.txt'), 'utf8'),
   'single-line-string-field': fs.readFileSync(path.join(__dirname, './single-line-string-field.txt'), 'utf8'),
-  'select-field': fs.readFileSync(path.join(__dirname, './select-field.txt'), 'utf8')
+  'select-field': fs.readFileSync(path.join(__dirname, './select-field.txt'), 'utf8'),
+  'boolean-field': fs.readFileSync(path.join(__dirname, './boolean-field.txt'), 'utf8')
 };
