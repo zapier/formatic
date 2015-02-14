@@ -24,7 +24,7 @@ module.exports = React.createClass({
           </small>
         </h1>
 
-        <p>{this.children}</p>
+        <p>{this.props.children}</p>
 
         <h2>Field</h2>
 
