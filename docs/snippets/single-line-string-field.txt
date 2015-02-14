@@ -1,0 +1,5 @@
+{
+  type: "single-line-string",
+  key: "myKey",
+  label: "My Label"
+}

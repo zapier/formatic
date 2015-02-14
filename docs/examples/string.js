@@ -8,9 +8,8 @@ var fields = [
     key: 'summary',
     label: 'Summary'
   },
-  // text alias
   {
-    type: 'text',
+    type: 'string',
     key: 'description',
     label: 'Description',
     // Number of rows.

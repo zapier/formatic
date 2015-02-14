@@ -9,6 +9,8 @@ var Footer = require('./footer');
 var ReactPlayground = require('./react-playground');
 var fs = require('fs');
 var path = require('path');
+var Snippet = require('./snippet');
+var FieldType = require('./field-type');
 
 module.exports = React.createClass({
 
@@ -23,35 +25,21 @@ module.exports = React.createClass({
           <div className="row">
             <div className="col-md-9" role="main">
 
-              <div className="bs-docs-section">
+              <FieldType title="String" type="string" aliases={['text']} codeText={fs.readFileSync(path.join(__dirname, '../examples/string.js'), 'utf8')}>
+                String fields can be used to edit multi-line text, i.e. a textarea. Use the optional <code>rows</code> property to set the number of rows.
+              </FieldType>
 
-                <h1 id="single-line-string" className="page-header">Single Line String <small>single-line-string, unicode, str</small></h1>
+              <FieldType title="Single Line String" type="single-line-string" aliases={['unicode', 'str', 'string[isSingleLine=true]']}
+                codeText={fs.readFileSync(path.join(__dirname, '../examples/single-line-string.js'), 'utf8')}>
+                A single-line string is for editing a single line of text, i.e. an input with type="text".
+                  You can also use the property <code>isSingleLine</code> with the string type as an alias for this type.
+              </FieldType>
 
-                <h2 id="buttons-options">Example</h2>
-                <p>This type is for a field that edits a single line of text.</p>
-                <ReactPlayground codeText={fs.readFileSync(path.join(__dirname, '../examples/single-line-string.js'), 'utf8')} />
-
-              </div>
-
-              <div className="bs-docs-section">
-
-                <h1 id="string" className="page-header">String <small>string, text, textarea</small></h1>
-
-                <h2 id="buttons-options">Example</h2>
-                <p>This type is for a field that edits multi-line text.</p>
-                <ReactPlayground codeText={fs.readFileSync(path.join(__dirname, '../examples/string.js'), 'utf8')} />
-
-              </div>
-
-              <div className="bs-docs-section">
-
-                <h1 id="select" className="page-header">Select <small>select</small></h1>
-
-                <h2 id="buttons-options">Example</h2>
-                <p>This type is for a dropdown set of choices.</p>
-                <ReactPlayground codeText={fs.readFileSync(path.join(__dirname, '../examples/select.js'), 'utf8')} />
-
-              </div>
+              <FieldType title="Select" type="select" aliases={['string[choices]', 'single-line-string[choices]']}
+                codeText={fs.readFileSync(path.join(__dirname, '../examples/select.js'), 'utf8')}>
+                This type is for a dropdown set of choices. If you add <code>choices</code> to a string or single-line-string type, it will become
+                a select type.
+              </FieldType>
 
             </div>
           </div>

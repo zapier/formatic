@@ -1,0 +1,11 @@
+{
+  type: "select",
+  key: "myKey",
+  label: "My Label",
+  choices: [
+    {
+      "value": "choiceValue",
+      "label": "My Choice Label"
+    }
+  ]
+}
