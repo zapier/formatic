@@ -226,3 +226,13 @@ ol.linenums {
 ol.linenums li {
   line-height: 18px;
   padding-left: 12px; }
+
+.alias {
+  font-style: italic;
+}
+
+.alias::before {
+  content: 'Alias: ';
+  font-weight: bold;
+  margin-left: 20px;
+}
