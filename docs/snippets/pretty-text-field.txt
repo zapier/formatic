@@ -1,0 +1,12 @@
+{
+  type: "pretty-text",
+  key: "myKey",
+  label: "My Label",
+  choices: [
+    {
+      "value": "choiceValue",
+      "label": "My Choice Label",
+      "sample": "My Choice Sample"
+    }
+  ]
+}

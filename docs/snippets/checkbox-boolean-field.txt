@@ -1,0 +1,5 @@
+{
+  type: "checkbox-boolean",
+  key: "myKey",
+  label: "My Label"
+}

@@ -11,8 +11,41 @@ var fs = require('fs');
 var path = require('path');
 var Snippet = require('./snippet');
 var FieldType = require('./field-type');
+var Bootstrap = require('react-bootstrap');
+var Affix = Bootstrap.Affix;
+var Nav = Bootstrap.Nav;
+var NavItem = Bootstrap.NavItem;
+var SubNav = Bootstrap.SubNav;
 
 module.exports = React.createClass({
+
+  getInitialState: function () {
+    return {
+      activeNavItemHref: null,
+      navOffsetTop: null
+    };
+  },
+
+  handleNavItemSelect: function (key, href) {
+    this.setState({
+      activeNavItemHref: href
+    });
+
+    window.location = href;
+  },
+
+  componentDidMount: function () {
+    var elem = this.refs.sideNav.getDOMNode(),
+        domUtils = Affix.domUtils,
+        sideNavOffsetTop = domUtils.getOffset(elem).top,
+        sideNavMarginTop = parseInt(domUtils.getComputedStyles(elem.firstChild).marginTop, 10),
+        topNavHeight = this.refs.topNav.getDOMNode().offsetHeight;
+
+    this.setState({
+      navOffsetTop: sideNavOffsetTop - topNavHeight - sideNavMarginTop,
+      navOffsetBottom: this.refs.footer.getDOMNode().offsetHeight
+    });
+  },
 
   render: function () {
 
@@ -45,11 +78,61 @@ module.exports = React.createClass({
                 Boolean fields are for true/false values.
               </FieldType>
 
+              <FieldType title="Checkbox Boolean" type="checkbox-boolean" codeText={fs.readFileSync(path.join(__dirname, '../examples/checkbox-boolean.js'), 'utf8')}>
+                Checkbox Boolean fields are simple checkboxes for true/false values.
+              </FieldType>
+
+              <FieldType title="Pretty Text" type="pretty-text" codeText={fs.readFileSync(path.join(__dirname, '../examples/pretty-text.js'), 'utf8')}>
+                Pretty Text fields show pretty pills with labels in place of their actual values.
+              </FieldType>
+
+              <FieldType title="Array" type="array" aliases={['list']} codeText={fs.readFileSync(path.join(__dirname, '../examples/array.js'), 'utf8')}>
+                Array fields allow you to create sorted lists of values. The <code>itemFields</code> property lets you
+                define the type of child fields.
+              </FieldType>
+
+              <FieldType title="Checkbox Array" type="checkbox-array" codeText={fs.readFileSync(path.join(__dirname, '../examples/checkbox-array.js'), 'utf8')}>
+                Checkbox Array fields provide a checkbox for each item of an array. Each checked item is added to the array.
+              </FieldType>
+
+              <FieldType title="Object" type="object" aliases={['dict']} codeText={fs.readFileSync(path.join(__dirname, '../examples/object.js'), 'utf8')}>
+                Object fields allow you to create sets of key/value pairs. The <code>itemFields</code> property lets you
+                define the type of child fields.
+              </FieldType>
+
             </div>
+
+            <div className="col-md-3">
+              <Affix
+                className="bs-docs-sidebar hidden-print"
+                role="complementary"
+                offsetTop={this.state.navOffsetTop}
+                offsetBottom={this.state.navOffsetBottom}>
+                <Nav
+                  className="bs-docs-sidenav"
+                  activeHref={this.state.activeNavItemHref}
+                  onSelect={this.handleNavItemSelect}
+                  ref="sideNav">
+                  <NavItem href="#string" key="string">String</NavItem>
+                  <NavItem href="#single-line-string" key="single-line-string">Single Line String</NavItem>
+                  <NavItem href="#select" key="select">Select</NavItem>
+                  <NavItem href="#boolean" key="boolean">Boolean</NavItem>
+                  <NavItem href="#checkbox-boolean" key="checkbox-boolean">Checkbox Boolean</NavItem>
+                  <NavItem href="#pretty-text" key="pretty-text">Pretty Text</NavItem>
+                  <NavItem href="#array" key="array">Array</NavItem>
+                  <NavItem href="#checkbox-array" key="checkbox-array">Checkbox Array</NavItem>
+                  <NavItem href="#object" key="object">Object</NavItem>
+                </Nav>
+                <a className="back-to-top" href="#top">
+                Back to top
+                </a>
+              </Affix>
+            </div>
+
           </div>
         </div>
 
-        <Footer/>
+        <Footer ref="footer"/>
       </div>
     );
   }

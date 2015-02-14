@@ -1,0 +1,10 @@
+{
+  type: "array",
+  key: "myKey",
+  label: "My Label",
+  itemFields: [
+    {
+      type: "single-line-string"
+    }
+  ]
+}
