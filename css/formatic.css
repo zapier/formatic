@@ -1,0 +1,295 @@
+@charset "UTF-8";
+
+.formatic {
+  /*font-family: 'Open Sans', Helvetica, arial, sans-serif;*/
+}
+
+
+.formatic .field {
+  /*padding: 10px;*/
+}
+
+.formatic fieldset {
+  margin-left: 5px;
+}
+
+.formatic .field-label {
+  /*padding-bottom: 10px;*/
+}
+
+.formatic .field-help {
+  color: #777;
+}
+
+.formatic .required-text, .formatic .not-required-text {
+  font-size: 80%;
+  color: #aaa;
+}
+
+.formatic .required-text:after {
+  content: '(required)'
+}
+
+.formatic .not-required-text:after {
+  content: ''
+}
+
+.formatic .validation-error-required .required-text:after {
+  color: #ff4a00;
+}
+
+.formatic .dropdown-field {
+  position: relative;
+  /*max-width: 870px;*/
+}
+
+.formatic .field-value {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.formatic .field-toggle {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  width: 42px;
+  text-align: center;
+  line-height: 40px;
+  border: 1px solid #ccc;
+}
+
+.formatic .field-toggle.field-open::before {
+  content: '▲';
+  vertical-align: middle;
+}
+
+.formatic .field-toggle.field-closed::before {
+  content: '▼';
+  vertical-align: middle;
+}
+
+.formatic .dropdown-field .field-choices-container {
+  max-height: 400px;
+  overflow-y: scroll;
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
+.formatic .dropdown-field .field-choices {
+  list-style-type: none;
+  margin-top: 0px;
+  padding-left: 0px;
+}
+
+.formatic .choices-container {
+  max-height: 400px;
+  overflow-y: scroll;
+  position: absolute;
+  z-index: 1000;
+  background: #fff;
+  border: 1px solid #ccc;
+  /*max-width: 600px;
+  overflow-x: hidden;*/
+  /*border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;*/
+}
+
+.formatic .choices {
+  list-style-type: none;
+  margin: 0px;
+  padding-left: 0px;
+}
+
+.formatic .choice-label {
+  font-weight: 600;
+  padding-right: 10px;
+}
+
+.formatic .choice-sample {
+  color: #999;
+}
+
+.formatic .dropdown-field .field-choice {
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+}
+
+.formatic .choice {
+  /*border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;*/
+  border-bottom: 1px solid #ccc;
+  padding: 0px;
+}
+
+.formatic .choice a {
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+  display: inline-block;
+  max-width: 600px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formatic .reveal-enter {
+  opacity: 0.01;
+  transition: opacity .1s ease-in;
+}
+
+.formatic .reveal-enter.reveal-enter-active {
+  opacity: 1;
+}
+
+.formatic .reveal-leave {
+  opacity: 1;
+  transition: opacity .1s ease-in;
+}
+
+.formatic .reveal-leave.reveal-leave-active {
+  opacity: 0.01;
+}
+
+.formatic .pretty-part {
+  border-radius: 12px;
+  background: #ff9266;
+  cursor: pointer;
+}
+
+.formatic .pretty-part-left, .formatic .pretty-part-right {
+}
+
+.formatic .pretty-overlay {
+}
+
+.formatic .pretty-content {
+}
+
+.formatic .pretty-part-hover {
+  background: rgb(255, 74, 0);
+}
+
+/*.formatic .pretty-content {
+  font-family: 'Open Sans', Helvetica, arial, sans-serif;
+  font-size: 13px;
+  max-width: 870px;
+  border: solid 1px;
+  height: 100px;
+  padding: 2px;
+  margin: 2px;
+  overflow: scroll;
+  width: 200px;
+}
+
+.formatic .pretty-overlay {
+  font-family: 'Open Sans', Helvetica, arial, sans-serif;
+  font-size: 13px;
+  max-width: 870px;
+  border: solid 1px;
+  height: 100px;
+  padding: 2px;
+  margin: 2px;
+  overflow: scroll;
+  width: 200px;
+
+  color: rgba(0, 0, 0, 0);
+
+  height: 98px;
+  border-bottom: 0px;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+  word-break: keep-all;
+}*/
+
+/*
+.formatic .boolean-checkbox-field label {
+  display: inline
+}
+
+.formatic .pretty-part {
+  border-radius: 12px;
+  background: #ff9266;
+  cursor: pointer;
+}
+
+.formatic .pretty-part-left, .formatic .pretty-part-right {
+}
+
+.formatic .pretty-textarea-field textarea, .formatic .pretty-textarea-field pre {
+  font-family: 'Open Sans', Helvetica, arial, sans-serif;
+  font-size: 13px;
+  max-width: 870px;
+  border: solid 1px;
+  height: 100px;
+  padding: 2px;
+  margin: 2px;
+  overflow: scroll;
+}
+
+.formatic .pretty-textarea-field pre {
+  color: rgba(0, 0, 0, 0);
+
+  height: 98px;
+  border-bottom: 0px;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.formatic textarea {
+  height: 5em;
+  max-width: 870px;
+}
+
+.formatic pre {
+  width: 500px;
+}
+
+.formatic .code-field pre {
+  white-space: pre-wrap;
+}
+*/
+
+/*.formatic .list-field, .formatic .object-field {
+  border: 1px solid #ccc;
+}
+
+.formatic .list-item, .formatic .object-item {
+  border: 1px solid #ccc;
+}*/
+
+.formatic .add-item, .formatic .object-control-add {
+  color: green;
+  cursor: pointer;
+}
+
+.formatic .remove-item, .formatic .object-control-remove {
+  color: red;
+  cursor: pointer;
+  padding-right: 1em;
+}
+
+.formatic .maybe-removing {
+  background: rgba(255, 0, 0, 0.25);
+}
+
+.formatic .move-item-back {
+  cursor: pointer;
+  padding-right: 1em;
+}
+
+.formatic .move-item-forward {
+  cursor: pointer;
+  padding-right: 1em;
+}
