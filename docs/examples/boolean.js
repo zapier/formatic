@@ -10,9 +10,18 @@ var fields = [
   },
   {
     type: 'boolean',
-    key: 'knowsSpanish',
-    label: 'Do you know Spanish?',
-    choices: ['si', 'no']
+    key: 'isOptIn',
+    label: 'Subscribe to our newsletter?',
+    choices: [
+      {
+        value: true,
+        label: 'Absolutely!'
+      },
+      {
+        value: false,
+        label: 'No way!'
+      }
+    ]
   }
 ];
 

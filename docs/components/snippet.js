@@ -2,7 +2,6 @@
 
 var React = require('react');
 var R = React.DOM;
-var snippets = require('../snippets');
 
 module.exports = React.createClass({
 
@@ -15,20 +14,22 @@ module.exports = React.createClass({
   },
 
   render: function () {
-    var snippet = this.props.snippet;
+    var snippet = this.props.code;
 
-    if (!snippet && this.props.name) {
-      snippet = snippets[this.props.name];
+    if (!snippet && this.props.json) {
+      snippet = JSON.stringify(this.props.json, null, 2);
+    }
+
+    var lang = '';
+
+    if (this.props.lang) {
+      lang += ' lang-' + this.props.lang;
     }
 
     return (
-      //R.div({className: 'highlight'},
-        R.pre({className: 'prettyprint'},
-          //R.code({className: this.props.language ? this.props.language : 'plain'},
-            snippet
-          //)
-        )
-      //)
+      R.pre({className: 'prettyprint' + lang},
+          snippet
+      )
     );
   }
 

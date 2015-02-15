@@ -7,6 +7,8 @@ var NavMain = require('./nav-main');
 var Header = require('./header');
 var Footer = require('./footer');
 var Snippet = require('./snippet');
+var fs = require('fs');
+var path = require('path');
 
 module.exports = React.createClass({
 
@@ -27,12 +29,12 @@ module.exports = React.createClass({
 
               R.h3(null, 'CommonJS'),
 
-              E(Snippet, {language: 'shell', name: 'npm-install'}),
-              E(Snippet, {language: 'js', name: 'use-commonjs'}),
+              E(Snippet, {code: fs.readFileSync(path.join(__dirname, '../snippets/npm-install.sh'), 'utf8')}),
+              E(Snippet, {code: fs.readFileSync(path.join(__dirname, '../snippets/use-commonjs.js'), 'utf8')}),
 
               R.h3(null, 'Global'),
 
-              E(Snippet, {language: 'shell', name: 'bower-install'}),
+              E(Snippet, {code: fs.readFileSync(path.join(__dirname, '../snippets/bower-install.sh'), 'utf8')}),
 
               R.p(null,
                 'The bower repo contains ',
@@ -44,7 +46,7 @@ module.exports = React.createClass({
                 '.'
               ),
 
-              E(Snippet, {language: 'html', name: 'use-global'})
+              E(Snippet, {code: fs.readFileSync(path.join(__dirname, '../snippets/use-global.js'), 'utf8')})
             )
           )
         )

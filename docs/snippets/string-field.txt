@@ -1,6 +1,0 @@
-{
-  type: "string",
-  key: "myKey",
-  label: "My Label",
-  rows: 5
-}

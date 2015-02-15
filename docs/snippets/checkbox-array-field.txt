@@ -1,8 +1,0 @@
-{
-  type: "array",
-  key: "myKey",
-  label: "My Label",
-  choices: [
-    'choiceValue1', 'choiceValue2'
-  ]
-}

@@ -28,11 +28,15 @@ module.exports = React.createClass({
 
         <h2>Field</h2>
 
-        <Snippet language="js" name={this.props.type + '-field'}/>
+        <Snippet json={this.props.field || {
+            type: this.props.type,
+            key: 'myKey',
+            label: 'My Label'
+          }}/>
 
         <h2 id={this.props.type + '-example'}>Live example</h2>
 
-        <ReactPlayground codeText={this.props.codeText} />
+        <ReactPlayground code={this.props.code} />
 
       </div>
     );

@@ -1,5 +1,0 @@
-{
-  type: "boolean",
-  key: "myKey",
-  label: "My Label"
-}

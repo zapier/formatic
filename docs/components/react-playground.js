@@ -37,7 +37,7 @@ var CodeMirrorEditor = React.createClass({
 
   componentDidUpdate: function() {
     if (this.props.readOnly) {
-      this.editor.setValue(this.props.codeText);
+      this.editor.setValue(this.props.code);
     }
   },
 
@@ -55,9 +55,9 @@ var CodeMirrorEditor = React.createClass({
 
     if (IS_MOBILE) {
       var preStyles = {overflow: 'scroll'};
-      editor = <pre style={preStyles}>{this.props.codeText}</pre>;
+      editor = <pre style={preStyles}>{this.props.code}</pre>;
     } else {
-      editor = <textarea ref="editor" defaultValue={this.props.codeText} />;
+      editor = <textarea ref="editor" defaultValue={this.props.code} />;
     }
 
     return (
@@ -85,7 +85,7 @@ var ReactPlayground = React.createClass({
   MODES: {JSX: 'JSX', JS: 'JS', OUTPUT: 'OUTPUT', NONE: null},
 
   propTypes: {
-    codeText: React.PropTypes.string.isRequired,
+    code: React.PropTypes.string.isRequired,
     transformer: React.PropTypes.func,
     renderCode: React.PropTypes.bool
   },
@@ -101,7 +101,7 @@ var ReactPlayground = React.createClass({
   getInitialState: function() {
     return {
       mode: this.MODES.NONE,
-      code: this.props.codeText,
+      code: this.props.code,
       output: null
     };
   },
@@ -171,7 +171,7 @@ var ReactPlayground = React.createClass({
           key="jsx"
           onChange={this.handleCodeChange}
           className="highlight"
-          codeText={this.state.code}/>
+          code={this.state.code}/>
       );
       toggleClasses.code.open = true;
     } else if (this.state.mode === this.MODES.OUTPUT) {
@@ -237,7 +237,7 @@ var ReactPlayground = React.createClass({
       var compiledCode = this.compileCode();
       if (this.props.renderCode) {
         React.render(
-          <CodeMirrorEditor codeText={compiledCode} readOnly={true} />,
+          <CodeMirrorEditor code={compiledCode} readOnly={true} />,
           mountNode
         );
       } else {
