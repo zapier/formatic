@@ -4,16 +4,10 @@ var config = Formatic.createConfig(Formatic.plugins.bootstrap);
 // Create some fields.
 var fields = [
   {
-    type: 'string',
-    key: 'summary',
-    label: 'Summary'
-  },
-  {
-    type: 'string',
-    key: 'description',
-    label: 'Description',
-    // Number of rows.
-    rows: 5
+    type: 'json',
+    key: 'blob',
+    label: 'JSON Blob',
+    rows: 10
   }
 ];
 

@@ -13,7 +13,12 @@ gulp.task('docs-clean', function () {
     .pipe(plugins.clean());
 });
 
-gulp.task('docs-copy', ['docs-clean'], function () {
+gulp.task('docs-copy-formatic-css', ['docs-clean'], function () {
+  return gulp.src(['./style/*.css'])
+    .pipe(gulp.dest('./build-docs/css'));
+});
+
+gulp.task('docs-copy', ['docs-copy-formatic-css', 'docs-clean'], function () {
   return gulp.src(['./docs/assets/**/*.*'])
     .pipe(gulp.dest('./build-docs'));
 });

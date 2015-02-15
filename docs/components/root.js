@@ -8,6 +8,7 @@ var Router = require('react-router');
 var Route = Router.Route;
 var DefaultRoute = Router.DefaultRoute;
 var RouteHandler = Router.RouteHandler;
+var NotFoundRoute = Router.NotFoundRoute;
 
 var pages = {
   'home': {
@@ -61,6 +62,7 @@ var Root = module.exports = React.createClass({
         R.link({href: 'vendor/codemirror/syntax.css', rel: 'stylesheet'}),
         R.link({rel: 'stylesheet', href: 'vendor/prettify/prettify.css'}),
         R.link({href: 'css/style.css', rel: 'stylesheet'}),
+        R.link({href: 'css/formatic.css', rel: 'stylesheet'}),
         //R.link({rel: 'icon', href: 'https://zapier.cachefly.net/static/C5cFWy/images/favicon.ico', type: 'image/x-icon'})
         //R.link({rel: 'favicons', href: '../docs/assets/images/logo.png'})
         //,
@@ -105,8 +107,6 @@ Object.keys(pages).forEach(function (name) {
   } else {
     children.push(E(Route, {name: name, path: page.path, handler: page.class}));
   }
-  //children.push(E(Route, {path: '/formatic/', handler: page.class}));
-  children.push(E(Route, {path: '/formatic/', handler: page.class}));
 });
 
 routes = E.apply(null, [Route, {path: '/formatic/', handler: Root}].concat(children));

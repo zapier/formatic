@@ -4,16 +4,12 @@ var config = Formatic.createConfig(Formatic.plugins.bootstrap);
 // Create some fields.
 var fields = [
   {
-    type: 'string',
-    key: 'summary',
-    label: 'Summary'
-  },
-  {
-    type: 'string',
-    key: 'description',
-    label: 'Description',
-    // Number of rows.
-    rows: 5
+    type: 'object',
+    key: 'data',
+    label: 'Data',
+    itemFields: {
+      type: 'single-line-string'
+    }
   }
 ];
 
