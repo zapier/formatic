@@ -29,6 +29,12 @@ var fields = [
         label: 'Opera'
       }
     ]
+  },
+  {
+    type: 'select',
+    key: 'favoriteColor',
+    label: 'Favorite Color of the Rainbow',
+    choices: ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
   }
 ];
 

@@ -4,6 +4,7 @@ var React = require('react');
 var NavMain = require('./nav-main');
 var Header = require('./header');
 var Footer = require('./footer');
+var Snippet = require('./snippet');
 var fs = require('fs');
 var path = require('path');
 var FieldType = require('./field-type');
@@ -92,6 +93,31 @@ module.exports = React.createClass({
                     }
                   ]
                 }}
+                moreFields=<div>
+                  The canonical form for <code>choices</code> is an array of objects with
+                  each object having a <code>value</code> and <code>label</code> property.
+                  Two shorter forms are also available.
+                  You can use an object, where each key is the value, and each value
+                  is the label. For example:
+                  <Snippet json={{
+                    type: 'select',
+                    key: 'country',
+                    label: 'Country',
+                    choices: {
+                      us: 'United States',
+                      ca: 'Canada'
+                    }
+                  }}/>
+                  You can also use an array of strings. Each string will be a value, and
+                  the values will be "humanized" to be used for the labels. For example:
+                  <Snippet json={{
+                    type: 'select',
+                    key: 'favoriteColor',
+                    label: 'Favorite Color of the Rainbow',
+                    choices: ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']
+                  }}/>
+                  In this case, the labels would be "Red", "Orange", etc.
+                </div>
                 code={fs.readFileSync(path.join(__dirname, '../examples/select.js'), 'utf8')}>
                 Select fields give you a dropdown set of choices. If you add <code>choices</code> to a string or single-line-string type, it will become
                 a select type.

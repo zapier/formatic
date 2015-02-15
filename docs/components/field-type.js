@@ -34,6 +34,8 @@ module.exports = React.createClass({
             label: 'My Label'
           }}/>
 
+        {this.props.moreFields}
+
         <h2 id={this.props.type + '-example'}>Live example</h2>
 
         <ReactPlayground code={this.props.code} />
