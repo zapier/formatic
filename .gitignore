@@ -3,3 +3,4 @@ node_modules
 /live
 /demo/test.html
 /build-docs
+.DS_Store

@@ -1,3 +1,5 @@
+// Need this rule here because we define Formatic to be used by eval.
+/*eslint no-unused-vars:0*/
 'use strict';
 
 var React = require('react');
@@ -187,6 +189,13 @@ var ReactPlayground = React.createClass({
         }
       });
     }
+
+    var valueTab = null;
+
+    if (!this.props.hideValueTab) {
+      valueTab = <a className={classSet(toggleClasses.output)} onClick={this.handleOutputModeToggle} href="#">{this.state.mode !== this.MODES.OUTPUT ? 'show value' : 'hide value'}</a>;
+    }
+
     return (
       <div className="playground">
         <div className={classSet(classes)}>
@@ -194,7 +203,7 @@ var ReactPlayground = React.createClass({
         </div>
         {drawer}
         <a className={classSet(toggleClasses.code)} onClick={this.handleCodeModeToggle} href="#">{this.state.mode !== this.MODES.JSX ? 'show code' : 'hide code'}</a>
-        <a className={classSet(toggleClasses.output)} onClick={this.handleOutputModeToggle} href="#">{this.state.mode !== this.MODES.OUTPUT ? 'show value' : 'hide value'}</a>
+        { valueTab }
       </div>
       );
   },

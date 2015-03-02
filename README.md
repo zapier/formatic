@@ -35,9 +35,8 @@ npm install
 gulp build
 ```
 
-This will build three files in the build directory: formatic-min.js (minified),
-formatic.js (not minified) and formatic-dev.js (not minified and includes
-source maps for development).
+This will build two files in the build directory: formatic-min.js (minified)
+and formatic-dev.js (not minified and includes source maps for development).
 
 ## What is formatic?
 
@@ -87,3 +86,8 @@ This creates a simple form like this (assuming you're using formatic.css):
 
 The above assumes you're using a CommonJS build tool like browserify or webpack.
 If you use the standalone build, you can just the global `Formatic'.
+
+## Documentation
+
+The [documentation](http://zapier.github.io/formatic/) is a work in progress,
+but there's already a lot of useful info there.

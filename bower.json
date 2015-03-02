@@ -1,7 +1,7 @@
 {
   "name": "formatic",
   "main": "build/formatic-min.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "zapier.github.io/formatic",
   "authors": [
     "Justin Deal <justin.deal@zapier.com>"
