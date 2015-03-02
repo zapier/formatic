@@ -1,6 +1,3 @@
-// Get the Formatic class.
-var Formatic = require('formatic');
-
 // Create some fields.
 var fields = [
   {
@@ -16,4 +13,6 @@ var fields = [
 ];
 
 // Render the form.
-React.render(React.createElement(Formatic, {fields: fields}), document.body);
+React.render(
+  <Formatic fields={fields}/>
+, mountNode);
