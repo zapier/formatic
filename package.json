@@ -4,7 +4,19 @@
   "description": "Automatic, pluggable form generation",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/jest-cli/bin/jest.js"
+    "test": "jest",
+    "lint": "eslint gulpfile.js lib/**/*.js docs/components/*.js docs/index.js",
+    "bundle-dev": "browserify -e index.js -d -s Formatic -x underscore -x react -x react/addons -o build/formatic-dev.js",
+    "bundle-prod": "browserify -e index.js -s Formatic -x underscore -x react -x react/addons | uglifyjs -o build/formatic-min.js",
+    "build": "npm run bundle-dev & npm run bundle-prod",
+    "copy-all": "node tasks/copy-build && node tasks/copy-demo && node tasks/copy-style",
+    "watch-bundle": "watchify -e index.js -d -s Formatic -x underscore -x react -x react/addons -o build/formatic-dev.js",
+    "watch-build": "gaze 'node tasks/copy-build' './build/formatic-dev.js'",
+    "watch-test": "gaze 'npm run test' './build/formatic-dev.js' & gaze 'npm run test' './__tests__/**/*.js'",
+    "watch-demo": "gaze 'node tasks/copy-demo' './demo/*.html'",
+    "watch-style": "gaze 'node tasks/copy-style' './style'",
+    "watch": "npm run watch-bundle & npm run watch-build & npm run watch-test & npm run watch-demo & npm run watch-style",
+    "live": "npm run bundle-dev && npm run copy-all && npm run watch & node tasks/live-server"
   },
   "repository": {
     "type": "git",
@@ -16,11 +28,15 @@
     "6to5ify": "^4.1.1",
     "body-parser": "^1.4.3",
     "brfs": "^1.3.0",
-    "browserify": "git+https://github.com/jdeal/node-browserify.git",
+    "browserify": "^6.2.0",
     "browserify-shim": "^3.8.0",
     "chai": "^1.9.1",
+    "chokidar": "^1.0.0-rc3",
     "connect-livereload": "^0.4.0",
+    "eslint": "^0.15.1",
     "express": "^4.5.1",
+    "gaze": "^0.5.1",
+    "gaze-cli": "^0.1.0",
     "glob-watcher": "0.0.7",
     "groc": "^0.7.0",
     "gulp": "^3.8.11",
@@ -36,14 +52,18 @@
     "gulp-shell": "^0.2.8",
     "gulp-streamify": "0.0.5",
     "gulp-uglify": "^0.3.1",
-    "jest-cli": "^0.1.15",
+    "jest": "^0.1.37",
+    "jest-cli": "^0.4.0",
+    "live-server": "^0.6.4",
     "lodash": "^3.2.0",
     "react-bootstrap": "^0.14.0",
     "react-router": "^0.12.0",
     "require-dir": "^0.1.0",
     "tiny-lr": "0.0.9",
+    "uglify-js": "^2.4.16",
     "vinyl-source-stream": "^0.1.1",
-    "watchify": "^2.1.1"
+    "watch": "^0.14.0",
+    "watchify": "https://registry.npmjs.org/watchify/-/watchify-2.1.1.tgz"
   },
   "dependencies": {
     "envify": "^1.2.1",
@@ -59,6 +79,9 @@
       "<rootDir>/node_modules/underscore",
       "<rootDir>/index.js",
       "<rootDir>/lib"
+    ],
+    "testPathDirs": [
+      "__tests__"
     ]
   },
   "browserify": {
