@@ -11,7 +11,7 @@ gulp.task('bundle-dev', function () {
   return browserify({entries: ['./index.js'], debug: true, standalone: 'Formatic'})
     .add('./index.js')
     .require('./index.js', {expose: 'formatic'})
-    .external(['underscore', 'react', 'react/addons'])
+    .external(['underscore', 'react', 'react/addons', 'codemirror'])
     .bundle()
     .pipe(source('formatic-dev.js'))
     .pipe(gulp.dest('./build'));

@@ -71,6 +71,7 @@
   "browserify-shim": {
     "react": "global:React",
     "react/addons": "global:React",
-    "underscore": "global:_"
+    "underscore": "global:_",
+    "codemirror": "global:CodeMirror"
   }
 }

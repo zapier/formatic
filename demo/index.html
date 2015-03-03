@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link href="./style/formatic.css" rel="stylesheet" type="text/css"/>
+  <link href="/style/formatic.css" rel="stylesheet" type="text/css"/>
   <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.0.0/codemirror.css" type="text/css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.0.0/codemirror.js"></script>
 </head>
 <body>
   <div class="container-fluid">
@@ -91,7 +94,38 @@
         ]
       },
       {label: 'More colors', key: 'moreColors', extends: 'colors'},
-      {label: 'Alive', label: "I'm alive!", type: 'checkbox-boolean', key: 'isAlive'}
+      {label: 'Alive', label: "I'm alive!", type: 'checkbox-boolean', key: 'isAlive'},
+      {
+        label: 'Pretty Text', key: 'prettyText', type: 'pretty-textarea',
+        replaceChoices: [
+          {
+            value: 'firstName',
+            label: 'First Name',
+            sample: 'Bob'
+          },
+          {
+            value: 'lastName',
+            label: 'Last Name',
+            sample: 'Smith'
+          }
+        ]
+      },
+      {
+        label: 'Pretty Text 2', key: 'prettyText2', type: 'pretty-text2',
+        initialValue: 'Hi there {{firstName}} {{lastName}}',
+        replaceChoices: [
+          {
+            value: 'firstName',
+            label: 'First Name',
+            sample: 'Bob'
+          },
+          {
+            value: 'lastName',
+            label: 'Last Name',
+            sample: 'Smith'
+          }
+        ]
+      }
     ];
 
     var formValue = {};
