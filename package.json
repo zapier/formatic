@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "lint": "eslint gulpfile.js lib/**/*.js docs/components/*.js docs/index.js",
-    "build": "gulp bundle-dev & gulp bundle-prod",
+    "build": "gulp build",
     "docs-build": "gulp docs-build",
     "docs-publish": "gulp docs-publish",
     "watch": "gulp watch",
