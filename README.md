@@ -16,7 +16,7 @@ away!
 git clone git@github.com:zapier/formatic.git
 cd formatic
 npm install
-gulp live
+npm run live
 ```
 
 Point your browser to `localhost:3000/index.html`. Hack away on the code, the
@@ -29,10 +29,7 @@ from elsewhere.
 ## Build
 
 ```
-git clone git@github.com:zapier/formatic.git
-cd formatic
-npm install
-gulp build
+npm run build
 ```
 
 This will build two files in the build directory: formatic-min.js (minified)
