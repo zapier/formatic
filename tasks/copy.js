@@ -1,29 +1,32 @@
 'use strict';
 
 var gulp = require('gulp');
-var plugins = require('gulp-load-plugins')();
+var sh = require('shelljs');
 
-gulp.task('html-copy', function () {
-  return gulp.src(['./demo/*.html'])
-    .pipe(gulp.dest('./live'));
+gulp.task('copy-build', ['watch-bundle', 'mkdir-live'], function () {
+  sh.cp('-f', './build/formatic-dev.js', './live/lib');
 });
 
-gulp.task('html-watch', ['html-copy'], function () {
-  return gulp.watch(['./demo/*.html'], ['html-copy']);
+gulp.task('copy-demo', ['mkdir-live'], function () {
+  sh.cp('-f', './demo/*.html', './live');
 });
 
-gulp.task('css-copy', function () {
-  return gulp.src(['./style/*.css'])
-    .pipe(gulp.dest('./live/style'));
+gulp.task('copy-style', ['mkdir-live'], function () {
+  sh.cp('-rf', './style', './live');
 });
 
-gulp.task('css-watch', ['css-copy'], function () {
-  return gulp.watch(['./style/*.css'], ['css-copy']);
+gulp.task('copy-all', ['copy-build', 'copy-demo', 'copy-style']);
+
+gulp.task('copy-docs-build', ['mkdir-live-docs'], function () {
+  sh.cp('-f', './build/formatic-dev.js', './live/formatic/lib');
 });
 
-gulp.task('bower-copy', function () {
-  return gulp.src(['./demo/bower_components/**/*.*'])
-    .pipe(gulp.dest('./live/bower_components'));
+gulp.task('copy-docs-assets', ['mkdir-live-docs'], function () {
+  sh.cp('-rf', './docs/assets/*', './live/formatic');
 });
 
-gulp.task('copy-watch', ['bower-copy', 'html-watch', 'css-watch']);
+gulp.task('copy-docs-style', ['mkdir-live-docs'], function () {
+  sh.cp('-rf', './style/*.css', './live/formatic/css');
+});
+
+gulp.task('copy-docs-all', ['copy-docs-assets', 'copy-docs-style', 'copy-docs-assets']);
