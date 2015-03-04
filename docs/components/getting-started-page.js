@@ -52,7 +52,7 @@ module.exports = React.createClass({
                 <Snippet code={fs.readFileSync(path.join(__dirname, '../snippets/basic.js'), 'utf8')}/>
 
                 <p>
-                  The live example is the same. The only difference is that we render to <code>mountNode</code>,
+                  The live example is the same. The only difference is that we render to <code>mountNode</code>{','}
                   which is just the DOM node for the example.
                 </p>
 

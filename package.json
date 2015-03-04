@@ -4,7 +4,13 @@
   "description": "Automatic, pluggable form generation",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/jest-cli/bin/jest.js"
+    "test": "jest",
+    "lint": "eslint gulpfile.js lib/**/*.js docs/components/*.js docs/index.js",
+    "build": "gulp bundle-dev & gulp bundle-prod",
+    "docs-build": "gulp docs-build",
+    "docs-publish": "gulp docs-publish",
+    "watch": "gulp watch",
+    "live": "gulp server-live"
   },
   "repository": {
     "type": "git",
@@ -14,51 +20,47 @@
   "devDependencies": {
     "6to5": "^3.5.3",
     "6to5ify": "^4.1.1",
-    "body-parser": "^1.4.3",
     "brfs": "^1.3.0",
-    "browserify": "git+https://github.com/jdeal/node-browserify.git",
+    "browserify": "^6.2.0",
     "browserify-shim": "^3.8.0",
-    "chai": "^1.9.1",
     "connect-livereload": "^0.4.0",
+    "eslint": "^0.15.1",
     "express": "^4.5.1",
+    "gaze": "^0.5.1",
     "glob-watcher": "0.0.7",
-    "groc": "^0.7.0",
+    "groc": "https://registry.npmjs.org/groc/-/groc-0.7.0.tgz",
     "gulp": "^3.8.11",
-    "gulp-changed": "^0.4.0",
-    "gulp-clean": "^0.3.1",
     "gulp-eslint": "^0.1.8",
-    "gulp-favicons": "^1.0.8",
-    "gulp-file": "^0.2.0",
     "gulp-gh-pages": "^0.4.0",
-    "gulp-groc": "^0.4.1",
     "gulp-load-plugins": "^0.5.3",
-    "gulp-rename": "^1.2.0",
+    "gulp-run": "^1.6.6",
     "gulp-shell": "^0.2.8",
-    "gulp-streamify": "0.0.5",
-    "gulp-uglify": "^0.3.1",
-    "jest-cli": "^0.1.15",
-    "lodash": "^3.2.0",
+    "jest-cli": "^0.4.0",
     "react-bootstrap": "^0.14.0",
     "react-router": "^0.12.0",
     "require-dir": "^0.1.0",
+    "run-sequence": "^1.0.2",
     "tiny-lr": "0.0.9",
-    "vinyl-source-stream": "^0.1.1",
-    "watchify": "^2.1.1"
+    "uglify-js": "^2.4.16",
+    "watchify": "https://registry.npmjs.org/watchify/-/watchify-2.1.1.tgz"
   },
   "dependencies": {
     "envify": "^1.2.1",
-    "eventemitter3": "^0.1.5",
-    "funql": "0.0.15",
-    "jsnox": "^0.9.1",
     "react": "^0.12.0",
+    "react-tools": "^0.12.2",
+    "shelljs": "^0.3.0",
     "underscore": "^1.6.0"
   },
   "jest": {
+    "scriptPreprocessor": "<rootDir>/preprocessor.js",
     "unmockedModulePathPatterns": [
       "<rootDir>/node_modules/react",
       "<rootDir>/node_modules/underscore",
       "<rootDir>/index.js",
       "<rootDir>/lib"
+    ],
+    "testPathDirs": [
+      "__tests__"
     ]
   },
   "browserify": {
