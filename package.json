@@ -42,6 +42,7 @@
     "react-router": "^0.12.0",
     "require-dir": "^0.1.0",
     "run-sequence": "^1.0.2",
+    "shelljs": "^0.3.0",
     "tiny-lr": "0.0.9",
     "uglify-js": "^2.4.16",
     "watchify": "https://registry.npmjs.org/watchify/-/watchify-2.1.1.tgz"
