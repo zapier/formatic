@@ -1,6 +1,6 @@
 'use strict';
 
-require('6to5/register');
+require('babel/register');
 
 var fs = require('fs');
 var path = require('path');
