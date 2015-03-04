@@ -1,0 +1,239 @@
+<!DOCTYPE html><html lang="en"><head><title>components/fields/object</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="components/fields/object"><meta name="groc-project-path" content="lib/components/fields/object.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/components/fields/object.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="object-component">object component</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render a field to edit an object with dynamic child fields.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+'use strict'</span>;
+
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
+<span class="hljs-keyword">var</span> R = React.DOM;
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
+<span class="hljs-keyword">var</span> cx = React.addons.classSet;
+
+<span class="hljs-keyword">var</span> CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
+
+<span class="hljs-keyword">var</span> tempKeyPrefix = <span class="hljs-string">'$$__temp__'</span>;
+
+<span class="hljs-keyword">var</span> tempKey = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(id)</span> </span>{
+  <span class="hljs-keyword">return</span> tempKeyPrefix + id;
+};
+
+<span class="hljs-keyword">var</span> isTempKey = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+  <span class="hljs-keyword">return</span> key.substring(<span class="hljs-number">0</span>, tempKeyPrefix.length) === tempKeyPrefix;
+};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO: keep invalid keys as state and don&#39;t send in onChange; clone context
+and use clone to create child contexts</p></div></div><div class="code"><div class="wrapper"><span class="hljs-built_in">module</span>.exports = React.createClass({
+
+  displayName: <span class="hljs-string">'Object'</span>,
+
+  mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/field'</span>)],
+
+  nextLookupId: <span class="hljs-number">0</span>,
+
+  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+
+    <span class="hljs-keyword">var</span> keyToId = {};
+    <span class="hljs-keyword">var</span> keys = <span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>.props.field.value);
+    <span class="hljs-keyword">var</span> keyOrder = [];</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Temp keys keeps the key to display, which sometimes may be different
+than the actual key. For example, duplicate keys are not allowed,
+but we may temporarily show duplicate keys.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">var</span> tempDisplayKeys = {};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Keys don&#39;t make good react keys, since we&#39;re allowing them to be
+changed here, so we&#39;ll have to create fake keys and
+keep track of the mapping of real keys to fake keys. Yuck.</p></div></div><div class="code"><div class="wrapper">    keys.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+      <span class="hljs-keyword">var</span> id = ++<span class="hljs-keyword">this</span>.nextLookupId;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Map the real key to the id.</p></div></div><div class="code"><div class="wrapper">      keyToId[key] = id;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Keep the ordering of the keys so we don&#39;t shuffle things around later.</p></div></div><div class="code"><div class="wrapper">      keyOrder.push(key);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If this is a temporary key that was persisted, best we can do is display
+a blank.
+TODO: Probably just not send temporary keys back through. This behavior
+is actually leftover from an earlier incarnation of formatic where
+values had to go back to the root.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (isTempKey(key)) {
+        tempDisplayKeys[id] = <span class="hljs-string">''</span>;
+      }
+    }.bind(<span class="hljs-keyword">this</span>));
+
+    <span class="hljs-keyword">return</span> {
+      keyToId: keyToId,
+      keyOrder: keyOrder,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Temp keys keeps the key to display, which sometimes may be different
+than the actual key. For example, duplicate keys are not allowed,
+but we may temporarily show duplicate keys.</p></div></div><div class="code"><div class="wrapper">      tempDisplayKeys: tempDisplayKeys
+    };
+  },
+
+  componentWillReceiveProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(newProps)</span> </span>{
+
+    <span class="hljs-keyword">var</span> keyToId = <span class="hljs-keyword">this</span>.state.keyToId;
+    <span class="hljs-keyword">var</span> newKeyToId = {};
+    <span class="hljs-keyword">var</span> tempDisplayKeys = <span class="hljs-keyword">this</span>.state.tempDisplayKeys;
+    <span class="hljs-keyword">var</span> newTempDisplayKeys = {};
+    <span class="hljs-keyword">var</span> keyOrder = <span class="hljs-keyword">this</span>.state.keyOrder;
+    <span class="hljs-keyword">var</span> keys = <span class="hljs-built_in">Object</span>.keys(newProps.field.value);
+    <span class="hljs-keyword">var</span> addedKeys = [];</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look at the new keys.</p></div></div><div class="code"><div class="wrapper">    keys.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add new lookup if this key wasn&#39;t here last time.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (!keyToId[key]) {
+        <span class="hljs-keyword">this</span>.nextLookupId++;
+        newKeyToId[key] = <span class="hljs-keyword">this</span>.nextLookupId;
+        addedKeys.push(key);
+      } <span class="hljs-keyword">else</span> {
+        newKeyToId[key] = keyToId[key];
+      }
+      <span class="hljs-keyword">if</span> (isTempKey(key) &amp;&amp; newKeyToId[key] <span class="hljs-keyword">in</span> tempDisplayKeys) {
+        newTempDisplayKeys[newKeyToId[key]] = tempDisplayKeys[newKeyToId[key]];
+      }
+    }.bind(<span class="hljs-keyword">this</span>));
+
+    <span class="hljs-keyword">var</span> newKeyOrder = [];</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look at the old keys.</p></div></div><div class="code"><div class="wrapper">    keyOrder.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If the key is in the new keys, push it onto the order to retain the
+same order.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (newKeyToId[key]) {
+        newKeyOrder.push(key);
+      }
+    });</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Put added fields at the end. (So things don&#39;t get shuffled.)</p></div></div><div class="code"><div class="wrapper">    newKeyOrder = newKeyOrder.concat(addedKeys);
+
+    <span class="hljs-keyword">this</span>.setState({
+      keyToId: newKeyToId,
+      keyOrder: newKeyOrder,
+      tempDisplayKeys: newTempDisplayKeys
+    });
+  },
+
+  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key, newValue, info)</span> </span>{
+    <span class="hljs-keyword">var</span> newObj = _.extend({}, <span class="hljs-keyword">this</span>.props.field.value);
+    newObj[key] = newValue;
+    <span class="hljs-keyword">this</span>.onBubbleValue(newObj, info);
+  },
+
+  onAppend: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemChoiceIndex)</span> </span>{
+    <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
+    <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
+    <span class="hljs-keyword">this</span>.nextLookupId++;
+
+    <span class="hljs-keyword">var</span> keyToId = <span class="hljs-keyword">this</span>.state.keyToId;
+    <span class="hljs-keyword">var</span> keyOrder = <span class="hljs-keyword">this</span>.state.keyOrder;
+    <span class="hljs-keyword">var</span> tempDisplayKeys = <span class="hljs-keyword">this</span>.state.tempDisplayKeys;
+
+    <span class="hljs-keyword">var</span> id = <span class="hljs-keyword">this</span>.nextLookupId;
+    <span class="hljs-keyword">var</span> newKey = tempKey(id);
+
+    keyToId[newKey] = id;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Temporarily, we&#39;ll show a blank key.</p></div></div><div class="code"><div class="wrapper">    tempDisplayKeys[id] = <span class="hljs-string">''</span>;
+    keyOrder.push(newKey);
+
+    <span class="hljs-keyword">this</span>.setState({
+      keyToId: keyToId,
+      tempDisplayKeys: tempDisplayKeys,
+      keyOrder: keyOrder
+    });
+
+    <span class="hljs-keyword">var</span> newObj = _.extend(<span class="hljs-keyword">this</span>.props.field.value);
+
+    <span class="hljs-keyword">var</span> newValue = config.createNewChildFieldValue(field, itemChoiceIndex);
+
+    newObj[newKey] = newValue;
+
+    <span class="hljs-keyword">this</span>.onChangeValue(newObj);
+  },
+
+  onRemove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+    <span class="hljs-keyword">var</span> newObj = _.extend(<span class="hljs-keyword">this</span>.props.field.value);
+    <span class="hljs-keyword">delete</span> newObj[key];
+    <span class="hljs-keyword">this</span>.onChangeValue(newObj);
+  },
+
+  onMove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fromKey, toKey)</span> </span>{
+    <span class="hljs-keyword">if</span> (fromKey !== toKey) {
+      <span class="hljs-keyword">var</span> keyToId = <span class="hljs-keyword">this</span>.state.keyToId;
+      <span class="hljs-keyword">var</span> keyOrder = <span class="hljs-keyword">this</span>.state.keyOrder;
+      <span class="hljs-keyword">var</span> tempDisplayKeys = <span class="hljs-keyword">this</span>.state.tempDisplayKeys;
+
+      <span class="hljs-keyword">var</span> newObj = _.extend(<span class="hljs-keyword">this</span>.props.field.value);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If we already have the key we&#39;re moving to, then we have to change that
+key to something else.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (keyToId[toKey]) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Make a new</p></div></div><div class="code"><div class="wrapper">        <span class="hljs-keyword">var</span> tempToKey = tempKey(keyToId[toKey]);
+        tempDisplayKeys[keyToId[toKey]] = toKey;
+        keyToId[tempToKey] = keyToId[toKey];
+        keyOrder[keyOrder.indexOf(toKey)] = tempToKey;
+        <span class="hljs-keyword">delete</span> keyToId[toKey];
+        <span class="hljs-keyword">this</span>.setState({
+          keyToId: keyToId,
+          tempDisplayKeys: tempDisplayKeys,
+          keyOrder: keyOrder
+        });
+
+        newObj[tempToKey] = newObj[toKey];
+        <span class="hljs-keyword">delete</span> newObj[toKey];
+      }
+
+      <span class="hljs-keyword">if</span> (!toKey) {
+        toKey = tempKey(keyToId[fromKey]);
+        tempDisplayKeys[keyToId[fromKey]] = <span class="hljs-string">''</span>;
+      }
+      keyToId[toKey] = keyToId[fromKey];
+      <span class="hljs-keyword">delete</span> keyToId[fromKey];
+      keyOrder[keyOrder.indexOf(fromKey)] = toKey;
+
+      <span class="hljs-keyword">this</span>.setState({
+        keyToId: keyToId,
+        keyOrder: keyOrder,
+        tempDisplayKeys: tempDisplayKeys
+      });
+
+      newObj[toKey] = newObj[fromKey];
+      <span class="hljs-keyword">delete</span> newObj[fromKey];
+
+      <span class="hljs-keyword">this</span>.onChangeValue(newObj);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Check if our fromKey has opened up a spot.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (fromKey &amp;&amp; fromKey !== toKey) {
+        <span class="hljs-keyword">if</span> (!(fromKey <span class="hljs-keyword">in</span> newObj)) {
+          <span class="hljs-built_in">Object</span>.keys(newObj).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+            <span class="hljs-keyword">if</span> (!(isTempKey(key))) {
+              <span class="hljs-keyword">return</span>;
+            }
+            <span class="hljs-keyword">var</span> id = keyToId[key];
+            <span class="hljs-keyword">var</span> displayKey = tempDisplayKeys[id];
+            <span class="hljs-keyword">if</span> (fromKey === displayKey) {
+              <span class="hljs-keyword">this</span>.onMove(key, displayKey);
+            }
+          }.bind(<span class="hljs-keyword">this</span>));
+        }
+      }
+    }
+  },
+
+  getFields: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
+    <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
+
+    <span class="hljs-keyword">var</span> fields = config.createChildFields(field);
+
+    <span class="hljs-keyword">var</span> keyToField = {};
+
+    _.each(fields, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childField)</span> </span>{
+      keyToField[childField.key] = childField;
+    });
+
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.state.keyOrder.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+      <span class="hljs-keyword">return</span> keyToField[key];
+    });
+  },
+
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
+  },
+
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+
+    <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
+    <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
+
+    <span class="hljs-keyword">var</span> fields = <span class="hljs-keyword">this</span>.getFields();
+
+    <span class="hljs-keyword">return</span> config.createElement(<span class="hljs-string">'field'</span>, {
+      field: field, plain: <span class="hljs-keyword">this</span>.props.plain
+    },
+      R.div({className: cx(<span class="hljs-keyword">this</span>.props.classes)},
+        CSSTransitionGroup({transitionName: <span class="hljs-string">'reveal'</span>},
+          fields.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childField)</span> </span>{
+            <span class="hljs-keyword">var</span> displayKey = <span class="hljs-keyword">this</span>.state.tempDisplayKeys[<span class="hljs-keyword">this</span>.state.keyToId[childField.key]];
+            <span class="hljs-keyword">if</span> (_.isUndefined(displayKey)) {
+              displayKey = childField.key;
+            }
+            <span class="hljs-keyword">return</span> config.createElement(<span class="hljs-string">'object-item'</span>, {
+              key: <span class="hljs-keyword">this</span>.state.keyToId[childField.key],
+              field: childField,
+              onMove: <span class="hljs-keyword">this</span>.onMove,
+              onRemove: <span class="hljs-keyword">this</span>.onRemove,
+              onChange: <span class="hljs-keyword">this</span>.onChange,
+              onAction: <span class="hljs-keyword">this</span>.onBubbleAction,
+              displayKey: displayKey,
+              itemKey: childField.key
+            });
+          }.bind(<span class="hljs-keyword">this</span>))
+        ),
+        config.createElement(<span class="hljs-string">'object-control'</span>, {field: field, onAppend: <span class="hljs-keyword">this</span>.onAppend})
+      )
+    );
+  }
+});</div></div></div></div></body></html>

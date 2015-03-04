@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="en"><head><title>mixins/resize</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="mixins/resize"><meta name="groc-project-path" content="lib/mixins/resize.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/mixins/resize.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="resize-mixin">resize mixin</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>You&#39;d think it would be pretty easy to detect when a DOM element is resized.
+And you&#39;d be wrong. There are various tricks, but none of them work very well.
+So, using good ol&#39; polling here. To try to be as efficient as possible, there
+is only a single setInterval used for all elements. To use:</p>
+<pre><code class="lang-js"><span class="hljs-built_in">module</span>.exports = React.createClass({
+
+  mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/resize'</span>)],
+
+  onResize: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'resized!'</span>);
+  },
+
+  componentDidMount: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">this</span>.setOnResize(<span class="hljs-string">'myText'</span>, <span class="hljs-keyword">this</span>.onResize);
+  },
+
+  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    ...
+  },
+
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> React.DOM.textarea({ref: <span class="hljs-string">'myText'</span>, value: <span class="hljs-keyword">this</span>.props.value, onChange: ...})
+  }
+});</code></pre></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+'use strict'</span>;
+
+<span class="hljs-keyword">var</span> id = <span class="hljs-number">0</span>;
+
+<span class="hljs-keyword">var</span> resizeIntervalElements = {};
+<span class="hljs-keyword">var</span> resizeIntervalElementsCount = <span class="hljs-number">0</span>;
+<span class="hljs-keyword">var</span> resizeIntervalTimer = <span class="hljs-literal">null</span>;
+
+<span class="hljs-keyword">var</span> checkElements = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  <span class="hljs-built_in">Object</span>.keys(resizeIntervalElements).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+    <span class="hljs-keyword">var</span> element = resizeIntervalElements[key];
+    <span class="hljs-keyword">if</span> (element.clientWidth !== element.__prevClientWidth || element.clientHeight !== element.__prevClientHeight) {
+      element.__prevClientWidth = element.clientWidth;
+      element.__prevClientHeight = element.clientHeight;
+      <span class="hljs-keyword">var</span> handlers = element.__resizeHandlers;
+      handlers.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(handler)</span> </span>{
+        handler();
+      });
+    }
+  }, <span class="hljs-number">100</span>);
+};
+
+<span class="hljs-keyword">var</span> addResizeIntervalHandler = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(element, fn)</span> </span>{
+  <span class="hljs-keyword">if</span> (resizeIntervalTimer === <span class="hljs-literal">null</span>) {
+    resizeIntervalTimer = setInterval(checkElements, <span class="hljs-number">100</span>);
+  }
+  <span class="hljs-keyword">if</span> (!(<span class="hljs-string">'__resizeId'</span> <span class="hljs-keyword">in</span> element)) {
+    id++;
+    element.__prevClientWidth = element.clientWidth;
+    element.__prevClientHeight = element.clientHeight;
+    element.__resizeId = id;
+    resizeIntervalElementsCount++;
+    resizeIntervalElements[id] = element;
+    element.__resizeHandlers = [];
+  }
+  element.__resizeHandlers.push(fn);
+};
+
+<span class="hljs-keyword">var</span> removeResizeIntervalHandlers = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(element)</span> </span>{
+  <span class="hljs-keyword">if</span> (!(<span class="hljs-string">'__resizeId'</span> <span class="hljs-keyword">in</span> element)) {
+    <span class="hljs-keyword">return</span>;
+  }
+  <span class="hljs-keyword">var</span> resizeId = element.__resizeId;
+  <span class="hljs-keyword">delete</span> element.__resizeId;
+  <span class="hljs-keyword">delete</span> element.__resizeHandlers;
+  <span class="hljs-keyword">delete</span> resizeIntervalElements[resizeId];
+  resizeIntervalElementsCount--;
+  <span class="hljs-keyword">if</span> (resizeIntervalElementsCount &lt; <span class="hljs-number">1</span>) {
+    clearInterval(resizeIntervalTimer);
+    resizeIntervalTimer = <span class="hljs-literal">null</span>;
+  }
+};
+
+<span class="hljs-keyword">var</span> onResize = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ref, fn)</span> </span>{
+  fn(ref);
+};
+
+<span class="hljs-built_in">module</span>.exports = {
+
+  componentDidMount: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.onResizeWindow) {
+      <span class="hljs-built_in">window</span>.addEventListener(<span class="hljs-string">'resize'</span>, <span class="hljs-keyword">this</span>.onResizeWindow);
+    }
+    <span class="hljs-keyword">this</span>.resizeElementRefs = {};
+  },
+
+  componentWillUnmount: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.onResizeWindow) {
+      <span class="hljs-built_in">window</span>.removeEventListener(<span class="hljs-string">'resize'</span>, <span class="hljs-keyword">this</span>.onResizeWindow);
+    }
+    <span class="hljs-built_in">Object</span>.keys(<span class="hljs-keyword">this</span>.resizeElementRefs).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ref)</span> </span>{
+      removeResizeIntervalHandlers(<span class="hljs-keyword">this</span>.refs[ref].getDOMNode());
+    }.bind(<span class="hljs-keyword">this</span>));
+  },
+
+  setOnResize: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(ref, fn)</span> </span>{
+    <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.resizeElementRefs[ref]) {
+      <span class="hljs-keyword">this</span>.resizeElementRefs[ref] = <span class="hljs-literal">true</span>;
+    }
+    addResizeIntervalHandler(<span class="hljs-keyword">this</span>.refs[ref].getDOMNode(), onResize.bind(<span class="hljs-keyword">this</span>, ref, fn));
+  }
+};</div></div></div></div></body></html>

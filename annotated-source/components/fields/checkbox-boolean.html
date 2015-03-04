@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="en"><head><title>components/fields/checkbox-boolean</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="components/fields/checkbox-boolean"><meta name="groc-project-path" content="lib/components/fields/checkbox-boolean.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/components/fields/checkbox-boolean.js</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="checkbox-boolean-component">checkbox-boolean component</h1></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render a field that can edit a boolean with a checkbox.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi">
+'use strict'</span>;
+
+<span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
+<span class="hljs-keyword">var</span> R = React.DOM;
+<span class="hljs-keyword">var</span> cx = React.addons.classSet;
+
+<span class="hljs-built_in">module</span>.exports = React.createClass({
+
+  displayName: <span class="hljs-string">'CheckboxBoolean'</span>,
+
+  mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/field'</span>)],
+
+  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> </span>{
+    <span class="hljs-keyword">this</span>.onChangeValue(event.target.checked);
+  },
+
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
+  },
+
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+
+    <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
+    <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
+
+    <span class="hljs-keyword">return</span> config.createElement(<span class="hljs-string">'field'</span>, {
+      config: config, field: field, plain: <span class="hljs-literal">true</span>
+    },
+    R.span({style: {whiteSpace: <span class="hljs-string">'nowrap'</span>}},
+      R.input({
+        type: <span class="hljs-string">'checkbox'</span>,
+        checked: field.value,
+        className: cx(<span class="hljs-keyword">this</span>.props.classes),
+        onChange: <span class="hljs-keyword">this</span>.onChange,
+        onFocus: <span class="hljs-keyword">this</span>.onFocusAction,
+        onBlur: <span class="hljs-keyword">this</span>.onBlurAction
+      }),
+      R.span({}, <span class="hljs-string">' '</span>),
+      R.span({}, config.fieldHelpText(field) || config.fieldLabel(field))
+    ));
+  }
+});</div></div></div></div></body></html>
