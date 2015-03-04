@@ -15,7 +15,7 @@ gulp.task('watch-bundle', function (done) {
   plugins.run('watchify -e index.js -d -s Formatic -x underscore -x react -x react/addons -o build/formatic-dev.js').exec();
 });
 
-gulp.task('watch-build', ['watch-bundle'], function () {
+gulp.task('watch-build', function () {
   return gulp.watch(['./build/formatic-dev.js'], ['copy-build']);
 });
 
@@ -27,11 +27,11 @@ gulp.task('watch-test', ['watch-test-run-test-before-watch'], function () {
   return gulp.watch(['./build/formatic-dev.js', '__tests__/**/*.js'], ['test']);
 });
 
-gulp.task('watch-demo', ['copy-demo'], function () {
+gulp.task('watch-demo', function () {
   return gulp.watch(['./demo/*.html'], ['copy-demo']);
 });
 
-gulp.task('watch-style', ['copy-style'], function () {
+gulp.task('watch-style', function () {
   return gulp.watch(['./style/*.css'], ['copy-style']);
 });
 
@@ -49,4 +49,10 @@ gulp.task('watch-docs-build', ['watch-docs-bundle'], function () {
   return gulp.watch(['live/formatic/lib/bundle.js'], ['docs-build-site']);
 });
 
-gulp.task('watch', ['watch-bundle', 'watch-docs-build', 'watch-demo', 'watch-style', 'watch-test', 'watch-docs-build']);
+gulp.task('watch', function (done) {
+  run(
+    'watch-bundle',
+    ['watch-build', 'watch-docs-build', 'watch-demo', 'watch-style', 'watch-test'],
+    done
+  );
+});

@@ -3,7 +3,7 @@
 var gulp = require('gulp');
 var sh = require('shelljs');
 
-gulp.task('copy-build', ['watch-bundle', 'mkdir-live'], function () {
+gulp.task('copy-build', ['mkdir-live'], function () {
   sh.cp('-f', './build/formatic-dev.js', './live/lib');
 });
 
