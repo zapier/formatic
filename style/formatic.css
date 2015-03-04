@@ -293,3 +293,26 @@
   cursor: pointer;
   padding-right: 1em;
 }
+
+/* TEMP HACK TO GET PrettyText2 going: */
+.tag {
+  border-radius: 16px;
+  background: #ff9266;
+  cursor: pointer;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.textBox {
+  -moz-appearance: textfield-multiline;
+  -webkit-appearance: textarea;
+  border: 1px solid gray;
+  font: medium -moz-fixed;
+  font: -webkit-small-control;
+  height: 28px;
+  overflow: auto;
+  padding: 2px;
+  resize: both;
+  width: 400px;
+  margin: 10px;
+}
