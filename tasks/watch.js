@@ -49,9 +49,8 @@ gulp.task('watch-docs-build', ['watch-docs-bundle'], function () {
   return gulp.watch(['live/formatic/lib/bundle.js'], ['docs-build-site']);
 });
 
-gulp.task('watch', function (done) {
+gulp.task('watch', ['watch-bundle'], function (done) {
   run(
-    'watch-bundle',
     ['watch-build', 'watch-docs-build', 'watch-demo', 'watch-style', 'watch-test'],
     done
   );

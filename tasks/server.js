@@ -8,7 +8,7 @@ var gaze = require('gaze');
 var LR_PORT = 35729;
 var APP_PORT = 3000;
 
-gulp.task('server-express', ['copy-all', 'copy-docs-all'], function (done) {
+gulp.task('server-express', ['copy-all-after-bundle', 'copy-docs-all-after-bundle'], function (done) {
   var app = express();
 
   app
