@@ -2,4 +2,4 @@
 
 var gulp = require('gulp');
 
-gulp.task('build', ['bundle-dev', 'bundle-prod']);
+gulp.task('build', ['lint', 'bundle-dev', 'bundle-prod']);
