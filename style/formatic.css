@@ -168,9 +168,10 @@
   background: rgb(255, 74, 0);
 }
 
-.pretty-text-box {
+/* use div. to make this rule more specific than BS .form-control */
+div.pretty-text-box {
   overflow: auto;
-  height: 60px;
+  height: 54px;
   resize: both;
 }
 
