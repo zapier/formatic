@@ -168,15 +168,11 @@
   background: rgb(255, 74, 0);
 }
 
-/* .prettyBox {
-   -moz-appearance: textfield-multiline;
-   -webkit-appearance: textarea;
-   border: 1px solid gray;
-   overflow: auto;
-   padding: 5px;
-   resize: both;
-   }
- */
+.pretty-text-box {
+  overflow: auto;
+  height: 60px;
+  resize: both;
+}
 
 .formatic .pretty-part-left, .formatic .pretty-part-right {
 }
