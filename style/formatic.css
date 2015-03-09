@@ -173,6 +173,7 @@ div.pretty-text-box {
   overflow: auto;
   height: 54px;
   resize: both;
+  white-space: pre-wrap;
 }
 
 .formatic .pretty-part-left, .formatic .pretty-part-right {
