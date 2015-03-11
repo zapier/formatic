@@ -49,9 +49,12 @@
       Formatic.plugins.bootstrap
     );
 
-    var fields = [
-      {
-        label: 'Pretty Text 2', key: 'prettyText2', type: 'pretty-text2',
+    var fields = [];
+
+    var prettyNum = 10;
+    _.each(_.range(prettyNum), function(x){
+      fields.push({
+        label: 'Pretty Text 2', key: 'prettyText2-' + x, type: 'pretty-text2',
         initialValue: 'Hi there {{firstName}} {{lastName}} {{middleName}}',
         tabIndex: 1,
         replaceChoices: [
@@ -66,8 +69,10 @@
             sample: 'Smith'
           }
         ]
-      },
+      });
+    });
 
+    fields = fields.concat([
       {label: 'Name', type: 'unicode', key: 'name', required: true, default: 'Unknown'},
       {id: 'silly', type: 'copy', help_text_html: 'What the hey?'},
       {label: 'Note', type: 'text', key: 'note'},
@@ -128,7 +133,7 @@
       },
       {label: 'More colors', key: 'moreColors', extends: 'colors'},
       {label: 'Alive', label: "I'm alive!", type: 'checkbox-boolean', key: 'isAlive'}
-    ];
+    ]);
 
     var formValue = {};
 
