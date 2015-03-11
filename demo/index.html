@@ -13,7 +13,6 @@
      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
    }
 
-   /*
    /* PADDING */
    .CodeMirror-lines {
      padding: 0 0; /* Vertical padding around content */
@@ -21,7 +20,6 @@
    .CodeMirror pre {
      padding: 0 0; /* Horizontal padding of content */
    }
-   */
   </style>
 </head>
 <body>
@@ -54,7 +52,7 @@
     var fields = [
       {
         label: 'Pretty Text 2', key: 'prettyText2', type: 'pretty-text2',
-        initialValue: 'Hi there {{firstName}} {{lastName}}',
+        initialValue: 'Hi there {{firstName}} {{lastName}} {{middleName}}',
         tabIndex: 1,
         replaceChoices: [
           {
