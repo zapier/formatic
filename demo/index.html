@@ -55,7 +55,7 @@
     _.each(_.range(prettyNum), function(x){
       fields.push({
         label: 'Pretty Text 2', key: 'prettyText2-' + x, type: 'pretty-text2',
-        initialValue: 'Hi there {{firstName}} {{lastName}} {{middleName}}',
+        default: 'Hi there {{firstName}} {{lastName}} {{middleName}}',
         tabIndex: 1,
         replaceChoices: [
           {
