@@ -4,7 +4,11 @@
 var TagTranslator = require('../../../lib/components/helpers/tag-translator');
 
 describe('editor-util', function () {
-  var choices = {firstName: 'First Name', lastName: 'Last Name'};
+  var choices = [
+    { value: 'firstName', label: 'First Name' },
+    { value: 'lastName', label: 'Last Name' }
+  ];
+
   var translator = TagTranslator(choices);
 
   var tagged = 'hello {{firstName}} {{lastName}}';
