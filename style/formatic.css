@@ -4,11 +4,6 @@
   /*font-family: 'Open Sans', Helvetica, arial, sans-serif;*/
 }
 
-
-.formatic .field {
-  /*padding: 10px;*/
-}
-
 .formatic fieldset {
   margin-left: 5px;
 }
@@ -156,10 +151,24 @@
   opacity: 0.01;
 }
 
-.formatic .pretty-part {
+.pretty-part {
   border-radius: 12px;
   background: #ff9266;
   cursor: pointer;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.pretty-part:hover {
+  background: rgb(255, 74, 0);
+}
+
+/* use div. to make this rule more specific than BS .form-control */
+div.pretty-text-box {
+  overflow: auto;
+  height: 54px;
+  resize: both;
+  white-space: pre-wrap;
 }
 
 .formatic .pretty-part-left, .formatic .pretty-part-right {
@@ -174,100 +183,6 @@
 .formatic .pretty-part-hover {
   background: rgb(255, 74, 0);
 }
-
-/*.formatic .pretty-content {
-  font-family: 'Open Sans', Helvetica, arial, sans-serif;
-  font-size: 13px;
-  max-width: 870px;
-  border: solid 1px;
-  height: 100px;
-  padding: 2px;
-  margin: 2px;
-  overflow: scroll;
-  width: 200px;
-}
-
-.formatic .pretty-overlay {
-  font-family: 'Open Sans', Helvetica, arial, sans-serif;
-  font-size: 13px;
-  max-width: 870px;
-  border: solid 1px;
-  height: 100px;
-  padding: 2px;
-  margin: 2px;
-  overflow: scroll;
-  width: 200px;
-
-  color: rgba(0, 0, 0, 0);
-
-  height: 98px;
-  border-bottom: 0px;
-  white-space: pre-wrap;
-  white-space: -moz-pre-wrap;
-  white-space: -pre-wrap;
-  white-space: -o-pre-wrap;
-  word-wrap: break-word;
-  word-break: keep-all;
-}*/
-
-/*
-.formatic .boolean-checkbox-field label {
-  display: inline
-}
-
-.formatic .pretty-part {
-  border-radius: 12px;
-  background: #ff9266;
-  cursor: pointer;
-}
-
-.formatic .pretty-part-left, .formatic .pretty-part-right {
-}
-
-.formatic .pretty-textarea-field textarea, .formatic .pretty-textarea-field pre {
-  font-family: 'Open Sans', Helvetica, arial, sans-serif;
-  font-size: 13px;
-  max-width: 870px;
-  border: solid 1px;
-  height: 100px;
-  padding: 2px;
-  margin: 2px;
-  overflow: scroll;
-}
-
-.formatic .pretty-textarea-field pre {
-  color: rgba(0, 0, 0, 0);
-
-  height: 98px;
-  border-bottom: 0px;
-  white-space: pre-wrap;
-  white-space: -moz-pre-wrap;
-  white-space: -pre-wrap;
-  white-space: -o-pre-wrap;
-  word-wrap: break-word;
-}
-
-.formatic textarea {
-  height: 5em;
-  max-width: 870px;
-}
-
-.formatic pre {
-  width: 500px;
-}
-
-.formatic .code-field pre {
-  white-space: pre-wrap;
-}
-*/
-
-/*.formatic .list-field, .formatic .object-field {
-  border: 1px solid #ccc;
-}
-
-.formatic .list-item, .formatic .object-item {
-  border: 1px solid #ccc;
-}*/
 
 .formatic .add-item, .formatic .object-control-add {
   color: green;
@@ -292,4 +207,37 @@
 .formatic .move-item-forward {
   cursor: pointer;
   padding-right: 1em;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  /* -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075); */
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  /* -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s; */
+  /* -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s; */
+  transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  box-sizing: border-box;
+}
+
+:before, :after {
+  /* -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box; */
+  box-sizing: border-box;
+}
+
+:before, :after {
+  /* -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box; */
+  box-sizing: border-box;
 }

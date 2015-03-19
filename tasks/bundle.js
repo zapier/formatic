@@ -4,11 +4,11 @@ var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
 
 gulp.task('bundle-dev', plugins.shell.task(
-  'browserify -e index.js -d -s Formatic -x underscore -x react -x react/addons -o build/formatic-dev.js'
+  'browserify -e index.js -d -s Formatic -x underscore -x react -x react/addons -x codemirror -o build/formatic-dev.js'
 ));
 
 gulp.task('bundle-prod', plugins.shell.task([
-  'browserify -e index.js -s Formatic -x underscore -x react -x react/addons',
+  'browserify -e index.js -s Formatic -x underscore -x react -x react/addons -x codemirror',
   'uglifyjs -o build/formatic-min.js'
 ].join(' | ')));
 

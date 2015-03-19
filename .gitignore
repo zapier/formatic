@@ -4,3 +4,8 @@ node_modules
 /demo/test.html
 /build-docs
 .DS_Store
+.tern-port
+*~
+\#*\#
+.\#*
+.projectile

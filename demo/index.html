@@ -4,6 +4,23 @@
   <link href="./style/formatic.css" rel="stylesheet" type="text/css"/>
   <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="./bower_components/codemirror/lib/codemirror.css">
+
+  <style type="text/css" media="screen">
+   /* CodeMirror styling */
+   .CodeMirror {
+     /* Set height, width, borders, and global font properties here */
+     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+   }
+
+   /* PADDING */
+   .CodeMirror-lines {
+     padding: 0 0; /* Vertical padding around content */
+   }
+   .CodeMirror pre {
+     padding: 0 0; /* Horizontal padding of content */
+   }
+  </style>
 </head>
 <body>
   <div class="container-fluid">
@@ -16,6 +33,7 @@
   <script src="./bower_components/jquery/dist/jquery.min.js"></script>
   <script src="./bower_components/underscore/underscore-min.js"></script>
   <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="./bower_components/codemirror/lib/codemirror.js"></script>
   <script src="./bower_components/react/react-with-addons.js"></script>
 
   <script src="./lib/formatic-dev.js"></script>
@@ -31,7 +49,30 @@
       Formatic.plugins.bootstrap
     );
 
-    var fields = [
+    var fields = [];
+
+    var prettyNum = 10;
+    _.each(_.range(prettyNum), function(x){
+      fields.push({
+        label: 'Pretty Text 2', key: 'prettyText2-' + x, type: 'pretty-text',
+        default: 'Hi there {{firstName}} {{lastName}} {{middleName}}',
+        tabIndex: x + 1,
+        replaceChoices: [
+          {
+            value: 'firstName',
+            label: 'First Name',
+            sample: 'Bob'
+          },
+          {
+            value: 'lastName',
+            label: 'Last Name',
+            sample: 'Smith'
+          }
+        ]
+      });
+    });
+
+    fields = fields.concat([
       {label: 'Name', type: 'unicode', key: 'name', required: true, default: 'Unknown'},
       {id: 'silly', type: 'copy', help_text_html: 'What the hey?'},
       {label: 'Note', type: 'text', key: 'note', required: true},
@@ -92,7 +133,7 @@
       },
       {label: 'More colors', key: 'moreColors', extends: 'colors'},
       {label: 'Alive', label: "I'm alive!", type: 'checkbox-boolean', key: 'isAlive'}
-    ];
+    ]);
 
     var formValue = {};
 
