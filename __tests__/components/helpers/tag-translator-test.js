@@ -30,4 +30,8 @@ describe('editor-util', function () {
     expect(actual).toEqual(html);
   });
 
+  it('should convert ints to HTML', function () {
+    var actual = translator.toHtml(42);
+    expect(actual).toEqual('42');
+  });
 });
