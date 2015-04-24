@@ -5,21 +5,21 @@
 <span class="hljs-keyword">var</span> R = React.DOM;
 <span class="hljs-keyword">var</span> cx = React.addons.classSet;
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'ObjectItemKey'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/helper'</span>)],
 
-  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> </span>{
+  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> {</span>
     <span class="hljs-keyword">this</span>.props.onChange(event.target.value);
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> R.input({className: cx(<span class="hljs-keyword">this</span>.props.classes), type: <span class="hljs-string">'text'</span>, value: <span class="hljs-keyword">this</span>.props.displayKey, onChange: <span class="hljs-keyword">this</span>.onChange});
   }
 });</div></div></div></div></body></html>

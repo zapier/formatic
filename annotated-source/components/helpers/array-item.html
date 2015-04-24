@@ -6,29 +6,29 @@
 <span class="hljs-keyword">var</span> cx = React.addons.classSet;
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'ArrayItem'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/helper'</span>)],
 
-  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> {
       isMaybeRemoving: <span class="hljs-literal">false</span>
     };
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  onMaybeRemove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(isMaybeRemoving)</span> </span>{
+  onMaybeRemove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(isMaybeRemoving)</span> {</span>
     <span class="hljs-keyword">this</span>.setState({
       isMaybeRemoving: isMaybeRemoving
     });
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
 

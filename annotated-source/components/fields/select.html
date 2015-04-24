@@ -5,29 +5,29 @@ boolean values, but it <em>should</em> work for other values.</p></div></div><di
 
 <span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'Select'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/field'</span>)],
 
-  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> {
       choices: <span class="hljs-keyword">this</span>.props.config.fieldChoices(<span class="hljs-keyword">this</span>.props.field)
     };
   },
 
-  componentWillReceiveProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(newProps)</span> </span>{
+  componentWillReceiveProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(newProps)</span> {</span>
     <span class="hljs-keyword">this</span>.setState({
       choices: newProps.config.fieldChoices(newProps.field)
     });
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
 
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;

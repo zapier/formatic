@@ -5,35 +5,35 @@
 <span class="hljs-keyword">var</span> R = React.DOM;
 <span class="hljs-keyword">var</span> cx = React.addons.classSet;
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'RemoveItem'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/helper'</span>)],
 
-  getDefaultProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  getDefaultProps: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> {
       label: <span class="hljs-string">'[remove]'</span>
     };
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  onMouseOverRemove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  onMouseOverRemove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.props.onMaybeRemove) {
       <span class="hljs-keyword">this</span>.props.onMaybeRemove(<span class="hljs-literal">true</span>);
     }
   },
 
-  onMouseOutRemove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  onMouseOutRemove: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.props.onMaybeRemove) {
       <span class="hljs-keyword">this</span>.props.onMaybeRemove(<span class="hljs-literal">false</span>);
     }
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> R.span({
       className: cx(<span class="hljs-keyword">this</span>.props.classes), onClick: <span class="hljs-keyword">this</span>.props.onClick,
       onMouseOver: <span class="hljs-keyword">this</span>.onMouseOverRemove, onMouseOut: <span class="hljs-keyword">this</span>.onMouseOutRemove

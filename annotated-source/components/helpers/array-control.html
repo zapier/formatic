@@ -5,33 +5,33 @@
 <span class="hljs-keyword">var</span> R = React.DOM;
 <span class="hljs-keyword">var</span> cx = React.addons.classSet;
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'ArrayControl'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/helper'</span>)],
 
-  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> {
       fieldTemplateIndex: <span class="hljs-number">0</span>
     };
   },
 
-  onSelect: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(index)</span> </span>{
+  onSelect: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(index)</span> {</span>
     <span class="hljs-keyword">this</span>.setState({
       fieldTemplateIndex: index
     });
   },
 
-  onAppend: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  onAppend: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">this</span>.props.onAppend(<span class="hljs-keyword">this</span>.state.fieldTemplateIndex);
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
 
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
 

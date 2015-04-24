@@ -3,26 +3,26 @@
 
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 
-<span class="hljs-built_in">module</span>.exports = {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Delegate rendering back to config so it can be wrapped.</p></div></div><div class="code"><div class="wrapper">  renderWithConfig: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+module.exports = {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Delegate rendering back to config so it can be wrapped.</p></div></div><div class="code"><div class="wrapper">  renderWithConfig: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.props.config.renderComponent(<span class="hljs-keyword">this</span>);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Start an action bubbling up through parent components.</p></div></div><div class="code"><div class="wrapper">  onStartAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(action, props)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Start an action bubbling up through parent components.</p></div></div><div class="code"><div class="wrapper">  onStartAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(action, props)</span> {</span>
     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.props.onAction) {
       <span class="hljs-keyword">var</span> info = _.extend({}, props);
       info.action = action;
       info.field = <span class="hljs-keyword">this</span>.props.field;
       <span class="hljs-keyword">this</span>.props.onAction(info);
     }
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Bubble up an action.</p></div></div><div class="code"><div class="wrapper">  onBubbleAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(info)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Bubble up an action.</p></div></div><div class="code"><div class="wrapper">  onBubbleAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(info)</span> {</span>
     <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span>.props.onAction) {
       <span class="hljs-keyword">this</span>.props.onAction(info);
     }
   },
 
-  onFocusAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  onFocusAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">this</span>.onStartAction(<span class="hljs-string">'focus'</span>);
   },
 
-  onBlurAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  onBlurAction: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">this</span>.onStartAction(<span class="hljs-string">'blur'</span>);
   }
 };</div></div></div></div></body></html>

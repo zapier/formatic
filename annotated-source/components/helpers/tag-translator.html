@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="en"><head><title>components/helpers/tag-translator</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../../"><meta name="groc-document-path" content="components/helpers/tag-translator"><meta name="groc-project-path" content="lib/components/helpers/tag-translator.js"><link rel="stylesheet" type="text/css" media="all" href="../../assets/style.css"><script type="text/javascript" src="../../assets/behavior.js"></script><body><div id="meta"><div class="file-path">lib/components/helpers/tag-translator.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
+
+<span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Constant for first unused special use character.
+See IMPLEMENTATION NOTE in pretty-text2.js.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> FIRST_SPECIAL_CHAR = <span class="hljs-number">0xe000</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>regexp used to grep out tags like {{firstName}}</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> TAGS_REGEXP = <span class="hljs-regexp">/\{\{(.+?)\}\}/g</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Zapier specific stuff. Make a plugin for this later.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">removeIdPrefix</span><span class="hljs-params">(key)</span> {</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>(key).replace(<span class="hljs-regexp">/^[0-9]+__/</span>, <span class="hljs-string">''</span>);
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">buildChoicesMap</span><span class="hljs-params">(replaceChoices)</span> {</span>
+  <span class="hljs-keyword">var</span> choices = {};
+  replaceChoices.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice)</span> {</span>
+    <span class="hljs-keyword">var</span> key = removeIdPrefix(choice.value);
+    choices[key] = choice.label;
+  });
+  <span class="hljs-keyword">return</span> choices;
+}</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>   Creates helper to translate between tags like {{firstName}} and
+   an encoded representation suitable for use in CodeMirror.</p>
+<p>   See IMPLEMENTATION NOTE in pretty-text2.js.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">TagTranslator</span><span class="hljs-params">(replaceChoices, humanize)</span> {</span>
+  <span class="hljs-keyword">var</span> nextCharCode = FIRST_SPECIAL_CHAR;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Map of tag to label &#39;firstName&#39; --&gt; &#39;First Name&#39;</p></div></div><div class="code"><div class="wrapper">  <span class="hljs-keyword">var</span> choices = {};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>To help translate to and from the CM representation with the special
+characters, build two maps:</p>
+<ul>
+<li>charToTagMap: special char to tag - i.e. { &#39;\ue000&#39;: &#39;firstName&#39; }</li>
+<li>tagToCharMap: tag to special char, i.e. { firstName: &#39;\ue000&#39; }</li>
+</ul></div></div><div class="code"><div class="wrapper">  <span class="hljs-keyword">var</span> charToTagMap = {};
+  <span class="hljs-keyword">var</span> tagToCharMap = {};
+
+  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addChoices</span><span class="hljs-params">(choicesArray)</span> {</span>
+    choices = buildChoicesMap(choicesArray);
+
+    <span class="hljs-built_in">Object</span>.keys(choices).sort().forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+      <span class="hljs-keyword">if</span> (tagToCharMap[tag]) {
+        <span class="hljs-keyword">return</span>; <span class="hljs-comment">// we already have this tag mapped</span>
+      }
+
+      <span class="hljs-keyword">var</span> char = <span class="hljs-built_in">String</span>.fromCharCode(nextCharCode++);
+      charToTagMap[char] = tag;
+      tagToCharMap[tag] = char;
+    });
+  }
+
+  addChoices(replaceChoices);
+
+  <span class="hljs-keyword">return</span> {
+    specialCharsRegexp: <span class="hljs-regexp">/[\ue000-\uefff]/g</span>,
+
+    addChoices: addChoices,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>   Convert tag to encoded character. For example
+   &#39;firstName&#39; becomes &#39;\ue000&#39;.</p></div></div><div class="code"><div class="wrapper">    encodeTag: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+      tag = removeIdPrefix(tag);
+      <span class="hljs-keyword">if</span> (!tagToCharMap[tag]) {
+        <span class="hljs-keyword">var</span> char = <span class="hljs-built_in">String</span>.fromCharCode(nextCharCode++);
+        tagToCharMap[tag] = char;
+        charToTagMap[char] = tag;
+      }
+      <span class="hljs-keyword">return</span> tagToCharMap[tag];
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>   Convert text value to encoded value for CodeMirror. For example
+   &#39;hello {{firstName}}&#39; becomes &#39;hello \ue000&#39;</p></div></div><div class="code"><div class="wrapper">    encodeValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>(value).replace(TAGS_REGEXP, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(m, tag)</span> {</span>
+        tag = removeIdPrefix(tag);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.encodeTag(tag);
+      }.bind(<span class="hljs-keyword">this</span>));
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>   Convert encoded text used in CM to tagged text. For example
+   &#39;hello \ue000&#39; becomes &#39;hello {{firstName}}&#39;</p></div></div><div class="code"><div class="wrapper">    decodeValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(encodedValue)</span> {</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>(encodedValue).replace(<span class="hljs-keyword">this</span>.specialCharsRegexp, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(c)</span> {</span>
+        <span class="hljs-keyword">var</span> tag = charToTagMap[c];
+        <span class="hljs-keyword">return</span> <span class="hljs-string">'{{'</span> + tag + <span class="hljs-string">'}}'</span>;
+      });
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>   Convert encoded character to label. For example
+   &#39;\ue000&#39; becomes &#39;Last Name&#39;.</p></div></div><div class="code"><div class="wrapper">    decodeChar: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(char)</span> {</span>
+      <span class="hljs-keyword">var</span> tag = charToTagMap[char];
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.getLabel(tag);
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>   Convert tagged value to HTML. For example
+   &#39;hello {{firstName}}&#39; becomes &#39;hello <span class="tag">First Name</span>&#39;</p></div></div><div class="code"><div class="wrapper">    toHtml: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">String</span>(value).replace(TAGS_REGEXP, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(m, mustache)</span> {</span>
+        <span class="hljs-keyword">var</span> tag = mustache.replace(<span class="hljs-string">'{{'</span>, <span class="hljs-string">''</span>).replace(<span class="hljs-string">'}}'</span>, <span class="hljs-string">''</span>);
+        tag = removeIdPrefix(tag);
+        <span class="hljs-keyword">var</span> label = <span class="hljs-keyword">this</span>.getLabel(tag);
+        <span class="hljs-keyword">return</span> <span class="hljs-string">'&lt;span class="pretty-part"&gt;'</span> + label + <span class="hljs-string">'&lt;/span&gt;'</span>;
+      }.bind(<span class="hljs-keyword">this</span>));
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>   Get label for tag.  For example &#39;firstName&#39; becomes &#39;First Name&#39;.
+   Returns a humanized version of the tag if we don&#39;t have a label for the tag.</p></div></div><div class="code"><div class="wrapper">    getLabel: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(tag)</span> {</span>
+      tag = removeIdPrefix(tag);
+      <span class="hljs-keyword">var</span> label = choices[tag];
+      <span class="hljs-keyword">if</span> (!label) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If tag not found and we have a humanize function, humanize the tag.
+Otherwise just return the tag.</p></div></div><div class="code"><div class="wrapper">        label = humanize &amp;&amp; humanize(tag) || tag;
+      }
+      <span class="hljs-keyword">return</span> label;
+    }
+  };
+}
+
+module.exports = TagTranslator;</div></div></div></div></body></html>

@@ -7,13 +7,13 @@ type.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 <span class="hljs-keyword">var</span> cx = React.addons.classSet;
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'SelectValue'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/helper'</span>)],
 
-  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> </span>{
+  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(event)</span> {</span>
     <span class="hljs-keyword">var</span> choiceValue = event.target.value;
     <span class="hljs-keyword">var</span> choiceType = choiceValue.substring(<span class="hljs-number">0</span>, choiceValue.indexOf(<span class="hljs-string">':'</span>));
     <span class="hljs-keyword">if</span> (choiceType === <span class="hljs-string">'choice'</span>) {
@@ -23,11 +23,11 @@ type.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi
     }
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
 
     <span class="hljs-keyword">var</span> choices = <span class="hljs-keyword">this</span>.props.choices || [];
 
@@ -41,7 +41,7 @@ type.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi
 
       <span class="hljs-keyword">var</span> value = <span class="hljs-keyword">this</span>.props.field.value !== <span class="hljs-literal">undefined</span> ? <span class="hljs-keyword">this</span>.props.field.value : <span class="hljs-string">''</span>;
 
-      choices = choices.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> </span>{
+      choices = choices.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> {</span>
         <span class="hljs-keyword">return</span> {
           choiceValue: <span class="hljs-string">'choice:'</span> + i,
           value: choice.value,
@@ -49,7 +49,7 @@ type.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi
         };
       });
 
-      <span class="hljs-keyword">var</span> valueChoice = _.find(choices, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice)</span> </span>{
+      <span class="hljs-keyword">var</span> valueChoice = _.find(choices, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice)</span> {</span>
         <span class="hljs-keyword">return</span> choice.value === value;
       });
 
@@ -74,7 +74,7 @@ type.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-pi
         onFocus: <span class="hljs-keyword">this</span>.onFocusAction,
         onBlur: <span class="hljs-keyword">this</span>.onBlurAction
       },
-      choices.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> </span>{
+      choices.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> {</span>
         <span class="hljs-keyword">return</span> R.option({
           key: i,
           value: choice.choiceValue

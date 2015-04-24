@@ -5,20 +5,20 @@
 <span class="hljs-keyword">var</span> R = React.DOM;
 <span class="hljs-keyword">var</span> cx = React.addons.classSet;
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'Copy'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/field'</span>)],
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
 
-    <span class="hljs-keyword">return</span> R.div({className: cx(<span class="hljs-keyword">this</span>.props.classes)},
-      <span class="hljs-keyword">this</span>.props.config.fieldHelpText(<span class="hljs-keyword">this</span>.props.field)
-    );
+    <span class="hljs-keyword">return</span> R.div({className: cx(<span class="hljs-keyword">this</span>.props.classes), dangerouslySetInnerHTML: {
+      __html: <span class="hljs-keyword">this</span>.props.config.fieldHelpText(<span class="hljs-keyword">this</span>.props.field)
+    }});
   }
 });</div></div></div></div></body></html>

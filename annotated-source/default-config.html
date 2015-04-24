@@ -10,7 +10,7 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
 
 <span class="hljs-keyword">var</span> utils = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./utils'</span>);
 
-<span class="hljs-built_in">module</span>.exports = {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field element factories. Create field elements.</p></div></div><div class="code"><div class="wrapper">  createElement_Fields: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/fields'</span>)),
+module.exports = {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field element factories. Create field elements.</p></div></div><div class="code"><div class="wrapper">  createElement_Fields: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/fields'</span>)),
 
   createElement_String: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/string'</span>)),
 
@@ -20,9 +20,7 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
 
   createElement_Boolean: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/boolean'</span>)),
 
-  createElement_CheckboxBoolean: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/checkbox-boolean'</span>)),
-
-  createElement_PrettyText: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/pretty-text'</span>)),
+  createElement_CheckboxBoolean: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/checkbox-boolean'</span>)),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>createElement_PrettyText: React.createFactory(require(&#39;./components/fields/pretty-text&#39;)),</p></div></div><div class="code"><div class="wrapper">  createElement_PrettyText: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/pretty-text2'</span>)),
 
   createElement_Array: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/fields/array'</span>)),
 
@@ -72,19 +70,19 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
 
   createElement_SelectValue: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/helpers/select-value'</span>)),
 
-  createElement_Sample: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/helpers/sample'</span>)),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field default value factories. Give a default value for a specific type.</p></div></div><div class="code"><div class="wrapper">  createDefaultValue_String: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* fieldTemplate */</span>)</span> </span>{
+  createElement_Sample: React.createFactory(<span class="hljs-built_in">require</span>(<span class="hljs-string">'./components/helpers/sample'</span>)),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field default value factories. Give a default value for a specific type.</p></div></div><div class="code"><div class="wrapper">  createDefaultValue_String: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* fieldTemplate */</span>)</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
   },
 
-  createDefaultValue_Object: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* fieldTemplate */</span>)</span> </span>{
+  createDefaultValue_Object: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* fieldTemplate */</span>)</span> {</span>
     <span class="hljs-keyword">return</span> {};
   },
 
-  createDefaultValue_Array: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* fieldTemplate */</span>)</span> </span>{
+  createDefaultValue_Array: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* fieldTemplate */</span>)</span> {</span>
     <span class="hljs-keyword">return</span> [];
   },
 
-  createDefaultValue_Boolean: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* fieldTemplate */</span>)</span> </span>{
+  createDefaultValue_Boolean: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* fieldTemplate */</span>)</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
   },
 
@@ -98,7 +96,7 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
 
   createDefaultValue_CheckboxArray: utils.delegateTo(<span class="hljs-string">'createDefaultValue_Array'</span>),
 
-  createDefaultValue_CheckboxBoolean: utils.delegateTo(<span class="hljs-string">'createDefaultValue_Boolean'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field value coercers. Coerce a value into a value appropriate for a specific type.</p></div></div><div class="code"><div class="wrapper">  coerceValue_String: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> </span>{
+  createDefaultValue_CheckboxBoolean: utils.delegateTo(<span class="hljs-string">'createDefaultValue_Boolean'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field value coercers. Coerce a value into a value appropriate for a specific type.</p></div></div><div class="code"><div class="wrapper">  coerceValue_String: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> {</span>
     <span class="hljs-keyword">if</span> (_.isString(value)) {
       <span class="hljs-keyword">return</span> value;
     }
@@ -108,21 +106,21 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">JSON</span>.stringify(value);
   },
 
-  coerceValue_Object: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> </span>{
+  coerceValue_Object: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> {</span>
     <span class="hljs-keyword">if</span> (!_.isObject(value)) {
       <span class="hljs-keyword">return</span> {};
     }
     <span class="hljs-keyword">return</span> value;
   },
 
-  coerceValue_Array: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> </span>{
+  coerceValue_Array: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> {</span>
     <span class="hljs-keyword">if</span> (!_.isArray(value)) {
       <span class="hljs-keyword">return</span> [value];
     }
     <span class="hljs-keyword">return</span> value;
   },
 
-  coerceValue_Boolean: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> </span>{
+  coerceValue_Boolean: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.coerceValueToBoolean(value);
   },
 
@@ -136,10 +134,10 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
 
   coerceValue_CheckboxArray: utils.delegateTo(<span class="hljs-string">'coerceValue_Array'</span>),
 
-  coerceValue_CheckboxBoolean: utils.delegateTo(<span class="hljs-string">'coerceValue_Boolean'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field child fields factories, so some types can have dynamic children.</p></div></div><div class="code"><div class="wrapper">  createChildFields_Array: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  coerceValue_CheckboxBoolean: utils.delegateTo(<span class="hljs-string">'coerceValue_Boolean'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field child fields factories, so some types can have dynamic children.</p></div></div><div class="code"><div class="wrapper">  createChildFields_Array: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
-    <span class="hljs-keyword">return</span> field.value.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(arrayItem, i)</span> </span>{
+    <span class="hljs-keyword">return</span> field.value.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(arrayItem, i)</span> {</span>
       <span class="hljs-keyword">var</span> childFieldTemplate = config.childFieldTemplateForValue(field, arrayItem);
 
       <span class="hljs-keyword">var</span> childField = config.createChildField(field, {
@@ -150,10 +148,10 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
     });
   },
 
-  createChildFields_Object: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  createChildFields_Object: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
-    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(field.value).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key, i)</span> </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(field.value).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key, i)</span> {</span>
       <span class="hljs-keyword">var</span> childFieldTemplate = config.childFieldTemplateForValue(field, field.value[key]);
 
       <span class="hljs-keyword">var</span> childField = config.createChildField(field, {
@@ -162,11 +160,11 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
 
       <span class="hljs-keyword">return</span> childField;
     });
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Check if there is a factory for the name.</p></div></div><div class="code"><div class="wrapper">  hasElementFactory: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Check if there is a factory for the name.</p></div></div><div class="code"><div class="wrapper">  hasElementFactory: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">return</span> config[<span class="hljs-string">'createElement_'</span> + name] ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create an element given a name, props, and children.</p></div></div><div class="code"><div class="wrapper">  createElement: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, props, children)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create an element given a name, props, and children.</p></div></div><div class="code"><div class="wrapper">  createElement: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, props, children)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!props.config) {
@@ -186,7 +184,7 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
     }
 
     <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Factory not found for: '</span> + name);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a field element given some props. Use context to determine name.</p></div></div><div class="code"><div class="wrapper">  createFieldElement: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a field element given some props. Use context to determine name.</p></div></div><div class="code"><div class="wrapper">  createFieldElement: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> name = config.fieldTypeName(props.field);
@@ -196,7 +194,7 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
     }
 
     <span class="hljs-keyword">return</span> config.createElement(<span class="hljs-string">'UnknownField'</span>, props);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render the root formatic component</p></div></div><div class="code"><div class="wrapper">  renderFormaticComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(component)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render the root formatic component</p></div></div><div class="code"><div class="wrapper">  renderFormaticComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(component)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
     <span class="hljs-keyword">var</span> props = component.props;
 
@@ -205,7 +203,7 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
     <span class="hljs-keyword">return</span> R.div({className: <span class="hljs-string">'formatic'</span>},
       config.createFieldElement({field: field, onChange: component.onChange, onAction: component.onAction})
     );
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render any component.</p></div></div><div class="code"><div class="wrapper">  renderComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(component)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render any component.</p></div></div><div class="code"><div class="wrapper">  renderComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(component)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> name = component.constructor.displayName;
@@ -215,11 +213,11 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
     }
 
     <span class="hljs-keyword">return</span> component.renderDefault();
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render field components.</p></div></div><div class="code"><div class="wrapper">  renderFieldComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(component)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Render field components.</p></div></div><div class="code"><div class="wrapper">  renderFieldComponent: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(component)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">return</span> config.renderComponent(component);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Normalize an element name.</p></div></div><div class="code"><div class="wrapper">  elementName: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Normalize an element name.</p></div></div><div class="code"><div class="wrapper">  elementName: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name)</span> {</span>
     <span class="hljs-keyword">return</span> utils.dashToPascal(name);
   },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Type aliases.</p></div></div><div class="code"><div class="wrapper">  alias_Dict: <span class="hljs-string">'Object'</span>,
 
@@ -227,7 +225,7 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
 
   alias_PrettyTextarea: <span class="hljs-string">'PrettyText'</span>,
 
-  alias_SingleLineString: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+  alias_SingleLineString: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
     <span class="hljs-keyword">if</span> (fieldTemplate.replaceChoices) {
       <span class="hljs-keyword">return</span> <span class="hljs-string">'PrettyText'</span>;
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (fieldTemplate.choices) {
@@ -236,7 +234,7 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
     <span class="hljs-keyword">return</span> <span class="hljs-string">'SingleLineString'</span>;
   },
 
-  alias_String: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+  alias_String: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (fieldTemplate.replaceChoices) {
@@ -262,31 +260,38 @@ the methods.</p></div></div><div class="code"><div class="wrapper"><span class="
   alias_Fieldset: <span class="hljs-string">'Fields'</span>,
 
   alias_Checkbox: <span class="hljs-string">'CheckboxBoolean'</span>,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field factory</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a field, expand all child fields recursively to get the default
-values of all fields.</p></div></div><div class="code"><div class="wrapper">  inflateFieldValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+values of all fields.</p></div></div><div class="code"><div class="wrapper">  inflateFieldValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, fieldHandler)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
+
+    <span class="hljs-keyword">if</span> (fieldHandler) {
+      <span class="hljs-keyword">var</span> stop = fieldHandler(field);
+      <span class="hljs-keyword">if</span> (stop === <span class="hljs-literal">false</span>) {
+        <span class="hljs-keyword">return</span>;
+      }
+    }
 
     <span class="hljs-keyword">if</span> (config.fieldHasValueChildren(field)) {
       <span class="hljs-keyword">var</span> value = _.clone(field.value);
       <span class="hljs-keyword">var</span> childFields = config.createChildFields(field);
-      childFields.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childField)</span> </span>{
+      childFields.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childField)</span> {</span>
         <span class="hljs-keyword">if</span> (config.isKey(childField.key)) {
-          value[childField.key] = config.inflateFieldValue(childField);
+          value[childField.key] = config.inflateFieldValue(childField, fieldHandler);
         }
       });
       <span class="hljs-keyword">return</span> value;
     } <span class="hljs-keyword">else</span> {
       <span class="hljs-keyword">return</span> field.value;
     }
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Initialize the root field.</p></div></div><div class="code"><div class="wrapper">  initRootField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* field, props */</span>)</span> </span>{
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Initialize every field.</p></div></div><div class="code"><div class="wrapper">  initField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* field */</span>)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Initialize the root field.</p></div></div><div class="code"><div class="wrapper">  initRootField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* field, props */</span>)</span> {</span>
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Initialize every field.</p></div></div><div class="code"><div class="wrapper">  initField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(<span class="hljs-comment">/* field */</span>)</span> {</span>
   },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If an array of field templates are passed in, this method is used to
-wrap the fields inside a single root field template.</p></div></div><div class="code"><div class="wrapper">  wrapFieldTemplates: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplates)</span> </span>{
+wrap the fields inside a single root field template.</p></div></div><div class="code"><div class="wrapper">  wrapFieldTemplates: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplates)</span> {</span>
     <span class="hljs-keyword">return</span> {
       type: <span class="hljs-string">'fields'</span>,
       plain: <span class="hljs-literal">true</span>,
       fields: fieldTemplates
     };
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the props that are passed in, create the root field.</p></div></div><div class="code"><div class="wrapper">  createRootField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the props that are passed in, create the root field.</p></div></div><div class="code"><div class="wrapper">  createRootField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> fieldTemplate = props.fieldTemplate || props.fieldTemplates || props.field || props.fields;
@@ -316,13 +321,58 @@ wrap the fields inside a single root field template.</p></div></div><div class="
 
     <span class="hljs-keyword">return</span> field;
   },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given the props that are passed in, create the value that will be displayed
-by all the components.</p></div></div><div class="code"><div class="wrapper">  createRootValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> </span>{
+by all the components.</p></div></div><div class="code"><div class="wrapper">  createRootValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props, fieldHandler)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> field = config.createRootField(props);
 
-    <span class="hljs-keyword">return</span> config.inflateFieldValue(field);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create dynamic child fields for a field.</p></div></div><div class="code"><div class="wrapper">  createChildFields: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+    <span class="hljs-keyword">return</span> config.inflateFieldValue(field, fieldHandler);
+  },
+
+  validateRootValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> {</span>
+    <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
+
+    <span class="hljs-keyword">var</span> errors = [];
+
+    config.createRootValue(props, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
+      <span class="hljs-keyword">var</span> fieldErrors = config.fieldErrors(field);
+      <span class="hljs-keyword">if</span> (fieldErrors.length &gt; <span class="hljs-number">0</span>) {
+        errors.push({
+          path: config.fieldValuePath(field),
+          errors: fieldErrors
+        });
+      }
+    });
+
+    <span class="hljs-keyword">return</span> errors;
+  },
+
+  isValidRootValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(props)</span> {</span>
+    <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
+
+    <span class="hljs-keyword">var</span> isValid = <span class="hljs-literal">true</span>;
+
+    config.createRootValue(props, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
+      <span class="hljs-keyword">if</span> (config.fieldErrors(field).length &gt; <span class="hljs-number">0</span>) {
+        isValid = <span class="hljs-literal">false</span>;
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+      }
+    });
+
+    <span class="hljs-keyword">return</span> isValid;
+  },
+
+  validateField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, errors)</span> {</span>
+    <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
+
+    <span class="hljs-keyword">if</span> (field.value === <span class="hljs-literal">undefined</span> || field.value === <span class="hljs-string">''</span>) {
+      <span class="hljs-keyword">if</span> (config.fieldIsRequired(field)) {
+        errors.push({
+          type: <span class="hljs-string">'required'</span>
+        });
+      }
+    }
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create dynamic child fields for a field.</p></div></div><div class="code"><div class="wrapper">  createChildFields: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> typeName = config.fieldTypeName(field);
@@ -331,12 +381,12 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  c
       <span class="hljs-keyword">return</span> config[<span class="hljs-string">'createChildFields_'</span> + typeName](field);
     }
 
-    <span class="hljs-keyword">return</span> config.fieldChildFieldTemplates(field).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childField, i)</span> </span>{
+    <span class="hljs-keyword">return</span> config.fieldChildFieldTemplates(field).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childField, i)</span> {</span>
       <span class="hljs-keyword">return</span> config.createChildField(field, {
         fieldTemplate: childField, key: childField.key, fieldIndex: i, value: field.value[childField.key]
       });
     });
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a single child field for a parent field.</p></div></div><div class="code"><div class="wrapper">  createChildField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parentField, options)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a single child field for a parent field.</p></div></div><div class="code"><div class="wrapper">  createChildField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parentField, options)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> childValue = options.value;
@@ -355,7 +405,7 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  c
     config.initField(childField);
 
     <span class="hljs-keyword">return</span> childField;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a temporary field and extract its value.</p></div></div><div class="code"><div class="wrapper">  createNewChildFieldValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parentField, itemFieldIndex)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Create a temporary field and extract its value.</p></div></div><div class="code"><div class="wrapper">  createNewChildFieldValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(parentField, itemFieldIndex)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> childFieldTemplate = config.fieldItemFieldTemplates(parentField)[itemFieldIndex];
@@ -375,7 +425,7 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  c
     newValue = config.inflateFieldValue(childField);
 
     <span class="hljs-keyword">return</span> newValue;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a value, create a field template for that value.</p></div></div><div class="code"><div class="wrapper">  createFieldTemplateFromValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a value, create a field template for that value.</p></div></div><div class="code"><div class="wrapper">  createFieldTemplateFromValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> field = {
@@ -394,7 +444,7 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  c
         type: <span class="hljs-string">'boolean'</span>
       };
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isArray(value)) {
-      <span class="hljs-keyword">var</span> arrayItemFields = value.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childValue, i)</span> </span>{
+      <span class="hljs-keyword">var</span> arrayItemFields = value.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childValue, i)</span> {</span>
         <span class="hljs-keyword">var</span> childField = config.createFieldTemplateFromValue(childValue);
         childField.key = i;
         <span class="hljs-keyword">return</span> childField;
@@ -404,7 +454,7 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  c
         fields: arrayItemFields
       };
     } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (_.isObject(value)) {
-      <span class="hljs-keyword">var</span> objectItemFields = <span class="hljs-built_in">Object</span>.keys(value).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+      <span class="hljs-keyword">var</span> objectItemFields = <span class="hljs-built_in">Object</span>.keys(value).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
         <span class="hljs-keyword">var</span> childField = config.createFieldTemplateFromValue(value[key]);
         childField.key = key;
         childField.label = config.humanize(key);
@@ -420,7 +470,7 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  c
       };
     }
     <span class="hljs-keyword">return</span> field;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Default value factory</p></div></div><div class="code"><div class="wrapper">  createDefaultValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Default value factory</p></div></div><div class="code"><div class="wrapper">  createDefaultValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> defaultValue = config.fieldTemplateDefaultValue(fieldTemplate);
@@ -436,9 +486,9 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  c
     }
 
     <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field helpers</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if a value &quot;exists&quot;.</p></div></div><div class="code"><div class="wrapper">  hasValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field helpers</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if a value &quot;exists&quot;.</p></div></div><div class="code"><div class="wrapper">  hasValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> {</span>
     <span class="hljs-keyword">return</span> value !== <span class="hljs-literal">null</span> &amp;&amp; !_.isUndefined(value);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Coerce a value to value appropriate for a field.</p></div></div><div class="code"><div class="wrapper">  coerceValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, value)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Coerce a value to value appropriate for a field.</p></div></div><div class="code"><div class="wrapper">  coerceValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, value)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> typeName = config.fieldTypeName(field);
@@ -449,14 +499,14 @@ by all the components.</p></div></div><div class="code"><div class="wrapper">  c
 
     <span class="hljs-keyword">return</span> value;
   },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Given a field and a child value, find the appropriate field template for
-that child value.</p></div></div><div class="code"><div class="wrapper">  childFieldTemplateForValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, childValue)</span> </span>{
+that child value.</p></div></div><div class="code"><div class="wrapper">  childFieldTemplateForValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, childValue)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> fieldTemplate;
 
     <span class="hljs-keyword">var</span> fieldTemplates = config.fieldItemFieldTemplates(field);
 
-    fieldTemplate = _.find(fieldTemplates, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemFieldTemplate)</span> </span>{
+    fieldTemplate = _.find(fieldTemplates, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemFieldTemplate)</span> {</span>
       <span class="hljs-keyword">return</span> config.matchesFieldTemplateToValue(itemFieldTemplate, childValue);
     });
 
@@ -465,15 +515,15 @@ that child value.</p></div></div><div class="code"><div class="wrapper">  childF
     } <span class="hljs-keyword">else</span> {
       <span class="hljs-keyword">return</span> config.createFieldTemplateFromValue(childValue);
     }
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if a value is a match for a field template.</p></div></div><div class="code"><div class="wrapper">  matchesFieldTemplateToValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if a value is a match for a field template.</p></div></div><div class="code"><div class="wrapper">  matchesFieldTemplateToValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate, value)</span> {</span>
     <span class="hljs-keyword">var</span> match = fieldTemplate.match;
     <span class="hljs-keyword">if</span> (!match) {
       <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
     }
-    <span class="hljs-keyword">return</span> _.every(_.keys(match), <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+    <span class="hljs-keyword">return</span> _.every(_.keys(match), <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
       <span class="hljs-keyword">return</span> _.isEqual(match[key], value[key]);
     });
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field template helpers</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Normalized (PascalCase) type name for a field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateTypeName: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field template helpers</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Normalized (PascalCase) type name for a field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateTypeName: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> typeName = utils.dashToPascal(fieldTemplate.type || <span class="hljs-string">'undefined'</span>);
@@ -493,11 +543,11 @@ that child value.</p></div></div><div class="code"><div class="wrapper">  childF
     }
 
     <span class="hljs-keyword">return</span> typeName;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Default value for a field template.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateDefaultValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Default value for a field template.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateDefaultValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
 
     <span class="hljs-keyword">return</span> fieldTemplate.default;
   },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Value for a field template. Used to determine the value of a new child
-field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This logic might be brittle.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">var</span> defaultValue = config.fieldTemplateDefaultValue(fieldTemplate);
 
     <span class="hljs-keyword">var</span> match = config.fieldTemplateMatch(fieldTemplate);
@@ -511,12 +561,12 @@ field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateValu
     }
 
     <span class="hljs-keyword">return</span> value;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Match rule for a field template.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateMatch: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Match rule for a field template.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateMatch: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
     <span class="hljs-keyword">return</span> fieldTemplate.match;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if a field template has a single-line value.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateIsSingleLine: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if a field template has a single-line value.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateIsSingleLine: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
     <span class="hljs-keyword">return</span> fieldTemplate.isSingleLine || fieldTemplate.is_single_line ||
             fieldTemplate.type === <span class="hljs-string">'single-line-string'</span> || fieldTemplate.type === <span class="hljs-string">'SingleLineString'</span>;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field helpers</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get an array of keys representing the path to a value.</p></div></div><div class="code"><div class="wrapper">  fieldValuePath: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Field helpers</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get an array of keys representing the path to a value.</p></div></div><div class="code"><div class="wrapper">  fieldValuePath: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> parentPath = [];
@@ -525,18 +575,18 @@ field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateValu
       parentPath = config.fieldValuePath(field.parent);
     }
 
-    <span class="hljs-keyword">return</span> parentPath.concat(field.key).filter(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+    <span class="hljs-keyword">return</span> parentPath.concat(field.key).filter(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
       <span class="hljs-keyword">return</span> !_.isUndefined(key) &amp;&amp; key !== <span class="hljs-string">''</span>;
     });
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Clone a field with a different value.</p></div></div><div class="code"><div class="wrapper">  fieldWithValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, value)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Clone a field with a different value.</p></div></div><div class="code"><div class="wrapper">  fieldWithValue: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, value)</span> {</span>
     <span class="hljs-keyword">return</span> _.extend({}, field, {value: value});
   },
 
-  fieldTypeName: utils.delegateTo(<span class="hljs-string">'fieldTemplateTypeName'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the choices for a dropdown field.</p></div></div><div class="code"><div class="wrapper">  fieldChoices: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  fieldTypeName: utils.delegateTo(<span class="hljs-string">'fieldTemplateTypeName'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the choices for a dropdown field.</p></div></div><div class="code"><div class="wrapper">  fieldChoices: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">return</span> config.normalizeChoices(field.choices);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get a set of boolean choices for a field.</p></div></div><div class="code"><div class="wrapper">  fieldBooleanChoices: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get a set of boolean choices for a field.</p></div></div><div class="code"><div class="wrapper">  fieldBooleanChoices: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> choices = config.fieldChoices(field);
@@ -551,7 +601,7 @@ field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateValu
       }];
     }
 
-    <span class="hljs-keyword">return</span> choices.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice)</span> </span>{
+    <span class="hljs-keyword">return</span> choices.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice)</span> {</span>
       <span class="hljs-keyword">if</span> (_.isBoolean(choice.value)) {
         <span class="hljs-keyword">return</span> choice;
       }
@@ -559,17 +609,17 @@ field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateValu
         value: config.coerceValueToBoolean(choice.value)
       });
     });
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get a set of replacement choices for a field.</p></div></div><div class="code"><div class="wrapper">  fieldReplaceChoices: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get a set of replacement choices for a field.</p></div></div><div class="code"><div class="wrapper">  fieldReplaceChoices: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">return</span> config.normalizeChoices(field.replaceChoices);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get a label for a field.</p></div></div><div class="code"><div class="wrapper">  fieldLabel: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get a label for a field.</p></div></div><div class="code"><div class="wrapper">  fieldLabel: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">return</span> field.label;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the help text for a field.</p></div></div><div class="code"><div class="wrapper">  fieldHelpText: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the help text for a field.</p></div></div><div class="code"><div class="wrapper">  fieldHelpText: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">return</span> field.help_text_html || field.help_text || field.helpText || field.helpTextHtml;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get whether or not a field is required.</p></div></div><div class="code"><div class="wrapper">  fieldIsRequired: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get whether or not a field is required.</p></div></div><div class="code"><div class="wrapper">  fieldIsRequired: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">return</span> field.required ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if value for this field is not a leaf value.</p></div></div><div class="code"><div class="wrapper">  fieldHasValueChildren: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if value for this field is not a leaf value.</p></div></div><div class="code"><div class="wrapper">  fieldHasValueChildren: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> defaultValue = config.createDefaultValue(field);
@@ -579,10 +629,10 @@ field.</p></div></div><div class="code"><div class="wrapper">  fieldTemplateValu
     }
 
     <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the child field templates for this field.</p></div></div><div class="code"><div class="wrapper">  fieldChildFieldTemplates: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the child field templates for this field.</p></div></div><div class="code"><div class="wrapper">  fieldChildFieldTemplates: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">return</span> field.fields || [];
   },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the field templates for each item of this field. (For dynamic children,
-like arrays.)</p></div></div><div class="code"><div class="wrapper">  fieldItemFieldTemplates: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+like arrays.)</p></div></div><div class="code"><div class="wrapper">  fieldItemFieldTemplates: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">if</span> (!field.itemFields) {
       <span class="hljs-keyword">return</span> [{type: <span class="hljs-string">'text'</span>}];
     }
@@ -592,22 +642,34 @@ like arrays.)</p></div></div><div class="code"><div class="wrapper">  fieldItemF
     <span class="hljs-keyword">return</span> field.itemFields;
   },
 
-  fieldIsSingleLine: utils.delegateTo(<span class="hljs-string">'fieldTemplateIsSingleLine'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get whether or not a field is collapsed.</p></div></div><div class="code"><div class="wrapper">  fieldIsCollapsed: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  fieldIsSingleLine: utils.delegateTo(<span class="hljs-string">'fieldTemplateIsSingleLine'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get whether or not a field is collapsed.</p></div></div><div class="code"><div class="wrapper">  fieldIsCollapsed: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">return</span> field.collapsed ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get wheter or not a field can be collapsed.</p></div></div><div class="code"><div class="wrapper">  fieldIsCollapsible: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get wheter or not a field can be collapsed.</p></div></div><div class="code"><div class="wrapper">  fieldIsCollapsible: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">return</span> field.collapsible || !_.isUndefined(field.collapsed);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the number of rows for a field.</p></div></div><div class="code"><div class="wrapper">  fieldRows: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Get the number of rows for a field.</p></div></div><div class="code"><div class="wrapper">  fieldRows: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
     <span class="hljs-keyword">return</span> field.rows;
   },
 
-  fieldMatch: utils.delegateTo(<span class="hljs-string">'fieldTemplateMatch'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Other helpers</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert a key to a nice human-readable version.</p></div></div><div class="code"><div class="wrapper">  humanize: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(property)</span> </span>{
+  fieldErrors: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
+    <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
+
+    <span class="hljs-keyword">var</span> errors = [];
+
+    <span class="hljs-keyword">if</span> (config.isKey(field.key)) {
+      config.validateField(field, errors);
+    }
+
+    <span class="hljs-keyword">return</span> errors;
+  },
+
+  fieldMatch: utils.delegateTo(<span class="hljs-string">'fieldTemplateMatch'</span>),</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Other helpers</p></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert a key to a nice human-readable version.</p></div></div><div class="code"><div class="wrapper">  humanize: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(property)</span> {</span>
     property = property.replace(<span class="hljs-regexp">/\{\{/g</span>, <span class="hljs-string">''</span>);
     property = property.replace(<span class="hljs-regexp">/\}\}/g</span>, <span class="hljs-string">''</span>);
     <span class="hljs-keyword">return</span> property.replace(<span class="hljs-regexp">/_/g</span>, <span class="hljs-string">' '</span>)
-    .replace(<span class="hljs-regexp">/(\w+)/g</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(match)</span> </span>{
+    .replace(<span class="hljs-regexp">/(\w+)/g</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(match)</span> {</span>
       <span class="hljs-keyword">return</span> match.charAt(<span class="hljs-number">0</span>).toUpperCase() + match.slice(<span class="hljs-number">1</span>);
     });
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Normalize some choices for a drop-down.</p></div></div><div class="code"><div class="wrapper">  normalizeChoices: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choices)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Normalize some choices for a drop-down.</p></div></div><div class="code"><div class="wrapper">  normalizeChoices: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choices)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!choices) {
@@ -615,7 +677,7 @@ like arrays.)</p></div></div><div class="code"><div class="wrapper">  fieldItemF
     }</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert comma separated string to array of strings.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> (_.isString(choices)) {
       choices = choices.split(<span class="hljs-string">','</span>);
     }</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert object to array of objects with <code>value</code> and <code>label</code> properties.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> (!_.isArray(choices) &amp;&amp; _.isObject(choices)) {
-      choices = <span class="hljs-built_in">Object</span>.keys(choices).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+      choices = <span class="hljs-built_in">Object</span>.keys(choices).map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
         <span class="hljs-keyword">return</span> {
           value: key,
           label: choices[key]
@@ -623,7 +685,7 @@ like arrays.)</p></div></div><div class="code"><div class="wrapper">  fieldItemF
       });
     }</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Copy the array of choices so we can manipulate them.</p></div></div><div class="code"><div class="wrapper">    choices = choices.slice(<span class="hljs-number">0</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Array of choice arrays should be flattened.</p></div></div><div class="code"><div class="wrapper">    choices = _.flatten(choices);
 
-    choices.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> </span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert any string choices to objects with <code>value</code> and <code>label</code>
+    choices.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(choice, i)</span> {</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Convert any string choices to objects with <code>value</code> and <code>label</code>
 properties.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">if</span> (_.isString(choice)) {
         choices[i] = {
           value: choice,
@@ -636,7 +698,7 @@ properties.</p></div></div><div class="code"><div class="wrapper">      <span cl
     });
 
     <span class="hljs-keyword">return</span> choices;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Coerce a value to a boolean</p></div></div><div class="code"><div class="wrapper">  coerceValueToBoolean: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Coerce a value to a boolean</p></div></div><div class="code"><div class="wrapper">  coerceValueToBoolean: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(value)</span> {</span>
     <span class="hljs-keyword">if</span> (!_.isString(value)) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Just use the default truthiness.</p></div></div><div class="code"><div class="wrapper">      <span class="hljs-keyword">return</span> value ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>;
     }
     value = value.toLowerCase();
@@ -644,9 +706,9 @@ properties.</p></div></div><div class="code"><div class="wrapper">      <span cl
       <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
     }
     <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if a value is a valid key.</p></div></div><div class="code"><div class="wrapper">  isKey: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Determine if a value is a valid key.</p></div></div><div class="code"><div class="wrapper">  isKey: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key)</span> {</span>
     <span class="hljs-keyword">return</span> (_.isNumber(key) &amp;&amp; key &gt;= <span class="hljs-number">0</span>) || (_.isString(key) &amp;&amp; key !== <span class="hljs-string">''</span>);
-  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Fast way to check for empty object.</p></div></div><div class="code"><div class="wrapper">  isEmptyObject: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(obj)</span> </span>{
+  },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Fast way to check for empty object.</p></div></div><div class="code"><div class="wrapper">  isEmptyObject: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(obj)</span> {</span>
     <span class="hljs-keyword">for</span>(<span class="hljs-keyword">var</span> key <span class="hljs-keyword">in</span> obj) {
       <span class="hljs-keyword">if</span> (obj.hasOwnProperty(key)) {
         <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;

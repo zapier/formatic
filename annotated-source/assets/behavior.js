@@ -333,6 +333,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "foldPrefix": "^",
                   "name": "JavaScript"
                 },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/pretty-text2.js",
+                "projectPath": "lib/components/fields/pretty-text2.js",
+                "targetPath": "components/fields/pretty-text2",
+                "pageTitle": "components/fields/pretty-text2",
+                "title": "pretty-text2"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
                 "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/fields/select.js",
                 "projectPath": "lib/components/fields/select.js",
                 "targetPath": "components/fields/select",
@@ -628,6 +648,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "depth": 1
                 },
                 "title": "choices component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/choices-dropdown.js",
+                "projectPath": "lib/components/helpers/choices-dropdown.js",
+                "targetPath": "components/helpers/choices-dropdown",
+                "pageTitle": "components/helpers/choices-dropdown",
+                "title": "choices-dropdown"
               },
               "depth": 3,
               "outline": []
@@ -1048,6 +1088,26 @@ f.event={add:function(a,c,d,e,g){var h,i,j,k,l,m,n,o,p,q,r,s;if(!(a.nodeType===3
                   "depth": 1
                 },
                 "title": "select-value component"
+              },
+              "depth": 3,
+              "outline": []
+            }, {
+              "type": "file",
+              "data": {
+                "language": {
+                  "nameMatchers": [".js"],
+                  "pygmentsLexer": "javascript",
+                  "multiLineComment": ["/*", "*", "*/"],
+                  "singleLineComment": ["//"],
+                  "ignorePrefix": "}",
+                  "foldPrefix": "^",
+                  "name": "JavaScript"
+                },
+                "sourcePath": "/Users/justin/Dropbox/git/formatic/lib/components/helpers/tag-translator.js",
+                "projectPath": "lib/components/helpers/tag-translator.js",
+                "targetPath": "components/helpers/tag-translator",
+                "pageTitle": "components/helpers/tag-translator",
+                "title": "tag-translator"
               },
               "depth": 3,
               "outline": []

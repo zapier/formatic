@@ -3,21 +3,21 @@
 
 <span class="hljs-keyword">var</span> React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react/addons'</span>);
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'Boolean'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/field'</span>)],
 
-  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(newValue)</span> </span>{
+  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(newValue)</span> {</span>
     <span class="hljs-keyword">this</span>.onChangeValue(newValue);
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
 
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;

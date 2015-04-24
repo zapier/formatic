@@ -8,29 +8,29 @@
 
 <span class="hljs-keyword">var</span> CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'Field'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/helper'</span>)],
 
-  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  getInitialState: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> {
       collapsed: <span class="hljs-keyword">this</span>.props.config.fieldIsCollapsed(<span class="hljs-keyword">this</span>.props.field) ? <span class="hljs-literal">true</span> : <span class="hljs-literal">false</span>
     };
   },
 
-  onClickLabel: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  onClickLabel: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">this</span>.setState({
       collapsed: !<span class="hljs-keyword">this</span>.state.collapsed
     });
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
 
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
 
@@ -48,13 +48,14 @@
 
     <span class="hljs-keyword">var</span> classes = _.extend({}, <span class="hljs-keyword">this</span>.props.classes);
 
+    <span class="hljs-keyword">var</span> errors = config.fieldErrors(field);
+
+    errors.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(error)</span> {</span>
+      classes[<span class="hljs-string">'validation-error-'</span> + error.type] = <span class="hljs-literal">true</span>;
+    });
+
     <span class="hljs-keyword">if</span> (config.fieldIsRequired(field)) {
       classes.required = <span class="hljs-literal">true</span>;
-
-      <span class="hljs-keyword">if</span> (_.isUndefined(<span class="hljs-keyword">this</span>.props.field.value) || <span class="hljs-keyword">this</span>.props.field.value === <span class="hljs-string">''</span>) {
-        classes[<span class="hljs-string">'validation-error-required'</span>] = <span class="hljs-literal">true</span>;
-      }
-
     } <span class="hljs-keyword">else</span> {
       classes.optional = <span class="hljs-literal">true</span>;
     }

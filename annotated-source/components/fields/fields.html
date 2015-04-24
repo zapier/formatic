@@ -6,13 +6,13 @@
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 <span class="hljs-keyword">var</span> cx = React.addons.classSet;
 
-<span class="hljs-built_in">module</span>.exports = React.createClass({
+module.exports = React.createClass({
 
   displayName: <span class="hljs-string">'Fields'</span>,
 
   mixins: [<span class="hljs-built_in">require</span>(<span class="hljs-string">'../../mixins/field'</span>)],
 
-  onChangeField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key, newValue, info)</span> </span>{
+  onChangeField: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(key, newValue, info)</span> {</span>
     <span class="hljs-keyword">if</span> (key) {
       <span class="hljs-keyword">var</span> newObjectValue = _.extend({}, <span class="hljs-keyword">this</span>.props.field.value);
       newObjectValue[key] = newValue;
@@ -20,11 +20,11 @@
     }
   },
 
-  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  render: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.renderWithConfig();
   },
 
-  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+  renderDefault: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>.props.config;
     <span class="hljs-keyword">var</span> field = <span class="hljs-keyword">this</span>.props.field;
 
@@ -34,7 +34,7 @@
       config: config, field: field, plain: <span class="hljs-keyword">this</span>.props.plain
     },
       R.fieldset({className: cx(<span class="hljs-keyword">this</span>.props.classes)},
-        fields.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childField, i)</span> </span>{
+        fields.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(childField, i)</span> {</span>
           <span class="hljs-keyword">var</span> key = childField.key || i;
           <span class="hljs-keyword">return</span> config.createFieldElement({
             key: key || i,

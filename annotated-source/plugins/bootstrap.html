@@ -24,9 +24,9 @@ with Twitter Bootstrap.</p></div></div><div class="code"><div class="wrapper"><s
   <span class="hljs-string">'SelectValue'</span>: {classes: {<span class="hljs-string">'form-control'</span>: <span class="hljs-literal">true</span>}}
 };
 
-<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> </span>{
+module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> {</span>
 
-  <span class="hljs-keyword">var</span> defaultCreateElement = config.createElement;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the createElement method.</p></div></div><div class="code"><div class="wrapper">  config.createElement = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, props, children)</span> </span>{
+  <span class="hljs-keyword">var</span> defaultCreateElement = config.createElement;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the createElement method.</p></div></div><div class="code"><div class="wrapper">  config.createElement = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, props, children)</span> {</span>
 
     name = config.elementName(name);
 

@@ -5,9 +5,9 @@ extends: [&#39;foo&#39;, &#39;bar&#39;] where &#39;foo&#39; and &#39;bar&#39; re
 
 <span class="hljs-keyword">var</span> _ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'underscore'</span>);
 
-<span class="hljs-built_in">module</span>.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cfg)</span> </span>{
+module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(cfg)</span> {</span>
 
-  <span class="hljs-keyword">var</span> initField = cfg.initField;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look for a template in this field or any of its parents.</p></div></div><div class="code"><div class="wrapper">  cfg.findFieldTemplate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, name)</span> </span>{
+  <span class="hljs-keyword">var</span> initField = cfg.initField;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Look for a template in this field or any of its parents.</p></div></div><div class="code"><div class="wrapper">  cfg.findFieldTemplate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, name)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (field.templates[name]) {
@@ -20,7 +20,7 @@ extends: [&#39;foo&#39;, &#39;bar&#39;] where &#39;foo&#39; and &#39;bar&#39; re
 
     <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
   };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Inherit from any field templates that this field template
-extends.</p></div></div><div class="code"><div class="wrapper">  cfg.resolveFieldTemplate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, fieldTemplate)</span> </span>{
+extends.</p></div></div><div class="code"><div class="wrapper">  cfg.resolveFieldTemplate = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field, fieldTemplate)</span> {</span>
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">if</span> (!fieldTemplate.extends) {
@@ -33,7 +33,7 @@ extends.</p></div></div><div class="code"><div class="wrapper">  cfg.resolveFiel
       ext = [ext];
     }
 
-    <span class="hljs-keyword">var</span> bases = ext.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(base)</span> </span>{
+    <span class="hljs-keyword">var</span> bases = ext.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(base)</span> {</span>
       <span class="hljs-keyword">var</span> template = config.findFieldTemplate(field, base);
       <span class="hljs-keyword">if</span> (!template) {
         <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Template '</span> + base + <span class="hljs-string">' not found.'</span>);
@@ -45,13 +45,13 @@ extends.</p></div></div><div class="code"><div class="wrapper">  cfg.resolveFiel
     fieldTemplate = _.extend.apply(_, chain);
 
     <span class="hljs-keyword">return</span> fieldTemplate;
-  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the initField method.</p></div></div><div class="code"><div class="wrapper">  cfg.initField = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> </span>{
+  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the initField method.</p></div></div><div class="code"><div class="wrapper">  cfg.initField = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(field)</span> {</span>
 
     <span class="hljs-keyword">var</span> config = <span class="hljs-keyword">this</span>;
 
     <span class="hljs-keyword">var</span> templates = field.templates = {};
 
-    <span class="hljs-keyword">var</span> childFieldTemplates = config.fieldChildFieldTemplates(field);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add each of the child field templates to our template map.</p></div></div><div class="code"><div class="wrapper">    childFieldTemplates.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+    <span class="hljs-keyword">var</span> childFieldTemplates = config.fieldChildFieldTemplates(field);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Add each of the child field templates to our template map.</p></div></div><div class="code"><div class="wrapper">    childFieldTemplates.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
 
       <span class="hljs-keyword">if</span> (_.isString(fieldTemplate)) {
         <span class="hljs-keyword">return</span>;
@@ -72,7 +72,7 @@ extends.</p></div></div><div class="code"><div class="wrapper">  cfg.resolveFiel
         templates[id] = fieldTemplate;
       }
     });</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Resolve any references to other field templates.</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> (childFieldTemplates.length &gt; <span class="hljs-number">0</span>) {
-      field.fields = childFieldTemplates.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+      field.fields = childFieldTemplates.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
         <span class="hljs-keyword">if</span> (_.isString(fieldTemplate)) {
           fieldTemplate = config.findFieldTemplate(field, fieldTemplate);
         }
@@ -80,14 +80,14 @@ extends.</p></div></div><div class="code"><div class="wrapper">  cfg.resolveFiel
         <span class="hljs-keyword">return</span> config.resolveFieldTemplate(field, fieldTemplate);
       });
 
-      field.fields = field.fields.filter(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> </span>{
+      field.fields = field.fields.filter(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(fieldTemplate)</span> {</span>
         <span class="hljs-keyword">return</span> !fieldTemplate.template;
       });
     }
 
     <span class="hljs-keyword">var</span> itemFieldTemplates = config.fieldItemFieldTemplates(field);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Resolve any of our item field templates. (Field templates for dynamic
 child fields.)</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">if</span> (itemFieldTemplates.length &gt; <span class="hljs-number">0</span>) {
-      field.itemFields = itemFieldTemplates.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemFieldTemplate)</span> </span>{
+      field.itemFields = itemFieldTemplates.map(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(itemFieldTemplate)</span> {</span>
         <span class="hljs-keyword">if</span> (_.isString(itemFieldTemplate)) {
           itemFieldTemplate = config.findFieldTemplate(field, itemFieldTemplate);
         }
