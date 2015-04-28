@@ -1,3 +1,5 @@
+// Our new field type is mostly represented by a React class. To make it play
+// well with others, there are some conventions to follow.
 var Tweet = React.createClass({
   displayName: 'Tweet',
 
@@ -47,7 +49,8 @@ var Tweet = React.createClass({
   }
 });
 
-var plugin = function (config) {
+// Here's our plugin for adding our new type.
+var tweetFieldTypePlugin = function (config) {
 
   return {
     createElement_Tweet: React.createFactory(Tweet),
@@ -66,7 +69,7 @@ var plugin = function (config) {
   };
 };
 
-var config = Formatic.createConfig(Formatic.plugins.bootstrap, plugin);
+var config = Formatic.createConfig(Formatic.plugins.bootstrap, tweetFieldTypePlugin);
 
 // Create some fields.
 var fields = [
