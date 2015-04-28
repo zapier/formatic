@@ -139,6 +139,22 @@ module.exports = React.createClass({
 
               </div>
 
+              <div className="bs-docs-section">
+                <h2 id="adding-type" className="page-header">Adding field types</h2>
+
+                <p>
+                  Field types are handled by methods on the <code>config</code> object, so to add a new field type,
+                  just create a plugin that provides the appropriate methods.
+                </p>
+
+                <p>
+                  Here's an example of a "tweet" field type which turns the text red if we go over 140 characters.
+                </p>
+
+                <ReactPlayground code={fs.readFileSync(path.join(__dirname, '../examples/adding-field-type.js'), 'utf8')} />
+
+              </div>
+
             </div>
 
             <div className="col-md-3">
@@ -155,6 +171,7 @@ module.exports = React.createClass({
                   <NavItem href="#config" key="config">Config</NavItem>
                   <NavItem href="#simple-plugin" key="simple-plugin">A simple plugin</NavItem>
                   <NavItem href="#using-plugins" key="using-plugins">Using plugins</NavItem>
+                  <NavItem href="#adding-types" key="adding-types">Adding field types</NavItem>
                 </Nav>
                 <a className="back-to-top" href="#top">
                 Back to top
