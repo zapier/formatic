@@ -77,6 +77,21 @@ describe('utils', function() {
     expect(dog.bark()).toEqual(dog.speak());
   });
 
+  it('should create a delegator', function () {
+
+    var dog = {
+      bark: function () {
+        return 'woof';
+      }
+    };
+
+    var delegateTo = utils.delegator(dog);
+
+    dog.speak = delegateTo('bark');
+
+    expect(dog.bark()).toEqual(dog.speak());
+  });
+
   // May pull parsing back out of pretty-text component in the future, so
   // leaving this here for now.
 

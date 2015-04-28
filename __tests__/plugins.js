@@ -7,11 +7,9 @@ describe('plugins', function() {
 
   it('can create a new default configuration', function () {
 
-    var defaultConfig = require('../lib/default-config');
-
     var config = Formatic.createConfig();
 
-    expect(config.isEmptyObject.toString()).toEqual(defaultConfig.isEmptyObject.toString());
+    expect(config.humanize('foo')).toEqual('Foo');
   });
 
   it('can create a new configuration with plugin', function () {
@@ -20,11 +18,13 @@ describe('plugins', function() {
 
       var isEmptyObject = config.isEmptyObject;
 
-      config.isEmptyObject = function (obj) {
-        if (obj === 'empty') {
-          return true;
+      return {
+        isEmptyObject: function (obj) {
+          if (obj === 'empty') {
+            return true;
+          }
+          return isEmptyObject(obj);
         }
-        return isEmptyObject.apply(this, arguments);
       };
     };
 
