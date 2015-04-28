@@ -15,6 +15,10 @@ var NAV_LINKS = {
   'field-types': {
     link: '/formatic/field-types.html',
     title: 'Field types'
+  },
+  'plugins': {
+    link: '/formatic/plugins.html',
+    title: 'Plugins'
   }
 };
 
@@ -32,7 +36,7 @@ module.exports = React.createClass({
         E(Bootstrap.Nav, {className: 'bs-navbar-collapse', role: 'navigation', eventKey: 0, id: 'top'},
           Object.keys(NAV_LINKS).map(this.renderNavItem).concat(
             R.li({key: 'annotated-source'},
-              R.a({href: '/formatic/annotated-source/index.html'}, 'Annotated Source')
+              R.a({href: '/formatic/annotated-source/index.html', target: 'formatic-annotated-source'}, 'Annotated Source')
             )
           )
         )

@@ -43,10 +43,31 @@
 
     var Form = React.createFactory(Formatic);
 
+    var plugin = function (config) {
+
+      var initField = config.initField;
+
+      return {
+
+        initField: function (field) {
+
+          initField(field);
+
+          if (field.id === 'silly') {
+
+            if ((field.parent.value.name || '').toLowerCase() === 'joe') {
+              field.help_text_html = field.meta.msg;
+            }
+          }
+        }
+      };
+    };
+
     var config = Formatic.createConfig(
       Formatic.plugins.reference,
       Formatic.plugins.meta,
-      Formatic.plugins.bootstrap
+      Formatic.plugins.bootstrap,
+      plugin
     );
 
     var fields = [];
@@ -136,55 +157,6 @@
     ]);
 
     var formValue = {};
-
-    var initField = config.initField;
-
-    config.initField = function (field) {
-
-      initField.apply(this, arguments);
-
-      if (field.id === 'silly') {
-
-        if ((field.parent.value.name || '').toLowerCase() === 'joe') {
-          field.help_text_html = field.meta.msg;
-        }
-      }
-    };
-
-    // var createField = config.createField;
-    //
-    // config.createField = function (props) {
-    //   var config = this;
-    //
-    //   if (props.field.id === 'silly' && formValue.name === 'Joe') {
-    //     props = _.extend({}, props);
-    //     field = _.extend({}, props.field);
-    //     field.help_text_html = 'What a nice name!';
-    //     props.field = field;
-    //   }
-    //
-    //   return createField.call(config, props);
-    // };
-
-    // var renderFieldComponent = config.renderFieldComponent;
-    //
-    // config.renderFieldComponent = function (component) {
-    //   var config = this;
-    //
-    //   return R.div({style: {border: '#ccc solid 2px'}},
-    //     renderFieldComponent.call(config, component)
-    //   );
-    // };
-    //
-    // config.renderComponent_Text = function (component) {
-    //   var config = this;
-    //
-    //   return R.div({style: {border: 'blue solid 2px'}},
-    //     component.renderDefault()
-    //   );
-    // };
-
-    //console.log(config);
 
     var onFocus = function (event) {
       console.log('focus:', event.path, event.field);

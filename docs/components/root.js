@@ -26,6 +26,11 @@ var pages = {
     path: '/formatic/field-types.html',
     filename: 'field-types.html',
     class: require('./field-types-page')
+  },
+  'plugins': {
+    path: '/formatic/plugins.html',
+    filename: 'plugins.html',
+    class: require('./plugins-page')
   }
 };
 
