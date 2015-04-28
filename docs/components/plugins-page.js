@@ -140,7 +140,7 @@ module.exports = React.createClass({
               </div>
 
               <div className="bs-docs-section">
-                <h2 id="adding-type" className="page-header">Adding field types</h2>
+                <h2 id="adding-types" className="page-header">Adding field types</h2>
 
                 <p>
                   Field types are handled by methods on the <code>config</code> object, so to add a new field type,
