@@ -51,7 +51,7 @@
 
         initField: function (field) {
 
-          initField.apply(this, arguments);
+          initField(field);
 
           if (field.id === 'silly') {
 
@@ -66,7 +66,8 @@
     var config = Formatic.createConfig(
       Formatic.plugins.reference,
       Formatic.plugins.meta,
-      Formatic.plugins.bootstrap
+      Formatic.plugins.bootstrap,
+      plugin
     );
 
     var fields = [];
@@ -156,20 +157,6 @@
     ]);
 
     var formValue = {};
-
-    var initField = config.initField;
-
-    config.initField = function (field) {
-
-      initField.apply(this, arguments);
-
-      if (field.id === 'silly') {
-
-        if ((field.parent.value.name || '').toLowerCase() === 'joe') {
-          field.help_text_html = field.meta.msg;
-        }
-      }
-    };
 
     var onFocus = function (event) {
       console.log('focus:', event.path, event.field);
