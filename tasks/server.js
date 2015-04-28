@@ -4,16 +4,17 @@ var gulp = require('gulp');
 var express = require('express');
 var tinylr = require('tiny-lr');
 var gaze = require('gaze');
-var portscanner = require('portscanner')
+var portscanner = require('portscanner');
 
-var LR_PORT = 35729;
 var APP_PORT = 3000;
+var LR_PORT = 35729;
+var lrPort = LR_PORT;
 
-gulp.task('server-express', ['copy-all-after-bundle', 'copy-docs-all-after-bundle'], function (done) {
+gulp.task('server-express', ['copy-all-after-bundle', 'copy-docs-all-after-bundle', 'server-livereload'], function (done) {
   var app = express();
 
   app
-    .use(require('connect-livereload')())
+    .use(require('connect-livereload')({port: lrPort}))
     .use('/', express.static('./live'))
     .use('/formatic', express.static('./build-docs'))
     .listen(APP_PORT, function() {
@@ -31,6 +32,7 @@ gulp.task('server-livereload', ['watch'], function (done) {
     }
 
     lr.listen(port, function () {
+      lrPort = port;
       console.log('reload server listening on %d', port);
 
       gaze([
