@@ -26,19 +26,23 @@ with Twitter Bootstrap.</p></div></div><div class="code"><div class="wrapper"><s
 
 module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> {</span>
 
-  <span class="hljs-keyword">var</span> defaultCreateElement = config.createElement;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the createElement method.</p></div></div><div class="code"><div class="wrapper">  config.createElement = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, props, children)</span> {</span>
+  <span class="hljs-keyword">var</span> createElement = config.createElement;
 
-    name = config.elementName(name);
+  <span class="hljs-keyword">return</span> {
+    createElement: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, props, children)</span> {</span>
 
-    <span class="hljs-keyword">var</span> modifier = modifiers[name];
+      name = config.elementName(name);
 
-    <span class="hljs-keyword">if</span> (modifier) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If there is a modifier for this element, add the classes and label.</p></div></div><div class="code"><div class="wrapper">      props = _.extend({}, props);
-      props.classes = _.extend({}, props.classes, modifier.classes);
-      <span class="hljs-keyword">if</span> (<span class="hljs-string">'label'</span> <span class="hljs-keyword">in</span> modifier) {
-        props.label = modifier.label;
+      <span class="hljs-keyword">var</span> modifier = modifiers[name];
+
+      <span class="hljs-keyword">if</span> (modifier) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>If there is a modifier for this element, add the classes and label.</p></div></div><div class="code"><div class="wrapper">        props = _.extend({}, props);
+        props.classes = _.extend({}, props.classes, modifier.classes);
+        <span class="hljs-keyword">if</span> (<span class="hljs-string">'label'</span> <span class="hljs-keyword">in</span> modifier) {
+          props.label = modifier.label;
+        }
       }
-    }
 
-    <span class="hljs-keyword">return</span> defaultCreateElement.call(<span class="hljs-keyword">this</span>, name, props, children);
+      <span class="hljs-keyword">return</span> createElement(name, props, children);
+    }
   };
 };</div></div></div></div></body></html>

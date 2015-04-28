@@ -11,7 +11,26 @@ is what is actually exported.</p></div></div><div class="code"><div class="wrapp
 
 <span class="hljs-keyword">var</span> utils = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./utils'</span>);
 
-<span class="hljs-keyword">var</span> defaultConfig = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./default-config'</span>);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The main formatic component that renders the form.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> FormaticControlledClass = React.createClass({
+<span class="hljs-keyword">var</span> defaultConfigPlugin = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./default-config'</span>);
+
+<span class="hljs-keyword">var</span> createConfig = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
+  <span class="hljs-keyword">var</span> plugins = [defaultConfigPlugin].concat(_.toArray(<span class="hljs-built_in">arguments</span>));
+
+  <span class="hljs-keyword">return</span> plugins.reduce(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config, plugin)</span> {</span>
+    <span class="hljs-keyword">if</span> (_.isFunction(plugin)) {
+      <span class="hljs-keyword">var</span> extensions = plugin(config);
+      <span class="hljs-keyword">if</span> (extensions) {
+        _.extend(config, extensions);
+      }
+    } <span class="hljs-keyword">else</span> {
+      _.extend(config, plugin);
+    }
+
+    <span class="hljs-keyword">return</span> config;
+  }, {});
+};
+
+<span class="hljs-keyword">var</span> defaultConfig = createConfig();</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>The main formatic component that renders the form.</p></div></div><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> FormaticControlledClass = React.createClass({
 
   displayName: <span class="hljs-string">'FormaticControlled'</span>,</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Respond to any value changes.</p></div></div><div class="code"><div class="wrapper">  onChange: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(newValue, info)</span> {</span>
     <span class="hljs-keyword">if</span> (!<span class="hljs-keyword">this</span>.props.onChange) {
@@ -39,22 +58,7 @@ blur.)</p></div></div><div class="code"><div class="wrapper">  onAction: <span c
 <span class="hljs-keyword">var</span> FormaticControlled = React.createFactory(FormaticControlledClass);</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>A wrapper component that is actually exported and can allow formatic to be
 used in an &quot;uncontrolled&quot; manner. (See uncontrolled components in the React
 documentation for an explanation of the difference.)</p></div></div><div class="code"><div class="wrapper">module.exports = React.createClass({</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Export some stuff as statics.</p></div></div><div class="code"><div class="wrapper">  statics: {
-    createConfig: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> {</span>
-      <span class="hljs-keyword">var</span> args = _.toArray(<span class="hljs-built_in">arguments</span>);
-      <span class="hljs-keyword">var</span> config = _.extend({}, defaultConfig);
-
-      <span class="hljs-keyword">if</span> (args.length === <span class="hljs-number">0</span>) {
-        <span class="hljs-keyword">return</span> config;
-      }
-      <span class="hljs-keyword">var</span> configs = [config].concat(args);
-      <span class="hljs-keyword">return</span> configs.reduce(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(prev, curr)</span> {</span>
-        <span class="hljs-keyword">if</span> (_.isFunction(curr)) {
-          curr(prev);
-          <span class="hljs-keyword">return</span> prev;
-        }
-        <span class="hljs-keyword">return</span> _.extend(prev, curr);
-      });
-    },
+    createConfig: createConfig,
     availableMixins: {
       clickOutside: <span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/click-outside.js'</span>),
       field: <span class="hljs-built_in">require</span>(<span class="hljs-string">'./mixins/field.js'</span>),

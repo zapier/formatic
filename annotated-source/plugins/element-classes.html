@@ -6,27 +6,29 @@ class to an element.</p></div></div><div class="code"><div class="wrapper"><span
 
 module.exports = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(config)</span> {</span>
 
-  <span class="hljs-keyword">var</span> defaultCreateElement = config.createElement;
+  <span class="hljs-keyword">var</span> createElement = config.createElement;
 
   <span class="hljs-keyword">var</span> elementClasses = {};
 
-  config.addElementClass = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, className)</span> {</span>
+  <span class="hljs-keyword">return</span> {
+    addElementClass: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, className)</span> {</span>
 
-    name = config.elementName(name);
+      name = config.elementName(name);
 
-    <span class="hljs-keyword">if</span> (!elementClasses[name]) {
-      elementClasses[name] = {};
+      <span class="hljs-keyword">if</span> (!elementClasses[name]) {
+        elementClasses[name] = {};
+      }
+
+      elementClasses[name][className] = <span class="hljs-literal">true</span>;
+    },</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the createElement method.</p></div></div><div class="code"><div class="wrapper">    createElement: <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, props, children)</span> {</span>
+
+      name = config.elementName(name);
+
+      <span class="hljs-keyword">if</span> (elementClasses[name]) {
+        props = _.extend({}, props, {classes: elementClasses[name]});
+      }
+
+      <span class="hljs-keyword">return</span> createElement(name, props, children);
     }
-
-    elementClasses[name][className] = <span class="hljs-literal">true</span>;
-  };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>Wrap the createElement method.</p></div></div><div class="code"><div class="wrapper">  config.createElement = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(name, props, children)</span> {</span>
-
-    name = config.elementName(name);
-
-    <span class="hljs-keyword">if</span> (elementClasses[name]) {
-      props = _.extend({}, props, {classes: elementClasses[name]});
-    }
-
-    <span class="hljs-keyword">return</span> defaultCreateElement.call(<span class="hljs-keyword">this</span>, name, props, children);
   };
 };</div></div></div></div></body></html>
