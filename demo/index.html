@@ -5,7 +5,6 @@
   <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap-theme.min.css">
   <link rel="stylesheet" href="./bower_components/codemirror/lib/codemirror.css">
-  <link rel="stylesheet" href="./bower_components/codemirror/lib/codemirror-overrides.css">
 
   <style type="text/css" media="screen">
    /* CodeMirror styling */
@@ -75,7 +74,7 @@
 
     var fields = [];
 
-    var prettyNum = 10;
+    var prettyNum = 1;
     _.each(_.range(prettyNum), function(x){
       fields.push({
         label: 'Pretty Text 2', key: 'prettyText2-' + x, type: 'pretty-text',
@@ -97,6 +96,20 @@
     });
 
     fields = fields.concat([
+      {label: 'Size', type: 'pretty-select', key: 'size', defaultValue: 'S', choices: [
+        {
+          value: 'S',
+          label: 'Small'
+        },
+        {
+          value: 'M',
+          label: 'Medium'
+        },
+        {
+          value: 'L',
+          label: 'Large'
+        }
+      ]},
       {label: 'Name', type: 'unicode', key: 'name', required: true, default: 'Unknown'},
       {id: 'silly', type: 'copy', help_text_html: 'What the hey? <b>Seriously?</b>'},
       {label: 'Note', type: 'text', key: 'note', required: true},
