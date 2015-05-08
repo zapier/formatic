@@ -92,6 +92,10 @@ charset "UTF-8";
   border-top: 1px solid #ccc;*/
 }
 
+.formatic .choices-container-closed {
+  display: none;
+}
+
 .formatic .choices {
   list-style-type: none;
   margin: 0px;
