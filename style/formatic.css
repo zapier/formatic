@@ -248,3 +248,20 @@ div.pretty-text-box {
      -moz-box-sizing: border-box; */
   box-sizing: border-box;
 }
+
+
+.zf-select-active {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.formatic .select-arrow {
+  line-height: 23px;
+  border: 1px solid #ccc;
+  display: inline-block;
+}
+
+.formatic .select-arrow::before {
+  content: '▼';
+  vertical-align: middle;
+}
