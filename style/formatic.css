@@ -253,12 +253,6 @@ div.pretty-text-box {
   box-sizing: border-box;
 }
 
-
-.zf-select-active {
-  border: 1px solid #ccc;
-  padding: 10px;
-}
-
 .formatic .select-arrow {
   line-height: 23px;
   border: 1px solid #ccc;
