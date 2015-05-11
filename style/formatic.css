@@ -93,7 +93,7 @@ charset "UTF-8";
 }
 
 .formatic .choices-container-closed {
-  display: none;
+  opacity: 0;
 }
 
 .formatic .choices {
