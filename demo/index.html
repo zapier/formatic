@@ -74,7 +74,7 @@
 
     var fields = [];
 
-    var prettyNum = 1;
+    var prettyNum = 0;
     _.each(_.range(prettyNum), function(x){
       fields.push({
         label: 'Pretty Text 2', key: 'prettyText2-' + x, type: 'pretty-text',
@@ -97,13 +97,15 @@
 
     fields = fields.concat([
       {label: 'Size', type: 'pretty-select', key: 'size', default: 'S',
-       choices: { S: 'Small', M: 'Medium', L: 'Large'}
+       choices: { S: 'Small', M: 'Medium', L: 'Large' },
       },
       {label: 'Colors', type: 'pretty-select', key: 'colors1', choices: "red, green, yellow"},
       {label: 'Colors 2', type: 'pretty-select', key: 'colors2', choices: {r: "Red", g: "Green"}},
       {label: 'Colors 3', type: 'pretty-select', key: 'colors3', choices: [
         { value: 'r', label: 'Red', sample: 'cherry'},
-        { value: 'g', label: 'Green', sample: 'lime'}
+        { value: 'g', label: 'Green', sample: 'lime'},
+        { value: '', action: 'clear-current-choice'},
+        { value: 'loadMore', label: 'Load more choices..', action: 'load-more-choices'}
       ]},
       {label: 'Name', type: 'unicode', key: 'name', required: true, default: 'Unknown'},
       {id: 'silly', type: 'copy', help_text_html: 'What the hey? <b>Seriously?</b>'},
@@ -186,6 +188,10 @@
       console.log('closing replacements:', info);
     }
 
+    var onClearCurrentChoice = function (info) {
+      console.log('on clear current choice', info);
+    }
+
     // Controlled version:
 
     var render = function (value) {
@@ -203,7 +209,8 @@
         onFocus: onFocus,
         onBlur: onBlur,
         onOpenReplacements: onOpenReplacements,
-        onCloseReplacements: onCloseReplacements
+        onCloseReplacements: onCloseReplacements,
+        onClearCurrentChoice: onClearCurrentChoice
       }), document.getElementById('user'));
     };
 
