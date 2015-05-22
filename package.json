@@ -62,7 +62,8 @@
     "unmockedModulePathPatterns": [
       "<rootDir>/node_modules",
       "<rootDir>/index.js",
-      "<rootDir>/lib"
+      "<rootDir>/lib",
+      "<rootDir>/build"
     ],
     "testPathDirs": [
       "__tests__"
