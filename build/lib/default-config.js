@@ -757,6 +757,11 @@ module.exports = function (config) {
       return field.label;
     },
 
+    // Get a placeholder (just a default display value, not a default value) for a field.
+    fieldPlaceholder: function fieldPlaceholder(field) {
+      return field.placeholder;
+    },
+
     // Get the help text for a field.
     fieldHelpText: function fieldHelpText(field) {
       return field.help_text_html || field.help_text || field.helpText || field.helpTextHtml;

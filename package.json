@@ -10,7 +10,8 @@
     "docs-build": "gulp docs-build",
     "docs-publish": "gulp docs-publish",
     "watch": "gulp watch",
-    "live": "gulp server-live"
+    "live": "gulp server-live",
+    "patch-release": "npm version patch && npm publish && git push --follow-tags"
   },
   "repository": {
     "type": "git",

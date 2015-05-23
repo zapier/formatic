@@ -125,6 +125,7 @@ module.exports = React.createClass({
   },
 
   getDisplayValue: function getDisplayValue() {
+    var config = this.props.config;
     var currentValue = this.state.value;
     var currentChoice = _.find(this.props.choices, function (choice) {
       return choice.value === currentValue;
@@ -136,7 +137,7 @@ module.exports = React.createClass({
       // custom value
       return currentValue;
     }
-    return '';
+    return config.fieldPlaceholder(this.props.field) || '';
   },
 
   onChoiceAction: function onChoiceAction(choice) {
