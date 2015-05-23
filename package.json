@@ -2,7 +2,7 @@
   "name": "formatic",
   "version": "0.2.2",
   "description": "Automatic, pluggable form generation",
-  "main": "/build/lib/formatic.js",
+  "main": "./build/lib/formatic",
   "scripts": {
     "test": "jest",
     "lint": "eslint gulpfile.js lib/**/*.js docs/components/*.js docs/index.js",
