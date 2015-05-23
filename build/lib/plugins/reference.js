@@ -8,7 +8,7 @@ extends: ['foo', 'bar'] where 'foo' and 'bar' refer to other keys or ids.
 
 'use strict';
 
-var _ = require('underscore');
+var _ = require('../undash');
 
 module.exports = function (config) {
 

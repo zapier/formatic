@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react/addons');
-var _ = require('underscore');
+var _ = require('../../undash');
 
 /*
    Choices drop down component for picking pretty text tags.

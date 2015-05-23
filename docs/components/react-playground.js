@@ -1,5 +1,5 @@
 // Need this rule here because we define Formatic to be used by eval.
-/*eslint no-unused-vars:0*/
+/*eslint no-unused-vars:0 no-empty:0*/
 'use strict';
 
 var React = require('react');

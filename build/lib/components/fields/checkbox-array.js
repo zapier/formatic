@@ -9,7 +9,7 @@ enumerated values to an array.
 
 var React = require('react');
 var R = React.DOM;
-var _ = require('underscore');
+var _ = require('../../undash');
 var cx = require('classnames');
 
 module.exports = React.createClass({

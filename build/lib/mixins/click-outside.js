@@ -29,7 +29,7 @@ module.exports = React.createClass({
 
 'use strict';
 
-var _ = require('underscore');
+var _ = require('../undash');
 
 var hasAncestor = function hasAncestor(_x, _x2) {
   var _again = true;

@@ -13,14 +13,18 @@ is what is actually exported.
 'use strict';
 
 var React = require('react/addons');
-var _ = require('underscore');
+var _ = require('./undash');
 
 var utils = require('./utils');
 
 var defaultConfigPlugin = require('./default-config');
 
 var createConfig = function createConfig() {
-  var plugins = [defaultConfigPlugin].concat(_.toArray(arguments));
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  var plugins = [defaultConfigPlugin].concat(args);
 
   return plugins.reduce(function (config, plugin) {
     if (_.isFunction(plugin)) {

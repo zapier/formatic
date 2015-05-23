@@ -8,7 +8,7 @@ Used by any fields to put the label and help text around the field.
 
 var React = require('react/addons');
 var R = React.DOM;
-var _ = require('underscore');
+var _ = require('../../undash');
 var cx = require('classnames');
 
 var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);

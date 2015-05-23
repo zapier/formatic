@@ -1,15 +1,26 @@
 {
+  "parser": "babel-eslint",
   "env": {
     "node": true,
     "browser": true
   },
   "rules": {
     "quotes": [2, "single", "avoid-escape"],
-    "no-global-strict": 0,
+    "strict": [0, "never"],
     "camelcase": 0,
     "no-underscore-dangle": 0,
-    "new-cap": false
+    "new-cap": false,
+    "strict": 0,
+    "indent": [2, 2],
+    "react/jsx-uses-vars": 1
   },
+  "globals": {
+    "escape": true,
+    "unescape": true
+  },
+  "plugins": [
+    "react"
+  ],
   "ecmaFeatures": {
     "jsx": true
   }

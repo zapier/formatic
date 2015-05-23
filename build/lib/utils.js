@@ -6,7 +6,7 @@ Just some shared utility functions.
 
 'use strict';
 
-var _ = require('underscore');
+var _ = require('./undash');
 
 var utils = exports;
 
