@@ -105,7 +105,7 @@ module.exports = React.createClass({
   },
 
   setChoicesOpen: function setChoicesOpen(isOpen) {
-    var action = isOpen ? 'open-replacements' : 'close-replacements';
+    var action = isOpen ? 'open-choices' : 'close-choices';
     this.onStartAction(action);
     this.setState({ isChoicesOpen: isOpen });
   },
