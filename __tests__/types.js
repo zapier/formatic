@@ -68,8 +68,13 @@ describe('types and value changes', function() {
         var node = component.getDOMNode().getElementsByTagName(options.tagName)[0];
 
         var nodeValue = node.value;
+
         if (options.getNodeValue) {
           nodeValue = options.getNodeValue(node);
+        }
+        // Something changed in a React 0.13.x, and now textarea has extra newline in front of it.
+        if (typeof nodeValue === 'string') {
+          nodeValue = nodeValue.replace(/^\n/, '');
         }
         expect(nodeValue).toEqual(options.from);
 
@@ -177,7 +182,7 @@ describe('types and value changes', function() {
             key: 'myArray',
             itemFields: [
               {
-                type: 'string'
+                type: 'single-line-string'
               }
             ]
           }
@@ -189,7 +194,7 @@ describe('types and value changes', function() {
         }
       }));
 
-      var node = component.getDOMNode().getElementsByClassName('string')[0];
+      var node = component.getDOMNode().getElementsByClassName('single-line-string')[0];
 
       expect(node.value).toEqual('red');
 
@@ -213,7 +218,7 @@ describe('types and value changes', function() {
             key: 'myObject',
             itemFields: [
               {
-                type: 'string'
+                type: 'single-line-string'
               }
             ]
           }
@@ -225,7 +230,7 @@ describe('types and value changes', function() {
         }
       }));
 
-      var node = component.getDOMNode().getElementsByClassName('string')[0];
+      var node = component.getDOMNode().getElementsByClassName('single-line-string')[0];
 
       expect(node.value).toEqual('foo');
 

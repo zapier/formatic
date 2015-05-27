@@ -42,7 +42,6 @@
     "gulp-shell": "^0.2.8",
     "jest-cli": "^0.4.0",
     "portscanner": "^1.0.0",
-    "react": "^0.13.3",
     "react-bootstrap": "^0.23.0",
     "react-router": "^0.13.3",
     "react-tools": "^0.12.2",
@@ -57,7 +56,8 @@
   "dependencies": {
     "classnames": "^2.1.1",
     "deep-equal": "^1.0.0",
-    "object-assign": "^2.0.0"
+    "object-assign": "^2.0.0",
+    "react": "^0.13.3"
   },
   "peerDependencies": {
     "react": ">=0.13"
