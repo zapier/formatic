@@ -42,8 +42,9 @@
     "gulp-shell": "^0.2.8",
     "jest-cli": "^0.4.0",
     "portscanner": "^1.0.0",
-    "react-bootstrap": "^0.14.0",
-    "react-router": "^0.12.0",
+    "react": "^0.13.3",
+    "react-bootstrap": "^0.23.0",
+    "react-router": "^0.13.3",
     "react-tools": "^0.12.2",
     "require-dir": "^0.1.0",
     "run-sequence": "^1.0.2",
@@ -59,7 +60,7 @@
     "object-assign": "^2.0.0"
   },
   "peerDependencies": {
-    "react": ">=0.12"
+    "react": ">=0.13"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
