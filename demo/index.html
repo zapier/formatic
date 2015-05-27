@@ -1,4 +1,4 @@
-k<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <link href="./style/formatic.css" rel="stylesheet" type="text/css"/>
@@ -37,197 +37,202 @@ k<!DOCTYPE html>
   <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="./bower_components/codemirror/lib/codemirror.js"></script>
   <script src="./bower_components/react/react-with-addons.js"></script>
+  <script src="./bower_components/react/JSXTransformer.js"></script>
 
   <script src="./lib/formatic-dev.js"></script>
-  <script>
+  <script type="text/jsx;harmony=true">
+    React.render(<Formatic.StringField value="fool"/>, document.getElementById('user'));
 
-    var R = React.DOM;
 
-    var Form = React.createFactory(Formatic);
 
-    var plugin = function (config) {
-
-      var initField = config.initField;
-
-      return {
-
-        createElement_ChoiceActionSample: function (action) {
-          return R.span({}, 'X');
-        },
-
-        initField: function (field) {
-
-          initField(field);
-
-          if (field.id === 'silly') {
-
-            if ((field.parent.value.name || '').toLowerCase() === 'joe') {
-              field.help_text_html = field.meta.msg;
-            }
-          }
-        }
-      };
-    };
-
-    var config = Formatic.createConfig(
-      Formatic.plugins.reference,
-      Formatic.plugins.meta,
-      Formatic.plugins.bootstrap,
-      plugin
-    );
-
-    var fields = [];
-
-    var prettyNum = 0;
-    _.each(_.range(prettyNum), function(x){
-      fields.push({
-        label: 'Pretty Text 2', key: 'prettyText2-' + x, type: 'pretty-text',
-        default: 'Hi there {{firstName}} {{lastName}} {{middleName}}. A lot more text to do a wrap. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam metus tellus, suscipit eget gravida rhoncus, convallis sed justo. Aenean at condimentum ipsum, ut rutrum nisi. Vestibulum tincidunt nisl vel lectus varius semper. Ut tortor nunc, lacinia non mi convallis, iaculis posuere ipsum.',
-        tabIndex: x + 1,
-        replaceChoices: [
-          {
-            value: 'firstName',
-            label: 'First Name',
-            sample: 'Bob'
-          },
-          {
-            value: 'lastName',
-            label: 'Last Name',
-            sample: 'Smith'
-          }
-        ]
-      });
-    });
-
-    fields = fields.concat([
-      {label: 'Size', type: 'pretty-select', key: 'size', default: 'S',
-       choices: { S: 'Small', M: 'Medium', L: 'Large' },
-      },
-      {label: 'Colors', type: 'pretty-select', key: 'colors1', placeholder: 'Pick a color...', choices: "red, green, yellow"},
-      {label: 'Colors 2', type: 'pretty-select', key: 'colors2', choices: {r: "Red", g: "Green"}},
-      {label: 'Colors 3', type: 'pretty-select', key: 'colors3', choices: [
-        { value: 'r', label: 'Red', sample: 'cherry'},
-        { value: 'g', label: 'Green', sample: 'lime'},
-        { value: '', action: 'clear-current-choice'},
-        { action: 'enter-custom-value', label: 'Type a custom value' },
-        { value: 'loadMore', label: 'Load more choices..', action: 'load-more-choices'}
-      ]},
-      {label: 'Name', type: 'unicode', key: 'name', required: true, default: 'Unknown'},
-      {id: 'silly', type: 'copy', help_text_html: 'What the hey? <b>Seriously?</b>'},
-      {label: 'Note', type: 'text', key: 'note', required: true},
-      {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},
-      {label: 'Groceries', type: 'text', key: 'groceries', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
-      {label: 'Path', type: 'unicode', key: 'path', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
-      {
-        label: 'Robots', type: 'list', key: 'robots',
-        itemFields: [{
-          label: 'Simple',
-          match: {type: 'simple'},
-          type: 'fields',
-          fields: [
-            {label: 'Name', type: 'unicode', key: 'name'}
-          ]
-        },{
-          label: 'Complex',
-          match: {type: 'complex'},
-          type: 'fields',
-          fields: [
-            {label: 'Name', type: 'unicode', key: 'name'},
-            {label: 'Description', type: 'text', key: 'description'}
-          ]
-        }]
-      },
-      {label: 'Mapping', type: 'object', key: 'mapping'},
-      {label: 'The Blob', type: 'json', key: 'blob'},
-      {label: 'Do you like cookies?', type: 'boolean', key: 'likesCookies'},
-      {label: 'Do you like pretty cookies with sprinkles?', type: 'pretty-boolean', key: 'likesPrettyCookies'},
-      {label: 'Colors', type: 'checkbox-list', key: 'colors', choices: ['red', 'green', 'blue']},
-      {label: 'Junk', type: 'junk'},
-      {
-        label: 'Folder',
-        type: 'fields',
-        key: 'folder',
-        match: {type: 'folder'},
-        fields: [
-          {type: 'unicode', key: 'type', hidden: true, default: 'folder'},
-          {label: 'Name', type: 'unicode', key: 'name'},
-          {
-            label: 'Children',
-            type: 'array',
-            key: 'children',
-            itemFields: [
-              {
-                label: 'File',
-                type: 'fields',
-                match: {type: 'file'},
-                fields: [
-                  {type: 'unicode', key: 'type', hidden: true, default: 'file'},
-                  {label: 'Name', type: 'unicode', key: 'name'},
-                  {label: 'Content', type: 'text', key: 'content'}
-                ]
-              },
-              'folder'
-            ]
-          }
-        ]
-      },
-      {label: 'More colors', key: 'moreColors', extends: 'colors'},
-      {label: 'Alive', label: "I'm alive!", type: 'checkbox-boolean', key: 'isAlive'}
-    ]);
-
-    var formValue = {};
-
-    var onFocus = function (event) {
-      console.log('focus:', event.path, event.field);
-    };
-
-    var onBlur = function (event) {
-      console.log('blur:', event.path, event.field);
-    };
-
-    var onOpenReplacements = function (info) {
-      console.log('opening replacements:', info);
-    }
-
-    var onCloseReplacements = function (info) {
-      console.log('closing replacements:', info);
-    }
-
-    var onClearCurrentChoice = function (info) {
-      console.log('on clear current choice', info);
-    }
-
-    // Controlled version:
-
-    var render = function (value) {
-      React.render(Form({
-        meta: {msg: "That's a fine name you have there!"},
-        config: config,
-        fields: fields,
-        value: value,
-        onChange: function (newValue, info) {
-          console.log('changed at:', info.path);
-          console.log('new value:', newValue);
-          formValue = newValue;
-          render(newValue);
-        },
-        onFocus: onFocus,
-        onBlur: onBlur,
-        onOpenReplacements: onOpenReplacements,
-        onCloseReplacements: onCloseReplacements,
-        onClearCurrentChoice: onClearCurrentChoice
-      }), document.getElementById('user'));
-    };
-
-    var setValue = function (value) {
-      formValue = value;
-      render(formValue);
-    };
-
-    formValue.name = 'tom';
-    formValue.colors3 = 'custom';
-    console.log('formValue');
-    setValue(formValue);
+    //
+    // var R = React.DOM;
+    //
+    // var Form = React.createFactory(Formatic);
+    //
+    // var plugin = function (config) {
+    //
+    //   var initField = config.initField;
+    //
+    //   return {
+    //
+    //     createElement_ChoiceActionSample: function (action) {
+    //       return R.span({}, 'X');
+    //     },
+    //
+    //     initField: function (field) {
+    //
+    //       initField(field);
+    //
+    //       if (field.id === 'silly') {
+    //
+    //         if ((field.parent.value.name || '').toLowerCase() === 'joe') {
+    //           field.help_text_html = field.meta.msg;
+    //         }
+    //       }
+    //     }
+    //   };
+    // };
+    //
+    // var config = Formatic.createConfig(
+    //   Formatic.plugins.reference,
+    //   Formatic.plugins.meta,
+    //   Formatic.plugins.bootstrap,
+    //   plugin
+    // );
+    //
+    // var fields = [];
+    //
+    // var prettyNum = 0;
+    // _.each(_.range(prettyNum), function(x){
+    //   fields.push({
+    //     label: 'Pretty Text 2', key: 'prettyText2-' + x, type: 'pretty-text',
+    //     default: 'Hi there {{firstName}} {{lastName}} {{middleName}}. A lot more text to do a wrap. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam metus tellus, suscipit eget gravida rhoncus, convallis sed justo. Aenean at condimentum ipsum, ut rutrum nisi. Vestibulum tincidunt nisl vel lectus varius semper. Ut tortor nunc, lacinia non mi convallis, iaculis posuere ipsum.',
+    //     tabIndex: x + 1,
+    //     replaceChoices: [
+    //       {
+    //         value: 'firstName',
+    //         label: 'First Name',
+    //         sample: 'Bob'
+    //       },
+    //       {
+    //         value: 'lastName',
+    //         label: 'Last Name',
+    //         sample: 'Smith'
+    //       }
+    //     ]
+    //   });
+    // });
+    //
+    // fields = fields.concat([
+    //   {label: 'Size', type: 'pretty-select', key: 'size', default: 'S',
+    //    choices: { S: 'Small', M: 'Medium', L: 'Large' },
+    //   },
+    //   {label: 'Colors', type: 'pretty-select', key: 'colors1', placeholder: 'Pick a color...', choices: "red, green, yellow"},
+    //   {label: 'Colors 2', type: 'pretty-select', key: 'colors2', choices: {r: "Red", g: "Green"}},
+    //   {label: 'Colors 3', type: 'pretty-select', key: 'colors3', choices: [
+    //     { value: 'r', label: 'Red', sample: 'cherry'},
+    //     { value: 'g', label: 'Green', sample: 'lime'},
+    //     { value: '', action: 'clear-current-choice'},
+    //     { action: 'enter-custom-value', label: 'Type a custom value' },
+    //     { value: 'loadMore', label: 'Load more choices..', action: 'load-more-choices'}
+    //   ]},
+    //   {label: 'Name', type: 'unicode', key: 'name', required: true, default: 'Unknown'},
+    //   {id: 'silly', type: 'copy', help_text_html: 'What the hey? <b>Seriously?</b>'},
+    //   {label: 'Note', type: 'text', key: 'note', required: true},
+    //   {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},
+    //   {label: 'Groceries', type: 'text', key: 'groceries', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
+    //   {label: 'Path', type: 'unicode', key: 'path', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
+    //   {
+    //     label: 'Robots', type: 'list', key: 'robots',
+    //     itemFields: [{
+    //       label: 'Simple',
+    //       match: {type: 'simple'},
+    //       type: 'fields',
+    //       fields: [
+    //         {label: 'Name', type: 'unicode', key: 'name'}
+    //       ]
+    //     },{
+    //       label: 'Complex',
+    //       match: {type: 'complex'},
+    //       type: 'fields',
+    //       fields: [
+    //         {label: 'Name', type: 'unicode', key: 'name'},
+    //         {label: 'Description', type: 'text', key: 'description'}
+    //       ]
+    //     }]
+    //   },
+    //   {label: 'Mapping', type: 'object', key: 'mapping'},
+    //   {label: 'The Blob', type: 'json', key: 'blob'},
+    //   {label: 'Do you like cookies?', type: 'boolean', key: 'likesCookies'},
+    //   {label: 'Do you like pretty cookies with sprinkles?', type: 'pretty-boolean', key: 'likesPrettyCookies'},
+    //   {label: 'Colors', type: 'checkbox-list', key: 'colors', choices: ['red', 'green', 'blue']},
+    //   {label: 'Junk', type: 'junk'},
+    //   {
+    //     label: 'Folder',
+    //     type: 'fields',
+    //     key: 'folder',
+    //     match: {type: 'folder'},
+    //     fields: [
+    //       {type: 'unicode', key: 'type', hidden: true, default: 'folder'},
+    //       {label: 'Name', type: 'unicode', key: 'name'},
+    //       {
+    //         label: 'Children',
+    //         type: 'array',
+    //         key: 'children',
+    //         itemFields: [
+    //           {
+    //             label: 'File',
+    //             type: 'fields',
+    //             match: {type: 'file'},
+    //             fields: [
+    //               {type: 'unicode', key: 'type', hidden: true, default: 'file'},
+    //               {label: 'Name', type: 'unicode', key: 'name'},
+    //               {label: 'Content', type: 'text', key: 'content'}
+    //             ]
+    //           },
+    //           'folder'
+    //         ]
+    //       }
+    //     ]
+    //   },
+    //   {label: 'More colors', key: 'moreColors', extends: 'colors'},
+    //   {label: 'Alive', label: "I'm alive!", type: 'checkbox-boolean', key: 'isAlive'}
+    // ]);
+    //
+    // var formValue = {};
+    //
+    // var onFocus = function (event) {
+    //   console.log('focus:', event.path, event.field);
+    // };
+    //
+    // var onBlur = function (event) {
+    //   console.log('blur:', event.path, event.field);
+    // };
+    //
+    // var onOpenReplacements = function (info) {
+    //   console.log('opening replacements:', info);
+    // }
+    //
+    // var onCloseReplacements = function (info) {
+    //   console.log('closing replacements:', info);
+    // }
+    //
+    // var onClearCurrentChoice = function (info) {
+    //   console.log('on clear current choice', info);
+    // }
+    //
+    // // Controlled version:
+    //
+    // var render = function (value) {
+    //   React.render(Form({
+    //     meta: {msg: "That's a fine name you have there!"},
+    //     config: config,
+    //     fields: fields,
+    //     value: value,
+    //     onChange: function (newValue, info) {
+    //       console.log('changed at:', info.path);
+    //       console.log('new value:', newValue);
+    //       formValue = newValue;
+    //       render(newValue);
+    //     },
+    //     onFocus: onFocus,
+    //     onBlur: onBlur,
+    //     onOpenReplacements: onOpenReplacements,
+    //     onCloseReplacements: onCloseReplacements,
+    //     onClearCurrentChoice: onClearCurrentChoice
+    //   }), document.getElementById('user'));
+    // };
+    //
+    // var setValue = function (value) {
+    //   formValue = value;
+    //   render(formValue);
+    // };
+    //
+    // formValue.name = 'tom';
+    // formValue.colors3 = 'custom';
+    // console.log('formValue');
+    // setValue(formValue);
 
     // Uncontrolled version:
 
