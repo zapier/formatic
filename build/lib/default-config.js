@@ -66,6 +66,8 @@ module.exports = function (config) {
 
     createElement_LoadingChoices: React.createFactory(require('./components/helpers/loading-choices')),
 
+    createElement_LoadingChoice: React.createFactory(require('./components/helpers/loading-choice')),
+
     createElement_ArrayControl: React.createFactory(require('./components/helpers/array-control')),
 
     createElement_ArrayItemControl: React.createFactory(require('./components/helpers/array-item-control')),
@@ -750,6 +752,13 @@ module.exports = function (config) {
     fieldReplaceChoices: function fieldReplaceChoices(field) {
 
       return config.normalizeChoices(field.replaceChoices);
+    },
+
+    // The active selected choice could be unavailable in the current list of
+    // choices. This provides the selected choice in that case.
+    fieldSelectedChoice: function fieldSelectedChoice(field) {
+
+      return field.selectedChoice || null;
     },
 
     // Get a label for a field.

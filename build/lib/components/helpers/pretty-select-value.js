@@ -49,40 +49,43 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
-    var config = this.props.config;
+    // var config = this.props.config;
     var choices = this.props.config.normalizePrettyChoices(this.props.choices);
     var choicesOrLoading;
 
-    if (choices.length === 1 && choices[0].value === '///loading///') {
-      choicesOrLoading = config.createElement('loading-choices', {});
-    } else {
-      var choicesElem = this.props.config.createElement('choices', {
-        ref: 'choices',
-        choices: choices,
-        open: this.state.isChoicesOpen,
-        ignoreCloseNodes: this.getCloseIgnoreNodes,
-        onSelect: this.onSelectChoice,
-        onClose: this.onCloseChoices,
-        onChoiceAction: this.onChoiceAction
-      });
-
-      var inputElem = this.getInputElement();
-
-      choicesOrLoading = React.createElement(
-        'div',
-        { className: cx(this.props.classes),
-          onChange: this.onChange,
-          onFocus: this.onFocusAction,
-          onBlur: this.onBlurAction },
-        React.createElement(
-          'div',
-          { ref: 'toggle', onClick: this.onToggleChoices },
-          inputElem,
-          React.createElement('span', { className: 'select-arrow' })
-        ),
-        choicesElem
-      );
+    // if ((choices.length === 1 && choices[0].value === '///loading///') || this.props.field.isLoading) {
+    //   choicesOrLoading = config.createElement('loading-choices', {});
+    // } else {
+    if (choices.length > 1 && choices[0].value === '///loading///' || this.props.field.isLoading) {
+      choices = [{ value: '///loading///' }];
     }
+    var choicesElem = this.props.config.createElement('choices', {
+      ref: 'choices',
+      choices: choices,
+      open: this.state.isChoicesOpen,
+      ignoreCloseNodes: this.getCloseIgnoreNodes,
+      onSelect: this.onSelectChoice,
+      onClose: this.onCloseChoices,
+      onChoiceAction: this.onChoiceAction,
+      field: this.props.field
+    });
+
+    var inputElem = this.getInputElement();
+
+    choicesOrLoading = React.createElement(
+      'div',
+      { className: cx(this.props.classes),
+        onChange: this.onChange,
+        onFocus: this.onFocusAction,
+        onBlur: this.onBlurAction },
+      React.createElement(
+        'div',
+        { ref: 'toggle', onClick: this.onToggleChoices },
+        inputElem,
+        React.createElement('span', { className: 'select-arrow' })
+      ),
+      choicesElem
+    );
 
     return choicesOrLoading;
   },
@@ -127,9 +130,16 @@ module.exports = React.createClass({
   getDisplayValue: function getDisplayValue() {
     var config = this.props.config;
     var currentValue = this.state.value;
-    var currentChoice = _.find(this.props.choices, function (choice) {
-      return !choice.action && choice.value === currentValue;
-    });
+    var currentChoice = this.props.config.fieldSelectedChoice(this.props.field);
+    // Make sure selectedChoice is a match for current value.
+    if (currentChoice && currentChoice.value !== currentValue) {
+      currentChoice = null;
+    }
+    if (!currentChoice) {
+      currentChoice = _.find(this.props.choices, function (choice) {
+        return !choice.action && choice.value === currentValue;
+      });
+    }
 
     if (currentChoice) {
       return currentChoice.label;

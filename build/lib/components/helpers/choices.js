@@ -97,6 +97,7 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
+    var config = this.props.config;
 
     var choices = this.props.choices;
 
@@ -114,7 +115,7 @@ module.exports = React.createClass({
         var choiceElement = null;
 
         if (choice.value === '///loading///') {
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.props.onClose }, R.span({ className: 'choice-label' }, 'Loading...'));
+          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.props.onClose }, R.span({ className: 'choice-label' }, config.createElement('loading-choice', { field: this.props.field })));
         } else if (choice.value === '///empty///') {
           choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.props.onClose }, R.span({ className: 'choice-label' }, 'No choices available.'));
         } else if (choice.action) {
