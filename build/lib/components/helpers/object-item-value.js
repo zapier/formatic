@@ -28,6 +28,6 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
 
-    return R.div({ className: cx(this.props.classes) }, config.createFieldElement({ field: field, onChange: this.onChangeField, plain: true }));
+    return R.div({ className: cx(this.props.classes) }, config.createFieldElement({ field: field, onChange: this.onChangeField, plain: true, onAction: this.onBubbleAction }));
   }
 });
