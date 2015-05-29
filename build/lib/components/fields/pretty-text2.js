@@ -143,7 +143,7 @@ module.exports = React.createClass({
       { className: 'pretty-text-wrapper', onMouseEnter: this.switchToCodeMirror },
       React.createElement(
         'div',
-        { className: textBoxClasses, tabIndex: tabIndex },
+        { className: textBoxClasses, tabIndex: tabIndex, onFocus: this.onFocusAction, onBlur: this.onBlurAction },
         textBox
       ),
       insertBtn,
