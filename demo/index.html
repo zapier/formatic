@@ -41,7 +41,9 @@
 
   <script src="./lib/formatic-dev.js"></script>
   <script type="text/jsx;harmony=true">
-    React.render(<Formatic.StringField value="fool"/>, document.getElementById('user'));
+    const Fields = Formatic.fields;
+    const Helpers = Formatic.helpers;
+    React.render(<Fields.String value="fool"/>, document.getElementById('user'));
 
 
 
