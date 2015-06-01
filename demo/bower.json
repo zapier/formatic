@@ -16,8 +16,8 @@
     "tests"
   ],
   "dependencies": {
-    "react": "~0.12.0",
     "underscore": "~1.7.0",
-    "codemirror": "~5.0.0"
+    "codemirror": "~5.0.0",
+    "react": "~0.13.3"
   }
 }

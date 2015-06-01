@@ -43,9 +43,13 @@
   <script type="text/jsx;harmony=true">
     const Fields = Formatic.fields;
     const Helpers = Formatic.helpers;
-    React.render(<Fields.String value="fool"/>, document.getElementById('user'));
-
-
+    React.render(
+      <Fields.Fields onChange={(value) => console.log(value)} defaultValue={{}}>
+        <Fields.String fieldKey="greeting" label="Greeting" helpText="Say hello to your momma."/>
+        <Fields.String fieldKey="name" label="Name" helpText="The name your momma gave you."/>
+      </Fields.Fields>,
+      document.getElementById('user')
+    );
 
     //
     // var R = React.DOM;
