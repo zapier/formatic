@@ -711,6 +711,11 @@ module.exports = function (config) {
 
     fieldTypeName: delegateTo('fieldTemplateTypeName'),
 
+    // Field is loading choices.
+    fieldIsLoading: function fieldIsLoading(field) {
+      return field.isLoading;
+    },
+
     // Get the choices for a dropdown field.
     fieldChoices: function fieldChoices(field) {
 
