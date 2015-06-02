@@ -123,6 +123,7 @@ module.exports = React.createClass({
 
   onSelectChoice: function onSelectChoice(value) {
     this.setState({
+      isEnteringCustomValue: false,
       isChoicesOpen: false,
       value: value
     });
@@ -171,9 +172,14 @@ module.exports = React.createClass({
       });
     } else {
       this.setState({
-        isChoicesOpen: false,
-        value: choice.value
+        isChoicesOpen: false
       });
+      if (choice.action === 'clear-current-choice') {
+        this.setState({
+          value: ''
+        });
+        this.props.onChange('');
+      }
     }
 
     this.onStartAction(choice.action, choice);
