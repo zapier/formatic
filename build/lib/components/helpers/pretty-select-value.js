@@ -72,9 +72,7 @@ module.exports = React.createClass({
     choicesOrLoading = React.createElement(
       'div',
       { className: cx(this.props.classes),
-        onChange: this.onChange,
-        onFocus: this.onFocusAction,
-        onBlur: this.onBlurAction },
+        onChange: this.onChange },
       React.createElement(
         'div',
         { ref: 'toggle', onClick: this.onToggleChoices },
@@ -90,10 +88,16 @@ module.exports = React.createClass({
   getInputElement: function getInputElement() {
     if (this.state.isEnteringCustomValue) {
       return React.createElement('input', { ref: 'customInput', type: 'text', value: this.props.field.value,
-        onChange: this.onInputChange, onFocus: this.onFocusAction, onBlur: this.onBlurAction });
+        onChange: this.onInputChange, onFocus: this.onFocusAction, onBlur: this.onBlur });
     }
 
-    return React.createElement('input', { type: 'text', value: this.getDisplayValue(), readOnly: true });
+    return React.createElement('input', { type: 'text', value: this.getDisplayValue(), readOnly: true, onFocus: this.onFocusAction, onBlur: this.onBlur });
+  },
+
+  onBlur: function onBlur() {
+    if (!this.state.isChoicesOpen) {
+      this.onBlurAction();
+    }
   },
 
   getCloseIgnoreNodes: function getCloseIgnoreNodes() {
@@ -116,10 +120,12 @@ module.exports = React.createClass({
       value: value
     });
     this.props.onChange(value);
+    this.onBlurAction();
   },
 
   onCloseChoices: function onCloseChoices() {
     if (this.state.isChoicesOpen) {
+      this.onBlurAction();
       this.setChoicesOpen(false);
     }
   },
