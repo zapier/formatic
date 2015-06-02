@@ -96,7 +96,9 @@ module.exports = React.createClass({
 
   onBlur: function onBlur() {
     if (!this.state.isChoicesOpen) {
-      this.onBlurAction();
+      setTimeout(function () {
+        this.onBlurAction();
+      }, 0);
     }
   },
 
