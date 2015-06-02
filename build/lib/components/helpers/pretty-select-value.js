@@ -94,11 +94,16 @@ module.exports = React.createClass({
     return React.createElement('input', { type: 'text', value: this.getDisplayValue(), readOnly: true, onFocus: this.onFocusAction, onBlur: this.onBlur });
   },
 
+  blurLater: function blurLater() {
+    var self = this;
+    setTimeout(function () {
+      self.onBlurAction();
+    }, 0);
+  },
+
   onBlur: function onBlur() {
     if (!this.state.isChoicesOpen) {
-      setTimeout(function () {
-        this.onBlurAction();
-      }, 0);
+      this.blurLater();
     }
   },
 
@@ -122,12 +127,12 @@ module.exports = React.createClass({
       value: value
     });
     this.props.onChange(value);
-    this.onBlurAction();
+    this.blurLater();
   },
 
   onCloseChoices: function onCloseChoices() {
     if (this.state.isChoicesOpen) {
-      this.onBlurAction();
+      this.blurLater();
       this.setChoicesOpen(false);
     }
   },
