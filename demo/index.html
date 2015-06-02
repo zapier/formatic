@@ -144,7 +144,13 @@
           hideLabel: true
         }]
       },
-      {label: 'Mapping', type: 'object', key: 'mapping'},
+      {
+        label: 'Mapping Pretty Text', type: 'object', key: 'mapping',
+        itemFields: [{
+          type: 'pretty-text',
+          hideLabel: true
+        }]
+      },
       {label: 'The Blob', type: 'json', key: 'blob'},
       {label: 'Do you like cookies?', type: 'boolean', key: 'likesCookies'},
       {label: 'Do you like pretty cookies with sprinkles?', type: 'pretty-boolean', key: 'likesPrettyCookies'},

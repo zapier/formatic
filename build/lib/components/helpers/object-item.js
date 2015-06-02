@@ -28,6 +28,6 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
 
-    return R.div({ className: cx(this.props.classes) }, config.createElement('object-item-key', { field: field, onChange: this.onChangeKey, onAction: this.props.onAction, displayKey: this.props.displayKey, itemKey: this.props.itemKey }), config.createElement('object-item-value', { field: field, onChange: this.props.onChange, onAction: this.props.onAction, itemKey: this.props.itemKey }), config.createElement('object-item-control', { field: field, onRemove: this.props.onRemove, itemKey: this.props.itemKey }));
+    return R.div({ className: cx(this.props.classes) }, config.createElement('object-item-key', { field: field, onChange: this.onChangeKey, onAction: this.onBubbleAction, displayKey: this.props.displayKey, itemKey: this.props.itemKey }), config.createElement('object-item-value', { field: field, onChange: this.props.onChange, onAction: this.onBubbleAction, itemKey: this.props.itemKey }), config.createElement('object-item-control', { field: field, onRemove: this.props.onRemove, itemKey: this.props.itemKey }));
   }
 });
