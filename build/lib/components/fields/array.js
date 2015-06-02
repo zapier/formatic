@@ -10,8 +10,6 @@ var React = require('react/addons');
 var R = React.DOM;
 var cx = require('classnames');
 
-var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
-
 module.exports = React.createClass({
 
   displayName: 'Array',
@@ -124,7 +122,9 @@ module.exports = React.createClass({
     var numItems = field.value.length;
     return config.createElement('field', {
       field: field, plain: this.props.plain
-    }, R.div({ className: cx(this.props.classes) }, CSSTransitionGroup({ transitionName: 'reveal' }, fields.map((function (childField, i) {
+    }, R.div({ className: cx(this.props.classes) },
+    // css transitions know to cause event problems
+    config.cssTransitionWrapper(fields.map((function (childField, i) {
       return config.createElement('array-item', {
         key: this.state.lookups[i],
         field: childField,

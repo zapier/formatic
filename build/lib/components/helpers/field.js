@@ -11,8 +11,6 @@ var R = React.DOM;
 var _ = require('../../undash');
 var cx = require('classnames');
 
-var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
-
 module.exports = React.createClass({
 
   displayName: 'Field',
@@ -68,7 +66,7 @@ module.exports = React.createClass({
     return R.div({ className: cx(classes), style: { display: field.hidden ? 'none' : '' } }, config.createElement('label', {
       config: config, field: field,
       index: index, onClick: config.fieldIsCollapsible(field) ? this.onClickLabel : null
-    }), CSSTransitionGroup({ transitionName: 'reveal' }, this.state.collapsed ? [] : [config.createElement('help', {
+    }), config.cssTransitionWrapper(this.state.collapsed ? [] : [config.createElement('help', {
       config: config, field: field,
       key: 'help'
     }), this.props.children]));

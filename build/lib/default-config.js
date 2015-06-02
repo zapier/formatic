@@ -445,6 +445,12 @@ module.exports = function (config) {
       }
     },
 
+    cssTransitionWrapper: function cssTransitionWrapper() {
+      var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
+      var args = [{ transitionName: 'reveal' }].concat(Array.prototype.slice.call(arguments));
+      return CSSTransitionGroup.apply(null, args);
+    },
+
     // Create dynamic child fields for a field.
     createChildFields: function createChildFields(field) {
 

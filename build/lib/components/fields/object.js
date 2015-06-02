@@ -11,8 +11,6 @@ var R = React.DOM;
 var _ = require('../../undash');
 var cx = require('classnames');
 
-var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
-
 var tempKeyPrefix = '$$__temp__';
 
 var tempKey = function tempKey(id) {
@@ -257,7 +255,7 @@ module.exports = React.createClass({
 
     return config.createElement('field', {
       field: field, plain: this.props.plain
-    }, R.div({ className: cx(this.props.classes) }, CSSTransitionGroup({ transitionName: 'reveal' }, fields.map((function (childField) {
+    }, R.div({ className: cx(this.props.classes) }, config.cssTransitionWrapper(fields.map((function (childField) {
       var displayKey = this.state.tempDisplayKeys[this.state.keyToId[childField.key]];
       if (_.isUndefined(displayKey)) {
         displayKey = childField.key;

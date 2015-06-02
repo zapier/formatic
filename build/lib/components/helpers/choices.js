@@ -10,8 +10,6 @@ var React = require('react/addons');
 var R = React.DOM;
 var _ = require('underscore');
 
-var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
-
 module.exports = React.createClass({
 
   displayName: 'Choices',
@@ -110,7 +108,7 @@ module.exports = React.createClass({
         className: 'choices-container', style: {
           userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
           maxHeight: this.state.maxHeight ? this.state.maxHeight : null
-        } }, CSSTransitionGroup({ transitionName: 'reveal' }, R.ul({ ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
+        } }, config.cssTransitionWrapper(R.ul({ ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
 
         var choiceElement = null;
 
