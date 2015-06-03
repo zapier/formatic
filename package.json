@@ -1,6 +1,6 @@
 {
   "name": "formatic",
-  "version": "0.2.26",
+  "version": "0.2.27",
   "description": "Automatic, pluggable form generation",
   "main": "./build/lib/formatic",
   "scripts": {
