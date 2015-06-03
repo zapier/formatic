@@ -43,11 +43,55 @@
   <script type="text/jsx;harmony=true">
     const Fields = Formatic.fields;
     const Helpers = Formatic.helpers;
+
+    const overrides = {
+      // `Formatic.wrapHelper` is a higher-order component to provide event-bubbling
+      // controlled/uncontrolled usage, etc.
+      // All fields and helpers are first-class components (already wrapped), so
+      // it's easy to re-use them.
+      Label: Formatic.wrapHelper(React.createClass({
+        render() {
+          return (
+            <b>
+              <Helpers.Label {...this.props}/>
+            </b>
+          );
+        }
+      }))
+    };
+
+    // Conceivably could provide just one extension point: a function to map a
+    // name to a component. Could also sugar this lookup.
+    const config = Formatic.createConfig((cfg) => {
+      const componentClass = cfg.componentClass;
+      cfg.componentClass = (name) => {
+        if (overrides[name]) {
+          return overrides[name];
+        }
+        return componentClass(name);
+      };
+    });
+
+    // Here are two ways to create the same exact form.
     React.render(
-      <Fields.Fields onChange={(value) => console.log(value)} defaultValue={{}}>
-        <Fields.String fieldKey="greeting" label="Greeting" helpText="Say hello to your momma."/>
-        <Fields.String fieldKey="name" label="Name" helpText="The name your momma gave you."/>
-      </Fields.Fields>,
+      <div>
+        // Here we use JSX.
+        <h2>JSX fields</h2>
+        <Fields.Fields config={config} onChange={(value) => console.log('JSX:', value)} defaultValue={{}}>
+          <Fields.String fieldKey="greeting" label="Greeting" helpText="Say hello to your momma."/>
+          <Fields.String fieldKey="name" label="Name" helpText="The name your momma gave you."/>
+        </Fields.Fields>
+
+        // And here we use JSON. The JSON format roughly just maps to the above. Props of each field
+        // become the same-named props of the components.
+        <h2>JSON fields</h2>
+        <Fields.Fields config={config} fields={
+          [
+            {type: 'string', key: 'greeting', label: 'Greeting', helpText: 'Say hello to your momma.'},
+            {type: 'string', key: 'name', label: 'Name', helpText: 'The name your momma gave you.'}
+          ]
+        } onChange={(value) => console.log('JSON:', value)} defaultValue={{}}/>
+      </div>,
       document.getElementById('user')
     );
 
