@@ -176,10 +176,10 @@ module.exports = React.createClass({
 
   createTextBoxNode: function createTextBoxNode() {
     if (this.state.codeMirrorMode) {
-      return React.createElement('div', { ref: 'textBox' });
+      return React.createElement('div', { ref: 'textBox', 'class': 'internal-text-wrapper' });
     } else {
       var html = this.state.translator.toHtml(this.state.value);
-      return React.createElement('div', { ref: 'textBox', dangerouslySetInnerHTML: { __html: html } });
+      return React.createElement('div', { ref: 'textBox', 'class': 'internal-text-wrapper', dangerouslySetInnerHTML: { __html: html } });
     }
   },
 
