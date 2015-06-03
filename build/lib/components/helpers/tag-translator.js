@@ -1,7 +1,5 @@
 'use strict';
 
-var _ = require('underscore');
-
 // Constant for first unused special use character.
 // See IMPLEMENTATION NOTE in pretty-text2.js.
 var FIRST_SPECIAL_CHAR = 57344;
@@ -9,15 +7,10 @@ var FIRST_SPECIAL_CHAR = 57344;
 // regexp used to grep out tags like {{firstName}}
 var TAGS_REGEXP = /\{\{(.+?)\}\}/g;
 
-// Zapier specific stuff. Make a plugin for this later.
-function removeIdPrefix(key) {
-  return String(key).replace(/^[0-9]+__/, '');
-}
-
 function buildChoicesMap(replaceChoices) {
   var choices = {};
   replaceChoices.forEach(function (choice) {
-    var key = removeIdPrefix(choice.value);
+    var key = choice.value;
     choices[key] = choice.label;
   });
   return choices;
@@ -68,7 +61,6 @@ function TagTranslator(replaceChoices, humanize) {
        'firstName' becomes '\ue000'.
      */
     encodeTag: function encodeTag(tag) {
-      tag = removeIdPrefix(tag);
       if (!tagToCharMap[tag]) {
         var char = String.fromCharCode(nextCharCode++);
         tagToCharMap[tag] = char;
@@ -83,7 +75,6 @@ function TagTranslator(replaceChoices, humanize) {
      */
     encodeValue: function encodeValue(value) {
       return String(value).replace(TAGS_REGEXP, (function (m, tag) {
-        tag = removeIdPrefix(tag);
         return this.encodeTag(tag);
       }).bind(this));
     },
@@ -115,7 +106,6 @@ function TagTranslator(replaceChoices, humanize) {
     toHtml: function toHtml(value) {
       return String(value).replace(TAGS_REGEXP, (function (m, mustache) {
         var tag = mustache.replace('{{', '').replace('}}', '');
-        tag = removeIdPrefix(tag);
         var label = this.getLabel(tag);
         return '<span class="pretty-part">' + label + '</span>';
       }).bind(this));
@@ -126,7 +116,6 @@ function TagTranslator(replaceChoices, humanize) {
        Returns a humanized version of the tag if we don't have a label for the tag.
      */
     getLabel: function getLabel(tag) {
-      tag = removeIdPrefix(tag);
       var label = choices[tag];
       if (!label) {
         // If tag not found and we have a humanize function, humanize the tag.
