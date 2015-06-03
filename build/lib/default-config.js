@@ -772,6 +772,14 @@ module.exports = function (config) {
       return field.selectedChoice || null;
     },
 
+    // The active replace labels could be unavilable in the current list of
+    // replace choices. This provides the currently used replace labels in
+    // that case.
+    fieldSelectedReplaceChoices: function fieldSelectedReplaceChoices(field) {
+
+      return config.normalizeChoices(field.selectedReplaceChoices);
+    },
+
     // Get a label for a field.
     fieldLabel: function fieldLabel(field) {
       return field.label;
