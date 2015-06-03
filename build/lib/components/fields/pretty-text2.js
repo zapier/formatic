@@ -75,9 +75,8 @@ module.exports = React.createClass({
   },
 
   getInitialState: function getInitialState() {
-    var selectedChoices = this.props.config.fieldSelectedReplaceChoices(this.props.field);
     var replaceChoices = this.props.config.fieldReplaceChoices(this.props.field);
-    var translator = TagTranslator(selectedChoices.concat(replaceChoices), this.props.config.humanize);
+    var translator = TagTranslator(replaceChoices, this.props.config.humanize);
 
     return {
       value: this.props.field.value,
@@ -89,12 +88,12 @@ module.exports = React.createClass({
   },
 
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-    var selectedChoices = this.props.config.fieldSelectedReplaceChoices(this.props.field);
     var replaceChoices = this.props.config.fieldReplaceChoices(nextProps.field);
     var nextState = {
-      replaceChoices: replaceChoices,
-      translator: TagTranslator(selectedChoices.concat(replaceChoices), this.props.config.humanize)
+      replaceChoices: replaceChoices
     };
+
+    this.state.translator.addChoices(replaceChoices);
 
     if (this.state.value !== nextProps.field.value && nextProps.field.value) {
       nextState.value = nextProps.field.value;
@@ -176,10 +175,10 @@ module.exports = React.createClass({
 
   createTextBoxNode: function createTextBoxNode() {
     if (this.state.codeMirrorMode) {
-      return React.createElement('div', { ref: 'textBox', 'class': 'internal-text-wrapper' });
+      return React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' });
     } else {
       var html = this.state.translator.toHtml(this.state.value);
-      return React.createElement('div', { ref: 'textBox', 'class': 'internal-text-wrapper', dangerouslySetInnerHTML: { __html: html } });
+      return React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper', dangerouslySetInnerHTML: { __html: html } });
     }
   },
 
