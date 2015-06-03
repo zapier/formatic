@@ -172,7 +172,7 @@ module.exports = React.createClass({
       });
     } else {
       this.setState({
-        isChoicesOpen: false
+        isChoicesOpen: !!choice.isOpen
       });
       if (choice.action === 'clear-current-choice') {
         this.setState({
