@@ -7,6 +7,20 @@ var TagTranslator = require('../helpers/tag-translator');
 var _ = require('../../undash');
 var cx = require('classnames');
 
+var PrettyTag = React.createClass({
+  displayName: 'PrettyTag',
+
+  render: function render() {
+    var classes = cx(_.extend({}, this.props.classes, { 'pretty-part': true }));
+
+    return React.createElement(
+      'span',
+      { className: classes, onClick: this.props.onClick },
+      this.props.children
+    );
+  }
+});
+
 /*
    Editor for tagged text. Renders text like "hello {{firstName}}"
    with replacement labels rendered in a pill box. Designed to load
@@ -198,6 +212,13 @@ module.exports = React.createClass({
     this.tagCodeMirror();
   },
 
+  getTagClasses: function getTagClasses(tag) {
+    var choice = _.find(this.state.replaceChoices, function (c) {
+      return c.value === tag;
+    });
+    return choice && choice.tagClasses || {};
+  },
+
   createReadonlyEditor: function createReadonlyEditor() {
     var textBoxNode = this.refs.textBox.getDOMNode();
 
@@ -205,9 +226,10 @@ module.exports = React.createClass({
     var self = this;
     var nodes = tokens.map(function (part) {
       if (part.type === 'tag') {
+        var tagClasses = self.getTagClasses(part.value);
         return React.createElement(
-          'span',
-          { className: 'pretty-part' },
+          PrettyTag,
+          { classes: tagClasses },
           self.state.translator.getLabel(part.value)
         );
       }
@@ -241,6 +263,7 @@ module.exports = React.createClass({
   createTagNode: function createTagNode(pos) {
     var node = document.createElement('span');
     var label = this.state.translator.getLabel(pos.tag);
+    var tagClasses = this.getTagClasses(pos.tag);
 
     var onTagClick = function onTagClick() {
       this.setState({ selectedTagPos: pos });
@@ -248,8 +271,8 @@ module.exports = React.createClass({
     };
 
     React.render(React.createElement(
-      'span',
-      { className: 'pretty-part', onClick: onTagClick.bind(this) },
+      PrettyTag,
+      { classes: tagClasses, onClick: onTagClick.bind(this) },
       label
     ), node);
     return node;
