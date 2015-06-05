@@ -56,8 +56,9 @@ module.exports = React.createClass({
   },
 
   getInitialState: function getInitialState() {
+    var selectedChoices = this.props.config.fieldSelectedReplaceChoices(this.props.field);
     var replaceChoices = this.props.config.fieldReplaceChoices(this.props.field);
-    var translator = TagTranslator(replaceChoices, this.props.config.humanize);
+    var translator = TagTranslator(selectedChoices.concat(replaceChoices), this.props.config.humanize);
 
     return {
       value: this.props.field.value,
@@ -69,10 +70,11 @@ module.exports = React.createClass({
   },
 
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+    var selectedChoices = this.props.config.fieldSelectedReplaceChoices(this.props.field);
     var replaceChoices = this.props.config.fieldReplaceChoices(nextProps.field);
     var nextState = {
       replaceChoices: replaceChoices,
-      translator: TagTranslator(replaceChoices, this.props.config.humanize)
+      translator: TagTranslator(selectedChoices.concat(replaceChoices), this.props.config.humanize)
     };
 
     if (this.state.value !== nextProps.field.value && nextProps.field.value) {
