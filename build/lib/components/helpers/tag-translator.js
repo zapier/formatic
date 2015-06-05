@@ -33,6 +33,10 @@ function TagTranslator(replaceChoices, humanize) {
     },
 
     tokenize: function tokenize(text) {
+      if (typeof text !== 'string') {
+        return [];
+      }
+
       var regexp = /(\{\{|\}\})/;
       var parts = text.split(regexp);
 

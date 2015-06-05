@@ -37,7 +37,6 @@ module.exports = React.createClass({
   mixins: [require('../../mixins/field')],
 
   componentDidMount: function componentDidMount() {
-    console.log('------- pt2');
     this.createEditor();
   },
 
