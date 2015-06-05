@@ -7,6 +7,20 @@ var TagTranslator = require('../helpers/tag-translator');
 var _ = require('../../undash');
 var cx = require('classnames');
 
+var PrettyTag = React.createClass({
+  displayName: 'PrettyTag',
+
+  render: function render() {
+    var classes = cx(_.extend({}, this.props.classes, { 'pretty-part': true }));
+
+    return React.createElement(
+      'span',
+      { className: classes, onClick: this.props.onClick },
+      this.props.children
+    );
+  }
+});
+
 /*
    Editor for tagged text. Renders text like "hello {{firstName}}"
    with replacement labels rendered in a pill box. Designed to load
@@ -16,20 +30,6 @@ var cx = require('classnames');
    Uses CodeMirror to edit text. To save memory the CodeMirror node is
    instantiated when the user moves the mouse into the edit area.
    Initially a read-only view using a simple div is shown.
-
-   IMPLEMENTATION NOTE:
-
-   To display the tags inside CodeMirror we are using CM's
-   specialCharPlaceholder feature, to replace special characters with
-   custom DOM nodes. This feature is designed for single character
-   replacements, not tags like 'firstName'.  So we replace each tag
-   with an unused character from the Unicode private use area, and
-   tell CM to replace that with a DOM node display the tag label with
-   the pill box effect.
-
-   Is this evil? Perhaps a little, but delete, undo, redo, cut, copy
-   and paste of the tag pill boxes just work because CM treats them as
-   atomic single characters, and it's not much code on our part.
  */
 module.exports = React.createClass({
   displayName: 'PrettyText',
@@ -37,6 +37,7 @@ module.exports = React.createClass({
   mixins: [require('../../mixins/field')],
 
   componentDidMount: function componentDidMount() {
+    console.log('------- pt2');
     this.createEditor();
   },
 
@@ -45,26 +46,6 @@ module.exports = React.createClass({
       // Changed from code mirror mode to read only mode or vice versa,
       // so setup the other editor.
       this.createEditor();
-    }
-
-    // If they just typed in a tag like {{firstName}} we have to replace it
-    if (this.state.codeMirrorMode && this.codeMirror.getValue().match(/\{\{.+\}\}/)) {
-      // avoid recursive update cycle
-      this.updatingCodeMirror = true;
-
-      // get new encoded value for CodeMirror
-      var cmValue = this.codeMirror.getValue();
-      var decodedValue = this.state.translator.decodeValue(cmValue);
-      var encodedValue = this.state.translator.encodeValue(decodedValue);
-
-      // Grab the cursor so we can reset it.
-      // The new length of the CM value will be shorter after replacing a tag like {{firstName}}
-      // with a single special char, so adjust cursor position accordingly.
-      var cursor = this.codeMirror.getCursor();
-      cursor.ch -= cmValue.length - encodedValue.length;
-
-      this.codeMirror.setValue(encodedValue);
-      this.codeMirror.setCursor(cursor);
     }
   },
 
@@ -90,10 +71,9 @@ module.exports = React.createClass({
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
     var replaceChoices = this.props.config.fieldReplaceChoices(nextProps.field);
     var nextState = {
-      replaceChoices: replaceChoices
+      replaceChoices: replaceChoices,
+      translator: TagTranslator(replaceChoices, this.props.config.humanize)
     };
-
-    this.state.translator.addChoices(replaceChoices);
 
     if (this.state.value !== nextProps.field.value && nextProps.field.value) {
       nextState.value = nextProps.field.value;
@@ -103,13 +83,17 @@ module.exports = React.createClass({
   },
 
   handleChoiceSelection: function handleChoiceSelection(key) {
-    this.setState({ isChoicesOpen: false });
+    var pos = this.state.selectedTagPos;
+    var tag = '{{' + key + '}}';
 
-    var char = this.state.translator.encodeTag(key);
-
-    // put the cursor at the end of the inserted tag.
-    this.codeMirror.replaceSelection(char, 'end');
+    if (pos) {
+      this.codeMirror.replaceRange(tag, { line: pos.line, ch: pos.start }, { line: pos.line, ch: pos.stop });
+    } else {
+      this.codeMirror.replaceSelection(tag, 'end');
+    }
     this.codeMirror.focus();
+
+    this.setState({ isChoicesOpen: false, selectedTagPos: null });
   },
 
   render: function render() {
@@ -121,11 +105,13 @@ module.exports = React.createClass({
     var field = this.props.field;
     var props = { field: field, plain: this.props.plain };
     var tabIndex = field.tabIndex;
-
     var textBoxClasses = cx(_.extend({}, this.props.classes, { 'pretty-text-box': true }));
-    var textBox = this.createTextBoxNode();
 
-    var insertBtn = config.createElement('insert-button', { ref: 'toggle', onClick: this.onToggleChoices }, 'Insert...');
+    var onInsertClick = function onInsertClick() {
+      this.setState({ selectedTagPos: null });
+      this.onToggleChoices();
+    };
+    var insertBtn = config.createElement('insert-button', { ref: 'toggle', onClick: onInsertClick.bind(this) }, 'Insert...');
 
     var choices = config.createElement('choices', {
       ref: 'choices',
@@ -136,15 +122,14 @@ module.exports = React.createClass({
       onClose: this.onCloseChoices
     });
 
-    // Render read-only version. We are using pure HTML via dangerouslySetInnerHTML, to avoid
-    // the cost of the react nodes. This is probably a premature optimization.
+    // Render read-only version.
     var element = React.createElement(
       'div',
       { className: 'pretty-text-wrapper', onMouseEnter: this.switchToCodeMirror },
       React.createElement(
         'div',
         { className: textBoxClasses, tabIndex: tabIndex, onFocus: this.onFocusAction, onBlur: this.onBlurAction },
-        textBox
+        React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' })
       ),
       insertBtn,
       choices
@@ -173,15 +158,6 @@ module.exports = React.createClass({
     }
   },
 
-  createTextBoxNode: function createTextBoxNode() {
-    if (this.state.codeMirrorMode) {
-      return React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' });
-    } else {
-      var html = this.state.translator.toHtml(this.state.value);
-      return React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper', dangerouslySetInnerHTML: { __html: html } });
-    }
-  },
-
   createEditor: function createEditor() {
     if (this.state.codeMirrorMode) {
       this.createCodeMirrorEditor();
@@ -191,14 +167,10 @@ module.exports = React.createClass({
   },
 
   createCodeMirrorEditor: function createCodeMirrorEditor() {
-    var cmValue = this.state.translator.encodeValue(this.state.value);
-
     var options = {
       lineWrapping: true,
       tabindex: this.props.tabIndex,
-      value: cmValue,
-      specialChars: this.state.translator.specialCharsRegexp,
-      specialCharPlaceholder: this.createTagNode,
+      value: this.state.value,
       extraKeys: {
         Tab: false
       }
@@ -209,6 +181,22 @@ module.exports = React.createClass({
 
     this.codeMirror = CodeMirror(textBox, options);
     this.codeMirror.on('change', this.onCodeMirrorChange);
+
+    this.tagCodeMirror();
+  },
+
+  tagCodeMirror: function tagCodeMirror() {
+    var positions = this.state.translator.getTagPositions(this.codeMirror.getValue());
+    var self = this;
+
+    var tagOps = function tagOps() {
+      positions.forEach(function (pos) {
+        var node = self.createTagNode(pos);
+        self.codeMirror.markText({ line: pos.line, ch: pos.start }, { line: pos.line, ch: pos.stop }, { replacedWith: node, handleMouseEvents: true });
+      });
+    };
+
+    this.codeMirror.operation(tagOps);
   },
 
   onCodeMirrorChange: function onCodeMirrorChange() {
@@ -218,14 +206,45 @@ module.exports = React.createClass({
       return;
     }
 
-    var newValue = this.state.translator.decodeValue(this.codeMirror.getValue());
+    var newValue = this.codeMirror.getValue();
     this.onChangeValue(newValue);
     this.setState({ value: newValue });
+    this.tagCodeMirror();
+  },
+
+  getTagClasses: function getTagClasses(tag) {
+    var choice = _.find(this.state.replaceChoices, function (c) {
+      return c.value === tag;
+    });
+    return choice && choice.tagClasses || {};
   },
 
   createReadonlyEditor: function createReadonlyEditor() {
     var textBoxNode = this.refs.textBox.getDOMNode();
-    textBoxNode.innerHTML = this.state.translator.toHtml(this.state.value);
+
+    var tokens = this.state.translator.tokenize(this.state.value);
+    var self = this;
+    var nodes = tokens.map(function (part) {
+      if (part.type === 'tag') {
+        var tagClasses = self.getTagClasses(part.value);
+        return React.createElement(
+          PrettyTag,
+          { classes: tagClasses },
+          self.state.translator.getLabel(part.value)
+        );
+      }
+      return React.createElement(
+        'span',
+        null,
+        part.value
+      );
+    });
+
+    React.render(React.createElement(
+      'span',
+      null,
+      nodes
+    ), textBoxNode);
   },
 
   removeCodeMirrorEditor: function removeCodeMirrorEditor() {
@@ -241,15 +260,19 @@ module.exports = React.createClass({
     }
   },
 
-  // Create pill box style for display inside CM. For example
-  // '\ue000' becomes '<span class="tag>First Name</span>'
-  createTagNode: function createTagNode(char) {
+  createTagNode: function createTagNode(pos) {
     var node = document.createElement('span');
-    var label = this.state.translator.decodeChar(char);
+    var label = this.state.translator.getLabel(pos.tag);
+    var tagClasses = this.getTagClasses(pos.tag);
+
+    var onTagClick = function onTagClick() {
+      this.setState({ selectedTagPos: pos });
+      this.onToggleChoices();
+    };
 
     React.render(React.createElement(
-      'span',
-      { className: 'pretty-part', onClick: this.onToggleChoices },
+      PrettyTag,
+      { classes: tagClasses, onClick: onTagClick.bind(this) },
       label
     ), node);
     return node;

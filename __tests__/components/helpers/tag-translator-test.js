@@ -4,34 +4,45 @@
 var TagTranslator = require('../../../lib/components/helpers/tag-translator');
 
 describe('editor-util', function () {
-  var choices = [
+  var replaceChoices = [
     { value: 'firstName', label: 'First Name' },
     { value: 'lastName', label: 'Last Name' }
   ];
+  var humanize = function (s) { return s.toUpperCase(); };
+  var translator = TagTranslator(replaceChoices, humanize);
 
-  var translator = TagTranslator(choices);
-
-  var tagged = 'hello {{firstName}} {{lastName}}';
-  var encoded = 'hello \ue000 \ue001';
-  var html = 'hello <span class="pretty-part">First Name</span> <span class="pretty-part">Last Name</span>';
-
-  it('should encode tagged values', function () {
-    var actual = translator.encodeValue(tagged);
-    expect(actual).toEqual(encoded);
+  it('should get labels', function () {
+    expect(translator.getLabel('firstName')).toBe('First Name');
+    expect(translator.getLabel('lastName')).toBe('Last Name');
   });
 
-  it('should decode encoded values', function () {
-    var actual = translator.decodeValue(encoded);
-    expect(actual).toEqual(tagged);
+  it('should humanize missing labels', function () {
+    expect(translator.getLabel('shouting')).toBe('SHOUTING');
   });
 
-  it('should convert tagged values to HTML', function () {
-    var actual = translator.toHtml(tagged);
-    expect(actual).toEqual(html);
+  it('should tokenize tagged text', function () {
+    var tagged = 'Hi there {{lastName}}, {{firstName}}.';
+
+    expect(translator.tokenize(tagged)).toEqual([
+      {type: 'string', value: 'Hi there '},
+      {type: 'tag', value: 'lastName'},
+      {type: 'string', value: ', '},
+      {type: 'tag', value: 'firstName'},
+      {type: 'string', value: '.'}
+    ]);
   });
 
-  it('should convert ints to HTML', function () {
-    var actual = translator.toHtml(42);
-    expect(actual).toEqual('42');
+  it('should get tag start and stop positions', function () {
+    //         '0123456789012345678901234567890123456789 01234567890123456789012345'
+    var text = 'Here there {{lastName}}, {{firstName}}.\nHow are you {{firstName}}?';
+    var positions = translator.getTagPositions(text);
+
+    expect(positions).toEqual([
+      {line: 0, start: 11, stop: 23, tag: 'lastName'},
+      {line: 0, start: 25, stop: 38, tag: 'firstName'},
+      {line: 1, start: 12, stop: 25, tag: 'firstName'}
+    ]);
   });
+
+
 });
