@@ -37,6 +37,7 @@ module.exports = React.createClass({
   mixins: [require('../../mixins/field')],
 
   componentDidMount: function componentDidMount() {
+    console.log('------- pt2');
     this.createEditor();
   },
 
@@ -128,8 +129,7 @@ module.exports = React.createClass({
       React.createElement(
         'div',
         { className: textBoxClasses, tabIndex: tabIndex, onFocus: this.onFocusAction, onBlur: this.onBlurAction },
-        React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' }),
-        ';'
+        React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' })
       ),
       insertBtn,
       choices
