@@ -42,6 +42,8 @@ module.exports = function (config) {
 
     createElement_PrettyText: React.createFactory(require('./components/fields/pretty-text2')),
 
+    createElement_PrettyTag: React.createFactory(require('./components/helpers/pretty-tag')),
+
     createElement_Array: React.createFactory(require('./components/fields/array')),
 
     createElement_CheckboxArray: React.createFactory(require('./components/fields/checkbox-array')),
