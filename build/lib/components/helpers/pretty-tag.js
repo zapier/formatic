@@ -29,7 +29,6 @@ module.exports = React.createClass({
   renderDefault: function renderDefault() {
     var classes = cx(_.extend({}, this.props.classes, { 'pretty-part': true }));
 
-    console.log('pretty classes', classes);
     return React.createElement(
       'span',
       { className: classes, onClick: this.props.onClick },
