@@ -55,7 +55,7 @@
         var tag = props.tag;
         var choice = _.find(props.replaceChoices, function(c) { return c.value === tag; });
         var classes = choice && choice.tagClasses || {};
-        var newProps = _.extend({}, props, {classes: classes})
+        var newProps = _.extend({}, props, {classes: classes});
 
         return origCreatePrettyTag(newProps, children);
       };
