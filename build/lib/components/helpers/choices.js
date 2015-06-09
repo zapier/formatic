@@ -156,9 +156,7 @@ module.exports = React.createClass({
 
           choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onChoiceAction.bind(this, choice) }, R.span({ className: labelClasses }, choice.label || this.props.config.actionChoiceLabel(choice.action)), this.props.config.createElement('choice-action-sample', { action: choice.action, choice: choice }));
         } else if (choice.sectionKey) {
-          var headerClasses = 'choice-header ' + choice.sectionKey;
-
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onHeaderClick.bind(this, choice) }, R.span({ className: headerClasses }, choice.label));
+          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onHeaderClick.bind(this, choice) }, config.createElement('choice-section-header', { choice: choice }));
         } else {
           choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onSelect.bind(this, choice) }, R.span({ className: 'choice-label' }, choice.label), R.span({ className: 'choice-sample' }, choice.sample));
         }

@@ -106,6 +106,8 @@ module.exports = function (config) {
 
     createElement_InsertButton: React.createFactory(require('./components/helpers/insert-button')),
 
+    createElement_ChoiceSectionHeader: React.createFactory(require('./components/helpers/choice-section-header')),
+
     // Field default value factories. Give a default value for a specific type.
 
     createDefaultValue_String: function createDefaultValue_String() {
