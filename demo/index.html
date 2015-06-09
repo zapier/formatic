@@ -112,6 +112,44 @@
     });
 
     fields = fields.concat([
+      {
+        label: 'Pretty Text 2', key: 'nestedPrettyText', type: 'pretty-text',
+        isAccordion: true,
+        default: 'Hi there {{firstName}} {{lastName}} {{middleName}}.',
+        tabIndex: prettyNum + 1,
+        replaceChoices: [
+          {
+            label: 'Hi Class People',
+            sectionKey: 'hiClass'
+          },
+          {
+            value: 'givenName',
+            label: 'Given Name',
+            sample: 'Sir Duke',
+            tagClasses: {special: true}
+          },
+          {
+            value: 'surname',
+            label: 'Surname',
+            sample: 'Ellington'
+          },
+          {
+            label: 'Lo Class People',
+            sectionKey: 'loClass'
+          },
+          {
+            value: 'firstName',
+            label: 'First Name',
+            sample: 'Peasant'
+          },
+          {
+            value: 'lastName',
+            label: 'Last Name',
+            sample: 'Brown'
+          }
+        ]
+      },
+
       {label: 'Size', type: 'pretty-select', key: 'size', default: 'S',
        choices: { S: 'Small', M: 'Medium', L: 'Large' },
       },
