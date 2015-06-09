@@ -44,7 +44,7 @@ module.exports = React.createClass({
       if (!_.find(this.getIgnoreCloseNodes(), (function (node) {
         return this.isNodeInside(event.target, node);
       }).bind(this))) {
-        this.props.onClose();
+        this.onClose();
       }
     }).bind(this));
 
@@ -52,11 +52,18 @@ module.exports = React.createClass({
   },
 
   onSelect: function onSelect(choice) {
+    this.setState({ openSection: null });
     this.props.onSelect(choice.value);
   },
 
   onChoiceAction: function onChoiceAction(choice) {
+    this.setState({ openSection: null });
     this.props.onChoiceAction(choice);
+  },
+
+  onClose: function onClose() {
+    this.setState({ openSection: null });
+    this.props.onClose();
   },
 
   onResizeWindow: function onResizeWindow() {
@@ -90,6 +97,38 @@ module.exports = React.createClass({
 
   onWheel: function onWheel() {},
 
+  onHeaderClick: function onHeaderClick(choice) {
+    if (this.state.openSection === choice.sectionKey) {
+      this.setState({ openSection: null });
+    } else {
+      this.setState({ openSection: choice.sectionKey });
+    }
+  },
+
+  visibleChoices: function visibleChoices() {
+    var choices = this.props.choices;
+
+    if (choices && choices.length === 0) {
+      return [{ value: '///empty///' }];
+    }
+    if (!this.props.isAccordion) {
+      return choices;
+    }
+
+    var openSection = this.state.openSection;
+    var visibleChoices = [];
+    var inSection;
+    choices.forEach(function (choice) {
+      if (choice.sectionKey) {
+        inSection = openSection && choice.sectionKey === openSection;
+      }
+      if (choice.sectionKey || inSection) {
+        visibleChoices.push(choice);
+      }
+    });
+    return visibleChoices;
+  },
+
   render: function render() {
     return this.renderWithConfig();
   },
@@ -97,11 +136,7 @@ module.exports = React.createClass({
   renderDefault: function renderDefault() {
     var config = this.props.config;
 
-    var choices = this.props.choices;
-
-    if (choices && choices.length === 0) {
-      choices = [{ value: '///empty///' }];
-    }
+    var choices = this.visibleChoices();
 
     if (this.props.open) {
       return R.div({ ref: 'container', onWheel: this.onWheel, onScroll: this.onScroll,
@@ -113,13 +148,17 @@ module.exports = React.createClass({
         var choiceElement = null;
 
         if (choice.value === '///loading///') {
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.props.onClose }, R.span({ className: 'choice-label' }, config.createElement('loading-choice', { field: this.props.field })));
+          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onClose }, R.span({ className: 'choice-label' }, config.createElement('loading-choice', { field: this.props.field })));
         } else if (choice.value === '///empty///') {
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.props.onClose }, R.span({ className: 'choice-label' }, 'No choices available.'));
+          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onClose }, R.span({ className: 'choice-label' }, 'No choices available.'));
         } else if (choice.action) {
           var labelClasses = 'choice-label ' + choice.action;
 
           choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onChoiceAction.bind(this, choice) }, R.span({ className: labelClasses }, choice.label || this.props.config.actionChoiceLabel(choice.action)), this.props.config.createElement('choice-action-sample', { action: choice.action, choice: choice }));
+        } else if (choice.sectionKey) {
+          var headerClasses = 'choice-header ' + choice.sectionKey;
+
+          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onHeaderClick.bind(this, choice) }, R.span({ className: headerClasses }, choice.label));
         } else {
           choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onSelect.bind(this, choice) }, R.span({ className: 'choice-label' }, choice.label), R.span({ className: 'choice-sample' }, choice.sample));
         }
