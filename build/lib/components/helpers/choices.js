@@ -20,15 +20,10 @@ module.exports = React.createClass({
   require('../../mixins/click-outside')],
 
   getInitialState: function getInitialState() {
-    var sectionHeaders = this.props.choices.filter(function (c) {
-      return c.sectionKey;
-    });
-    var openSection = sectionHeaders.length === 1 ? sectionHeaders[0].sectionKey : null;
-
     return {
       maxHeight: null,
       open: this.props.open,
-      openSection: openSection
+      openSection: this.getInitialOpenSection()
     };
   },
 
@@ -94,7 +89,12 @@ module.exports = React.createClass({
   },
 
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-    this.setState({ open: nextProps.open }, (function () {
+    var nextState = {
+      open: nextProps.open,
+      openSection: this.getInitialOpenSection()
+    };
+
+    this.setState(nextState, (function () {
       this.adjustSize();
     }).bind(this));
   },
@@ -107,8 +107,15 @@ module.exports = React.createClass({
     if (this.state.openSection === choice.sectionKey) {
       this.setState({ openSection: null });
     } else {
-      this.setState({ openSection: choice.sectionKey }, this.adjustSize.bind(this));
+      this.setState({ openSection: choice.sectionKey }, this.adjustSize);
     }
+  },
+
+  getInitialOpenSection: function getInitialOpenSection() {
+    var sectionHeaders = this.props.choices.filter(function (c) {
+      return c.sectionKey;
+    });
+    return sectionHeaders.length === 1 ? sectionHeaders[0].sectionKey : null;
   },
 
   visibleChoices: function visibleChoices() {
