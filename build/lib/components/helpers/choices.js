@@ -22,8 +22,7 @@ module.exports = React.createClass({
   getInitialState: function getInitialState() {
     return {
       maxHeight: null,
-      open: this.props.open,
-      openSection: this.getInitialOpenSection()
+      open: this.props.open
     };
   },
 
@@ -90,8 +89,7 @@ module.exports = React.createClass({
 
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
     var nextState = {
-      open: nextProps.open,
-      openSection: this.getInitialOpenSection()
+      open: nextProps.open
     };
 
     this.setState(nextState, (function () {
@@ -111,11 +109,11 @@ module.exports = React.createClass({
     }
   },
 
-  getInitialOpenSection: function getInitialOpenSection() {
+  hasOneSection: function hasOneSection() {
     var sectionHeaders = this.props.choices.filter(function (c) {
       return c.sectionKey;
     });
-    return sectionHeaders.length === 1 ? sectionHeaders[0].sectionKey : null;
+    return sectionHeaders.length === 1;
   },
 
   visibleChoices: function visibleChoices() {
@@ -129,13 +127,14 @@ module.exports = React.createClass({
     }
 
     var openSection = this.state.openSection;
+    var alwaysExanded = this.hasOneSection();
     var visibleChoices = [];
     var inSection;
     choices.forEach(function (choice) {
       if (choice.sectionKey) {
         inSection = choice.sectionKey === openSection;
       }
-      if (choice.sectionKey || inSection) {
+      if (alwaysExanded || choice.sectionKey || inSection) {
         visibleChoices.push(choice);
       }
     });
