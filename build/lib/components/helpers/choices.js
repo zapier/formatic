@@ -20,9 +20,15 @@ module.exports = React.createClass({
   require('../../mixins/click-outside')],
 
   getInitialState: function getInitialState() {
+    var sectionHeaders = this.props.choices.filter(function (c) {
+      return c.sectionKey;
+    });
+    var openSection = sectionHeaders.length === 1 ? sectionHeaders[0].sectionKey : null;
+
     return {
       maxHeight: null,
-      open: this.props.open
+      open: this.props.open,
+      openSection: openSection
     };
   },
 
@@ -101,7 +107,7 @@ module.exports = React.createClass({
     if (this.state.openSection === choice.sectionKey) {
       this.setState({ openSection: null });
     } else {
-      this.setState({ openSection: choice.sectionKey });
+      this.setState({ openSection: choice.sectionKey }, this.adjustSize.bind(this));
     }
   },
 
@@ -120,7 +126,7 @@ module.exports = React.createClass({
     var inSection;
     choices.forEach(function (choice) {
       if (choice.sectionKey) {
-        inSection = openSection && choice.sectionKey === openSection;
+        inSection = choice.sectionKey === openSection;
       }
       if (choice.sectionKey || inSection) {
         visibleChoices.push(choice);

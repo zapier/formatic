@@ -7,7 +7,6 @@ Render section header in choices dropdown
 'use strict';
 
 var React = require('react/addons');
-var R = React.DOM;
 var cx = require('classnames');
 
 module.exports = React.createClass({
