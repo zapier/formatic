@@ -159,6 +159,7 @@ module.exports = React.createClass({
       lineWrapping: true,
       tabindex: this.props.tabIndex,
       value: String(this.state.value),
+      mode: null,
       extraKeys: {
         Tab: false
       }
