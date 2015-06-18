@@ -71,7 +71,7 @@ module.exports = React.createClass({
 
     choicesOrLoading = React.createElement(
       'div',
-      { className: cx(this.props.classes),
+      { className: cx(this.props.classes, { 'choices-open': this.state.isChoicesOpen }),
         onChange: this.onChange },
       React.createElement(
         'div',

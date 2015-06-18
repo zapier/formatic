@@ -113,7 +113,7 @@ module.exports = React.createClass({
     // Render read-only version.
     var element = React.createElement(
       'div',
-      { className: 'pretty-text-wrapper', onMouseEnter: this.switchToCodeMirror },
+      { className: cx({ 'pretty-text-wrapper': true, 'choices-open': this.state.isChoicesOpen }), onMouseEnter: this.switchToCodeMirror },
       React.createElement(
         'div',
         { className: textBoxClasses, tabIndex: tabIndex, onFocus: this.onFocusAction, onBlur: this.onBlurAction },
