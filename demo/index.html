@@ -87,7 +87,9 @@
       plugin
     );
 
-    var fields = [];
+    var fields = [
+      {label: 'Code', type: 'code', key: 'somecode', language: 'javascript'},
+    ];
 
     var prettyNum = 2;
     _.each(_.range(prettyNum), function(x){

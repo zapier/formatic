@@ -40,6 +40,8 @@ module.exports = function (config) {
 
     // createElement_PrettyText: React.createFactory(require('./components/fields/pretty-text')),
 
+    createElement_Code: React.createFactory(require('./components/fields/code')),
+
     createElement_PrettyText: React.createFactory(require('./components/fields/pretty-text2')),
 
     createElement_PrettyTag: React.createFactory(require('./components/helpers/pretty-tag')),
