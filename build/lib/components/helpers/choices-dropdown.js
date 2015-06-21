@@ -13,7 +13,10 @@ var _ = require('../../undash');
    want to remove that dependency.
  */
 module.exports = React.createClass({
-  displayName: 'exports',
+
+  displayName: 'ChoicesDropdown',
+
+  mixins: [require('../../mixins/helper')],
 
   propTypes: {
     handleSelection: React.PropTypes.func.isRequired
@@ -72,6 +75,10 @@ module.exports = React.createClass({
   },
 
   render: function render() {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function renderDefault() {
     var items = this.items();
 
     return React.createElement(

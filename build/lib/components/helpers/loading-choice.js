@@ -3,6 +3,7 @@
 var React = require('react/addons');
 
 module.exports = React.createClass({
+
   displayName: 'LoadingChoice',
 
   mixins: [require('../../mixins/helper')],

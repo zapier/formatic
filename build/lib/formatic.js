@@ -84,6 +84,8 @@ var FormaticControlled = React.createFactory(FormaticControlledClass);
 // documentation for an explanation of the difference.)
 module.exports = React.createClass({
 
+  displayName: 'Formatic',
+
   // Export some stuff as statics.
   statics: {
     createConfig: createConfig,
@@ -103,8 +105,6 @@ module.exports = React.createClass({
     },
     utils: utils
   },
-
-  displayName: 'Formatic',
 
   // If we got a value, treat this component as controlled. Either way, retain
   // the value in the state.

@@ -18,6 +18,7 @@ var cx = require('classnames');
    Initially a read-only view using a simple div is shown.
  */
 module.exports = React.createClass({
+
   displayName: 'PrettyText',
 
   mixins: [require('../../mixins/field')],
@@ -88,6 +89,7 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
+
     var config = this.props.config;
     var field = this.props.field;
     var props = { field: field, plain: this.props.plain };
@@ -206,15 +208,15 @@ module.exports = React.createClass({
 
     var tokens = this.state.translator.tokenize(this.state.value);
     var self = this;
-    var nodes = tokens.map(function (part) {
+    var nodes = tokens.map(function (part, i) {
       if (part.type === 'tag') {
         var label = self.state.translator.getLabel(part.value);
-        var props = { tag: part.value, replaceChoices: self.state.replaceChoices };
+        var props = { key: i, tag: part.value, replaceChoices: self.state.replaceChoices };
         return self.props.config.createElement('pretty-tag', props, label);
       }
       return React.createElement(
         'span',
-        null,
+        { key: i },
         part.value
       );
     });

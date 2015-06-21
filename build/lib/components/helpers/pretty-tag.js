@@ -11,14 +11,15 @@ var _ = require('underscore');
 var cx = require('classnames');
 
 module.exports = React.createClass({
+
+  displayName: 'PrettyTag',
+
   propTypes: {
     tag: React.PropTypes.string,
     replaceChoices: React.PropTypes.array,
     onClick: React.PropTypes.func,
     classes: React.PropTypes.object
   },
-
-  displayName: 'PrettyTag',
 
   mixins: [require('../../mixins/helper')],
 
