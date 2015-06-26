@@ -42,16 +42,8 @@ module.exports = React.createClass({
       label = R.label({}, text);
     }
 
-    var requiredOrNot;
-
-    if (!config.fieldHasValueChildren(field)) {
-      requiredOrNot = R.span({
-        className: config.fieldIsRequired(field) ? 'required-text' : 'not-required-text'
-      });
-    }
-
     return R.div({
       className: cx(this.props.classes)
-    }, label, ' ', requiredOrNot);
+    }, label, ' ', R.span({ className: config.fieldIsRequired(field) ? 'required-text' : 'not-required-text' }));
   }
 });
