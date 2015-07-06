@@ -92,6 +92,7 @@ module.exports = React.createClass({
       onChange: this.onInputChange,
       onFocus: this.onFocusAction,
       onBlur: this.onBlur,
+      onAction: this.onBubbleAction,
       getDisplayValue: this.getDisplayValue
     });
   },

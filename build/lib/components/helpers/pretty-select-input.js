@@ -35,6 +35,8 @@ module.exports = React.createClass({
       onChange: this.props.onChange,
       onFocus: this.props.onFocus,
       onBlur: this.props.onBlur,
+      onAction: this.onBubbleAction,
+      field: this.props.field,
       value: this.props.isEnteringCustomValue ? this.props.field.value : this.props.getDisplayValue(),
       selectedChoices: this.props.config.fieldSelectedReplaceChoices(this.props.field),
       replaceChoices: this.props.config.fieldReplaceChoices(this.props.field),
