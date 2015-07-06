@@ -31,7 +31,8 @@ module.exports = React.createClass({
       onChange: this.onChangeValue,
       onFocus: this.onFocusAction,
       onBlur: this.onBlurAction,
-      onStartAction: this.onStartAction,
+      onAction: this.onBubbleAction,
+      field: this.props.field,
       value: this.props.field.value,
       isAccordion: this.props.field.isAccordion,
       selectedChoices: this.props.config.fieldSelectedReplaceChoices(this.props.field),
@@ -40,4 +41,5 @@ module.exports = React.createClass({
     });
 
     return config.createElement('field', props, element);
-  } });
+  }
+});

@@ -24,6 +24,10 @@ module.exports = React.createClass({
     this.refs.textBox.focus();
   },
 
+  setChoicesOpen: function setChoicesOpen(isOpenChoices) {
+    this.refs.textBox.setChoicesOpen(isOpenChoices);
+  },
+
   renderDefault: function renderDefault() {
     return this.props.config.createElement('pretty-text-helper', {
       classes: this.props.classes,

@@ -172,6 +172,12 @@ module.exports = React.createClass({
       }, function () {
         this.refs.customInput.focus();
       });
+    } else if (choice.action === 'insert-field') {
+      this.setState({
+        isChoicesOpen: false
+      }, function () {
+        this.refs.customInput.setChoicesOpen(true);
+      });
     } else {
       this.setState({
         isChoicesOpen: !!choice.isOpen
@@ -187,6 +193,7 @@ module.exports = React.createClass({
     this.onStartAction(choice.action, choice);
   },
 
+  // Is this even used? I don't think so.
   onAction: function onAction(params) {
     if (params.action === 'enter-custom-value') {
       this.setState({ isEnteringCustomValue: true }, function () {
@@ -198,5 +205,8 @@ module.exports = React.createClass({
 
   onInputChange: function onInputChange(value) {
     this.props.onChange(value);
+    this.setState({
+      value: value
+    });
   }
 });

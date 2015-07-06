@@ -72,25 +72,37 @@ module.exports = React.createClass({
   },
 
   handleChoiceSelection: function handleChoiceSelection(key) {
-    var pos = this.state.selectedTagPos;
-    var tag = '{{' + key + '}}';
+    var _this = this;
 
-    if (pos) {
-      this.codeMirror.replaceRange(tag, { line: pos.line, ch: pos.start }, { line: pos.line, ch: pos.stop });
+    var selectChoice = function selectChoice() {
+      var pos = _this.state.selectedTagPos;
+      var tag = '{{' + key + '}}';
+
+      if (pos) {
+        _this.codeMirror.replaceRange(tag, { line: pos.line, ch: pos.start }, { line: pos.line, ch: pos.stop });
+      } else {
+        _this.codeMirror.replaceSelection(tag, 'end');
+      }
+      _this.codeMirror.focus();
+
+      _this.setState({ isChoicesOpen: false, selectedTagPos: null });
+    };
+    if (this.state.codeMirrorMode) {
+      selectChoice();
+    } else if (this.props.readOnly) {
+      this.props.onChange('{{' + key + '}}');
+      this.setState({ isChoicesOpen: false });
     } else {
-      this.codeMirror.replaceSelection(tag, 'end');
+      this.switchToCodeMirror(selectChoice);
     }
-    this.codeMirror.focus();
-
-    this.setState({ isChoicesOpen: false, selectedTagPos: null });
   },
 
   focus: function focus() {
-    var _this = this;
+    var _this2 = this;
 
     this.switchToCodeMirror(function () {
-      _this.codeMirror.focus();
-      _this.codeMirror.setCursor(_this.codeMirror.lineCount(), 0);
+      _this2.codeMirror.focus();
+      _this2.codeMirror.setCursor(_this2.codeMirror.lineCount(), 0);
     });
   },
 
@@ -143,7 +155,7 @@ module.exports = React.createClass({
 
   setChoicesOpen: function setChoicesOpen(isOpen) {
     var action = isOpen ? 'open-replacements' : 'close-replacements';
-    this.props.onStartAction(action);
+    this.onStartAction(action);
     this.setState({ isChoicesOpen: isOpen });
   },
 
@@ -257,11 +269,11 @@ module.exports = React.createClass({
   },
 
   switchToCodeMirror: function switchToCodeMirror(cb) {
-    var _this2 = this;
+    var _this3 = this;
 
     if (!this.state.codeMirrorMode && !this.props.readOnly) {
       this.setState({ codeMirrorMode: true }, function () {
-        if (_this2.codeMirror && _.isFunction(cb)) {
+        if (_this3.codeMirror && _.isFunction(cb)) {
           cb();
         }
       });
