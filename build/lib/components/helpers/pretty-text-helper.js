@@ -23,11 +23,11 @@ module.exports = React.createClass({
 
   mixins: [require('../../mixins/helper')],
 
-  componentDidMount: function() {
+  componentDidMount: function componentDidMount() {
     this.createEditor();
   },
 
-  componentDidUpdate: function(prevProps, prevState) {
+  componentDidUpdate: function componentDidUpdate(prevProps, prevState) {
     if (prevState.codeMirrorMode !== this.state.codeMirrorMode) {
       // Changed from code mirror mode to read only mode or vice versa,
       // so setup the other editor.
@@ -36,13 +36,13 @@ module.exports = React.createClass({
     this.updateEditor();
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount: function componentWillUnmount() {
     if (this.state.codeMirrorMode) {
       this.removeCodeMirrorEditor();
     }
   },
 
-  getInitialState: function() {
+  getInitialState: function getInitialState() {
     var selectedChoices = this.props.selectedChoices;
     var replaceChoices = this.props.replaceChoices;
     var translator = TagTranslator(selectedChoices.concat(replaceChoices), this.props.config.humanize);
@@ -56,7 +56,7 @@ module.exports = React.createClass({
     };
   },
 
-  componentWillReceiveProps: function(nextProps) {
+  componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
     var selectedChoices = this.props.selectedChoices;
     var replaceChoices = this.props.replaceChoices;
     var nextState = {
@@ -71,12 +71,12 @@ module.exports = React.createClass({
     this.setState(nextState);
   },
 
-  handleChoiceSelection: function (key) {
+  handleChoiceSelection: function handleChoiceSelection(key) {
     var pos = this.state.selectedTagPos;
     var tag = '{{' + key + '}}';
 
     if (pos) {
-      this.codeMirror.replaceRange(tag, {line: pos.line, ch: pos.start}, {line: pos.line, ch: pos.stop});
+      this.codeMirror.replaceRange(tag, { line: pos.line, ch: pos.start }, { line: pos.line, ch: pos.stop });
     } else {
       this.codeMirror.replaceSelection(tag, 'end');
     }
@@ -85,29 +85,29 @@ module.exports = React.createClass({
     this.setState({ isChoicesOpen: false, selectedTagPos: null });
   },
 
-  focus: function () {
-    this.switchToCodeMirror(() => {
-      this.codeMirror.focus();
-      this.codeMirror.setCursor(this.codeMirror.lineCount(), 0);
+  focus: function focus() {
+    var _this = this;
+
+    this.switchToCodeMirror(function () {
+      _this.codeMirror.focus();
+      _this.codeMirror.setCursor(_this.codeMirror.lineCount(), 0);
     });
   },
 
-  render: function() {
+  render: function render() {
     return this.renderWithConfig();
   },
 
-  renderDefault: function () {
+  renderDefault: function renderDefault() {
 
     var config = this.props.config;
-    var textBoxClasses = cx(_.extend({}, this.props.classes, {'pretty-text-box': true}));
+    var textBoxClasses = cx(_.extend({}, this.props.classes, { 'pretty-text-box': true }));
 
-    var onInsertClick = function () {
-      this.setState({selectedTagPos: null});
+    var onInsertClick = function onInsertClick() {
+      this.setState({ selectedTagPos: null });
       this.onToggleChoices();
     };
-    var insertBtn = config.createElement('insert-button',
-                                         {ref: 'toggle', onClick: onInsertClick.bind(this)},
-                                         'Insert...');
+    var insertBtn = config.createElement('insert-button', { ref: 'toggle', onClick: onInsertClick.bind(this) }, 'Insert...');
 
     var choices = config.createElement('choices', {
       ref: 'choices',
@@ -120,38 +120,40 @@ module.exports = React.createClass({
     });
 
     // Render read-only version.
-    return (
-      <div className={cx({'pretty-text-wrapper': true, 'choices-open': this.state.isChoicesOpen})} onMouseEnter={this.switchToCodeMirror}>
-        <div className={textBoxClasses} tabIndex={this.props.tabIndex} onFocus={this.props.onFocus} onBlur={this.props.onBlur}>
-          <div ref='textBox' className='internal-text-wrapper' />
-        </div>
-        {insertBtn}
-        {choices}
-      </div>
+    return React.createElement(
+      'div',
+      { className: cx({ 'pretty-text-wrapper': true, 'choices-open': this.state.isChoicesOpen }), onMouseEnter: this.switchToCodeMirror },
+      React.createElement(
+        'div',
+        { className: textBoxClasses, tabIndex: this.props.tabIndex, onFocus: this.props.onFocus, onBlur: this.props.onBlur },
+        React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' })
+      ),
+      insertBtn,
+      choices
     );
   },
 
-  getCloseIgnoreNodes: function () {
+  getCloseIgnoreNodes: function getCloseIgnoreNodes() {
     return this.refs.toggle.getDOMNode();
   },
 
-  onToggleChoices: function () {
+  onToggleChoices: function onToggleChoices() {
     this.setChoicesOpen(!this.state.isChoicesOpen);
   },
 
-  setChoicesOpen: function (isOpen) {
+  setChoicesOpen: function setChoicesOpen(isOpen) {
     var action = isOpen ? 'open-replacements' : 'close-replacements';
     this.props.onStartAction(action);
     this.setState({ isChoicesOpen: isOpen });
   },
 
-  onCloseChoices: function () {
+  onCloseChoices: function onCloseChoices() {
     if (this.state.isChoicesOpen) {
       this.setChoicesOpen(false);
     }
   },
 
-  createEditor: function () {
+  createEditor: function createEditor() {
     if (this.state.codeMirrorMode) {
       this.createCodeMirrorEditor();
     } else {
@@ -159,7 +161,7 @@ module.exports = React.createClass({
     }
   },
 
-  updateEditor: function () {
+  updateEditor: function updateEditor() {
     if (this.state.codeMirrorMode) {
       var codeMirrorValue = this.codeMirror.getValue();
       if (codeMirrorValue !== this.state.value) {
@@ -175,7 +177,7 @@ module.exports = React.createClass({
     }
   },
 
-  createCodeMirrorEditor: function () {
+  createCodeMirrorEditor: function createCodeMirrorEditor() {
     var options = {
       lineWrapping: true,
       tabindex: this.props.tabIndex,
@@ -195,23 +197,21 @@ module.exports = React.createClass({
     this.tagCodeMirror();
   },
 
-  tagCodeMirror: function () {
+  tagCodeMirror: function tagCodeMirror() {
     var positions = this.state.translator.getTagPositions(this.codeMirror.getValue());
     var self = this;
 
-    var tagOps = function () {
+    var tagOps = function tagOps() {
       positions.forEach(function (pos) {
         var node = self.createTagNode(pos);
-        self.codeMirror.markText({line: pos.line, ch: pos.start},
-                                 {line: pos.line, ch: pos.stop},
-                                 {replacedWith: node, handleMouseEvents: true});
+        self.codeMirror.markText({ line: pos.line, ch: pos.start }, { line: pos.line, ch: pos.stop }, { replacedWith: node, handleMouseEvents: true });
       });
     };
 
     this.codeMirror.operation(tagOps);
   },
 
-  onCodeMirrorChange: function () {
+  onCodeMirrorChange: function onCodeMirrorChange() {
     if (this.updatingCodeMirror) {
       // avoid recursive update cycle, and mark the code mirror manual update as done
       this.updatingCodeMirror = false;
@@ -220,11 +220,11 @@ module.exports = React.createClass({
 
     var newValue = this.codeMirror.getValue();
     this.props.onChange(newValue);
-    this.setState({value: newValue});
+    this.setState({ value: newValue });
     this.tagCodeMirror();
   },
 
-  createReadonlyEditor: function () {
+  createReadonlyEditor: function createReadonlyEditor() {
     var textBoxNode = this.refs.textBox.getDOMNode();
 
     var tokens = this.state.translator.tokenize(this.state.value);
@@ -232,48 +232,55 @@ module.exports = React.createClass({
     var nodes = tokens.map(function (part, i) {
       if (part.type === 'tag') {
         var label = self.state.translator.getLabel(part.value);
-        var props = {key: i, tag: part.value, replaceChoices: self.state.replaceChoices};
+        var props = { key: i, tag: part.value, replaceChoices: self.state.replaceChoices };
         return self.props.config.createElement('pretty-tag', props, label);
       }
-      return <span key={i}>{part.value}</span>;
+      return React.createElement(
+        'span',
+        { key: i },
+        part.value
+      );
     });
 
-    React.render(<span>{nodes}</span>, textBoxNode);
+    React.render(React.createElement(
+      'span',
+      null,
+      nodes
+    ), textBoxNode);
   },
 
-  removeCodeMirrorEditor: function () {
+  removeCodeMirrorEditor: function removeCodeMirrorEditor() {
     var textBoxNode = this.refs.textBox.getDOMNode();
     var cmNode = textBoxNode.firstChild;
     textBoxNode.removeChild(cmNode);
     this.codeMirror = null;
   },
 
-  switchToCodeMirror: function (cb) {
+  switchToCodeMirror: function switchToCodeMirror(cb) {
+    var _this2 = this;
+
     if (!this.state.codeMirrorMode && !this.props.readOnly) {
-      this.setState({codeMirrorMode: true}, () => {
-        if (this.codeMirror && _.isFunction(cb)) {
+      this.setState({ codeMirrorMode: true }, function () {
+        if (_this2.codeMirror && _.isFunction(cb)) {
           cb();
         }
       });
     }
   },
 
-  createTagNode: function (pos) {
+  createTagNode: function createTagNode(pos) {
     var node = document.createElement('span');
     var label = this.state.translator.getLabel(pos.tag);
     var config = this.props.config;
 
-    var onTagClick = function () {
-      this.setState({selectedTagPos: pos});
+    var onTagClick = function onTagClick() {
+      this.setState({ selectedTagPos: pos });
       this.onToggleChoices();
     };
 
-    var props = {tag: pos.tag, replaceChoices: this.state.replaceChoices, onClick: onTagClick.bind(this)};
+    var props = { tag: pos.tag, replaceChoices: this.state.replaceChoices, onClick: onTagClick.bind(this) };
 
-    React.render(
-      config.createElement('pretty-tag', props, label),
-      node
-    );
+    React.render(config.createElement('pretty-tag', props, label), node);
 
     return node;
   }

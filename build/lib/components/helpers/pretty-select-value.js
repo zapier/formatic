@@ -49,7 +49,6 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
-    // var config = this.props.config;
     var choices = this.props.config.normalizePrettyChoices(this.props.choices);
     var choicesOrLoading;
 
@@ -86,12 +85,15 @@ module.exports = React.createClass({
   },
 
   getInputElement: function getInputElement() {
-    if (this.state.isEnteringCustomValue) {
-      return React.createElement('input', { ref: 'customInput', type: 'text', value: this.props.field.value,
-        onChange: this.onInputChange, onFocus: this.onFocusAction, onBlur: this.onBlur });
-    }
-
-    return React.createElement('input', { type: 'text', value: this.getDisplayValue(), readOnly: true, onFocus: this.onFocusAction, onBlur: this.onBlur });
+    return this.props.config.createElement('pretty-select-input', {
+      field: this.props.field,
+      ref: 'customInput',
+      isEnteringCustomValue: this.state.isEnteringCustomValue,
+      onChange: this.onInputChange,
+      onFocus: this.onFocusAction,
+      onBlur: this.onBlur,
+      getDisplayValue: this.getDisplayValue
+    });
   },
 
   blurLater: function blurLater() {
@@ -168,7 +170,7 @@ module.exports = React.createClass({
         isChoicesOpen: false,
         value: choice.value
       }, function () {
-        this.refs.customInput.getDOMNode().focus();
+        this.refs.customInput.focus();
       });
     } else {
       this.setState({
@@ -188,13 +190,13 @@ module.exports = React.createClass({
   onAction: function onAction(params) {
     if (params.action === 'enter-custom-value') {
       this.setState({ isEnteringCustomValue: true }, function () {
-        this.refs.customInput.getDOMNode().focus();
+        this.refs.customInput.focus();
       });
     }
     this.onBubbleAction(params);
   },
 
-  onInputChange: function onInputChange(event) {
-    this.props.onChange(event.target.value);
+  onInputChange: function onInputChange(value) {
+    this.props.onChange(value);
   }
 });
