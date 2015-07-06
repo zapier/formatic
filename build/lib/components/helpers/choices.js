@@ -51,9 +51,9 @@ module.exports = React.createClass({
     this.adjustSize();
   },
 
-  onSelect: function onSelect(choice) {
+  onSelect: function onSelect(choice, event) {
     this.setState({ openSection: null });
-    this.props.onSelect(choice.value);
+    this.props.onSelect(choice.value, event);
   },
 
   onChoiceAction: function onChoiceAction(choice) {

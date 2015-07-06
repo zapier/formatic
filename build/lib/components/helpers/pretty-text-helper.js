@@ -71,7 +71,7 @@ module.exports = React.createClass({
     this.setState(nextState);
   },
 
-  handleChoiceSelection: function handleChoiceSelection(key) {
+  handleChoiceSelection: function handleChoiceSelection(key, event) {
     var _this = this;
 
     var selectChoice = function selectChoice() {
@@ -90,6 +90,8 @@ module.exports = React.createClass({
     if (this.state.codeMirrorMode) {
       selectChoice();
     } else if (this.props.readOnly) {
+      // hackety hack to stop dropdown choices from toggling
+      event.stopPropagation();
       this.props.onChange('{{' + key + '}}');
       this.setState({ isChoicesOpen: false });
     } else {
