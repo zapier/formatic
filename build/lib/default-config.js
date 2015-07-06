@@ -28,6 +28,8 @@ module.exports = function (config) {
 
     createElement_SingleLineString: React.createFactory(require('./components/fields/single-line-string')),
 
+    createElement_Password: React.createFactory(require('./components/fields/password')),
+
     createElement_Select: React.createFactory(require('./components/fields/select')),
 
     createElement_PrettySelect: React.createFactory(require('./components/fields/pretty-select')),
