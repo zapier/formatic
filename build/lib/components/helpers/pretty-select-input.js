@@ -51,4 +51,6 @@ module.exports = React.createClass({
     }
 
     return React.createElement('input', { type: 'text', value: this.props.getDisplayValue(), readOnly: true, onFocus: this.props.onFocus, onBlur: this.props.onBlur });
-  } });
+  }
+
+});
