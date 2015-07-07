@@ -10,6 +10,8 @@ var React = require('react/addons');
 var R = React.DOM;
 var _ = require('underscore');
 
+var magicChoiceRe = /^\/\/\/[^\/]+\/\/\/$/;
+
 module.exports = React.createClass({
 
   displayName: 'Choices',
@@ -130,7 +132,11 @@ module.exports = React.createClass({
     var alwaysExanded = this.hasOneSection();
     var visibleChoices = [];
     var inSection;
+
     choices.forEach(function (choice) {
+      if (choice.value && choice.value.match(magicChoiceRe)) {
+        visibleChoices.push(choice);
+      }
       if (choice.sectionKey) {
         inSection = choice.sectionKey === openSection;
       }

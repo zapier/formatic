@@ -131,7 +131,8 @@ module.exports = React.createClass({
       ignoreCloseNodes: this.getCloseIgnoreNodes,
       onSelect: this.handleChoiceSelection,
       onClose: this.onCloseChoices,
-      isAccordion: this.props.isAccordion
+      isAccordion: this.props.isAccordion,
+      field: this.props.field
     });
 
     // Render read-only version.

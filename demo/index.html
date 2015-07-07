@@ -119,6 +119,8 @@
         isAccordion: true,
         default: 'Hi there {{firstName}} {{lastName}} {{middleName}}.',
         tabIndex: prettyNum + 1,
+        replaceChoices: ['///loading///']
+        /*
         replaceChoices: [
           {
             label: 'Hi Class People',
@@ -149,7 +151,7 @@
             label: 'Last Name',
             sample: 'Brown'
           }
-        ]
+        ]*/
       },
 
       {label: 'Size', type: 'pretty-select', key: 'size', default: 'S',
