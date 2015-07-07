@@ -151,13 +151,19 @@ module.exports = React.createClass({
     return this.renderWithConfig();
   },
 
+  onClick: function onClick(event) {
+    console.log('clickety');
+    // swallow clicks
+    event.stopPropagation();
+  },
+
   renderDefault: function renderDefault() {
     var config = this.props.config;
 
     var choices = this.visibleChoices();
 
     if (this.props.open) {
-      return R.div({ ref: 'container', onWheel: this.onWheel, onScroll: this.onScroll,
+      return R.div({ ref: 'container', onWheel: this.onWheel, onScroll: this.onScroll, onClick: this.onClick,
         className: 'choices-container', style: {
           userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
           maxHeight: this.state.maxHeight ? this.state.maxHeight : null
