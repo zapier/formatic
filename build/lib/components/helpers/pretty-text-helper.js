@@ -67,7 +67,7 @@ module.exports = React.createClass({
 
     // Not sure what the null/undefined checks are here for, but changed from falsey which was breaking.
     if (this.state.value !== nextProps.value && !_.isUndefined(nextProps.value) && nextProps.value !== null) {
-      nextState.value = nextProps.value;
+      nextState.value = String(nextProps.value || '');
     }
 
     this.setState(nextState);
