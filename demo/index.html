@@ -115,6 +115,12 @@
 
     fields = fields.concat([
       {
+        label: 'Pretty Text with integer default',
+        key: 'integerPrettyText',
+        type: 'pretty-text',
+        default: 12
+      },
+      {
         label: 'Pretty Text 2', key: 'nestedPrettyText', type: 'pretty-text',
         isAccordion: true,
         default: 'Hi there {{firstName}} {{lastName}} {{middleName}}.',
