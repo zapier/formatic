@@ -48,7 +48,8 @@ module.exports = React.createClass({
     var translator = TagTranslator(selectedChoices.concat(replaceChoices), this.props.config.humanize);
 
     return {
-      value: this.props.value,
+      // With number values, onFocus never fires, which means it stays read-only. So convert to string.
+      value: String(this.props.value || ''),
       codeMirrorMode: false,
       isChoicesOpen: false,
       replaceChoices: replaceChoices,
@@ -103,6 +104,7 @@ module.exports = React.createClass({
   focus: function focus() {
     var _this2 = this;
 
+    console.log('--- focus');
     this.switchToCodeMirror(function () {
       _this2.codeMirror.focus();
       _this2.codeMirror.setCursor(_this2.codeMirror.lineCount(), 0);
