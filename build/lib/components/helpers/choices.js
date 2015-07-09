@@ -152,7 +152,6 @@ module.exports = React.createClass({
   },
 
   onClick: function onClick(event) {
-    console.log('clickety');
     // swallow clicks
     event.stopPropagation();
   },
