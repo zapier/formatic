@@ -7,6 +7,13 @@ var TagTranslator = require('./tag-translator');
 var _ = require('../../undash');
 var cx = require('classnames');
 
+var toString = function toString(value) {
+  if (_.isUndefined(value) || _.isNull(value)) {
+    return '';
+  }
+  return String(value);
+};
+
 /*
    Editor for tagged text. Renders text like "hello {{firstName}}"
    with replacement labels rendered in a pill box. Designed to load
@@ -49,7 +56,7 @@ module.exports = React.createClass({
 
     return {
       // With number values, onFocus never fires, which means it stays read-only. So convert to string.
-      value: String(this.props.value || ''),
+      value: toString(this.props.value),
       codeMirrorMode: false,
       isChoicesOpen: false,
       replaceChoices: replaceChoices,
@@ -67,7 +74,7 @@ module.exports = React.createClass({
 
     // Not sure what the null/undefined checks are here for, but changed from falsey which was breaking.
     if (this.state.value !== nextProps.value && !_.isUndefined(nextProps.value) && nextProps.value !== null) {
-      nextState.value = String(nextProps.value || '');
+      nextState.value = toString(nextProps.value);
     }
 
     this.setState(nextState);
