@@ -52,13 +52,13 @@ module.exports = React.createClass({
     }
   },
 
-  renderFields: function renderFields(fields, groupLabel) {
+  renderFields: function renderFields(fields, groupKey, groupLabel) {
     var config = this.props.config;
     var self = this;
 
     var childFields = fields.map(function (fieldOrGroup) {
       if (fieldOrGroup.isGroup) {
-        return self.renderFields(fieldOrGroup.children, fieldOrGroup.label);
+        return self.renderFields(fieldOrGroup.children, fieldOrGroup.key, fieldOrGroup.label);
       }
 
       var key = fieldOrGroup.key;
@@ -79,12 +79,12 @@ module.exports = React.createClass({
         null,
         groupLabel
       );
-      className += ' fields-group';
+      className += ' child-fields-group';
     }
 
     return React.createElement(
       'fieldset',
-      { className: className },
+      { key: groupKey, className: className },
       legend,
       childFields
     );
