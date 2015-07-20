@@ -29,7 +29,7 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
-    return this.props.config.createElement('pretty-text-helper', {
+    return this.props.config.createElement('pretty-text-input', {
       classes: this.props.classes,
       tabIndex: this.props.field.tabIndex,
       onChange: this.props.onChange,
@@ -51,6 +51,4 @@ module.exports = React.createClass({
     }
 
     return React.createElement('input', { type: 'text', value: this.props.getDisplayValue(), readOnly: true, onFocus: this.props.onFocus, onBlur: this.props.onBlur });
-  }
-
-});
+  } });
