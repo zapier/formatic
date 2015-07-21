@@ -132,6 +132,7 @@ module.exports = React.createClass({
     var _this = this;
 
     var choices = this.props.choices;
+    var config = this.props.config;
 
     if (choices && choices.length === 0) {
       return [{ value: '///empty///' }];
@@ -145,7 +146,7 @@ module.exports = React.createClass({
         if (choice.action) {
           return false;
         }
-        return choice.label && choice.label.toLowerCase().indexOf(_this.state.searchString.toLowerCase()) > -1;
+        return config.isSearchStringInChoice(_this.state.searchString, choice);
       });
     }
 

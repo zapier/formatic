@@ -975,6 +975,10 @@ module.exports = function (config) {
 
     actionChoiceLabel: function actionChoiceLabel(action) {
       return utils.capitalize(action).replace(/[-]/g, ' ');
+    },
+
+    isSearchStringInChoice: function isSearchStringInChoice(searchString, choice) {
+      return choice.label && choice.label.toLowerCase().indexOf(searchString.toLowerCase()) > -1;
     }
   };
 };
