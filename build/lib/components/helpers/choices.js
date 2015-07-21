@@ -8,7 +8,7 @@ Render customized (non-native) dropdown choices.
 
 var React = require('react/addons');
 var R = React.DOM;
-var _ = require('underscore');
+var _ = require('../../undash');
 
 var magicChoiceRe = /^\/\/\/[^\/]+\/\/\/$/;
 
@@ -142,6 +142,9 @@ module.exports = React.createClass({
         if (choice.sectionKey) {
           return true;
         }
+        if (choice.action) {
+          return false;
+        }
         return choice.label && choice.label.toLowerCase().indexOf(_this.state.searchString.toLowerCase()) > -1;
       });
     }
@@ -190,12 +193,30 @@ module.exports = React.createClass({
 
     var choices = this.visibleChoices();
 
+    var search = null;
+
+    var hasSearch = !!this.state.searchString;
+
+    if (!hasSearch) {
+      if (this.props.choices.length > 2) {
+        if (_.find(choices, function (choice) {
+          return !choice.action && choice.value !== '///loading///';
+        })) {
+          hasSearch = true;
+        }
+      }
+    }
+
+    if (hasSearch) {
+      search = config.createElement('choices-search', { field: this.props.field, onChange: this.onChangeSearch });
+    }
+
     if (this.props.open) {
       return R.div({ ref: 'container', onWheel: this.onWheel, onScroll: this.onScroll, onClick: this.onClick,
         className: 'choices-container', style: {
           userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
           maxHeight: this.state.maxHeight ? this.state.maxHeight : null
-        } }, config.cssTransitionWrapper(R.div({ key: 'search', className: 'choices-search' }, R.input({ type: 'text', placeholder: 'Search...', onChange: this.onChangeSearch })), R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
+        } }, config.cssTransitionWrapper(search, R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
 
         var choiceElement = null;
 

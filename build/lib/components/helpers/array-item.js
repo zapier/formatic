@@ -9,7 +9,7 @@ Render an array item.
 var React = require('react');
 var R = React.DOM;
 var cx = require('classnames');
-var _ = require('underscore');
+var _ = require('../../undash');
 
 module.exports = React.createClass({
 

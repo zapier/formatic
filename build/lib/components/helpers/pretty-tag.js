@@ -7,7 +7,7 @@
 'use strict';
 
 var React = require('react/addons');
-var _ = require('underscore');
+var _ = require('../../undash');
 var cx = require('classnames');
 
 module.exports = React.createClass({
