@@ -24,7 +24,8 @@ module.exports = React.createClass({
   getInitialState: function getInitialState() {
     return {
       maxHeight: null,
-      open: this.props.open
+      open: this.props.open,
+      searchString: ''
     };
   },
 
@@ -40,7 +41,7 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function componentDidMount() {
-    this.setOnClickOutside('choices', (function (event) {
+    this.setOnClickOutside('container', (function (event) {
 
       // Make sure we don't find any nodes to ignore.
       if (!_.find(this.getIgnoreCloseNodes(), (function (node) {
@@ -54,17 +55,26 @@ module.exports = React.createClass({
   },
 
   onSelect: function onSelect(choice, event) {
-    this.setState({ openSection: null });
+    this.setState({
+      openSection: null,
+      searchString: ''
+    });
     this.props.onSelect(choice.value, event);
   },
 
   onChoiceAction: function onChoiceAction(choice) {
-    this.setState({ openSection: null });
+    this.setState({
+      openSection: null,
+      searchString: ''
+    });
     this.props.onChoiceAction(choice);
   },
 
   onClose: function onClose() {
-    this.setState({ openSection: null });
+    this.setState({
+      openSection: null,
+      searchString: ''
+    });
     this.props.onClose();
   },
 
@@ -119,17 +129,29 @@ module.exports = React.createClass({
   },
 
   visibleChoices: function visibleChoices() {
+    var _this = this;
+
     var choices = this.props.choices;
 
     if (choices && choices.length === 0) {
       return [{ value: '///empty///' }];
     }
+
+    if (this.state.searchString) {
+      choices = choices.filter(function (choice) {
+        if (choice.sectionKey) {
+          return true;
+        }
+        return choice.label && choice.label.toLowerCase().indexOf(_this.state.searchString.toLowerCase()) > -1;
+      });
+    }
+
     if (!this.props.isAccordion) {
       return choices;
     }
 
     var openSection = this.state.openSection;
-    var alwaysExanded = this.hasOneSection();
+    var alwaysExanded = this.hasOneSection() || this.state.searchString;
     var visibleChoices = [];
     var inSection;
 
@@ -144,6 +166,7 @@ module.exports = React.createClass({
         visibleChoices.push(choice);
       }
     });
+
     return visibleChoices;
   },
 
@@ -156,6 +179,12 @@ module.exports = React.createClass({
     event.stopPropagation();
   },
 
+  onChangeSearch: function onChangeSearch(event) {
+    this.setState({
+      searchString: event.target.value
+    });
+  },
+
   renderDefault: function renderDefault() {
     var config = this.props.config;
 
@@ -166,7 +195,7 @@ module.exports = React.createClass({
         className: 'choices-container', style: {
           userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
           maxHeight: this.state.maxHeight ? this.state.maxHeight : null
-        } }, config.cssTransitionWrapper(R.ul({ ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
+        } }, config.cssTransitionWrapper(R.div({ key: 'search', className: 'choices-search' }, R.input({ type: 'text', placeholder: 'Search...', onChange: this.onChangeSearch })), R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
 
         var choiceElement = null;
 
