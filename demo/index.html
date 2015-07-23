@@ -267,6 +267,29 @@
           {label: 'Section 2 field 1', type: 'unicode', key: 'section2Field1', groupKey: 'section2'},
           {label: 'Section 2 field 2', type: 'unicode', key: 'section2Field2', groupKey: 'section2'},
         ]
+      },
+      {
+        label: 'Grouped Fields Classic',
+        key: 'groupedFieldsClassic',
+        type: 'fields',
+        fields: [
+          {
+            label: 'Section 1',
+            type: 'fields',
+            fields: [
+              {label: 'Section 1 field 1', type: 'unicode', key: 'section1Field1'},
+              {label: 'Section 1 field 2', type: 'unicode', key: 'section1Field2'},
+            ]
+          },
+          {
+            label: 'Section 2',
+            type: 'fields',
+            fields: [
+              {label: 'Section 2 field 1', type: 'unicode', key: 'section2Field1'},
+              {label: 'Section 2 field 2', type: 'unicode', key: 'section2Field2'},
+            ]
+          }
+        ]
       }
     ]);
 
