@@ -18,6 +18,12 @@ module.exports = React.createClass({
   mixins: [require('../../mixins/field')],
 
   onChangeField: function onChangeField(key, newValue, info) {
+    if (!key) {
+      key = info.field.key;
+      if (key) {
+        newValue = newValue[key];
+      }
+    }
     if (key) {
       var newObjectValue = _.extend({}, this.props.field.value);
       newObjectValue[key] = newValue;
@@ -35,14 +41,22 @@ module.exports = React.createClass({
 
     var fields = config.createChildFields(field);
 
+    // Want to move to fieldset with legend, but doing a little backward-compatible
+    // hacking here, only converting child `fields` without keys.
+    var isGroup = !!(field.parent && !field.key);
+
     return config.createElement('field', {
-      config: config, field: field, plain: this.props.plain
-    }, R.fieldset({ className: cx(this.props.classes) }, fields.map((function (childField, i) {
+      config: config, field: field, plain: isGroup || this.props.plain
+    }, R.fieldset({ className: cx(this.props.classes) }, isGroup ? React.createElement(
+      'legend',
+      null,
+      config.fieldLabel(field)
+    ) : null, fields.map((function (childField, i) {
       var key = childField.key || i;
       return config.createFieldElement({
         key: key || i,
         field: childField,
-        onChange: this.onChangeField.bind(this, key), onAction: this.onBubbleAction
+        onChange: this.onChangeField.bind(this, childField.key), onAction: this.onBubbleAction
       });
     }).bind(this))));
   }
