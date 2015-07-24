@@ -18,7 +18,6 @@ module.exports = React.createClass({
   mixins: [require('../../mixins/field')],
 
   onChangeField: function onChangeField(key, newValue, info) {
-    console.log(arguments);
     if (!key) {
       var parentPath = this.props.config.fieldValuePath(this.props.field);
       var childPath = this.props.config.fieldValuePath(info.field).slice(parentPath.length);
