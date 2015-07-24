@@ -42,9 +42,11 @@
   <script src="./lib/formatic-dev.js"></script>
   <script type="text/jsx;harmony=true">
 
-    const onChange = (...args) => {
-      console.log(args);
+    const onChange = (event) => {
+      console.log(event);
     };
+
+    const {UncontrolledContainer, StringInput} = Formatic;
 
     React.render(
       // <Formatic.Input onChange={onChange}>
@@ -53,13 +55,16 @@
       //   }
       // </Formatic.Input>
 
-      const {FieldContainer, StringInput} = Formatic;
-
-      <Formatic>
-        <FieldContainer fieldKey="name" onChange={onChange}>
-          <StringInput/>
-        </FieldContainer>
-      </Formatic>
+      // const {FieldContainer, StringInput} = Formatic;
+      //
+      // <Formatic>
+      //   <FieldContainer fieldKey="name" onChange={onChange}>
+      //     <StringInput/>
+      //   </FieldContainer>
+      // </Formatic>
+      <UncontrolledContainer defaultValue="hello" onChange={onChange}>
+        <StringInput/>
+      </UncontrolledContainer>
       ,
       // <Formatic defaultValue="hello">
       //   <Formatic.StringInput/>
