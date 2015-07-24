@@ -18,8 +18,11 @@ module.exports = React.createClass({
   mixins: [require('../../mixins/field')],
 
   onChangeField: function onChangeField(key, newValue, info) {
+    console.log(arguments);
     if (!key) {
-      key = info.field.key;
+      var parentPath = this.props.config.fieldValuePath(this.props.field);
+      var childPath = this.props.config.fieldValuePath(info.field).slice(parentPath.length);
+      key = childPath[0];
       if (key) {
         newValue = newValue[key];
       }
@@ -45,9 +48,15 @@ module.exports = React.createClass({
     // hacking here, only converting child `fields` without keys.
     var isGroup = !!(field.parent && !field.key);
 
+    var classes = _.extend({}, this.props.classes);
+
+    if (isGroup) {
+      classes['child-fields-group'] = true;
+    }
+
     return config.createElement('field', {
       config: config, field: field, plain: isGroup || this.props.plain
-    }, R.fieldset({ className: cx(this.props.classes) }, isGroup ? React.createElement(
+    }, R.fieldset({ className: cx(classes) }, isGroup ? React.createElement(
       'legend',
       null,
       config.fieldLabel(field)
