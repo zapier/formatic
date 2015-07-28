@@ -46,7 +46,7 @@
       console.log(event);
     };
 
-    const {UncontrolledContainer, StringInput} = Formatic;
+    const {StringInput} = Formatic;
 
     React.render(
       // <Formatic.Input onChange={onChange}>
@@ -55,6 +55,8 @@
       //   }
       // </Formatic.Input>
 
+      <StringInput defaultValue="hello" onChange={onChange}/>
+
       // const {FieldContainer, StringInput} = Formatic;
       //
       // <Formatic>
@@ -62,9 +64,9 @@
       //     <StringInput/>
       //   </FieldContainer>
       // </Formatic>
-      <UncontrolledContainer defaultValue="hello" onChange={onChange}>
-        <StringInput/>
-      </UncontrolledContainer>
+      // <UncontrolledContainer defaultValue="hello" onChange={onChange}>
+      //   <StringInput/>
+      // </UncontrolledContainer>
       ,
       // <Formatic defaultValue="hello">
       //   <Formatic.StringInput/>
