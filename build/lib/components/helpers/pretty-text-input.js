@@ -257,7 +257,7 @@ module.exports = React.createClass({
     var nodes = tokens.map(function (part, i) {
       if (part.type === 'tag') {
         var label = self.state.translator.getLabel(part.value);
-        var props = { key: i, tag: part.value, replaceChoices: self.state.replaceChoices };
+        var props = { key: i, tag: part.value, replaceChoices: self.state.replaceChoices, field: self.props.field };
         return self.props.config.createElement('pretty-tag', props, label);
       }
       return React.createElement(
@@ -293,17 +293,17 @@ module.exports = React.createClass({
     }
   },
 
+  onTagClick: function onTagClick(pos) {
+    this.setState({ selectedTagPos: pos });
+    this.onToggleChoices();
+  },
+
   createTagNode: function createTagNode(pos) {
     var node = document.createElement('span');
     var label = this.state.translator.getLabel(pos.tag);
     var config = this.props.config;
 
-    var onTagClick = function onTagClick() {
-      this.setState({ selectedTagPos: pos });
-      this.onToggleChoices();
-    };
-
-    var props = { tag: pos.tag, replaceChoices: this.state.replaceChoices, onClick: onTagClick.bind(this) };
+    var props = { tag: pos.tag, pos: pos, replaceChoices: this.state.replaceChoices, onClick: this.onTagClick, field: this.props.field };
 
     React.render(config.createElement('pretty-tag', props, label), node);
 
