@@ -24,7 +24,7 @@
    }
   </style>
 </head>
-<bodby>
+<body>
   <div class="container-fluid">
     <div id="user"></div>
     <div id="extra"></div>
@@ -46,7 +46,15 @@
       console.log(event);
     };
 
-    const {StringInput} = Formatic;
+    const {ComponentContainer, StringInput} = Formatic;
+
+    const components = {
+      StringInputView: (props) => ({
+        render() {
+          return <span>{props.value || props.defaultValue}</span>;
+        }
+      })
+    }
 
     React.render(
       // <Formatic.Input onChange={onChange}>
@@ -55,7 +63,15 @@
       //   }
       // </Formatic.Input>
 
-      <StringInput defaultValue="hello" onChange={onChange}/>
+      <ComponentContainer components={components}>
+      {
+        Component => (
+          <Component $type="StringInput" defaultValue="hello" onChange={onChange}/>
+        )
+      }
+      </ComponentContainer>
+
+      //<StringInput defaultValue="hello" onChange={onChange}/>
 
       // const {FieldContainer, StringInput} = Formatic;
       //
