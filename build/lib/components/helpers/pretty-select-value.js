@@ -86,7 +86,10 @@ module.exports = React.createClass({
 
     var customFieldElement = null;
     if (this.state.isEnteringCustomValue && this.hasCustomField()) {
-      var customField = _.extend({}, field, { type: 'PrettyText' }, config.fieldCustomFieldTemplate(field));
+      var customFieldTemplate = config.fieldCustomFieldTemplate(field);
+      var customField = _.extend({ type: 'PrettyText' }, {
+        key: field.key, value: field.value, rawFieldTemplate: customFieldTemplate
+      }, customFieldTemplate);
       customFieldElement = config.createFieldElement({
         field: customField,
         onChange: this.props.onChange, onAction: this.onBubbleAction,

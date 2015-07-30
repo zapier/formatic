@@ -164,7 +164,7 @@
       },
       {label: 'Colors (R)', type: 'pretty-select', required: true, key: 'colors1', placeholder: 'Pick a color...', choices: "red, green, yellow"},
       {label: 'Colors 2', type: 'pretty-select', key: 'colors2', choices: {r: "Red", g: "Green"}},
-      {label: 'Colors 3', type: 'pretty-select', key: 'colors3', customField: {label: 'Custom Value'}, choices: [
+      {label: 'Colors 3', helpText: 'Tres colores', type: 'pretty-select', key: 'colors3', customField: {label: 'Custom Value', helpText: null}, choices: [
         { value: 'r', label: 'Red', sample: 'cherry'},
         { value: 'g', label: 'Green', sample: 'lime'},
         { value: '', action: 'clear-current-choice'},
