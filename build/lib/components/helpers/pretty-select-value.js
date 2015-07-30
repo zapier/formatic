@@ -35,6 +35,12 @@ module.exports = React.createClass({
     });
   },
 
+  // Intercept custom value field events and pretend like this field sent them.
+  onCustomAction: function onCustomAction(info) {
+    info = _.extend({}, info, { field: this.props.field, isCustomValue: true });
+    this.props.onAction(info);
+  },
+
   getDefaultProps: function getDefaultProps() {
     return {
       choices: []
@@ -102,7 +108,7 @@ module.exports = React.createClass({
       config.initField(customField);
       customFieldElement = config.createFieldElement({
         field: customField,
-        onChange: this.onChangeCustomValue, onAction: this.onBubbleAction,
+        onChange: this.onChangeCustomValue, onAction: this.onCustomAction,
         ref: 'customFieldInput'
       });
     }
