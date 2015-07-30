@@ -88,8 +88,11 @@ module.exports = React.createClass({
     if (this.state.isEnteringCustomValue && this.hasCustomField()) {
       var customFieldTemplate = config.fieldCustomFieldTemplate(field);
       var customField = _.extend({ type: 'PrettyText' }, {
-        key: field.key, value: field.value, rawFieldTemplate: customFieldTemplate
+        key: field.key, parent: field, fieldIndex: field.fieldIndex,
+        rawFieldTemplate: customFieldTemplate,
+        value: field.value
       }, customFieldTemplate);
+      config.initField(customField);
       customFieldElement = config.createFieldElement({
         field: customField,
         onChange: this.props.onChange, onAction: this.onBubbleAction,
