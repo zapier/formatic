@@ -852,6 +852,11 @@ module.exports = function (config) {
       return field.itemFields;
     },
 
+    // Template for a custom field for a dropdown.
+    fieldCustomFieldTemplate: function fieldCustomFieldTemplate(field) {
+      return field.customField;
+    },
+
     fieldIsSingleLine: delegateTo('fieldTemplateIsSingleLine'),
 
     // Get whether or not a field is collapsed.

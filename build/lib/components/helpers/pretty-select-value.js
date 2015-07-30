@@ -62,12 +62,14 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
-    var config = this.props.config;
+    var _props = this.props;
+    var config = _props.config;
+    var field = _props.field;
 
     var choices = config.normalizePrettyChoices(this.props.choices);
     var choicesOrLoading;
 
-    if (choices.length > 1 && choices[0].value === '///loading///' || config.fieldIsLoading(this.props.field)) {
+    if (choices.length > 1 && choices[0].value === '///loading///' || config.fieldIsLoading(field)) {
       choices = [{ value: '///loading///' }];
     }
     var choicesElem = config.createElement('choices', {
@@ -78,12 +80,20 @@ module.exports = React.createClass({
       onSelect: this.onSelectChoice,
       onClose: this.onCloseChoices,
       onChoiceAction: this.onChoiceAction,
-      field: this.props.field
+      field: field
     });
 
     var inputElem = this.getInputElement();
 
-    var customField = _.extend({}, this.props.field, { type: 'PrettyText', label: 'Custom Value' });
+    var customFieldElement = null;
+    if (this.state.isEnteringCustomValue && this.hasCustomField()) {
+      var customField = _.extend({}, field, { type: 'PrettyText' }, config.fieldCustomFieldTemplate(field));
+      customFieldElement = config.createFieldElement({
+        field: customField,
+        onChange: this.props.onChange, onAction: this.onBubbleAction,
+        ref: 'customFieldInput'
+      });
+    }
 
     choicesOrLoading = React.createElement(
       'div',
@@ -99,10 +109,7 @@ module.exports = React.createClass({
       React.createElement(
         'span',
         null,
-        !this.state.isEnteringCustomValue ? null : config.createFieldElement({
-          field: customField,
-          onChange: this.props.onChange, onAction: this.onBubbleAction
-        })
+        customFieldElement
       )
     );
 
@@ -113,7 +120,7 @@ module.exports = React.createClass({
     return this.props.config.createElement('pretty-select-input', {
       field: this.props.field,
       ref: 'customInput',
-      //isEnteringCustomValue: this.state.isEnteringCustomValue,
+      isEnteringCustomValue: this.state.isEnteringCustomValue && !this.hasCustomField(),
       onChange: this.onInputChange,
       onFocus: this.onFocusAction,
       onBlur: this.onBlur,
@@ -192,13 +199,15 @@ module.exports = React.createClass({
     var currentValue = this.value();
 
     if (this.state.isEnteringCustomValue || !currentChoice && currentValue) {
-      var choices = this.props.choices;
+      if (this.hasCustomField()) {
+        var choices = this.props.choices;
 
-      var customChoice = _.find(choices, function (choice) {
-        return choice.action === 'enter-custom-value';
-      });
-      if (customChoice && customChoice.label) {
-        return customChoice.label;
+        var customChoice = _.find(choices, function (choice) {
+          return choice.action === 'enter-custom-value';
+        });
+        if (customChoice && customChoice.label) {
+          return customChoice.label;
+        }
       }
       return currentValue;
     }
@@ -210,13 +219,21 @@ module.exports = React.createClass({
     return this.props.config.fieldPlaceholder(this.props.field) || '';
   },
 
+  hasCustomField: function hasCustomField() {
+    return !!this.props.config.fieldCustomFieldTemplate(this.props.field);
+  },
+
   onChoiceAction: function onChoiceAction(choice) {
     if (choice.action === 'enter-custom-value') {
       this.setState({
         isEnteringCustomValue: true,
         isChoicesOpen: false
       }, function () {
-        this.refs.customInput.focus();
+        if (this.hasCustomField()) {
+          this.refs.customFieldInput.focus();
+        } else {
+          this.refs.customInput.focus();
+        }
       });
     } else if (choice.action === 'insert-field') {
       this.setState({

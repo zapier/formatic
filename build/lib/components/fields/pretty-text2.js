@@ -18,6 +18,10 @@ module.exports = React.createClass({
     return this.renderWithConfig();
   },
 
+  focus: function focus() {
+    this.refs.textBox.focus();
+  },
+
   renderDefault: function renderDefault() {
 
     var config = this.props.config;
