@@ -47,7 +47,6 @@ module.exports = React.createClass({
   componentWillReceiveProps: function componentWillReceiveProps(newProps) {
     var currentChoice = this.currentChoice(newProps);
     this.setState({
-      isEnteringCustomValue: !currentChoice,
       currentChoice: currentChoice
     });
   },
