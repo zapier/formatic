@@ -31,6 +31,16 @@ module.exports = React.createClass({
     return this.renderWithConfig();
   },
 
+  onChange: function onChange(value, info) {
+    if (info && info.isCustomValue) {
+      this.props.onChange(value, {
+        field: this.props.field,
+        isCustomValue: true
+      });
+    }
+    this.onChangeValue(value);
+  },
+
   renderDefault: function renderDefault() {
 
     var config = this.props.config;
@@ -39,7 +49,7 @@ module.exports = React.createClass({
     return config.createElement('field', {
       config: config, field: field, plain: this.props.plain, classes: this.props.classes
     }, config.createElement('pretty-select-value', {
-      choices: this.state.choices, field: field, onChange: this.onChangeValue, onAction: this.onBubbleAction
+      choices: this.state.choices, field: field, onChange: this.onChange, onAction: this.onBubbleAction
     }));
   }
 });

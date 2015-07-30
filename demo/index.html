@@ -324,8 +324,8 @@
         fields: fields,
         value: value,
         onChange: function (newValue, info) {
-          console.log('changed at:', info.path);
           console.log('new value:', newValue);
+          console.log('info:', info);
           formValue = newValue;
           render(newValue);
         },

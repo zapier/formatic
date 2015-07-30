@@ -28,6 +28,13 @@ module.exports = React.createClass({
     }
   },
 
+  onChangeCustomValue: function onChangeCustomValue(newValue, info) {
+    this.props.onChange(newValue, {
+      field: info.field,
+      isCustomValue: true
+    });
+  },
+
   getDefaultProps: function getDefaultProps() {
     return {
       choices: []
@@ -95,7 +102,7 @@ module.exports = React.createClass({
       config.initField(customField);
       customFieldElement = config.createFieldElement({
         field: customField,
-        onChange: this.props.onChange, onAction: this.onBubbleAction,
+        onChange: this.onChangeCustomValue, onAction: this.onBubbleAction,
         ref: 'customFieldInput'
       });
     }

@@ -111,7 +111,6 @@ module.exports = React.createClass({
   focus: function focus() {
     var _this2 = this;
 
-    console.log('--- focus');
     this.switchToCodeMirror(function () {
       _this2.codeMirror.focus();
       _this2.codeMirror.setCursor(_this2.codeMirror.lineCount(), 0);
