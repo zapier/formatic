@@ -38,7 +38,7 @@ module.exports = React.createClass({
     var currentChoice = this.currentChoice(this.props);
     return {
       isChoicesOpen: this.props.isChoicesOpen,
-      isEnteringCustomValue: !currentChoice,
+      isEnteringCustomValue: !currentChoice && this.props.field.value,
       // Caching this cause it's kind of expensive.
       currentChoice: this.currentChoice(this.props)
     };
