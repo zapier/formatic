@@ -37,8 +37,9 @@ module.exports = React.createClass({
         field: this.props.field,
         isCustomValue: true
       });
+    } else {
+      this.onChangeValue(value);
     }
-    this.onChangeValue(value);
   },
 
   renderDefault: function renderDefault() {
