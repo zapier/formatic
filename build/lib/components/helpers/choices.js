@@ -143,9 +143,6 @@ module.exports = React.createClass({
         if (choice.sectionKey) {
           return true;
         }
-        if (choice.action) {
-          return false;
-        }
         return config.isSearchStringInChoice(_this.state.searchString, choice);
       });
     }
