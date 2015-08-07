@@ -117,22 +117,25 @@ module.exports = React.createClass({
     });
   },
 
-  render: function render() {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function renderDefault() {
-
-    var config = this.props.config;
-    var textBoxClasses = cx(_.extend({}, this.props.classes, { 'pretty-text-box': true }));
+  insertBtn: function insertBtn() {
+    if (this.isReadOnly()) {
+      return null;
+    }
 
     var onInsertClick = function onInsertClick() {
       this.setState({ selectedTagPos: null });
       this.onToggleChoices();
     };
-    var insertBtn = config.createElement('insert-button', { ref: 'toggle', onClick: onInsertClick.bind(this) }, 'Insert...');
 
-    var choices = config.createElement('choices', {
+    return this.props.config.createElement('insert-button', { ref: 'toggle', onClick: onInsertClick.bind(this) }, 'Insert...');
+  },
+
+  choices: function choices() {
+    if (this.isReadOnly()) {
+      return null;
+    }
+
+    return this.props.config.createElement('choices', {
       ref: 'choices',
       choices: this.state.replaceChoices,
       open: this.state.isChoicesOpen,
@@ -142,6 +145,14 @@ module.exports = React.createClass({
       isAccordion: this.props.isAccordion,
       field: this.props.field
     });
+  },
+
+  render: function render() {
+    return this.renderWithConfig();
+  },
+
+  renderDefault: function renderDefault() {
+    var textBoxClasses = cx(_.extend({}, this.props.classes, { 'pretty-text-box': true }));
 
     // Render read-only version.
     return React.createElement(
@@ -152,8 +163,8 @@ module.exports = React.createClass({
         { className: textBoxClasses, tabIndex: this.props.tabIndex, onFocus: this.props.onFocus, onBlur: this.props.onBlur },
         React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' })
       ),
-      insertBtn,
-      choices
+      this.insertBtn(),
+      this.choices()
     );
   },
 

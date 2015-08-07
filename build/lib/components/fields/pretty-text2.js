@@ -27,7 +27,11 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
     var props = { field: field, plain: this.props.plain };
-    var tabIndex = field.tabIndex;
+
+    var readOnly = config.fieldIsReadOnly(field);
+
+    // The tab index makes this control focusable and editable. If read only, no tabIndex
+    var tabIndex = readOnly ? null : field.tabIndex;
 
     var element = config.createElement('pretty-text-input', {
       classes: this.props.classes,
@@ -41,7 +45,8 @@ module.exports = React.createClass({
       isAccordion: this.props.field.isAccordion,
       selectedChoices: this.props.config.fieldSelectedReplaceChoices(this.props.field),
       replaceChoices: this.props.config.fieldReplaceChoices(this.props.field),
-      ref: 'textBox'
+      ref: 'textBox',
+      readOnly: readOnly
     });
 
     return config.createElement('field', props, element);

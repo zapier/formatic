@@ -32,6 +32,13 @@ module.exports = React.createClass({
     this.setState({ value: nextProps.field.value });
   },
 
+  tabIndex: function tabIndex() {
+    if (this.isReadOnly()) {
+      return null;
+    }
+    return this.props.field.tabIndex;
+  },
+
   render: function render() {
     return this.renderWithConfig();
   },
@@ -40,7 +47,7 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
     var props = { field: field, plain: this.props.plain };
-    var tabIndex = field.tabIndex;
+
     var textBoxClasses = cx(_.extend({}, this.props.classes, { 'pretty-text-box': true }));
 
     // Render read-only version.
@@ -49,7 +56,7 @@ module.exports = React.createClass({
       { className: 'pretty-text-wrapper' },
       React.createElement(
         'div',
-        { className: textBoxClasses, tabIndex: tabIndex, onFocus: this.onFocusAction, onBlur: this.onBlurAction },
+        { className: textBoxClasses, tabIndex: this.tabIndex(), onFocus: this.onFocusAction, onBlur: this.onBlurAction },
         React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' })
       )
     );
@@ -58,11 +65,16 @@ module.exports = React.createClass({
   },
 
   createCodeMirrorEditor: function createCodeMirrorEditor() {
+    var config = this.props.config;
+    var field = this.props.field;
+    var readOnly = config.fieldIsReadOnly(field);
+
     var options = {
       lineWrapping: true,
-      tabindex: this.props.tabIndex,
+      tabindex: this.tabIndex(),
       value: String(this.state.value),
-      mode: this.props.field.language || null
+      mode: this.props.field.language || null,
+      readOnly: readOnly ? 'nocursor' : false // 'nocursor' means read only and not focusable
     };
 
     if (this.props.field.codeMirrorOptions) {

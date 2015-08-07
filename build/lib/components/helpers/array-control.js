@@ -42,15 +42,19 @@ module.exports = React.createClass({
 
     var field = this.props.field;
     var fieldTemplates = config.fieldItemFieldTemplates(field);
-
     var typeChoices = null;
 
-    if (fieldTemplates.length > 0) {
+    if (!this.isReadOnly() && fieldTemplates.length > 0) {
       typeChoices = config.createElement('field-template-choices', {
         field: field, fieldTemplateIndex: this.state.fieldTemplateIndex, onSelect: this.onSelect
       });
     }
 
-    return R.div({ className: cx(this.props.classes) }, typeChoices, ' ', config.createElement('add-item', { field: field, onClick: this.onAppend }));
+    var addItem = undefined;
+    if (!this.isReadOnly()) {
+      addItem = config.createElement('add-item', { field: field, onClick: this.onAppend });
+    }
+
+    return R.div({ className: cx(this.props.classes) }, typeChoices, ' ', addItem);
   }
 });

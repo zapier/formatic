@@ -27,9 +27,11 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
+    var tabIndex = this.isReadOnly() ? null : this.props.field.tabIndex;
+
     return this.props.config.createElement('pretty-text-input', {
       classes: this.props.classes,
-      tabIndex: this.props.field.tabIndex,
+      tabIndex: tabIndex,
       onChange: this.props.onChange,
       onFocus: this.props.onFocus,
       onBlur: this.props.onBlur,
@@ -40,7 +42,8 @@ module.exports = React.createClass({
       replaceChoices: this.props.config.fieldReplaceChoices(this.props.field),
       onTagClick: this.onTagClick,
       ref: 'textBox',
-      readOnly: !this.props.isEnteringCustomValue
+      readOnly: !this.props.isEnteringCustomValue,
+      disabled: this.isReadOnly()
     });
   }
 
