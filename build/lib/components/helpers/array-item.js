@@ -43,8 +43,13 @@ module.exports = React.createClass({
       classes['maybe-removing'] = true;
     }
 
+    var arrayItemControl = undefined;
+    if (!config.fieldIsReadOnly(field)) {
+      config.createElement('array-item-control', { field: field, index: this.props.index, numItems: this.props.numItems,
+        onMove: this.props.onMove, onRemove: this.props.onRemove, onMaybeRemove: this.onMaybeRemove });
+    }
+
     return R.div({ className: cx(classes) }, config.createElement('array-item-value', { field: field, index: this.props.index,
-      onChange: this.props.onChange, onAction: this.onBubbleAction }), config.createElement('array-item-control', { field: field, index: this.props.index, numItems: this.props.numItems,
-      onMove: this.props.onMove, onRemove: this.props.onRemove, onMaybeRemove: this.onMaybeRemove }));
+      onChange: this.props.onChange, onAction: this.onBubbleAction }), arrayItemControl);
   }
 });

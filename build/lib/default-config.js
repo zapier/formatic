@@ -410,6 +410,10 @@ module.exports = function (config) {
         field.value = config.inflateFieldValue(field);
       }
 
+      if (props.readOnly) {
+        field.readOnly = true;
+      }
+
       return field;
     },
 
@@ -886,6 +890,17 @@ module.exports = function (config) {
     },
 
     fieldMatch: delegateTo('fieldTemplateMatch'),
+
+    // Return true if field is read-only, or is a descendant of a read-only field
+    fieldIsReadOnly: function fieldIsReadOnly(field) {
+      if (field.readOnly) {
+        return true;
+      } else if (field.parent) {
+        return config.fieldIsReadOnly(field.parent);
+      } else {
+        return false;
+      }
+    },
 
     // Other helpers
 

@@ -50,5 +50,9 @@ module.exports = {
   // Delegate rendering back to config so it can be wrapped.
   renderWithConfig: function renderWithConfig() {
     return this.props.config.renderFieldComponent(this);
+  },
+
+  isReadOnly: function isReadOnly() {
+    return this.props.config.fieldIsReadOnly(this.props.field);
   }
 };

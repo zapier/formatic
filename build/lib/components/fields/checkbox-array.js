@@ -68,7 +68,8 @@ module.exports = React.createClass({
         checked: field.value.indexOf(choice.value) >= 0 ? true : false,
         onChange: this.onChange,
         onFocus: this.onFocusAction,
-        onBlur: this.onBlurAction
+        onBlur: this.onBlurAction,
+        disabled: this.isReadOnly()
       }), ' ', R.span({ className: 'field-choice-label' }, choice.label));
 
       if (isInline) {

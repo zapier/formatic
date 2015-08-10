@@ -63,6 +63,10 @@ module.exports = React.createClass({
       classes.optional = true;
     }
 
+    if (this.isReadOnly()) {
+      classes.readonly = true;
+    }
+
     return R.div({ className: cx(classes), style: { display: field.hidden ? 'none' : '' } }, config.createElement('label', {
       config: config, field: field,
       index: index, onClick: config.fieldIsCollapsible(field) ? this.onClickLabel : null

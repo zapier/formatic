@@ -119,6 +119,11 @@ module.exports = React.createClass({
 
     var fields = config.createChildFields(field);
 
+    var arrayControl = undefined;
+    if (!config.fieldIsReadOnly(field)) {
+      config.createElement('array-control', { field: field, onAppend: this.onAppend });
+    }
+
     var numItems = field.value.length;
     return config.createElement('field', {
       field: field, plain: this.props.plain
@@ -135,6 +140,6 @@ module.exports = React.createClass({
         onChange: this.onChange,
         onAction: this.onBubbleAction
       });
-    }).bind(this))), config.createElement('array-control', { field: field, onAppend: this.onAppend })));
+    }).bind(this))), arrayControl));
   }
 });

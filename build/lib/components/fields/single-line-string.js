@@ -37,7 +37,8 @@ module.exports = React.createClass({
       className: cx(this.props.classes),
       onChange: this.onChange,
       onFocus: this.onFocusAction,
-      onBlur: this.onBlurAction
+      onBlur: this.onBlurAction,
+      readOnly: config.fieldIsReadOnly(field)
     }));
   }
 });

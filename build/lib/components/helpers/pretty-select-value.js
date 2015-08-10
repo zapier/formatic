@@ -84,16 +84,20 @@ module.exports = React.createClass({
     if (choices.length > 1 && choices[0].value === '///loading///' || config.fieldIsLoading(field)) {
       choices = [{ value: '///loading///' }];
     }
-    var choicesElem = config.createElement('choices', {
-      ref: 'choices',
-      choices: choices,
-      open: this.state.isChoicesOpen,
-      ignoreCloseNodes: this.getCloseIgnoreNodes,
-      onSelect: this.onSelectChoice,
-      onClose: this.onCloseChoices,
-      onChoiceAction: this.onChoiceAction,
-      field: field
-    });
+
+    var choicesElem = undefined;
+    if (!this.isReadOnly()) {
+      choicesElem = config.createElement('choices', {
+        ref: 'choices',
+        choices: choices,
+        open: this.state.isChoicesOpen,
+        ignoreCloseNodes: this.getCloseIgnoreNodes,
+        onSelect: this.onSelectChoice,
+        onClose: this.onCloseChoices,
+        onChoiceAction: this.onChoiceAction,
+        field: field
+      });
+    }
 
     var inputElem = this.getInputElement();
 
@@ -113,15 +117,20 @@ module.exports = React.createClass({
       });
     }
 
+    var selectArrow = undefined;
+    if (!this.isReadOnly()) {
+      selectArrow = React.createElement('span', { className: 'select-arrow' });
+    }
+
     choicesOrLoading = React.createElement(
       'div',
       { className: cx(_.extend({}, this.props.classes, { 'choices-open': this.state.isChoicesOpen })),
         onChange: this.onChange },
       React.createElement(
         'div',
-        { ref: 'toggle', onClick: this.onToggleChoices },
+        { ref: 'toggle', onClick: this.isReadOnly() ? null : this.onToggleChoices },
         inputElem,
-        React.createElement('span', { className: 'select-arrow' })
+        selectArrow
       ),
       choicesElem,
       React.createElement(

@@ -38,5 +38,9 @@ module.exports = {
 
   onBlurAction: function onBlurAction() {
     this.onStartAction('blur');
+  },
+
+  isReadOnly: function isReadOnly() {
+    return this.props.config.fieldIsReadOnly(this.props.field);
   }
 };
