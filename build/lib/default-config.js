@@ -410,6 +410,10 @@ module.exports = function (config) {
         field.value = config.inflateFieldValue(field);
       }
 
+      if (props.readOnly) {
+        field.readOnly = true;
+      }
+
       return field;
     },
 

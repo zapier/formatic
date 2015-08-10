@@ -255,3 +255,7 @@ div.pretty-text-box {
   content: '▼';
   vertical-align: middle;
 }
+
+.formatic .readonly {
+  background-color: LightGrey;
+}
