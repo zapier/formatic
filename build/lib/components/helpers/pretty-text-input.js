@@ -307,7 +307,10 @@ module.exports = React.createClass({
     }
   },
 
-  onTagClick: function onTagClick(pos) {
+  onTagClick: function onTagClick() {
+    var cursor = this.codeMirror.getCursor();
+    var pos = this.state.translator.getTrueTagPosition(this.state.value, cursor);
+
     this.setState({ selectedTagPos: pos });
     this.onToggleChoices();
   },
@@ -317,7 +320,7 @@ module.exports = React.createClass({
     var label = this.state.translator.getLabel(pos.tag);
     var config = this.props.config;
 
-    var props = { tag: pos.tag, pos: pos, replaceChoices: this.state.replaceChoices, onClick: this.onTagClick, field: this.props.field };
+    var props = { onClick: this.onTagClick };
 
     React.render(config.createElement('pretty-tag', props, label), node);
 

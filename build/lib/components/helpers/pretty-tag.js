@@ -15,9 +15,6 @@ module.exports = React.createClass({
   displayName: 'PrettyTag',
 
   propTypes: {
-    tag: React.PropTypes.string,
-    pos: React.PropTypes.object,
-    replaceChoices: React.PropTypes.array,
     onClick: React.PropTypes.func,
     classes: React.PropTypes.object
   },
@@ -28,18 +25,12 @@ module.exports = React.createClass({
     return this.renderWithConfig();
   },
 
-  onClick: function onClick() {
-    if (this.props.onClick) {
-      this.props.onClick(this.props.pos);
-    }
-  },
-
   renderDefault: function renderDefault() {
     var classes = cx(_.extend({}, this.props.classes, { 'pretty-part': true }));
 
     return React.createElement(
       'span',
-      { className: classes, onClick: this.onClick },
+      { className: classes, onClick: this.props.onClick },
       this.props.children
     );
   }

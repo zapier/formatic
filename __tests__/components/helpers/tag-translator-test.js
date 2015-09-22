@@ -44,5 +44,21 @@ describe('editor-util', function () {
     ]);
   });
 
+  it('should find tag at position', () => {
+    const text = 'Here there {{lastName}}, {{firstName}}.\nHow are you {{firstName}}?';
 
+    expect(translator.getTrueTagPosition(text, {line: 0, ch: 11})).toEqual({
+      line: 0, start: 11, stop: 23, tag: 'lastName'
+    });
+
+    expect(translator.getTrueTagPosition(text, {line: 0, ch: 12})).toEqual({
+      line: 0, start: 11, stop: 23, tag: 'lastName'
+    });
+
+    expect(translator.getTrueTagPosition(text, {line: 0, ch: 23})).toEqual({
+      line: 0, start: 11, stop: 23, tag: 'lastName'
+    });
+
+    expect(translator.getTrueTagPosition(text, {line: 0, ch: 24})).toBeUndefined();
+  });
 });
