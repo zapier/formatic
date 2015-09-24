@@ -320,7 +320,7 @@ module.exports = React.createClass({
     var label = this.state.translator.getLabel(pos.tag);
     var config = this.props.config;
 
-    var props = { onClick: this.onTagClick };
+    var props = { onClick: this.onTagClick, field: this.props.field, tag: pos.tag };
 
     React.render(config.createElement('pretty-tag', props, label), node);
 
