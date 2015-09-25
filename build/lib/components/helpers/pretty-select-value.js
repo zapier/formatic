@@ -225,8 +225,9 @@ module.exports = React.createClass({
 
     //var currentChoice = this.currentChoice();
     var currentValue = this.value();
+    var isDefaultValue = currentValue === this.props.config.fieldTemplateDefaultValue(this.props.field);
 
-    if (this.state.isEnteringCustomValue || !currentChoice && currentValue) {
+    if (this.state.isEnteringCustomValue || !isDefaultValue && !currentChoice && currentValue) {
       if (this.hasCustomField()) {
         var choices = this.props.choices;
 
@@ -242,6 +243,11 @@ module.exports = React.createClass({
 
     if (currentChoice) {
       return currentChoice.label;
+    }
+
+    // If this is the default value, and we have no choice to use for the label, just use the value.
+    if (isDefaultValue) {
+      return currentValue;
     }
 
     return this.props.config.fieldPlaceholder(this.props.field) || '';
