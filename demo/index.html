@@ -46,50 +46,64 @@
       console.log(event);
     };
 
-    const {ComponentContainer, StringInput} = Formatic;
-
-    const components = {
-      StringInputView: (props) => ({
-        render() {
-          return <span>{props.value || props.defaultValue}</span>;
-        }
-      })
-    }
+    // const {ComponentContainer, StringInput} = Formatic;
+    //
+    // const components = {
+    //   StringInputView: (props) => ({
+    //     render() {
+    //       return <span>{props.value || props.defaultValue}</span>;
+    //     }
+    //   })
+    // }
 
     React.render(
-      // <Formatic.Input onChange={onChange}>
-      //   {
-      //     ({onChange}) => <input type="text" onChange={onChange}/>
-      //   }
-      // </Formatic.Input>
-
-      <ComponentContainer components={components}>
-      {
-        Component => (
-          <Component $type="StringInput" defaultValue="hello" onChange={onChange}/>
-        )
-      }
-      </ComponentContainer>
-
-      //<StringInput defaultValue="hello" onChange={onChange}/>
-
-      // const {FieldContainer, StringInput} = Formatic;
-      //
-      // <Formatic>
-      //   <FieldContainer fieldKey="name" onChange={onChange}>
-      //     <StringInput/>
-      //   </FieldContainer>
-      // </Formatic>
-      // <UncontrolledContainer defaultValue="hello" onChange={onChange}>
-      //   <StringInput/>
-      // </UncontrolledContainer>
-      ,
-      // <Formatic defaultValue="hello">
-      //   <Formatic.StringInput/>
-      //   <Formatic.Input type="String"/>
-      // </Formatic>,
+      <Formatic.StringInput onChange={onChange}/>,
       document.getElementById('user')
-    )
+    );
+    //
+    //   <Formatic.StringInput onChange={onChange}>
+    //   ,
+    //
+    //
+    //   // <Formatic.Input onChange={onChange}>
+    //   //   {
+    //   //     ({onChange}) => <input type="text" onChange={onChange}/>
+    //   //   }
+    //   // </Formatic.Input>
+    //   //
+    //   // <ComponentContainer components={components}>
+    //   // {
+    //   //   Component => (
+    //   //     <Component $type="StringInput" defaultValue="hello" onChange={onChange}/>
+    //   //   )
+    //   // }
+    //   // </ComponentContainer>
+    //   //
+    //   // <Formatic.StringField value="foo" label="Hello"/>
+    //
+    //   // <Formatic components={components}>
+    //   //
+    //   // </Formatic>
+    //
+    //   //<StringInput defaultValue="hello" onChange={onChange}/>
+    //
+    //   // const {FieldContainer, StringInput} = Formatic;
+    //   //
+    //   // <Formatic>
+    //   //   <FieldContainer fieldKey="name" onChange={onChange}>
+    //   //     <StringInput/>
+    //   //   </FieldContainer>
+    //   // </Formatic>
+    //   // <UncontrolledContainer defaultValue="hello" onChange={onChange}>
+    //   //   <StringInput/>
+    //   // </UncontrolledContainer>
+    //   ,
+    //   // <Formatic defaultValue="hello">
+    //   //   <Formatic.StringInput/>
+    //   //   <Formatic.Input type="String"/>
+    //   // </Formatic>,
+    //   document.getElementById('user')
+    // )
 
     // const Fields = Formatic.fields;
     // const Helpers = Formatic.helpers;
