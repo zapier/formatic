@@ -121,7 +121,7 @@ module.exports = React.createClass({
 
     var arrayControl = undefined;
     if (!config.fieldIsReadOnly(field)) {
-      config.createElement('array-control', { field: field, onAppend: this.onAppend });
+      arrayControl = config.createElement('array-control', { field: field, onAppend: this.onAppend });
     }
 
     var numItems = field.value.length;
