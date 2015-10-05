@@ -276,11 +276,16 @@ module.exports = React.createClass({
         this.refs.customInput.setChoicesOpen(true);
       });
     } else {
-      this.setState({
-        isChoicesOpen: !!choice.isOpen
-      });
       if (choice.action === 'clear-current-choice') {
+        this.setState({
+          isChoicesOpen: false,
+          isEnteringCustomValue: false
+        });
         this.props.onChange('');
+      } else {
+        this.setState({
+          isChoicesOpen: !!choice.isOpen
+        });
       }
     }
 
