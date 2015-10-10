@@ -52,6 +52,11 @@ module.exports = React.createClass({
     }).bind(this));
 
     this.adjustSize();
+    this.updateListeningToWindow();
+  },
+
+  componentWillUnmount: function componentWillUnmount() {
+    this.stopListeningToWindow();
   },
 
   onSelect: function onSelect(choice, event) {
@@ -78,6 +83,28 @@ module.exports = React.createClass({
     this.props.onClose();
   },
 
+  updateListeningToWindow: function updateListeningToWindow() {
+    if (this.refs.choices) {
+      if (!this.isListening) {
+        window.addEventListener('resize', this.onResizeWindow);
+        window.addEventListener('scroll', this.onScrollWindow);
+        this.isListening = true;
+      }
+    } else {
+      if (this.isListening) {
+        this.stopListeningToWindow();
+      }
+    }
+  },
+
+  stopListeningToWindow: function stopListeningToWindow() {
+    if (this.isListening) {
+      window.removeEventListener('resize', this.onResizeWindow);
+      window.removeEventListener('scroll', this.onScrollWindow);
+      this.isListening = false;
+    }
+  },
+
   onResizeWindow: function onResizeWindow() {
     this.adjustSize();
   },
@@ -88,7 +115,7 @@ module.exports = React.createClass({
 
   adjustSize: function adjustSize() {
     if (this.refs.choices) {
-      var node = this.refs.choices.getDOMNode();
+      var node = this.refs.container.getDOMNode();
       var rect = node.getBoundingClientRect();
       var top = rect.top;
       var windowHeight = window.innerHeight;
@@ -106,12 +133,20 @@ module.exports = React.createClass({
 
     this.setState(nextState, (function () {
       this.adjustSize();
+      this.updateListeningToWindow();
     }).bind(this));
   },
 
-  onScroll: function onScroll() {},
+  onScroll: function onScroll() {
+    // console.log('stop that!')
+    // event.preventDefault();
+    // event.stopPropagation();
+  },
 
-  onWheel: function onWheel() {},
+  onWheel: function onWheel() {
+    // event.preventDefault();
+    // event.stopPropagation();
+  },
 
   onHeaderClick: function onHeaderClick(choice) {
     if (this.state.openSection === choice.sectionKey) {
@@ -240,10 +275,3 @@ module.exports = React.createClass({
     return null;
   }
 });
-
-// console.log('stop that!')
-// event.preventDefault();
-// event.stopPropagation();
-
-// event.preventDefault();
-// event.stopPropagation();

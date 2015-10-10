@@ -536,8 +536,8 @@ module.exports = React.createClass({
       this.undo();
       // Cmd-Shift-Z or Ctrl-Y
     } else if (event.keyCode === 89 && event.ctrlKey && !event.shiftKey || event.keyCode === 90 && event.metaKey && event.shiftKey) {
-      this.redo();
-    }
+        this.redo();
+      }
   },
 
   onKeyUp: function onKeyUp(event) {
@@ -676,7 +676,15 @@ module.exports = React.createClass({
     return this.refs.toggle.getDOMNode();
   },
 
-  onClickOutsideChoices: function onClickOutsideChoices() {},
+  onClickOutsideChoices: function onClickOutsideChoices() {
+    // // If we didn't click on the toggle button, close the choices.
+    // if (this.isNodeOutside(this.refs.toggle.getDOMNode(), event.target)) {
+    //   console.log('not a toggle click')
+    //   this.setState({
+    //     isChoicesOpen: false
+    //   });
+    // }
+  },
 
   onMouseMove: function onMouseMove(event) {
     // Placeholder to get at pill under mouse position. Inefficient, but not
@@ -759,11 +767,3 @@ module.exports = React.createClass({
     })));
   }
 });
-
-// // If we didn't click on the toggle button, close the choices.
-// if (this.isNodeOutside(this.refs.toggle.getDOMNode(), event.target)) {
-//   console.log('not a toggle click')
-//   this.setState({
-//     isChoicesOpen: false
-//   });
-// }
