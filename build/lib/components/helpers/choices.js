@@ -137,16 +137,9 @@ module.exports = React.createClass({
     }).bind(this));
   },
 
-  onScroll: function onScroll() {
-    // console.log('stop that!')
-    // event.preventDefault();
-    // event.stopPropagation();
-  },
+  onScroll: function onScroll() {},
 
-  onWheel: function onWheel() {
-    // event.preventDefault();
-    // event.stopPropagation();
-  },
+  onWheel: function onWheel() {},
 
   onHeaderClick: function onHeaderClick(choice) {
     if (this.state.openSection === choice.sectionKey) {
@@ -275,3 +268,10 @@ module.exports = React.createClass({
     return null;
   }
 });
+
+// console.log('stop that!')
+// event.preventDefault();
+// event.stopPropagation();
+
+// event.preventDefault();
+// event.stopPropagation();
