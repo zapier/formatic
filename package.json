@@ -57,7 +57,8 @@
   "dependencies": {
     "classnames": "^2.1.1",
     "deep-equal": "^1.0.0",
-    "object-assign": "^2.0.0"
+    "object-assign": "^2.0.0",
+    "react-scroll-lock": "^0.1.1"
   },
   "peerDependencies": {
     "react": ">=0.13"

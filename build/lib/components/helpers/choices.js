@@ -9,6 +9,7 @@ Render customized (non-native) dropdown choices.
 var React = require('react/addons');
 var R = React.DOM;
 var _ = require('../../undash');
+var ScrollLock = require('react-scroll-lock');
 
 var magicChoiceRe = /^\/\/\/[^\/]+\/\/\/$/;
 
@@ -19,7 +20,7 @@ module.exports = React.createClass({
   mixins: [require('../../mixins/helper'),
   //plugin.require('mixin.resize'),
   //plugin.require('mixin.scroll'),
-  require('../../mixins/click-outside')],
+  require('../../mixins/click-outside'), ScrollLock],
 
   getInitialState: function getInitialState() {
     return {
@@ -123,7 +124,7 @@ module.exports = React.createClass({
       var rect = node.getBoundingClientRect();
       var top = rect.top;
       var windowHeight = window.innerHeight;
-      var height = windowHeight - top;
+      var height = Math.min(windowHeight - top, windowHeight);
       if (height !== this.state.maxHeight) {
         this.setState({
           maxHeight: height
@@ -142,10 +143,6 @@ module.exports = React.createClass({
       this.updateListeningToWindow();
     }).bind(this));
   },
-
-  onScroll: function onScroll() {},
-
-  onWheel: function onWheel() {},
 
   onHeaderClick: function onHeaderClick(choice) {
     if (this.state.openSection === choice.sectionKey) {
@@ -244,7 +241,7 @@ module.exports = React.createClass({
     }
 
     if (this.props.open) {
-      return R.div({ ref: 'container', onWheel: this.onWheel, onScroll: this.onScroll, onClick: this.onClick,
+      return R.div({ ref: 'container', onClick: this.onClick,
         className: 'choices-container', style: {
           userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
           maxHeight: this.state.maxHeight ? this.state.maxHeight : null
@@ -274,10 +271,3 @@ module.exports = React.createClass({
     return null;
   }
 });
-
-// console.log('stop that!')
-// event.preventDefault();
-// event.stopPropagation();
-
-// event.preventDefault();
-// event.stopPropagation();
