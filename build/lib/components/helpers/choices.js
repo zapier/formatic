@@ -83,12 +83,26 @@ module.exports = React.createClass({
     this.props.onClose();
   },
 
+  // Doing something a little crazy... measuring on every frame. Makes this smoother than using an interval.
+  // Can't using scrolling events, because we might be scrolling inside a container instead of the body.
+  // Shouldn't be any more costly than animations though, I think. And only one of these is open at a time.
   updateListeningToWindow: function updateListeningToWindow() {
+    var _this = this;
+
     if (this.refs.choices) {
       if (!this.isListening) {
-        window.addEventListener('resize', this.onResizeWindow);
-        window.addEventListener('scroll', this.onScrollWindow);
-        this.isListening = true;
+        (function () {
+          var listenToFrame = function listenToFrame() {
+            requestAnimationFrame(function () {
+              _this.adjustSize();
+              if (_this.isListening) {
+                listenToFrame();
+              }
+            });
+          };
+          _this.isListening = true;
+          listenToFrame();
+        })();
       }
     } else {
       if (this.isListening) {
@@ -99,18 +113,8 @@ module.exports = React.createClass({
 
   stopListeningToWindow: function stopListeningToWindow() {
     if (this.isListening) {
-      window.removeEventListener('resize', this.onResizeWindow);
-      window.removeEventListener('scroll', this.onScrollWindow);
       this.isListening = false;
     }
-  },
-
-  onResizeWindow: function onResizeWindow() {
-    this.adjustSize();
-  },
-
-  onScrollWindow: function onScrollWindow() {
-    this.adjustSize();
   },
 
   adjustSize: function adjustSize() {
@@ -120,9 +124,11 @@ module.exports = React.createClass({
       var top = rect.top;
       var windowHeight = window.innerHeight;
       var height = windowHeight - top;
-      this.setState({
-        maxHeight: height
-      });
+      if (height !== this.state.maxHeight) {
+        this.setState({
+          maxHeight: height
+        });
+      }
     }
   },
 
@@ -157,7 +163,7 @@ module.exports = React.createClass({
   },
 
   visibleChoices: function visibleChoices() {
-    var _this = this;
+    var _this2 = this;
 
     var choices = this.props.choices;
     var config = this.props.config;
@@ -171,7 +177,7 @@ module.exports = React.createClass({
         if (choice.sectionKey) {
           return true;
         }
-        return config.isSearchStringInChoice(_this.state.searchString, choice);
+        return config.isSearchStringInChoice(_this2.state.searchString, choice);
       });
     }
 
