@@ -143,8 +143,16 @@ module.exports = React.createClass({
       onSelect: this.handleChoiceSelection,
       onClose: this.onCloseChoices,
       isAccordion: this.props.isAccordion,
-      field: this.props.field
+      field: this.props.field,
+      onChoiceAction: this.onChoiceAction
     });
+  },
+
+  onChoiceAction: function onChoiceAction(choice) {
+    this.setState({
+      isChoicesOpen: !!choice.isOpen
+    });
+    this.onStartAction(choice.action, choice);
   },
 
   render: function render() {

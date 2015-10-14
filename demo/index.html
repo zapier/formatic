@@ -196,7 +196,16 @@
       {id: 'silly', type: 'copy', help_text_html: 'What the hey? <b>Seriously?</b>'},
       {label: 'Note', type: 'text', key: 'note', required: true},
       {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},
-      {label: 'Groceries', type: 'text', key: 'groceries', selectedReplaceChoices: [{value: 'secret', label: 'KFC'}], replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
+      {
+        label: 'Groceries', type: 'text', key: 'groceries', selectedReplaceChoices: [{value: 'secret', label: 'KFC'}],
+        replaceChoices: [
+          'tacos', 'nachos', 'bread', 'milk', 'eggs',
+          {
+            label: 'Order Groceries',
+            action: 'order-groceries'
+          }
+        ]
+      },
       {label: 'Path', type: 'unicode', key: 'path', replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs']},
       {
         label: 'Robots (R)', type: 'list', key: 'robots', required: true,
@@ -334,6 +343,10 @@
       console.log('on clear current choice', info);
     }
 
+    var onOrderGroceries = function (info) {
+      console.log('ordering...', info);
+    }
+
     // Controlled version:
 
     var render = function (value) {
@@ -353,6 +366,7 @@
         onOpenReplacements: onOpenReplacements,
         onCloseReplacements: onCloseReplacements,
         onClearCurrentChoice: onClearCurrentChoice,
+        onOrderGroceries: onOrderGroceries,
         readOnly: false
       }), document.getElementById('user'));
     };
