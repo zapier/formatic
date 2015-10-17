@@ -20,6 +20,7 @@
   "license": "MIT",
   "devDependencies": {
     "babel": "^5.4.7",
+    "babel-core": "^5.8.25",
     "babel-eslint": "^3.0.1",
     "babel-jest": "^4.0.0",
     "babelify": "^5.0.3",
@@ -42,8 +43,9 @@
     "gulp-shell": "^0.2.8",
     "jest-cli": "^0.4.0",
     "portscanner": "^1.0.0",
+    "react": "^0.14.0",
     "react-bootstrap": "^0.23.0",
-    "react-router": "^0.13.3",
+    "react-router": "^1.0.0-rc3",
     "react-tools": "^0.12.2",
     "require-dir": "^0.1.0",
     "run-sequence": "^1.0.2",
@@ -54,7 +56,7 @@
     "watchify": "https://registry.npmjs.org/watchify/-/watchify-2.1.1.tgz"
   },
   "dependencies": {
-    "classnames": "^2.1.1",
+    "classnames": "^2.1.5",
     "deep-equal": "^1.0.0",
     "object-assign": "^2.0.0"
   },

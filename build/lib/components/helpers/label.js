@@ -1,57 +1,29 @@
-// # label component
-
-/*
-Just the label for a field.
-*/
-
 'use strict';
 
-var React = require('react/addons');
-var R = React.DOM;
-var cx = require('classnames');
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-module.exports = React.createClass({
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var Label = _react2['default'].createClass({
   displayName: 'Label',
 
-  mixins: [require('../../mixins/helper')],
-
   render: function render() {
-    return this.renderWithConfig();
-  },
+    var _props$label = this.props.label;
+    var label = _props$label === undefined ? '' : _props$label;
 
-  renderDefault: function renderDefault() {
-    var config = this.props.config;
-    var field = this.props.field;
-
-    var fieldLabel = config.fieldLabel(field);
-
-    var label = null;
-    if (typeof this.props.index === 'number') {
-      label = '' + (this.props.index + 1) + '.';
-      if (fieldLabel) {
-        label = label + ' ' + fieldLabel;
-      }
-    }
-
-    if (fieldLabel || label) {
-      var text = label || fieldLabel;
-      if (this.props.onClick) {
-        text = R.a({ href: 'JavaScript' + ':', onClick: this.props.onClick }, text);
-      }
-      label = R.label({}, text);
-    }
-
-    var requiredOrNot;
-
-    if (!config.fieldHasValueChildren(field)) {
-      requiredOrNot = R.span({
-        className: config.fieldIsRequired(field) ? 'required-text' : 'not-required-text'
-      });
-    }
-
-    return R.div({
-      className: cx(this.props.classes)
-    }, label, ' ', requiredOrNot);
+    return _react2['default'].createElement(
+      'div',
+      null,
+      label
+    );
   }
 });
+
+exports['default'] = Label;
+module.exports = exports['default'];

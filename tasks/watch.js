@@ -35,23 +35,25 @@ gulp.task('watch-style', function () {
   return gulp.watch(['./style/*.css'], ['copy-style']);
 });
 
-gulp.task('watch-docs-bundle', function (done) {
-  gaze('live/formatic/lib/bundle.js', function (err, watcher) {
-    watcher.on('all', function () {
-      watcher.close();
-      done(err);
-    });
-  });
-  plugins.run('watchify -e docs/index.js -d --ignore-transform=browserify-shim -o live/formatic/lib/bundle.js').exec();
-});
-
-gulp.task('watch-docs-build', ['watch-docs-bundle'], function () {
-  return gulp.watch(['live/formatic/lib/bundle.js'], ['docs-build-site']);
-});
+// gulp.task('watch-docs-bundle', function (done) {
+//   gaze('live/formatic/lib/bundle.js', function (err, watcher) {
+//     watcher.on('all', function () {
+//       watcher.close();
+//       done(err);
+//     });
+//   });
+//   plugins.run('watchify -e docs/index.js -d --ignore-transform=browserify-shim -o live/formatic/lib/bundle.js').exec();
+// });
+//
+// gulp.task('watch-docs-build', ['watch-docs-bundle'], function () {
+//   return gulp.watch(['live/formatic/lib/bundle.js'], ['docs-build-site']);
+// });
 
 gulp.task('watch', ['watch-bundle'], function (done) {
   run(
-    ['watch-build', 'watch-docs-build', 'watch-demo', 'watch-style', 'watch-test'],
+    ['watch-build',
+    //'watch-docs-build',
+    'watch-demo', 'watch-style', 'watch-test'],
     done
   );
 });

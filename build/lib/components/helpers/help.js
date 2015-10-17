@@ -1,29 +1,28 @@
-// # help component
-
-/*
-Just the help text block.
-*/
-
 'use strict';
 
-var React = require('react/addons');
-var R = React.DOM;
-var cx = require('classnames');
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 
-module.exports = React.createClass({
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var Help = _react2['default'].createClass({
   displayName: 'Help',
 
-  mixins: [require('../../mixins/helper')],
-
   render: function render() {
-    return this.renderWithConfig();
-  },
+    var help = this.props.help;
 
-  renderDefault: function renderDefault() {
-
-    var helpText = this.props.config.fieldHelpText(this.props.field);
-
-    return helpText ? R.div({ className: cx(this.props.classes), dangerouslySetInnerHTML: { __html: helpText } }) : R.span(null);
+    return !help ? null : _react2['default'].createElement(
+      'div',
+      null,
+      help
+    );
   }
 });
+
+exports['default'] = Help;
+module.exports = exports['default'];

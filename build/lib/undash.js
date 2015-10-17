@@ -68,4 +68,14 @@ _.each = function (obj, iterateFn) {
   });
 };
 
+_.object = function (array) {
+  var obj = {};
+
+  array.forEach(function (pair) {
+    obj[pair[0]] = pair[1];
+  });
+
+  return obj;
+};
+
 module.exports = _;

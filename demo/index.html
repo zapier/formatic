@@ -36,30 +36,52 @@
   <script src="./bower_components/underscore/underscore-min.js"></script>
   <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="./bower_components/codemirror/lib/codemirror.js"></script>
+  <script src="./bower_components/react/react.js"></script>
+  <script src="./bower_components/react/react-dom.js"></script>
   <script src="./bower_components/react/react-with-addons.js"></script>
-  <script src="./bower_components/react/JSXTransformer.js"></script>
+  <script src="./node_modules/babel-core/browser.js"></script>
 
   <script src="./lib/formatic-dev.js"></script>
-  <script type="text/jsx;harmony=true">
+  <script type="text/babel">
 
-    const onChange = (event) => {
-      console.log(event);
+    'use strict';
+
+    let user = {};
+
+    const onChange = (newValue, info) => {
+      console.log(newValue, info);
+      user = newValue;
+      render();
     };
 
-    // const {ComponentContainer, StringInput} = Formatic;
-    //
-    // const components = {
-    //   StringInputView: (props) => ({
-    //     render() {
-    //       return <span>{props.value || props.defaultValue}</span>;
-    //     }
-    //   })
-    // }
+    const components = Formatic.components;
 
-    React.render(
-      <Formatic.StringInput onChange={onChange}/>,
-      document.getElementById('user')
-    );
+    const render = () => {
+      ReactDOM.render(
+
+        <Formatic.ObjectContainer components={components} value={user} onChange={onChange}>
+          <div>
+            <Formatic.WithContext.ChildStringField label="First Name" parentValue={user} childKey="firstName"/>
+            <Formatic.WithContext.ChildStringField label="Last Name" parentValue={user} childKey="lastName"/>
+          </div>
+        </Formatic.ObjectContainer>
+
+        // <Formatic.ObjectContainer components={components} value={user} onChange={onChange}>
+        // {
+        //   ({onChangeChild}) => (
+        //     <div>
+        //       <Formatic.ChildStringField label="First Name" components={components} parentValue={user} childKey="firstName" onChange={onChangeChild}/>
+        //       <Formatic.ChildStringField label="Last Name" components={components} parentValue={user} childKey="lastName" onChange={onChangeChild}/>
+        //     </div>
+        //   )
+        // }
+        // </Formatic.ObjectContainer>
+        ,
+        document.getElementById('user')
+      );
+    };
+
+    render();
     //
     //   <Formatic.StringInput onChange={onChange}>
     //   ,

@@ -1,43 +1,14 @@
-// # string component
+"use strict";
 
-/*
-Render a field that can edit a string value.
-*/
-
-'use strict';
-
-var React = require('react/addons');
-var R = React.DOM;
-var cx = require('classnames');
-
-module.exports = React.createClass({
-
-  displayName: 'String',
-
-  mixins: [require('../../mixins/field')],
-
-  onChange: function onChange(event) {
-    this.onChangeValue(event.target.value);
-  },
-
-  render: function render() {
-    return this.renderWithConfig();
-  },
-
-  renderDefault: function renderDefault() {
-
-    var config = this.props.config;
-    var field = this.props.field;
-
-    return config.createElement('field', {
-      config: config, field: field, plain: this.props.plain
-    }, R.textarea({
-      value: field.value,
-      className: cx(this.props.classes),
-      rows: field.rows || this.props.rows,
-      onChange: this.onChange,
-      onFocus: this.onFocusAction,
-      onBlur: this.onBlurAction
-    }));
-  }
-});
+// import React from 'react';
+//
+// const StringField = React.createClass({
+//
+//   render() {
+//     return (
+//       <Field {...this.props}
+//     );
+//   }
+// });
+//
+// export default StringField;
