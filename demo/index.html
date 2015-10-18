@@ -63,17 +63,26 @@
           <div>
             <Formatic.WithContext.ChildStringField label="First Name" parentValue={user} childKey="firstName"/>
             <Formatic.WithContext.ChildStringField label="Last Name" parentValue={user} childKey="lastName"/>
-            <Formatic.WithContext.ChildStringInputContainer hasEvent parentValue={user} childKey="mood">
-            {
-              props => (
-                <input type="text" {...props}/>
-              )
-            }
-            </Formatic.WithContext.ChildStringInputContainer>
+            <Formatic.WithContext.ChildStringInputContainer hasEvent parentValue={user} childKey="mood"
+              onRender={
+                props => (
+                  <input type="text" {...props}/>
+                )
+              }
+            />
           </div>
         </Formatic.ObjectContainer>
 
-        // <Formatic.ObjectContainer components={components} value={user} onChange={onChange}>
+        // <Formatic.ObjectContainer components={components} value={user} onChange={onChange}
+        //   onRender={
+        //     ({onChangeChild}) => (
+        //       <div>
+        //         <Formatic.ChildStringField label="First Name" components={components} parentValue={user} childKey="firstName" onChange={onChangeChild}/>
+        //         <Formatic.ChildStringField label="Last Name" components={components} parentValue={user} childKey="lastName" onChange={onChangeChild}/>
+        //       </div>
+        //     )
+        //   }
+        // />
         // {
         //   ({onChangeChild}) => (
         //     <div>
