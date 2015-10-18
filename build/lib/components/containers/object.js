@@ -6,7 +6,7 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-function _defineProperty(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); }
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var _react = require('react');
 
@@ -21,7 +21,8 @@ var ObjectContainer = _react2['default'].createClass({
 
   propTypes: {
     value: _react2['default'].PropTypes.object,
-    onChange: _react2['default'].PropTypes.func.isRequired
+    onChange: _react2['default'].PropTypes.func.isRequired,
+    components: _react2['default'].PropTypes.object.isRequired
   },
 
   value: function value() {
@@ -34,20 +35,30 @@ var ObjectContainer = _react2['default'].createClass({
   },
 
   onChangeChild: function onChangeChild(newChildValue, info) {
-    var onChange = this.props.onChange;
-
     var key = info.path[0];
     var newValue = _undash2['default'].extend({}, this.value(), _defineProperty({}, key, newChildValue));
-    onChange(newValue, info);
+    this.props.onChange(newValue, info);
+  },
+
+  childContextTypes: {
+    onChangeChild: _react2['default'].PropTypes.func.isRequired,
+    components: _react2['default'].PropTypes.object.isRequired
+  },
+
+  getChildContext: function getChildContext() {
+    return {
+      onChangeChild: this.onChangeChild,
+      components: this.props.components
+    };
   },
 
   render: function render() {
     var children = this.props.children;
-    var onChangeChild = this.onChangeChild;
 
-    return children({
-      onChangeChild: onChangeChild
-    });
+    if (_undash2['default'].isFunction(children)) {
+      return children(this.getChildContext());
+    }
+    return children;
   }
 });
 

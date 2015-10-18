@@ -17,13 +17,17 @@ var _undash = require('../undash');
 var _undash2 = _interopRequireDefault(_undash);
 
 var useContext = function useContext(Component) {
-  var _ref = arguments[1] === undefined ? {} : arguments[1];
+  var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
+  var _ref$contextTypes = _ref.contextTypes;
+  var contextTypes = _ref$contextTypes === undefined ? {} : _ref$contextTypes;
   var _ref$contextToProps = _ref.contextToProps;
   var contextToProps = _ref$contextToProps === undefined ? {} : _ref$contextToProps;
 
   var UseContext = _react2['default'].createClass({
     displayName: 'UseContext',
+
+    contextTypes: contextTypes,
 
     propsFromContext: function propsFromContext() {
       var _this = this;

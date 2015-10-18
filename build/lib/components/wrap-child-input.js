@@ -8,6 +8,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
@@ -17,7 +19,7 @@ var _undash = require('../undash');
 var _undash2 = _interopRequireDefault(_undash);
 
 var wrapChildInput = function wrapChildInput(Input) {
-  var _ref = arguments[1] === undefined ? {} : arguments[1];
+  var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   var _ref$defaultValue = _ref.defaultValue;
   var defaultValue = _ref$defaultValue === undefined ? '' : _ref$defaultValue;
@@ -60,7 +62,13 @@ var wrapChildInput = function wrapChildInput(Input) {
       var onChange = this.onChange;
 
       var value = childValue();
-      return _react2['default'].createElement(Input, _extends({}, this.props, { value: value, onChange: onChange }));
+      var _props3 = this.props;
+      var parentKey = _props3.parentKey;
+      var childKey = _props3.childKey;
+
+      var props = _objectWithoutProperties(_props3, ['parentKey', 'childKey']);
+
+      return _react2['default'].createElement(Input, _extends({}, props, { value: value, onChange: onChange }));
     }
   });
 

@@ -7,6 +7,9 @@ Object.defineProperty(exports, '__esModule', {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports['default'] = wrapInput;
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
 var React = require('react');
 var u = require('../undash');
 
@@ -36,7 +39,7 @@ function wrapInput(InputComponent) {
 
     onChange: function onChange(newValue, info) {
 
-      if (InputComponent.hasEvent) {
+      if (InputComponent.hasEvent || this.props.hasEvent) {
         var _event = newValue;
         newValue = _event.target.value;
       }
@@ -53,7 +56,12 @@ function wrapInput(InputComponent) {
     },
 
     render: function render() {
-      return React.createElement(InputComponent, _extends({}, this.props, {
+      var _props = this.props;
+      var hasEvent = _props.hasEvent;
+
+      var props = _objectWithoutProperties(_props, ['hasEvent']);
+
+      return React.createElement(InputComponent, _extends({}, props, {
         value: this.state.value,
         onChange: this.onChange
       }));

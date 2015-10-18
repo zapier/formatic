@@ -6,6 +6,10 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
 var _undash = require('../undash');
 
 var _undash2 = _interopRequireDefault(_undash);
@@ -30,13 +34,13 @@ var _useContext = require('./use-context');
 
 var _useContext2 = _interopRequireDefault(_useContext);
 
-var _provideContext = require('./provide-context');
-
-var _provideContext2 = _interopRequireDefault(_provideContext);
-
 var _inputsString = require('./inputs/string');
 
 var _inputsString2 = _interopRequireDefault(_inputsString);
+
+var _containersStringInput = require('./containers/string-input');
+
+var _containersStringInput2 = _interopRequireDefault(_containersStringInput);
 
 var _containersObject = require('./containers/object');
 
@@ -54,40 +58,46 @@ var _helpersLabel = require('./helpers/label');
 
 var _helpersLabel2 = _interopRequireDefault(_helpersLabel);
 
-var components = {
-  StringInput: _inputsString2['default']
+var rawInputComponents = {
+  StringInput: _inputsString2['default'],
+  StringInputContainer: _containersStringInput2['default']
 };
 
-Object.keys(components).forEach(function (key) {
-  var PureComponent = (0, _wrapPure2['default'])(components[key]);
-  PureComponent.hasEvent = components[key].hasEvent;
-  components[key] = (0, _wrapInput2['default'])(PureComponent);
-});
+var components = {
+  WithContext: {}
+};
 
-Object.keys(components).forEach(function (key) {
-  components['Child' + key] = (0, _wrapChildInput2['default'])(components[key]);
+var useContextParam = {
+  contextTypes: {
+    onChangeChild: _react2['default'].PropTypes.func.isRequired,
+    components: _react2['default'].PropTypes.object.isRequired
+  },
+  contextToProps: { onChangeChild: 'onChange', components: 'components' }
+};
+
+Object.keys(rawInputComponents).forEach(function (key) {
+  var RawInputComponent = rawInputComponents[key];
+  var PureComponent = (0, _wrapPure2['default'])(RawInputComponent);
+  PureComponent.hasEvent = RawInputComponent.hasEvent;
+  var InputComponent = (0, _wrapInput2['default'])(PureComponent);
+  components[key] = InputComponent;
+  var ChildInputComponent = (0, _wrapChildInput2['default'])(InputComponent);
+  components['Child' + key] = ChildInputComponent;
+  components.WithContext['Child' + key] = (0, _useContext2['default'])(ChildInputComponent, useContextParam);
 });
 
 var inputTypes = ['String'];
 
-components.WithContext = {};
-
 inputTypes.forEach(function (inputType) {
-  var InputComponent = components['' + inputType + 'Input'];
+  var InputComponent = components[inputType + 'Input'];
   var FieldComponent = (0, _createField2['default'])(InputComponent);
-  components['' + inputType + 'Field'] = FieldComponent;
-  components['Child' + inputType + 'Field'] = (0, _wrapChildInput2['default'])(FieldComponent);
-  components.WithContext['' + inputType + 'Input'] = (0, _useContext2['default'])(InputComponent);
-  components.WithContext['' + inputType + 'Field'] = (0, _useContext2['default'])(FieldComponent);
+  components[inputType + 'Field'] = FieldComponent;
+  var ChildFieldComponent = (0, _wrapChildInput2['default'])(FieldComponent);
+  components['Child' + inputType + 'Field'] = ChildFieldComponent;
+  components.WithContext['Child' + inputType + 'Field'] = (0, _useContext2['default'])(ChildFieldComponent, useContextParam);
 });
 
-components.WithContext.ObjectContainer = (0, _provideContext2['default'])(_containersObject2['default'], {
-  childContext: function childContext(props) {
-    return {
-      components: props.components
-    };
-  }
-});
+console.log(components);
 
 _undash2['default'].extend(components, {
   ObjectContainer: _containersObject2['default'],

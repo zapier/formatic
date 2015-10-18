@@ -88,9 +88,16 @@ module.exports = React.createClass({
     }).bind(this));
   },
 
-  onScroll: function onScroll() {},
+  onScroll: function onScroll() {
+    // console.log('stop that!')
+    // event.preventDefault();
+    // event.stopPropagation();
+  },
 
-  onWheel: function onWheel() {},
+  onWheel: function onWheel() {
+    // event.preventDefault();
+    // event.stopPropagation();
+  },
 
   render: function render() {
     return this.renderWithConfig();
@@ -133,10 +140,3 @@ module.exports = React.createClass({
     return null;
   }
 });
-
-// console.log('stop that!')
-// event.preventDefault();
-// event.stopPropagation();
-
-// event.preventDefault();
-// event.stopPropagation();

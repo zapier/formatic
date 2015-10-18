@@ -63,6 +63,13 @@
           <div>
             <Formatic.WithContext.ChildStringField label="First Name" parentValue={user} childKey="firstName"/>
             <Formatic.WithContext.ChildStringField label="Last Name" parentValue={user} childKey="lastName"/>
+            <Formatic.WithContext.ChildStringInputContainer hasEvent parentValue={user} childKey="mood">
+            {
+              props => (
+                <input type="text" {...props}/>
+              )
+            }
+            </Formatic.WithContext.ChildStringInputContainer>
           </div>
         </Formatic.ObjectContainer>
 

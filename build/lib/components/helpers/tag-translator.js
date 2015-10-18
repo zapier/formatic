@@ -4,7 +4,7 @@ var _ = require('underscore');
 
 // Constant for first unused special use character.
 // See IMPLEMENTATION NOTE in pretty-text2.js.
-var FIRST_SPECIAL_CHAR = 57344;
+var FIRST_SPECIAL_CHAR = 0xe000;
 
 // regexp used to grep out tags like {{firstName}}
 var TAGS_REGEXP = /\{\{(.+?)\}\}/g;

@@ -11,7 +11,7 @@ var _react = require('react');
 var _react2 = _interopRequireDefault(_react);
 
 var provideContext = function provideContext(Component) {
-  var _ref = arguments[1] === undefined ? {} : arguments[1];
+  var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   var _ref$childContext = _ref.childContext;
   var childContext = _ref$childContext === undefined ? function () {

@@ -11,7 +11,7 @@ var _react = require('react');
 var _react2 = _interopRequireDefault(_react);
 
 var createField = function createField(Input) {
-  var _ref = arguments[1] === undefined ? {} : arguments[1];
+  var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
   var name = _ref.name;
 
