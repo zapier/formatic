@@ -19,7 +19,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "babel": "^5.4.7",
+    "babel": "^5.8.23",
     "babel-eslint": "^3.0.1",
     "babel-jest": "^4.0.0",
     "babelify": "^5.0.3",

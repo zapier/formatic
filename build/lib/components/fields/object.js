@@ -146,7 +146,7 @@ module.exports = React.createClass({
       keyOrder: keyOrder
     });
 
-    var newObj = _.extend(this.props.field.value);
+    var newObj = _.extend({}, this.props.field.value);
 
     var newValue = config.createNewChildFieldValue(field, itemChoiceIndex);
 
@@ -156,7 +156,7 @@ module.exports = React.createClass({
   },
 
   onRemove: function onRemove(key) {
-    var newObj = _.extend(this.props.field.value);
+    var newObj = _.extend({}, this.props.field.value);
     delete newObj[key];
     this.onChangeValue(newObj);
   },
@@ -167,7 +167,7 @@ module.exports = React.createClass({
       var keyOrder = this.state.keyOrder;
       var tempDisplayKeys = this.state.tempDisplayKeys;
 
-      var newObj = _.extend(this.props.field.value);
+      var newObj = _.extend({}, this.props.field.value);
 
       // If we already have the key we're moving to, then we have to change that
       // key to something else.

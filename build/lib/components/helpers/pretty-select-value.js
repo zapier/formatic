@@ -202,9 +202,10 @@ module.exports = React.createClass({
 
   currentChoice: function currentChoice(props) {
     props = props || this.props;
-    var config = props.config;
-    var field = props.field;
-    var choices = props.choices;
+    var _props2 = props;
+    var config = _props2.config;
+    var field = _props2.field;
+    var choices = _props2.choices;
 
     var currentValue = this.value(props);
     var currentChoice = config.fieldSelectedChoice(field);

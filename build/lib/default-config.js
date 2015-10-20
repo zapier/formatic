@@ -122,19 +122,19 @@ module.exports = function (config) {
 
     // Field default value factories. Give a default value for a specific type.
 
-    createDefaultValue_String: function createDefaultValue_String() {
+    createDefaultValue_String: function createDefaultValue_String() /* fieldTemplate */{
       return '';
     },
 
-    createDefaultValue_Object: function createDefaultValue_Object() {
+    createDefaultValue_Object: function createDefaultValue_Object() /* fieldTemplate */{
       return {};
     },
 
-    createDefaultValue_Array: function createDefaultValue_Array() {
+    createDefaultValue_Array: function createDefaultValue_Array() /* fieldTemplate */{
       return [];
     },
 
-    createDefaultValue_Boolean: function createDefaultValue_Boolean() {
+    createDefaultValue_Boolean: function createDefaultValue_Boolean() /* fieldTemplate */{
       return false;
     },
 
@@ -367,10 +367,10 @@ module.exports = function (config) {
     },
 
     // Initialize the root field.
-    initRootField: function initRootField() {},
+    initRootField: function initRootField() /* field, props */{},
 
     // Initialize every field.
-    initField: function initField() {},
+    initField: function initField() /* field */{},
 
     // If an array of field templates are passed in, this method is used to
     // wrap the fields inside a single root field template.
@@ -1010,4 +1010,3 @@ module.exports = function (config) {
     }
   };
 };
-/* fieldTemplate */ /* fieldTemplate */ /* fieldTemplate */ /* fieldTemplate */ /* field, props */ /* field */
