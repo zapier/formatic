@@ -16,7 +16,7 @@ module.exports = React.createClass({
 
   displayName: 'SelectValue',
 
-  mixins: [require('../../mixins/helper')],
+  mixins: [require('../../mixins/helper'), require('../../mixins/resize')],
 
   onChange: function onChange(event) {
     var choiceValue = event.target.value;
@@ -74,6 +74,10 @@ module.exports = React.createClass({
   },
 
   componentDidMount: function componentDidMount() {
+    this.updateChoicesWidth();
+  },
+
+  onResizeWindow: function onResizeWindow() {
     this.updateChoicesWidth();
   },
 
