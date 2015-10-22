@@ -22,7 +22,7 @@ module.exports = React.createClass({
     return React.createElement(
       'div',
       { className: 'choices-search' },
-      React.createElement('input', { type: 'text', placeholder: 'Search...', onChange: this.props.onChange })
+      React.createElement('input', { style: { width: this.props.width }, type: 'text', placeholder: 'Search...', onChange: this.props.onChange })
     );
   }
 

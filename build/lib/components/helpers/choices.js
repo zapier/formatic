@@ -237,7 +237,8 @@ module.exports = React.createClass({
     }
 
     if (hasSearch) {
-      search = config.createElement('choices-search', { field: this.props.field, onChange: this.onChangeSearch });
+      search = config.createElement('choices-search', { field: this.props.field, onChange: this.onChangeSearch,
+        width: this.props.width });
     }
 
     if (this.props.open) {
