@@ -237,14 +237,16 @@ module.exports = React.createClass({
     }
 
     if (hasSearch) {
-      search = config.createElement('choices-search', { field: this.props.field, onChange: this.onChangeSearch });
+      search = config.createElement('choices-search', { field: this.props.field, onChange: this.onChangeSearch,
+        width: this.props.width });
     }
 
     if (this.props.open) {
       return R.div({ ref: 'container', onClick: this.onClick,
         className: 'choices-container', style: {
           userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
-          maxHeight: this.state.maxHeight ? this.state.maxHeight : null
+          maxHeight: this.state.maxHeight ? this.state.maxHeight : null,
+          width: this.props.width ? this.props.width : null
         } }, config.cssTransitionWrapper(search, R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
 
         var choiceElement = null;
