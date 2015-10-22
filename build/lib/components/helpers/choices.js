@@ -244,7 +244,8 @@ module.exports = React.createClass({
       return R.div({ ref: 'container', onClick: this.onClick,
         className: 'choices-container', style: {
           userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
-          maxHeight: this.state.maxHeight ? this.state.maxHeight : null
+          maxHeight: this.state.maxHeight ? this.state.maxHeight : null,
+          width: this.props.width ? this.props.width : null
         } }, config.cssTransitionWrapper(search, R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
 
         var choiceElement = null;

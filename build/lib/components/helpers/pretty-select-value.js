@@ -54,14 +54,34 @@ module.exports = React.createClass({
       isChoicesOpen: this.props.isChoicesOpen,
       isEnteringCustomValue: !isDefaultValue && !currentChoice && this.props.field.value,
       // Caching this cause it's kind of expensive.
-      currentChoice: this.currentChoice(this.props)
+      currentChoice: this.currentChoice(this.props),
+      choicesWidth: null
     };
   },
 
   componentWillReceiveProps: function componentWillReceiveProps(newProps) {
+    var _this = this;
+
     var currentChoice = this.currentChoice(newProps);
     this.setState({
       currentChoice: currentChoice
+    });
+
+    // We only want to update when props change, not every `componentDidUpdate`. (Prevents infinite update loop.)
+    this.setState({}, function () {
+      _this.updateChoicesWidth();
+    });
+  },
+
+  componentDidMount: function componentDidMount() {
+    this.updateChoicesWidth();
+  },
+
+  updateChoicesWidth: function updateChoicesWidth() {
+    var container = this.refs.container.getDOMNode();
+    var width = container.getBoundingClientRect().width;
+    this.setState({
+      choicesWidth: width
     });
   },
 
@@ -96,6 +116,7 @@ module.exports = React.createClass({
         onSelect: this.onSelectChoice,
         onClose: this.onCloseChoices,
         onChoiceAction: this.onChoiceAction,
+        width: this.state.choicesWidth,
         field: field
       });
     }
@@ -125,7 +146,8 @@ module.exports = React.createClass({
 
     choicesOrLoading = React.createElement(
       'div',
-      { className: cx(_.extend({}, this.props.classes, { 'choices-open': this.state.isChoicesOpen })),
+      { ref: 'container',
+        className: cx(_.extend({}, this.props.classes, { 'choices-open': this.state.isChoicesOpen })),
         onChange: this.onChange },
       React.createElement(
         'div',
