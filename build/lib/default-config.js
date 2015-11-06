@@ -687,6 +687,10 @@ module.exports = function (config) {
     // Default value for a field template.
     fieldTemplateDefaultValue: function fieldTemplateDefaultValue(fieldTemplate) {
 
+      if (!_.isUndefined(fieldTemplate['default'])) {
+        return config.coerceValue(fieldTemplate, fieldTemplate['default']);
+      }
+
       return fieldTemplate['default'];
     },
 
