@@ -186,11 +186,15 @@ module.exports = function (config) {
 
     coerceValue_Select: delegateTo('coerceValue_String'),
 
+    coerceValue_PrettySelect: delegateTo('coerceValue_String'),
+
     coerceValue_Json: delegateTo('coerceValue_Object'),
 
     coerceValue_CheckboxArray: delegateTo('coerceValue_Array'),
 
     coerceValue_CheckboxBoolean: delegateTo('coerceValue_Boolean'),
+
+    coerceValue_PrettyBoolean: delegateTo('coerceValue_Boolean'),
 
     // Field child fields factories, so some types can have dynamic children.
 
