@@ -232,7 +232,7 @@ module.exports = React.createClass({
   },
 
   createCodeMirrorEditor: function createCodeMirrorEditor() {
-    var value = this.hasPlaceholder() ? this.props.field.placeholder : String(this.state.value);
+    var value = this.hasPlaceholder() ? this.props.config.fieldPlaceholder(this.props.field) : String(this.state.value);
 
     var options = {
       lineWrapping: true,

@@ -251,7 +251,7 @@ module.exports = React.createClass({
       return currentValue;
     }
 
-    return this.props.config.fieldPlaceholder(this.props.field) || '';
+    return '';
   },
 
   hasCustomField: function hasCustomField() {
