@@ -259,3 +259,7 @@ div.pretty-text-box {
 .formatic .readonly {
   background-color: LightGrey;
 }
+
+.formatic .placeholder {
+  font-style: italic;
+}

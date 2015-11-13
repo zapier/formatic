@@ -60,7 +60,8 @@ module.exports = React.createClass({
       codeMirrorMode: false,
       isChoicesOpen: false,
       replaceChoices: replaceChoices,
-      translator: translator
+      translator: translator,
+      hasChanged: false
     };
   },
 
@@ -75,9 +76,16 @@ module.exports = React.createClass({
     // Not sure what the null/undefined checks are here for, but changed from falsey which was breaking.
     if (this.state.value !== nextProps.value && !_.isUndefined(nextProps.value) && nextProps.value !== null) {
       nextState.value = toString(nextProps.value);
+      if (this.state.hasChanged === false) {
+        nextState.hasChanged = true;
+      }
     }
 
     this.setState(nextState);
+  },
+
+  onChange: function onChange(newValue) {
+    this.props.onChange(newValue);
   },
 
   handleChoiceSelection: function handleChoiceSelection(key, event) {
@@ -101,7 +109,7 @@ module.exports = React.createClass({
     } else if (this.props.readOnly) {
       // hackety hack to stop dropdown choices from toggling
       event.stopPropagation();
-      this.props.onChange('{{' + key + '}}');
+      this.onChange('{{' + key + '}}');
       this.setState({ isChoicesOpen: false });
     } else {
       this.switchToCodeMirror(selectChoice);
@@ -160,7 +168,10 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
-    var textBoxClasses = cx(_.extend({}, this.props.classes, { 'pretty-text-box': true }));
+    var textBoxClasses = cx(_.extend({}, this.props.classes, {
+      'pretty-text-box': true,
+      placeholder: this.hasPlaceholder()
+    }));
 
     // Render read-only version.
     return React.createElement(
@@ -207,7 +218,7 @@ module.exports = React.createClass({
   updateEditor: function updateEditor() {
     if (this.state.codeMirrorMode) {
       var codeMirrorValue = this.codeMirror.getValue();
-      if (codeMirrorValue !== this.state.value) {
+      if (!this.hasPlaceholder() && codeMirrorValue !== this.state.value) {
         // switch back to read-only mode to make it easier to render
         this.removeCodeMirrorEditor();
         this.createReadonlyEditor();
@@ -221,10 +232,13 @@ module.exports = React.createClass({
   },
 
   createCodeMirrorEditor: function createCodeMirrorEditor() {
+    var value = this.hasPlaceholder() ? this.props.field.placeholder : String(this.state.value);
+
     var options = {
       lineWrapping: true,
       tabindex: this.props.tabIndex,
-      value: String(this.state.value),
+      value: value,
+      readOnly: false,
       mode: null,
       extraKeys: {
         Tab: false
@@ -262,13 +276,26 @@ module.exports = React.createClass({
     }
 
     var newValue = this.codeMirror.getValue();
-    this.props.onChange(newValue);
+    this.onChange(newValue);
     this.setState({ value: newValue });
     this.tagCodeMirror();
   },
 
+  /* Return true if we should render the placeholder */
+  hasPlaceholder: function hasPlaceholder() {
+    return !this.state.hasChanged && this.props.field.placeholder && !this.state.value;
+  },
+
   createReadonlyEditor: function createReadonlyEditor() {
     var textBoxNode = this.refs.textBox.getDOMNode();
+
+    if (this.hasPlaceholder()) {
+      return React.render(React.createElement(
+        'span',
+        null,
+        this.props.field.placeholder
+      ), textBoxNode);
+    }
 
     var tokens = this.state.translator.tokenize(this.state.value);
     var self = this;
