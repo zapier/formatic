@@ -6,7 +6,7 @@ Render the item type choices and the add button.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var R = React.DOM;
 var cx = require('classnames');
 

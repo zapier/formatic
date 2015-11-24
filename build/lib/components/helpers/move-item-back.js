@@ -6,7 +6,7 @@ Button to move an item backwards in list.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var R = React.DOM;
 var cx = require('classnames');
 

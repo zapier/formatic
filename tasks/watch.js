@@ -12,7 +12,7 @@ gulp.task('watch-bundle', function (done) {
       done(err);
     });
   });
-  plugins.run('watchify -e index.js -d -s Formatic -x underscore -x react -x react/addons -o build/formatic-dev.js').exec();
+  plugins.run('watchify -e index.js -d -s Formatic -o build/formatic-dev.js').exec();
 });
 
 gulp.task('watch-build', function () {

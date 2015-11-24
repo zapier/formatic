@@ -16,6 +16,7 @@ gulp.task('server-express', ['copy-all-after-bundle', 'copy-docs-all-after-bundl
   app
     .use(require('connect-livereload')({port: lrPort}))
     .use('/', express.static('./live'))
+    .use('/node_modules/', express.static('./node_modules'))
     .use('/formatic', express.static('./build-docs'))
     .listen(APP_PORT, function() {
       console.log('app server listening on %d', APP_PORT);

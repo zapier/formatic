@@ -12,7 +12,7 @@ is what is actually exported.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var _ = require('./undash');
 
 var utils = require('./utils');

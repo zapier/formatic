@@ -2,7 +2,7 @@
 /* global CodeMirror */
 /*eslint no-script-url:0 */
 
-var React = require('react/addons');
+var React = require('react');
 var TagTranslator = require('./tag-translator');
 var _ = require('../../undash');
 var cx = require('classnames');

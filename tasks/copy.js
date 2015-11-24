@@ -19,17 +19,13 @@ gulp.task('copy-demo', ['mkdir-live'], function () {
   sh.cp('-f', './demo/*.html', './live');
 });
 
-gulp.task('copy-bower', ['mkdir-live'], function () {
-  sh.cp('-rf', './demo/bower_components', './live');
-});
-
 gulp.task('copy-style', ['mkdir-live'], function () {
   sh.cp('-rf', './style', './live');
 });
 
-gulp.task('copy-all', ['copy-build', 'copy-bower', 'copy-demo', 'copy-style']);
+gulp.task('copy-all', ['copy-build', 'copy-demo', 'copy-style']);
 
-gulp.task('copy-all-after-bundle', ['copy-build-after-bundle', 'copy-bower', 'copy-demo', 'copy-style']);
+gulp.task('copy-all-after-bundle', ['copy-build-after-bundle', 'copy-demo', 'copy-style']);
 
 gulp.task('copy-docs-build', ['mkdir-live-docs'], function () {
   sh.cp('-f', './build/formatic-dev.js', './live/formatic/lib');

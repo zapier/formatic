@@ -6,7 +6,7 @@ Render a dropdown to handle yes/no boolean values.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 
 module.exports = React.createClass({
 

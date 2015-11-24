@@ -6,7 +6,7 @@ Render a field that can edit a boolean with a checkbox.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var R = React.DOM;
 var cx = require('classnames');
 

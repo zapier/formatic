@@ -1,7 +1,7 @@
 'use strict';
 /*eslint no-script-url:0 */
 
-var React = require('react/addons');
+var React = require('react');
 var _ = require('../../undash');
 var cx = require('classnames');
 

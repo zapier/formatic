@@ -8,7 +8,8 @@ methods you want to add or override.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var CssTransitionGroup = require('react-addons-css-transition-group');
 var R = React.DOM;
 var _ = require('./undash');
 
@@ -473,9 +474,15 @@ module.exports = function (config) {
     },
 
     cssTransitionWrapper: function cssTransitionWrapper() {
-      var CSSTransitionGroup = React.createFactory(React.addons.CSSTransitionGroup);
-      var args = [{ transitionName: 'reveal' }].concat(Array.prototype.slice.call(arguments));
-      return CSSTransitionGroup.apply(null, args);
+      for (var _len = arguments.length, children = Array(_len), _key = 0; _key < _len; _key++) {
+        children[_key] = arguments[_key];
+      }
+
+      return React.createElement(
+        CssTransitionGroup,
+        { transitionName: 'reveal', transitionEnterTimeout: 100, transitionLeaveTimeout: 100 },
+        children
+      );
     },
 
     // Create dynamic child fields for a field.

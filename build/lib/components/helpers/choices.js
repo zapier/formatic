@@ -6,7 +6,7 @@ Render customized (non-native) dropdown choices.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var R = React.DOM;
 var _ = require('../../undash');
 var ScrollLock = require('react-scroll-lock');

@@ -7,7 +7,7 @@ select drop down and supports fancier renderings.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 
 module.exports = React.createClass({
 
