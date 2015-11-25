@@ -81,13 +81,13 @@ module.exports = React.createClass({
       options = _.extend({}, options, this.props.field.codeMirrorOptions);
     }
 
-    var textBox = this.refs.textBox.getDOMNode();
+    var textBox = this.refs.textBox;
     this.codeMirror = CodeMirror(textBox, options);
     this.codeMirror.on('change', this.onCodeMirrorChange);
   },
 
   removeCodeMirrorEditor: function removeCodeMirrorEditor() {
-    var textBoxNode = this.refs.textBox.getDOMNode();
+    var textBoxNode = this.refs.textBox;
     var cmNode = textBoxNode.firstChild;
     textBoxNode.removeChild(cmNode);
     this.codeMirror = null;

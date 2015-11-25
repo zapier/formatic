@@ -120,7 +120,7 @@ module.exports = React.createClass({
 
   adjustSize: function adjustSize() {
     if (this.refs.choices) {
-      var node = this.refs.container.getDOMNode();
+      var node = this.refs.container;
       var rect = node.getBoundingClientRect();
       var top = rect.top;
       var windowHeight = window.innerHeight;
@@ -241,11 +241,12 @@ module.exports = React.createClass({
     }
 
     if (this.props.open) {
-      return R.div({ ref: 'container', onClick: this.onClick,
-        className: 'choices-container', style: {
+      return R.div({
+        ref: 'container', onClick: this.onClick, className: 'choices-container', style: {
           userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
           maxHeight: this.state.maxHeight ? this.state.maxHeight : null
-        } }, config.cssTransitionWrapper(search, R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
+        }
+      }, config.cssTransitionWrapper(search, R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
 
         var choiceElement = null;
 

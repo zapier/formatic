@@ -2,8 +2,6 @@
 /*eslint no-script-url:0 */
 
 var React = require('react');
-var _ = require('../../undash');
-var cx = require('classnames');
 
 /*
    Wraps a PrettyTextInput to be a stand alone field.

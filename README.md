@@ -16,7 +16,7 @@ away!
 git clone git@github.com:zapier/formatic.git
 cd formatic
 npm install
-npm run live
+npm start
 ```
 
 Point your browser to `localhost:3000/index.html`. Hack away on the code, the
