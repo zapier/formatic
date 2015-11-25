@@ -24,8 +24,6 @@
     "babel-loader": "^5.3.2",
     "babelify": "^5.0.3",
     "bootstrap": "^3.3.5",
-    "browserify": "^6.2.0",
-    "browserify-shim": "^3.8.0",
     "codemirror": "^5.9.0",
     "css-loader": "^0.23.0",
     "envify": "^1.2.1",
