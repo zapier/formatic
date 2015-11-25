@@ -27,6 +27,14 @@ module.exports = {
     }, {
       test: /\.css$/,
       loader: 'style-loader!css-loader?importLoaders=1'
-    }]
+    }],
+
+    preLoaders: [
+      {
+        test: /\.js$/,
+        loader: 'eslint-loader',
+        include: [path.join(__dirname, 'lib'), path.join(__dirname, 'demo')]
+      }
+    ]
   }
 };

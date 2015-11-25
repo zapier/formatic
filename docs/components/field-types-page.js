@@ -33,10 +33,10 @@ module.exports = React.createClass({
 
   componentDidMount: function () {
     var elem = this.refs.sideNav.getDOMNode(),
-        domUtils = Affix.domUtils,
-        sideNavOffsetTop = domUtils.getOffset(elem).top,
-        sideNavMarginTop = parseInt(domUtils.getComputedStyles(elem.firstChild).marginTop, 10),
-        topNavHeight = this.refs.topNav.getDOMNode().offsetHeight;
+      domUtils = Affix.domUtils,
+      sideNavOffsetTop = domUtils.getOffset(elem).top,
+      sideNavMarginTop = parseInt(domUtils.getComputedStyles(elem.firstChild).marginTop, 10),
+      topNavHeight = this.refs.topNav.getDOMNode().offsetHeight;
 
     this.setState({
       navOffsetTop: sideNavOffsetTop - topNavHeight - sideNavMarginTop,
@@ -48,8 +48,8 @@ module.exports = React.createClass({
 
     return (
       <div>
-        <NavMain activePage='field-types' ref='topNav'/>
-        <Header title='Field types'/>
+        <NavMain activePage="field-types" ref="topNav"/>
+        <Header title="Field types"/>
 
         <div className="container bs-docs-container">
           <div className="row">

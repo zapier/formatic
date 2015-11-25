@@ -5,11 +5,9 @@
   "main": "./build/lib/formatic",
   "scripts": {
     "test": "jest",
-    "lint": "eslint gulpfile.js lib/**/*.js docs/components/*.js docs/index.js",
     "build": "babel lib --out-dir build/lib && gulp build",
     "docs-build": "gulp docs-build",
     "docs-publish": "gulp docs-publish",
-    "watch": "gulp watch",
     "live": "node server.js",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "start": "node server.js"
@@ -35,6 +33,7 @@
     "envify": "^1.2.1",
     "es6-promise": "^3.0.2",
     "eslint": "^1.2.1",
+    "eslint-loader": "^1.1.1",
     "eslint-plugin-react": "^2.3.0",
     "express": "^4.5.1",
     "gaze": "^0.5.1",

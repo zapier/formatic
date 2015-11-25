@@ -97,7 +97,7 @@ var Root = module.exports = React.createClass({
         <script src="vendor/codemirror/codemirror.js" />
         <script src="vendor/codemirror/javascript.js" />
         <script src="vendor/JSXTransformer.js" />
-        <script src='lib/bundle.js'/>
+        <script src="lib/bundle.js"/>
       </body>
     );
   }
