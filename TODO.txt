@@ -1,5 +1,1 @@
-- bower
-- gulpify docs home
-- need hideLabel
-- json value on demo
-- add checkbox
+- change everything

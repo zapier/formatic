@@ -6,7 +6,7 @@ Render a field to edit array values.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var R = React.DOM;
 var cx = require('classnames');
 

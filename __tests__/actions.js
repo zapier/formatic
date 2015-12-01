@@ -3,9 +3,8 @@
 
 describe('actions', function() {
 
-  var React = require('react/addons');
-  var TestUtils = React.addons.TestUtils;
-  var _ = require('underscore');
+  var React = require('react');
+  var TestUtils = require('react-addons-test-utils');
 
   var mounted = function (element) {
     var rendered = TestUtils.renderIntoDocument(element);

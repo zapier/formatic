@@ -32,10 +32,10 @@ module.exports = React.createClass({
 
   componentDidMount: function () {
     var elem = this.refs.sideNav.getDOMNode(),
-        domUtils = Affix.domUtils,
-        sideNavOffsetTop = domUtils.getOffset(elem).top,
-        sideNavMarginTop = parseInt(domUtils.getComputedStyles(elem.firstChild).marginTop, 10),
-        topNavHeight = this.refs.topNav.getDOMNode().offsetHeight;
+      domUtils = Affix.domUtils,
+      sideNavOffsetTop = domUtils.getOffset(elem).top,
+      sideNavMarginTop = parseInt(domUtils.getComputedStyles(elem.firstChild).marginTop, 10),
+      topNavHeight = this.refs.topNav.getDOMNode().offsetHeight;
 
     this.setState({
       navOffsetTop: sideNavOffsetTop - topNavHeight - sideNavMarginTop,

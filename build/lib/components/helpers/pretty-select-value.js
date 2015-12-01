@@ -8,7 +8,7 @@
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var _ = require('../../undash');
 var cx = require('classnames');
 
@@ -171,7 +171,7 @@ module.exports = React.createClass({
   },
 
   getCloseIgnoreNodes: function getCloseIgnoreNodes() {
-    return this.refs.toggle.getDOMNode();
+    return this.refs.toggle;
   },
 
   onToggleChoices: function onToggleChoices() {

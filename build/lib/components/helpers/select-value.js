@@ -7,7 +7,7 @@ type.
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var R = React.DOM;
 var _ = require('../../undash');
 var cx = require('classnames');

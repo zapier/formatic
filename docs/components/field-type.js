@@ -29,10 +29,10 @@ module.exports = React.createClass({
         <h2>Field</h2>
 
         <Snippet json={this.props.field || {
-            type: this.props.type,
-            key: 'myKey',
-            label: 'My Label'
-          }}/>
+          type: this.props.type,
+          key: 'myKey',
+          label: 'My Label'
+        }}/>
 
         {this.props.moreFields}
 

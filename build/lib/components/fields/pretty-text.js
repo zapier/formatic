@@ -24,7 +24,7 @@ So good luck!
 
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
 var R = React.DOM;
 var _ = require('../../undash');
 var cx = require('classnames');
@@ -184,8 +184,8 @@ module.exports = React.createClass({
 
   // Make highlight scroll match textarea scroll
   onScroll: function onScroll() {
-    this.refs.highlight.getDOMNode().scrollTop = this.refs.content.getDOMNode().scrollTop;
-    this.refs.highlight.getDOMNode().scrollLeft = this.refs.content.getDOMNode().scrollLeft;
+    this.refs.highlight.scrollTop = this.refs.content.scrollTop;
+    this.refs.highlight.scrollLeft = this.refs.content.scrollLeft;
   },
 
   // Given some postion, return the token index (position could be in the middle of a token)
@@ -272,9 +272,9 @@ module.exports = React.createClass({
     this.tracking.pos = pos;
     this.tracking.range = range;
 
-    if (document.activeElement === this.refs.content.getDOMNode()) {
+    if (document.activeElement === this.refs.content) {
       // React can lose the selection, so put it back.
-      this.refs.content.getDOMNode().setSelectionRange(pos, pos + range);
+      this.refs.content.setSelectionRange(pos, pos + range);
     }
   },
 
@@ -472,7 +472,7 @@ module.exports = React.createClass({
   },
 
   onCopy: function onCopy() {
-    var node = this.refs.content.getDOMNode();
+    var node = this.refs.content;
     var start = node.selectionStart;
     var end = node.selectionEnd;
     var text = node.value.substring(start, end);
@@ -490,7 +490,7 @@ module.exports = React.createClass({
   },
 
   onCut: function onCut() {
-    var node = this.refs.content.getDOMNode();
+    var node = this.refs.content;
     var start = node.selectionStart;
     var end = node.selectionEnd;
     var text = node.value.substring(start, end);
@@ -550,8 +550,8 @@ module.exports = React.createClass({
 
   // Keep the highlight styles in sync with the textarea styles.
   adjustStyles: function adjustStyles(isMount) {
-    var overlay = this.refs.highlight.getDOMNode();
-    var content = this.refs.content.getDOMNode();
+    var overlay = this.refs.highlight;
+    var content = this.refs.content;
 
     var style = window.getComputedStyle(content);
 
@@ -622,7 +622,7 @@ module.exports = React.createClass({
       var newValue = this.rawValue(tokens);
       this.tracking.pos += this.prettyLabel(tag).length;
       this.onChangeValue(newValue);
-      this.refs.content.getDOMNode().focus();
+      this.refs.content.focus();
     }
   },
 
@@ -646,7 +646,7 @@ module.exports = React.createClass({
     this.setState({
       isChoicesOpen: false
     });
-    this.refs.content.getDOMNode().focus();
+    this.refs.content.focus();
   },
 
   onToggleChoices: function onToggleChoices() {
@@ -673,12 +673,12 @@ module.exports = React.createClass({
   closeChoices: function closeChoices() {},
 
   getCloseIgnoreNodes: function getCloseIgnoreNodes() {
-    return this.refs.toggle.getDOMNode();
+    return this.refs.toggle;
   },
 
   onClickOutsideChoices: function onClickOutsideChoices() {
     // // If we didn't click on the toggle button, close the choices.
-    // if (this.isNodeOutside(this.refs.toggle.getDOMNode(), event.target)) {
+    // if (this.isNodeOutside(this.refs.toggle, event.target)) {
     //   console.log('not a toggle click')
     //   this.setState({
     //     isChoicesOpen: false
@@ -691,7 +691,7 @@ module.exports = React.createClass({
     // sure there's another way.
 
     var position = { x: event.clientX, y: event.clientY };
-    var nodes = this.refs.highlight.getDOMNode().childNodes;
+    var nodes = this.refs.highlight.childNodes;
     var matchedNode = null;
     for (var i = 0; i < nodes.length; i++) {
       var node = nodes[i];

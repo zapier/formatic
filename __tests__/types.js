@@ -14,9 +14,9 @@ var printTree = function (node, indent) {
 
 describe('types and value changes', function() {
 
-  var React = require('react/addons');
-  var TestUtils = React.addons.TestUtils;
-  var _ = require('underscore');
+  var React = require('react');
+  var TestUtils = require('react-addons-test-utils');
+  var _ = require('lodash');
 
   var mounted = function (element) {
     var rendered = TestUtils.renderIntoDocument(element);

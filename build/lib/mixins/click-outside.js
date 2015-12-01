@@ -79,7 +79,7 @@ module.exports = {
   _onClickMouseup: function _onClickMouseup(event) {
     _.each(this.clickOutsideHandlers, (function (funcs, ref) {
       if (this.refs[ref] && this._mousedownRefs[ref]) {
-        if (this.isNodeOutside(event.target, this.refs[ref].getDOMNode())) {
+        if (this.isNodeOutside(event.target, this.refs[ref])) {
           funcs.forEach((function (fn) {
             fn.call(this, event);
           }).bind(this));

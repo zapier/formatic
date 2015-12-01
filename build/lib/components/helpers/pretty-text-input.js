@@ -2,7 +2,8 @@
 /* global CodeMirror */
 /*eslint no-script-url:0 */
 
-var React = require('react/addons');
+var React = require('react');
+var ReactDOM = require('react-dom');
 var TagTranslator = require('./tag-translator');
 var _ = require('../../undash');
 var cx = require('classnames');
@@ -188,7 +189,7 @@ module.exports = React.createClass({
   },
 
   getCloseIgnoreNodes: function getCloseIgnoreNodes() {
-    return this.refs.toggle.getDOMNode();
+    return this.refs.toggle;
   },
 
   onToggleChoices: function onToggleChoices() {
@@ -245,7 +246,7 @@ module.exports = React.createClass({
       }
     };
 
-    var textBox = this.refs.textBox.getDOMNode();
+    var textBox = this.refs.textBox;
     textBox.innerHTML = ''; // release any previous read-only content so it can be GC'ed
 
     this.codeMirror = CodeMirror(textBox, options);
@@ -287,10 +288,10 @@ module.exports = React.createClass({
   },
 
   createReadonlyEditor: function createReadonlyEditor() {
-    var textBoxNode = this.refs.textBox.getDOMNode();
+    var textBoxNode = this.refs.textBox;
 
     if (this.hasPlaceholder()) {
-      return React.render(React.createElement(
+      return ReactDOM.render(React.createElement(
         'span',
         null,
         this.props.field.placeholder
@@ -312,7 +313,7 @@ module.exports = React.createClass({
       );
     });
 
-    React.render(React.createElement(
+    ReactDOM.render(React.createElement(
       'span',
       null,
       nodes
@@ -320,7 +321,7 @@ module.exports = React.createClass({
   },
 
   removeCodeMirrorEditor: function removeCodeMirrorEditor() {
-    var textBoxNode = this.refs.textBox.getDOMNode();
+    var textBoxNode = this.refs.textBox;
     var cmNode = textBoxNode.firstChild;
     textBoxNode.removeChild(cmNode);
     this.codeMirror = null;
@@ -357,7 +358,7 @@ module.exports = React.createClass({
 
     var props = { onClick: this.onTagClick, field: this.props.field, tag: pos.tag };
 
-    React.render(config.createElement('pretty-tag', props, label), node);
+    ReactDOM.render(config.createElement('pretty-tag', props, label), node);
 
     return node;
   }
