@@ -47,4 +47,10 @@ describe('utils', () => {
 
     expect(foundItem).toEqual(4);
   });
+
+  it('should test for objects', () => {
+    expect(_.isObject({})).toBe(true);
+    expect(_.isObject(null)).toBeFalsy();
+  });
+
 });
