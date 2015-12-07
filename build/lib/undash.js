@@ -18,9 +18,6 @@ _.isString = function (value) {
 _.isUndefined = function (value) {
   return typeof value === 'undefined';
 };
-_.isObject = function (value) {
-  return typeof value === 'object';
-};
 _.isArray = function (value) {
   return Object.prototype.toString.call(value) === '[object Array]';
 };
@@ -35,6 +32,11 @@ _.isNull = function (value) {
 };
 _.isFunction = function (value) {
   return typeof value === 'function';
+};
+
+_.isObject = function (value) {
+  var type = typeof value;
+  return !!value && (type === 'object' || type === 'function');
 };
 
 _.clone = function (value) {
