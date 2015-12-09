@@ -237,7 +237,7 @@ module.exports = React.createClass({
     }
 
     if (hasSearch) {
-      search = config.createElement('choices-search', { field: this.props.field, onChange: this.onChangeSearch });
+      search = config.createElement('choices-search', { key: 'choices-search', field: this.props.field, onChange: this.onChangeSearch });
     }
 
     if (this.props.open) {
@@ -261,7 +261,9 @@ module.exports = React.createClass({
         } else if (choice.sectionKey) {
           choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onHeaderClick.bind(this, choice) }, config.createElement('choice-section-header', { choice: choice }));
         } else {
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onSelect.bind(this, choice) }, R.span({ className: 'choice-label' }, choice.label), R.span({ className: 'choice-sample' }, choice.sample));
+          choiceElement = config.createElement('choice', {
+            onSelect: this.onSelect, choice: choice, field: this.props.field
+          });
         }
 
         return R.li({ key: i, className: 'choice' }, choiceElement);

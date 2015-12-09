@@ -72,6 +72,10 @@ _.each(_.range(prettyNum), function(x){
         value: 'lastName',
         label: 'Last Name',
         sample: 'Smith'
+      },
+      {
+        value: 'middleName',
+        label: 'A really long label that should break somewhere in the middle and then definitely fill up all the space.'
       }
     ]
   });
