@@ -36,6 +36,12 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
 
-    return R.div({ className: cx(this.props.classes) }, config.createElement('remove-item', { field: field, onClick: this.onRemove, onMaybeRemove: this.props.onMaybeRemove }), this.props.index > 0 ? config.createElement('move-item-back', { field: field, onClick: this.onMoveBack }) : null, this.props.index < this.props.numItems - 1 ? config.createElement('move-item-forward', { field: field, onClick: this.onMoveForward }) : null);
+    var isLastItem = field.fieldIndex === 0 && field.parent.value.length === 1;
+    var removeItemControl = undefined;
+    if (!isLastItem || config.isRemovalOfLastArrayItemAllowed(field)) {
+      removeItemControl = config.createElement('remove-item', { field: field, onClick: this.onRemove, onMaybeRemove: this.props.onMaybeRemove });
+    }
+
+    return R.div({ className: cx(this.props.classes) }, removeItemControl, this.props.index > 0 ? config.createElement('move-item-back', { field: field, onClick: this.onMoveBack }) : null, this.props.index < this.props.numItems - 1 ? config.createElement('move-item-forward', { field: field, onClick: this.onMoveForward }) : null);
   }
 });

@@ -1024,6 +1024,10 @@ module.exports = function (config) {
 
     isSearchStringInChoice: function isSearchStringInChoice(searchString, choice) {
       return choice.label && choice.label.toLowerCase().indexOf(searchString.toLowerCase()) > -1;
+    },
+
+    isRemovalOfLastArrayItemAllowed: function isRemovalOfLastArrayItemAllowed() /* field */{
+      return true;
     }
   };
 };
