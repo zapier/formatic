@@ -39,6 +39,10 @@ var plugin = function (config) {
           field.help_text_html = field.meta.msg;
         }
       }
+    },
+
+    isRemovalOfLastArrayItemAllowed(/*field*/) {
+      return false;
     }
   };
 };
@@ -51,6 +55,7 @@ var config = Formatic.createConfig(
 );
 
 var fields = [
+  {label: 'Array', type: 'array', key: 'yoArray'},
   {label: 'Code', type: 'code', key: 'somecode', language: 'javascript'},
   {label: 'Readonly Code', type: 'code', key: 'readonlyCode', language: 'javascript', readOnly: true, default: 'x = 3;'}
 ];
