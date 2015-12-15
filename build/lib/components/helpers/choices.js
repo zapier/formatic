@@ -13,6 +13,26 @@ var ScrollLock = require('react-scroll-lock');
 
 var magicChoiceRe = /^\/\/\/[^\/]+\/\/\/$/;
 
+var requestAnimationFrameThrottled = function requestAnimationFrameThrottled(frameCount, cb) {
+  if (frameCount === undefined) frameCount = 1;
+
+  if (frameCount < 1) {
+    frameCount = 1;
+  }
+  var frameIndex = 0;
+  var listenToFrame = function listenToFrame() {
+    requestAnimationFrame(function () {
+      frameIndex++;
+      if (frameIndex === frameCount) {
+        cb.apply(undefined, arguments);
+      } else {
+        listenToFrame();
+      }
+    });
+  };
+  listenToFrame();
+};
+
 module.exports = React.createClass({
 
   displayName: 'Choices',
@@ -94,10 +114,14 @@ module.exports = React.createClass({
       if (!this.isListening) {
         (function () {
           var listenToFrame = function listenToFrame() {
-            requestAnimationFrame(function () {
-              _this.adjustSize();
+            requestAnimationFrameThrottled(3, function () {
               if (_this.isListening) {
-                listenToFrame();
+                // Make sure we don't adjust again before rendering.
+                _this.adjustSize(function () {
+                  if (_this.isListening) {
+                    listenToFrame();
+                  }
+                });
               }
             });
           };
@@ -118,7 +142,8 @@ module.exports = React.createClass({
     }
   },
 
-  adjustSize: function adjustSize() {
+  adjustSize: function adjustSize(cb) {
+    var didSetState = false;
     if (this.refs.choices) {
       var node = this.refs.container;
       var rect = node.getBoundingClientRect();
@@ -126,9 +151,15 @@ module.exports = React.createClass({
       var windowHeight = window.innerHeight;
       var height = windowHeight - top;
       if (height !== this.state.maxHeight) {
+        didSetState = true;
         this.setState({
           maxHeight: height
-        });
+        }, cb);
+      }
+    }
+    if (!didSetState) {
+      if (cb) {
+        cb();
       }
     }
   },
