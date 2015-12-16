@@ -185,6 +185,7 @@ module.exports = React.createClass({
   },
 
   onSelectChoice: function onSelectChoice(value) {
+    this.onStartAction('exit-custom-value');
     this.setState({
       isEnteringCustomValue: false,
       isChoicesOpen: false
@@ -278,6 +279,7 @@ module.exports = React.createClass({
       });
     } else {
       if (choice.action === 'clear-current-choice') {
+        this.onStartAction('exit-custom-value');
         this.setState({
           isChoicesOpen: false,
           isEnteringCustomValue: false
@@ -291,16 +293,6 @@ module.exports = React.createClass({
     }
 
     this.onStartAction(choice.action, choice);
-  },
-
-  // Is this even used? I don't think so.
-  onAction: function onAction(params) {
-    if (params.action === 'enter-custom-value') {
-      this.setState({ isEnteringCustomValue: true }, function () {
-        this.refs.customInput.focus();
-      });
-    }
-    this.onBubbleAction(params);
   },
 
   onInputChange: function onInputChange(value) {
