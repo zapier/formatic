@@ -7,6 +7,7 @@
 'use strict';
 
 var React = require('react');
+var cx = require('classnames');
 
 module.exports = React.createClass({
 
@@ -26,7 +27,8 @@ module.exports = React.createClass({
   renderDefault: function renderDefault() {
     return React.createElement(
       'a',
-      { ref: this.props.ref, href: 'JavaScript' + ':', onClick: this.props.onClick },
+      { ref: this.props.ref, href: 'JavaScript' + ':', onClick: this.props.onClick,
+        className: cx({ 'readonly-control': this.props.readOnly }) },
       this.props.children
     );
   }

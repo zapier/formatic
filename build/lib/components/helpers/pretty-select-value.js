@@ -119,8 +119,8 @@ module.exports = React.createClass({
     }
 
     var selectArrow = undefined;
-    if (!this.isReadOnly()) {
-      selectArrow = React.createElement('span', { className: 'select-arrow' });
+    if (!this.isReadOnly() || this.hasReadOnlyControls()) {
+      selectArrow = React.createElement('span', { className: cx('select-arrow', { 'readonly-control': this.isReadOnly() }) });
     }
 
     choicesOrLoading = React.createElement(

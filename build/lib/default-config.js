@@ -919,6 +919,19 @@ module.exports = function (config) {
       }
     },
 
+    // Return true if field has read-only controls. Useful for read-only controls used
+    // in demo screenshot type effects, where you want it to look just like the real
+    // thing, but read-only.
+    fieldHasReadOnlyControls: function fieldHasReadOnlyControls(field) {
+      if (field.hasReadOnlyControls) {
+        return true;
+      } else if (field.parent) {
+        return config.fieldHasReadOnlyControls(field.parent);
+      } else {
+        return false;
+      }
+    },
+
     // Other helpers
 
     // Convert a key to a nice human-readable version.

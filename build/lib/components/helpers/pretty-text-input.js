@@ -127,7 +127,7 @@ module.exports = React.createClass({
   },
 
   insertBtn: function insertBtn() {
-    if (this.isReadOnly()) {
+    if (this.isReadOnly() && !this.hasReadOnlyControls()) {
       return null;
     }
 
@@ -136,7 +136,12 @@ module.exports = React.createClass({
       this.onToggleChoices();
     };
 
-    return this.props.config.createElement('insert-button', { ref: 'toggle', onClick: onInsertClick.bind(this) }, 'Insert...');
+    var props = {
+      ref: 'toggle',
+      onClick: onInsertClick.bind(this),
+      readOnly: this.isReadOnly()
+    };
+    return this.props.config.createElement('insert-button', props, 'Insert...');
   },
 
   choices: function choices() {

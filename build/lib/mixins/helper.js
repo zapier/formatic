@@ -42,5 +42,9 @@ module.exports = {
 
   isReadOnly: function isReadOnly() {
     return this.props.config.fieldIsReadOnly(this.props.field);
+  },
+
+  hasReadOnlyControls: function hasReadOnlyControls() {
+    return this.props.config.fieldHasReadOnlyControls(this.props.field);
   }
 };
