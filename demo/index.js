@@ -43,6 +43,10 @@ var plugin = function (config) {
 
     isRemovalOfLastArrayItemAllowed(/*field*/) {
       return false;
+    },
+
+    isRemovalOfLastObjectItemAllowed(/*field*/) {
+      return false;
     }
   };
 };

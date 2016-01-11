@@ -1041,6 +1041,10 @@ module.exports = function (config) {
 
     isRemovalOfLastArrayItemAllowed: function isRemovalOfLastArrayItemAllowed() /* field */{
       return true;
+    },
+
+    isRemovalOfLastObjectItemAllowed: function isRemovalOfLastObjectItemAllowed() /* field */{
+      return true;
     }
   };
 };

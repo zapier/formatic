@@ -28,6 +28,12 @@ module.exports = React.createClass({
     var config = this.props.config;
     var field = this.props.field;
 
-    return R.div({ className: cx(this.props.classes) }, config.createElement('remove-item', { field: field, onClick: this.onRemove }));
+    var isLastItem = field.fieldIndex === 0 && Object.keys(field.parent.value).length === 1;
+
+    return R.div({ className: cx(this.props.classes) }, config.createElement('remove-item', {
+      field: field,
+      onClick: this.onRemove,
+      readOnly: isLastItem && !config.isRemovalOfLastObjectItemAllowed(field)
+    }));
   }
 });
