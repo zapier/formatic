@@ -2,7 +2,7 @@
 
 [![travis](https://travis-ci.org/zapier/formatic.svg?branch=master)](https://travis-ci.org/zapier/formatic)
 
-Automatic forms.
+Automatic forms. Find it on NPM - [https://www.npmjs.com/package/formatic](https://www.npmjs.com/package/formatic).
 
 ## Warning!
 
