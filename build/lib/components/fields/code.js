@@ -84,6 +84,9 @@ module.exports = React.createClass({
           } else {
             cm.execCommand('insertSoftTab');
           }
+        },
+        'Shift-Tab': function ShiftTab(cm) {
+          cm.execCommand('indentLess');
         }
       },
       readOnly: readOnly ? 'nocursor' : false // 'nocursor' means read only and not focusable
