@@ -77,9 +77,19 @@ module.exports = React.createClass({
       readOnly: readOnly ? 'nocursor' : false // 'nocursor' means read only and not focusable
     };
 
+    if (this.props.field.language === 'python') {
+      options.indentWithTabs = false;
+      options.tabSize = 4;
+    } else if (this.props.field.language === 'javascript') {
+      options.indentWithTabs = false;
+      options.tabSize = 2;
+    }
+
     if (this.props.field.codeMirrorOptions) {
       options = _.extend({}, options, this.props.field.codeMirrorOptions);
     }
+
+    console.log('options', options);
 
     var textBox = this.refs.textBox;
     this.codeMirror = CodeMirror(textBox, options);
