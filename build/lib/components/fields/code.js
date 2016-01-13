@@ -74,8 +74,28 @@ module.exports = React.createClass({
       tabindex: this.tabIndex(),
       value: String(this.state.value),
       mode: this.props.field.language || null,
+      indentWithTabs: false,
+      indentUnit: 2,
+      tabSize: 2,
+      extraKeys: {
+        Tab: function Tab(cm) {
+          if (_.any(cm.getSelections(), Boolean)) {
+            cm.execCommand('defaultTab');
+          } else {
+            cm.execCommand('insertSoftTab');
+          }
+        },
+        'Shift-Tab': function ShiftTab(cm) {
+          cm.execCommand('indentLess');
+        }
+      },
       readOnly: readOnly ? 'nocursor' : false // 'nocursor' means read only and not focusable
     };
+
+    if (this.props.field.language === 'python') {
+      options.indentUnit = 4;
+      options.tabSize = 4;
+    }
 
     if (this.props.field.codeMirrorOptions) {
       options = _.extend({}, options, this.props.field.codeMirrorOptions);

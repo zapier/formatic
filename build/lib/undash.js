@@ -64,6 +64,15 @@ _.every = function (items, testFn) {
   return true;
 };
 
+_.any = function (items, testFn) {
+  for (var i = 0; i < items.length; i++) {
+    if (testFn(items[i])) {
+      return true;
+    }
+  }
+  return false;
+};
+
 _.each = function (obj, iterateFn) {
   Object.keys(obj).forEach(function (key) {
     iterateFn(obj[key], key);

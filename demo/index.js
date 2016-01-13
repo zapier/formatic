@@ -61,7 +61,8 @@ var config = Formatic.createConfig(
 var fields = [
   {label: 'Array', type: 'array', key: 'yoArray'},
   {label: 'Code', type: 'code', key: 'somecode', language: 'javascript'},
-  {label: 'Readonly Code', type: 'code', key: 'readonlyCode', language: 'javascript', readOnly: true, default: 'x = 3;'}
+  {label: 'Readonly Code', type: 'code', key: 'readonlyCode', language: 'javascript', readOnly: true, default: 'x = 3;'},
+  {label: 'Code Python', type: 'code', key: 'somepycode', language: 'python'}
 ];
 
 var prettyNum = 2;
