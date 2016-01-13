@@ -41,7 +41,6 @@
     "jest-cli": "^0.4.0",
     "jquery": "^2.1.4",
     "lodash": "^3.10.1",
-    "react": "^0.14.3",
     "react-addons-test-utils": "^0.14.3",
     "react-bootstrap": "^0.23.0",
     "react-dom": "^0.14.3",
@@ -59,7 +58,9 @@
     "classnames": "^2.1.1",
     "deep-equal": "^1.0.0",
     "object-assign": "^2.0.0",
+    "react": "^0.14.6",
     "react-addons-css-transition-group": "^0.14.3",
+    "react-addons-update": "^0.14.6",
     "react-scroll-lock": "git+https://github.com/Laiff/react-scroll-lock.git#267bf5bcf84d334aecc20908657088007b698dc2"
   },
   "peerDependencies": {

@@ -45,7 +45,7 @@ var plugin = function (config) {
       return false;
     },
 
-    isRemovalOfLastObjectItemAllowed(/*field*/) {
+    isRemovalOfLastAssocListItemAllowed(/*field*/) {
       return false;
     }
   };
@@ -142,7 +142,6 @@ fields = fields.concat([
       }
     ]
   },
-
   {label: 'Size', type: 'pretty-select', key: 'size', default: 'S',
    choices: { S: 'Small', M: 'Medium', L: 'Large' }
   },
@@ -217,7 +216,16 @@ fields = fields.concat([
     itemFields: [{
       type: 'pretty-text',
       hideLabel: true
-    }]
+    }],
+    default: {key1: 'value1', key2: 'value2'}
+  },
+  {
+    label: 'Associative List', type: 'assoc-list', key: 'assoc-list',
+    itemFields: [{
+      type: 'pretty-text',
+      hideLabel: true
+    }],
+    default: [{key: 'key1', value: 'value1'}, {key: 'key2', value: 'value2'}]
   },
   {
     label: 'Mapping Pretty Text (R)', type: 'object', key: 'mapping2', required: true,
