@@ -31,7 +31,7 @@ describe('types and value changes', function() {
       config.addElementClass('single-line-string', 'single-line-string');
       config.addElementClass('string', 'string');
       config.addElementClass('copy', 'copy');
-      config.addElementClass('object-item-key', 'object-item-key');
+      config.addElementClass('assoc-list-item-key', 'assoc-list-item-key');
     }
   );
 
@@ -240,7 +240,7 @@ describe('types and value changes', function() {
 
       expect(formValue.myObject).toEqual({x: 'baz', y: 'bar'});
 
-      node = component.getDOMNode().getElementsByClassName('object-item-key')[0];
+      node = component.getDOMNode().getElementsByClassName('assoc-list-item-key')[0];
 
       node.value = 'z';
 

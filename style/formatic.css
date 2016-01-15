@@ -263,3 +263,7 @@ div.pretty-text-box {
 .formatic .placeholder {
   font-style: italic;
 }
+
+.formatic .validation-error-duplicate-key {
+  background-color: pink;
+}

@@ -45,7 +45,7 @@ var plugin = function (config) {
       return false;
     },
 
-    isRemovalOfLastObjectItemAllowed(/*field*/) {
+    isRemovalOfLastAssocListItemAllowed(/*field*/) {
       return false;
     }
   };
@@ -143,7 +143,6 @@ fields = fields.concat([
       }
     ]
   },
-
   {label: 'Size', type: 'pretty-select', key: 'size', default: 'S',
    choices: { S: 'Small', M: 'Medium', L: 'Large' }
   },
@@ -218,15 +217,24 @@ fields = fields.concat([
     itemFields: [{
       type: 'pretty-text',
       hideLabel: true
-    }]
+    }],
+    default: {key1: 'value1', key2: 'value2'}
   },
   {
-    label: 'Mapping Pretty Text (R)', type: 'object', key: 'mapping2', required: true,
+    label: 'Associative List', type: 'assoc-list', key: 'assoc-list',
     itemFields: [{
       type: 'pretty-text',
       hideLabel: true
-    }]
+    }],
+    default: [{key: 'key1', value: 'value1'}, {key: 'key2', value: 'value2'}]
   },
+  /* {
+     label: 'Mapping Pretty Text (R)', type: 'object', key: 'mapping2', required: true,
+     itemFields: [{
+     type: 'pretty-text',
+     hideLabel: true
+     }]
+     }, */
   {label: 'The Blob', type: 'json', key: 'blob', readOnly: true},
   {label: 'Do you like cookies?', type: 'boolean', key: 'likesCookies', readOnly: true},
   {label: 'Do you like pretty cookies with sprinkles?', type: 'pretty-boolean', key: 'likesPrettyCookies', default: 'no'},
@@ -330,6 +338,7 @@ var onOrderGroceries = function (info) {
 // Controlled version:
 
 var render = function (value) {
+  window.value = value;
   ReactDOM.render(Form({
     meta: {msg: "That's a fine name you have there!"},
     config: config,
@@ -355,6 +364,8 @@ var setValue = function (value) {
   formValue = value;
   render(formValue);
 };
+
+window.setValue = setValue;
 
 formValue.name = 'tom';
 //formValue.colors3 = 'custom';
