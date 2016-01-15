@@ -57,6 +57,8 @@ module.exports = function (config) {
 
     createElement_Object: React.createFactory(require('./components/fields/object')),
 
+    createElement_AssocList: React.createFactory(require('./components/fields/assoc-list')),
+
     createElement_Json: React.createFactory(require('./components/fields/json')),
 
     createElement_UnknownField: React.createFactory(require('./components/fields/unknown')),
@@ -99,15 +101,15 @@ module.exports = function (config) {
 
     createElement_MoveItemBack: React.createFactory(require('./components/helpers/move-item-back')),
 
-    createElement_ObjectControl: React.createFactory(require('./components/helpers/object-control')),
+    createElement_AssocListControl: React.createFactory(require('./components/helpers/assoc-list-control')),
 
-    createElement_ObjectItemControl: React.createFactory(require('./components/helpers/object-item-control')),
+    createElement_AssocListItemControl: React.createFactory(require('./components/helpers/assoc-list-item-control')),
 
-    createElement_ObjectItemValue: React.createFactory(require('./components/helpers/object-item-value')),
+    createElement_AssocListItemValue: React.createFactory(require('./components/helpers/assoc-list-item-value')),
 
-    createElement_ObjectItemKey: React.createFactory(require('./components/helpers/object-item-key')),
+    createElement_AssocListItemKey: React.createFactory(require('./components/helpers/assoc-list-item-key')),
 
-    createElement_ObjectItem: React.createFactory(require('./components/helpers/object-item')),
+    createElement_AssocListItem: React.createFactory(require('./components/helpers/assoc-list-item')),
 
     createElement_SelectValue: React.createFactory(require('./components/helpers/select-value')),
 
@@ -141,6 +143,8 @@ module.exports = function (config) {
       return false;
     },
 
+    createDefaultValue_AssocList: delegateTo('createDefaultValue_Array'),
+
     createDefaultValue_Fields: delegateTo('createDefaultValue_Object'),
 
     createDefaultValue_SingleLineString: delegateTo('createDefaultValue_String'),
@@ -170,6 +174,16 @@ module.exports = function (config) {
         return {};
       }
       return value;
+    },
+
+    coerceValue_AssocList: function coerceValue_AssocList(fieldTemplate, value) {
+      if (_.isArray(value)) {
+        return value;
+      }
+      if (_.isObject(value)) {
+        return config.objectToAssocList(value);
+      }
+      return [value];
     },
 
     coerceValue_Array: function coerceValue_Array(fieldTemplate, value) {
@@ -208,6 +222,19 @@ module.exports = function (config) {
 
         var childField = config.createChildField(field, {
           fieldTemplate: childFieldTemplate, key: i, fieldIndex: i, value: arrayItem
+        });
+
+        return childField;
+      });
+    },
+
+    createChildFields_AssocList: function createChildFields_AssocList(field) {
+
+      return field.value.map(function (row, i) {
+        var childFieldTemplate = config.childFieldTemplateForValue(field, row.value);
+
+        var childField = config.createChildField(field, {
+          fieldTemplate: childFieldTemplate, key: i, fieldIndex: i, value: row.value
         });
 
         return childField;
@@ -934,6 +961,24 @@ module.exports = function (config) {
 
     // Other helpers
 
+    // Convert an object into an array of key / value objects
+    objectToAssocList: function objectToAssocList(obj) {
+      var array = [];
+      _.each(Object.keys(obj), function (key) {
+        array.push({ key: key, value: obj[key] });
+      });
+      return array;
+    },
+
+    // Convert an array of key / value objects to an object
+    assocListToObject: function assocListToObject(assocList) {
+      var obj = {};
+      _.each(assocList, function (row) {
+        obj[row.key] = row.value;
+      });
+      return obj;
+    },
+
     // Convert a key to a nice human-readable version.
     humanize: function humanize(property) {
       property = property.replace(/\{\{/g, '');
@@ -1043,7 +1088,7 @@ module.exports = function (config) {
       return true;
     },
 
-    isRemovalOfLastObjectItemAllowed: function isRemovalOfLastObjectItemAllowed() /* field */{
+    isRemovalOfLastAssocListItemAllowed: function isRemovalOfLastAssocListItemAllowed() /* field */{
       return true;
     }
   };
