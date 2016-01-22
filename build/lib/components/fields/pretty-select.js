@@ -50,7 +50,7 @@ module.exports = React.createClass({
     return config.createElement('field', {
       config: config, field: field, plain: this.props.plain, classes: this.props.classes
     }, config.createElement('pretty-select-value', {
-      choices: this.state.choices, field: field, onChange: this.onChange, onAction: this.onBubbleAction
+      choices: this.state.choices, isAccordion: field.isAccordion, field: field, onChange: this.onChange, onAction: this.onBubbleAction
     }));
   }
 });

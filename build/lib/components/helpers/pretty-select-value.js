@@ -96,7 +96,8 @@ module.exports = React.createClass({
         onSelect: this.onSelectChoice,
         onClose: this.onCloseChoices,
         onChoiceAction: this.onChoiceAction,
-        field: field
+        field: field,
+        isAccordion: field.isAccordion
       });
     }
 
