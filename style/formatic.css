@@ -129,6 +129,10 @@
   white-space: nowrap;
 }
 
+.formatic .choice.hover {
+  background-color: #ddd;
+}
+
 .formatic .reveal-enter {
   opacity: 0.01;
   transition: opacity .1s ease-in;

@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import Formatic from '../lib/formatic';
 import _ from 'lodash';
 
-const R = ReactDOM;
+const R = React.DOM;
 
 var Form = React.createFactory(Formatic);
 
