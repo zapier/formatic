@@ -339,7 +339,6 @@ module.exports = React.createClass({
   switchToCodeMirror: function switchToCodeMirror(cb) {
     var _this3 = this;
 
-    console.log('--- SWITCHING ---');
     if (this.isReadOnly()) {
       return; // never render in code mirror if read-only
     }
