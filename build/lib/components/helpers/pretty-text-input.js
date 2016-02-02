@@ -117,12 +117,13 @@ module.exports = React.createClass({
     }
   },
 
-  focus: function focus() {
+  onFocus: function onFocus() {
     var _this2 = this;
 
     this.switchToCodeMirror(function () {
       _this2.codeMirror.focus();
       _this2.codeMirror.setCursor(_this2.codeMirror.lineCount(), 0);
+      _this2.props.onFocus();
     });
   },
 
@@ -179,13 +180,15 @@ module.exports = React.createClass({
       placeholder: this.hasPlaceholder()
     }));
 
+    var tabIndex = this.state.codeMirrorMode ? null : this.props.tabIndex || 0;
+
     // Render read-only version.
     return React.createElement(
       'div',
       { className: cx({ 'pretty-text-wrapper': true, 'choices-open': this.state.isChoicesOpen }), onMouseEnter: this.switchToCodeMirror },
       React.createElement(
         'div',
-        { className: textBoxClasses, tabIndex: this.props.tabIndex, onFocus: this.props.onFocus, onBlur: this.props.onBlur },
+        { className: textBoxClasses, tabIndex: tabIndex, onFocus: this.onFocus, onBlur: this.props.onBlur },
         React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' })
       ),
       this.insertBtn(),
@@ -241,13 +244,14 @@ module.exports = React.createClass({
     var value = this.hasPlaceholder() ? this.props.config.fieldPlaceholder(this.props.field) : String(this.state.value);
 
     var options = {
+      tabindex: this.props.tabIndex || 0,
       lineWrapping: true,
-      tabindex: this.props.tabIndex,
       value: value,
       readOnly: false,
       mode: null,
       extraKeys: {
-        Tab: false
+        Tab: false,
+        'Shift-Tab': false
       }
     };
 
@@ -335,6 +339,7 @@ module.exports = React.createClass({
   switchToCodeMirror: function switchToCodeMirror(cb) {
     var _this3 = this;
 
+    console.log('--- SWITCHING ---');
     if (this.isReadOnly()) {
       return; // never render in code mirror if read-only
     }

@@ -32,6 +32,9 @@ var getTagPositions = function getTagPositions(text) {
 
 var tokenize = function tokenize(text) {
   text = String(text);
+  if (text === '') {
+    return [];
+  }
 
   var regexp = /(\{\{|\}\})/;
   var parts = text.split(regexp);

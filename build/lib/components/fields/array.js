@@ -127,7 +127,7 @@ module.exports = React.createClass({
     var numItems = field.value.length;
     return config.createElement('field', {
       field: field, plain: this.props.plain
-    }, R.div({ className: cx(this.props.classes) },
+    }, R.div({ className: cx(this.props.classes), tabIndex: this.props.tabIndex || 0 },
     // css transitions know to cause event problems
     config.cssTransitionWrapper(fields.map((function (childField, i) {
       return config.createElement('array-item', {
