@@ -159,7 +159,8 @@ module.exports = React.createClass({
     var props = {
       ref: 'toggle',
       onClick: onInsertClick.bind(this),
-      readOnly: this.isReadOnly()
+      readOnly: this.isReadOnly(),
+      field: this.props.field
     };
     return this.props.config.createElement('insert-button', props, 'Insert...');
   },
