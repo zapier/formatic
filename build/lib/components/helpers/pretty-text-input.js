@@ -117,14 +117,23 @@ module.exports = React.createClass({
     }
   },
 
-  onFocus: function onFocus() {
+  onFocusWrapper: function onFocusWrapper() {
     var _this2 = this;
 
     this.switchToCodeMirror(function () {
       _this2.codeMirror.focus();
       _this2.codeMirror.setCursor(_this2.codeMirror.lineCount(), 0);
-      _this2.props.onFocus();
     });
+  },
+
+  onFocusCodeMirror: function onFocusCodeMirror() {
+    this.setState({ hasFocus: true });
+    this.props.onFocus();
+  },
+
+  onBlur: function onBlur() {
+    this.setState({ hasFocus: false });
+    this.props.onBlur();
   },
 
   insertBtn: function insertBtn() {
@@ -170,6 +179,13 @@ module.exports = React.createClass({
     this.onStartAction(choice.action, choice);
   },
 
+  wrapperTabIndex: function wrapperTabIndex() {
+    if (this.props.readOnly || this.state.codeMirrorMode) {
+      return null;
+    }
+    return this.props.tabIndex || 0;
+  },
+
   render: function render() {
     return this.renderWithConfig();
   },
@@ -177,10 +193,9 @@ module.exports = React.createClass({
   renderDefault: function renderDefault() {
     var textBoxClasses = cx(_.extend({}, this.props.classes, {
       'pretty-text-box': true,
-      placeholder: this.hasPlaceholder()
+      placeholder: this.hasPlaceholder(),
+      'has-focus': this.state.hasFocus
     }));
-
-    var tabIndex = this.state.codeMirrorMode ? null : this.props.tabIndex || 0;
 
     // Render read-only version.
     return React.createElement(
@@ -188,7 +203,8 @@ module.exports = React.createClass({
       { className: cx({ 'pretty-text-wrapper': true, 'choices-open': this.state.isChoicesOpen }), onMouseEnter: this.switchToCodeMirror },
       React.createElement(
         'div',
-        { className: textBoxClasses, tabIndex: tabIndex, onFocus: this.onFocus, onBlur: this.props.onBlur },
+        { className: textBoxClasses, tabIndex: this.wrapperTabIndex(),
+          onFocus: this.onFocusWrapper, onBlur: this.onBlur },
         React.createElement('div', { ref: 'textBox', className: 'internal-text-wrapper' })
       ),
       this.insertBtn(),
@@ -260,6 +276,7 @@ module.exports = React.createClass({
 
     this.codeMirror = CodeMirror(textBox, options);
     this.codeMirror.on('change', this.onCodeMirrorChange);
+    this.codeMirror.on('focus', this.onFocusCodeMirror);
 
     this.tagCodeMirror();
   },

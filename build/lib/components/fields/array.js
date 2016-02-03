@@ -124,10 +124,12 @@ module.exports = React.createClass({
       arrayControl = config.createElement('array-control', { field: field, onAppend: this.onAppend });
     }
 
+    var tabIndex = this.isReadOnly() ? null : this.props.tabIndex || 0;
+
     var numItems = field.value.length;
     return config.createElement('field', {
       field: field, plain: this.props.plain
-    }, R.div({ className: cx(this.props.classes), tabIndex: this.props.tabIndex || 0 },
+    }, R.div({ className: cx(this.props.classes), tabIndex: tabIndex },
     // css transitions know to cause event problems
     config.cssTransitionWrapper(fields.map((function (childField, i) {
       return config.createElement('array-item', {
