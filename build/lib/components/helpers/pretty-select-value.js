@@ -78,6 +78,7 @@ module.exports = React.createClass({
         event.stopPropagation();
         if (this.state.isChoicesOpen) {
           this.onToggleChoices();
+          this.onFocus();
         }
       } else if (!this.state.isChoicesOpen) {
         if (event.keyCode === keyCodes.UP || event.keyCode === keyCodes.DOWN || event.keyCode === keyCodes.ENTER) {

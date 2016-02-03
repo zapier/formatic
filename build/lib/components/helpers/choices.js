@@ -186,8 +186,6 @@ module.exports = React.createClass({
 
     var isOpening = !this.props.open && nextProps.open;
 
-    var isClosing = this.props.open && !nextProps.open;
-
     var nextState = {
       open: nextProps.open
     };
@@ -204,9 +202,6 @@ module.exports = React.createClass({
         if (_this2.refs.search) {
           _this2.refs.search.focus();
         }
-      }
-      if (isClosing && _this2.props.onFocusSelect) {
-        _this2.props.onFocusSelect();
       }
       _this2.adjustSize();
       _this2.updateListeningToWindow();

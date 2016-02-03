@@ -130,6 +130,12 @@ module.exports = React.createClass({
     });
   },
 
+  focusCodeMirror: function focusCodeMirror() {
+    if (this.codeMirror) {
+      this.codeMirror.focus();
+    }
+  },
+
   onFocusCodeMirror: function onFocusCodeMirror() {
     this.setState({ hasFocus: true });
     this.props.onFocus();
@@ -165,7 +171,7 @@ module.exports = React.createClass({
 
     return this.props.config.createElement('choices', {
       ref: 'choices',
-      onFocusSelect: this.onFocus,
+      onFocusSelect: this.focusCodeMirror,
       choices: this.state.replaceChoices,
       open: this.state.isChoicesOpen,
       ignoreCloseNodes: this.getCloseIgnoreNodes,
@@ -198,6 +204,7 @@ module.exports = React.createClass({
         event.stopPropagation();
         if (this.state.isChoicesOpen) {
           this.onToggleChoices();
+          this.focusCodeMirror();
         }
       } else if (!this.state.isChoicesOpen) {
         // TODO: sane shortcut for opening choices
