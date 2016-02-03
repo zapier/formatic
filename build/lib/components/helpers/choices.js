@@ -275,11 +275,12 @@ module.exports = React.createClass({
 
   hasSearch: function hasSearch() {
     var visibleChoices = arguments.length <= 0 || arguments[0] === undefined ? this.visibleChoices() : arguments[0];
+    var props = arguments.length <= 1 || arguments[1] === undefined ? this.props : arguments[1];
 
     var hasSearch = !!this.state.searchString;
 
     if (!hasSearch) {
-      if (this.props.choices.length > 2) {
+      if (props.choices.length > 2) {
         if (_.find(visibleChoices, function (choice) {
           return !choice.action && choice.value !== '///loading///';
         })) {
@@ -294,7 +295,7 @@ module.exports = React.createClass({
   isSearchOpening: function isSearchOpening(nextProps) {
     if (this.props.choices.length < nextProps.choices.length) {
       var prevHasSearch = this.hasSearch(this.visibleChoices());
-      var nextHasSearch = this.hasSearch(this.visibleChoices(nextProps));
+      var nextHasSearch = this.hasSearch(this.visibleChoices(nextProps), nextProps);
       if (nextHasSearch && !prevHasSearch) {
         return true;
       }
