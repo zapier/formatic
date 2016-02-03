@@ -40,12 +40,21 @@ module.exports = React.createClass({
   },
 
   renderDefault: function renderDefault() {
+    var _this = this;
+
     if (this.props.readOnly) {
       var classes = _.extend({}, this.props.classes, { 'readonly-control': this.props.readOnly });
       return R.span({ className: cx(classes) }, this.props.label);
     }
 
+    var onKeyDown = function onKeyDown(event) {
+      if (event.keyCode === 13) {
+        _this.props.onClick(event);
+      }
+    };
+
     return R.span({
+      tabIndex: 0, onKeyDown: onKeyDown,
       className: cx(this.props.classes), onClick: this.props.onClick,
       onMouseOver: this.onMouseOverRemove, onMouseOut: this.onMouseOutRemove
     }, this.props.label);

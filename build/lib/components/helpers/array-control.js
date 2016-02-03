@@ -52,7 +52,7 @@ module.exports = React.createClass({
 
     var addItem = undefined;
     if (!this.isReadOnly()) {
-      addItem = config.createElement('add-item', { field: field, onClick: this.onAppend });
+      addItem = config.createElement('add-item', { field: field, onClick: this.onAppend, tabIndex: this.props.tabIndex });
     }
 
     return R.div({ className: cx(this.props.classes) }, typeChoices, ' ', addItem);
