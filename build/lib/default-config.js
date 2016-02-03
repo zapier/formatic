@@ -75,6 +75,8 @@ module.exports = function (config) {
 
     createElement_Choices: React.createFactory(require('./components/helpers/choices')),
 
+    createElement_ChoicesItem: React.createFactory(require('./components/helpers/choices-item')),
+
     createElement_Choice: React.createFactory(require('./components/helpers/choice')),
 
     createElement_ChoicesSearch: React.createFactory(require('./components/helpers/choices-search')),

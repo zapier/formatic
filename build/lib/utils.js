@@ -7,6 +7,7 @@ Just some shared utility functions.
 'use strict';
 
 var _ = require('./undash');
+var ReactDOM = require('react-dom');
 
 var utils = exports;
 
@@ -118,4 +119,46 @@ utils.delegator = function (obj) {
 
 utils.capitalize = function (s) {
   return s.charAt(0).toUpperCase() + s.substring(1).toLowerCase();
+};
+
+utils.keyCodes = {
+  UP: 38,
+  DOWN: 40,
+  ENTER: 13,
+  ESC: 27,
+  '[': 219,
+  SHIFT: 16
+};
+
+// utils.scrollIntoViewIfOutside = (node, container) => {
+//   if (node && container) {
+//     const nodeRect = node.getBoundingClientRect();
+//     const containerRect = container.getBoundingClientRect();
+//     if (nodeRect.bottom > containerRect.bottom || nodeRect.top < containerRect.top) {
+//       node.scrollIntoView(false);
+//     }
+//   }
+// };
+
+utils.scrollIntoContainerView = function (node, container) {
+  if (node && container) {
+    var nodeRect = node.getBoundingClientRect();
+    var containerRect = container.getBoundingClientRect();
+    var offset = 0;
+    if (nodeRect.bottom > containerRect.bottom) {
+      offset = nodeRect.bottom - containerRect.bottom;
+    } else if (nodeRect.top < containerRect.top) {
+      offset = nodeRect.top - containerRect.top;
+    }
+    if (offset !== 0) {
+      container.scrollTop = container.scrollTop + offset;
+    }
+  }
+};
+
+utils.focusRefNode = function (ref) {
+  if (ref) {
+    var node = ReactDOM.findDOMNode(ref);
+    node.focus();
+  }
 };

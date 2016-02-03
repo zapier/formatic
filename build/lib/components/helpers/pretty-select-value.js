@@ -12,6 +12,11 @@ var React = require('react');
 var _ = require('../../undash');
 var cx = require('classnames');
 
+var _require = require('../../utils');
+
+var keyCodes = _require.keyCodes;
+var focusRefNode = _require.focusRefNode;
+
 module.exports = React.createClass({
 
   displayName: 'SelectValue',
@@ -54,7 +59,8 @@ module.exports = React.createClass({
       isChoicesOpen: this.props.isChoicesOpen,
       isEnteringCustomValue: !isDefaultValue && !currentChoice && this.props.field.value,
       // Caching this cause it's kind of expensive.
-      currentChoice: this.currentChoice(this.props)
+      currentChoice: this.currentChoice(this.props),
+      hoverIndex: -1
     };
   },
 
@@ -65,9 +71,35 @@ module.exports = React.createClass({
     });
   },
 
+  onKeyDown: function onKeyDown(event) {
+    if (!this.isReadOnly()) {
+      if (event.keyCode === keyCodes.ESC) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.state.isChoicesOpen) {
+          this.onToggleChoices();
+        }
+      } else if (!this.state.isChoicesOpen) {
+        if (event.keyCode === keyCodes.UP || event.keyCode === keyCodes.DOWN || event.keyCode === keyCodes.ENTER) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.onToggleChoices();
+        }
+      } else {
+        if (this.refs.choices && this.refs.choices.onKeyDown) {
+          this.refs.choices.onKeyDown(event);
+        }
+      }
+    }
+  },
+
   value: function value(props) {
     props = props || this.props;
     return props.field.value !== undefined ? props.field.value : '';
+  },
+
+  onFocus: function onFocus() {
+    focusRefNode(this.refs.container);
   },
 
   render: function render() {
@@ -97,7 +129,9 @@ module.exports = React.createClass({
         onClose: this.onCloseChoices,
         onChoiceAction: this.onChoiceAction,
         field: field,
-        isAccordion: field.isAccordion
+        isAccordion: field.isAccordion,
+        hoverIndex: this.state.hoverIndex,
+        onFocusSelect: this.onFocus
       });
     }
 
@@ -126,7 +160,7 @@ module.exports = React.createClass({
 
     choicesOrLoading = React.createElement(
       'div',
-      { className: cx(_.extend({}, this.props.classes, { 'choices-open': this.state.isChoicesOpen })),
+      { ref: 'container', tabIndex: '0', onKeyDown: this.onKeyDown, className: cx(_.extend({}, this.props.classes, { 'choices-open': this.state.isChoicesOpen })),
         onChange: this.onChange },
       React.createElement(
         'div',

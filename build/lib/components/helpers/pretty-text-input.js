@@ -8,6 +8,10 @@ var TagTranslator = require('./tag-translator');
 var _ = require('../../undash');
 var cx = require('classnames');
 
+var _require = require('../../utils');
+
+var keyCodes = _require.keyCodes;
+
 var toString = function toString(value) {
   if (_.isUndefined(value) || _.isNull(value)) {
     return '';
@@ -161,6 +165,7 @@ module.exports = React.createClass({
 
     return this.props.config.createElement('choices', {
       ref: 'choices',
+      onFocusSelect: this.onFocus,
       choices: this.state.replaceChoices,
       open: this.state.isChoicesOpen,
       ignoreCloseNodes: this.getCloseIgnoreNodes,
@@ -186,6 +191,39 @@ module.exports = React.createClass({
     return this.props.tabIndex || 0;
   },
 
+  onKeyDown: function onKeyDown(event) {
+    if (!this.isReadOnly()) {
+      if (event.keyCode === keyCodes.ESC) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (this.state.isChoicesOpen) {
+          this.onToggleChoices();
+        }
+      } else if (!this.state.isChoicesOpen) {
+        // TODO: sane shortcut for opening choices
+        // Below does not work yet. Ends up dumping { into search input.
+        // if (this.codeMirror) {
+        //   if (event.keyCode === keyCodes['['] && event.shiftKey) {
+        //     const cursor = this.codeMirror.getCursor();
+        //     const value = this.codeMirror.getValue();
+        //     const lines = value.split('\n');
+        //     const line = lines[cursor.line];
+        //     if (line) {
+        //       const prevChar = line[cursor.ch - 1];
+        //       if (prevChar === '{') {
+        //         this.onToggleChoices();
+        //       }
+        //     }
+        //   }
+        // }
+      } else {
+          if (this.refs.choices && this.refs.choices.onKeyDown) {
+            this.refs.choices.onKeyDown(event);
+          }
+        }
+    }
+  },
+
   render: function render() {
     return this.renderWithConfig();
   },
@@ -200,7 +238,7 @@ module.exports = React.createClass({
     // Render read-only version.
     return React.createElement(
       'div',
-      { className: cx({ 'pretty-text-wrapper': true, 'choices-open': this.state.isChoicesOpen }), onMouseEnter: this.switchToCodeMirror },
+      { onKeyDown: this.onKeyDown, className: cx({ 'pretty-text-wrapper': true, 'choices-open': this.state.isChoicesOpen }), onMouseEnter: this.switchToCodeMirror },
       React.createElement(
         'div',
         { className: textBoxClasses, tabIndex: this.wrapperTabIndex(),

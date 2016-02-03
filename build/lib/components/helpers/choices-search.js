@@ -14,6 +14,10 @@ module.exports = React.createClass({
 
   mixins: [require('../../mixins/helper')],
 
+  focus: function focus() {
+    this.refs.input.focus();
+  },
+
   render: function render() {
     return this.renderWithConfig();
   },
@@ -22,7 +26,7 @@ module.exports = React.createClass({
     return React.createElement(
       'div',
       { className: 'choices-search' },
-      React.createElement('input', { type: 'text', placeholder: 'Search...', onChange: this.props.onChange })
+      React.createElement('input', { ref: 'input', type: 'text', placeholder: 'Search...', onChange: this.props.onChange })
     );
   }
 

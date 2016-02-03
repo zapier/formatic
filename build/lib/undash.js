@@ -48,7 +48,7 @@ _.clone = function (value) {
 
 _.find = function (items, testFn) {
   for (var i = 0; i < items.length; i++) {
-    if (testFn(items[i])) {
+    if (testFn(items[i], i)) {
       return items[i];
     }
   }

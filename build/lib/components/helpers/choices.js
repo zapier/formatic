@@ -6,12 +6,24 @@ Render customized (non-native) dropdown choices.
 
 'use strict';
 
+var _keyCodeToDirection;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 var React = require('react');
 var R = React.DOM;
+var ReactDOM = require('react-dom');
 var _ = require('../../undash');
 var ScrollLock = require('react-scroll-lock');
 
+var _require = require('../../utils');
+
+var keyCodes = _require.keyCodes;
+var scrollIntoContainerView = _require.scrollIntoContainerView;
+
 var magicChoiceRe = /^\/\/\/[^\/]+\/\/\/$/;
+
+var keyCodeToDirection = (_keyCodeToDirection = {}, _defineProperty(_keyCodeToDirection, keyCodes.UP, -1), _defineProperty(_keyCodeToDirection, keyCodes.DOWN, 1), _keyCodeToDirection);
 
 var requestAnimationFrameThrottled = function requestAnimationFrameThrottled(frameCount, cb) {
   if (frameCount === undefined) frameCount = 1;
@@ -46,7 +58,8 @@ module.exports = React.createClass({
     return {
       maxHeight: null,
       open: this.props.open,
-      searchString: ''
+      searchString: '',
+      hoverValue: null
     };
   },
 
@@ -71,6 +84,10 @@ module.exports = React.createClass({
         this.onClose();
       }
     }).bind(this));
+
+    if (this.refs.search) {
+      this.refs.search.focus();
+    }
 
     this.adjustSize();
     this.updateListeningToWindow();
@@ -165,14 +182,35 @@ module.exports = React.createClass({
   },
 
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+    var _this2 = this;
+
+    var isOpening = !this.props.open && nextProps.open;
+
+    var isClosing = this.props.open && !nextProps.open;
+
     var nextState = {
       open: nextProps.open
     };
 
-    this.setState(nextState, (function () {
-      this.adjustSize();
-      this.updateListeningToWindow();
-    }).bind(this));
+    // For now, erase hover value when opening. Maybe get smarter about this later.
+    if (isOpening) {
+      nextState.hoverValue = null;
+    }
+
+    var isSearchOpening = this.isSearchOpening(nextProps);
+
+    this.setState(nextState, function () {
+      if (isOpening || isSearchOpening) {
+        if (_this2.refs.search) {
+          _this2.refs.search.focus();
+        }
+      }
+      if (isClosing && _this2.props.onFocusSelect) {
+        _this2.props.onFocusSelect();
+      }
+      _this2.adjustSize();
+      _this2.updateListeningToWindow();
+    });
   },
 
   onHeaderClick: function onHeaderClick(choice) {
@@ -191,10 +229,12 @@ module.exports = React.createClass({
   },
 
   visibleChoices: function visibleChoices() {
-    var _this2 = this;
+    var _this3 = this;
 
-    var choices = this.props.choices;
-    var config = this.props.config;
+    var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
+
+    var choices = props.choices;
+    var config = props.config;
 
     if (choices && choices.length === 0) {
       return [{ value: '///empty///' }];
@@ -205,11 +245,11 @@ module.exports = React.createClass({
         if (choice.sectionKey) {
           return true;
         }
-        return config.isSearchStringInChoice(_this2.state.searchString, choice);
+        return config.isSearchStringInChoice(_this3.state.searchString, choice);
       });
     }
 
-    if (!this.props.isAccordion) {
+    if (!props.isAccordion) {
       return choices;
     }
 
@@ -233,6 +273,35 @@ module.exports = React.createClass({
     return visibleChoices;
   },
 
+  hasSearch: function hasSearch() {
+    var visibleChoices = arguments.length <= 0 || arguments[0] === undefined ? this.visibleChoices() : arguments[0];
+
+    var hasSearch = !!this.state.searchString;
+
+    if (!hasSearch) {
+      if (this.props.choices.length > 2) {
+        if (_.find(visibleChoices, function (choice) {
+          return !choice.action && choice.value !== '///loading///';
+        })) {
+          hasSearch = true;
+        }
+      }
+    }
+
+    return hasSearch;
+  },
+
+  isSearchOpening: function isSearchOpening(nextProps) {
+    if (this.props.choices.length < nextProps.choices.length) {
+      var prevHasSearch = this.hasSearch(this.visibleChoices());
+      var nextHasSearch = this.hasSearch(this.visibleChoices(nextProps));
+      if (nextHasSearch && !prevHasSearch) {
+        return true;
+      }
+    }
+    return false;
+  },
+
   render: function render() {
     return this.renderWithConfig();
   },
@@ -248,60 +317,150 @@ module.exports = React.createClass({
     });
   },
 
+  choiceValue: function choiceValue(choice) {
+    if (choice.value === '///loading///') {
+      return 'loading';
+    } else if (choice.value === '///empty///') {
+      return 'empty';
+    } else if (choice.action) {
+      return 'action:' + choice.action;
+    } else if (choice.sectionKey) {
+      return 'section:' + choice.sectionKey;
+    } else {
+      return 'value:' + choice.value;
+    }
+  },
+
+  // Receive keydown events from parent. Really, this component should be
+  // ripped apart into a stateless component, but much refactoring to be done
+  // for that.
+  onKeyDown: function onKeyDown(event) {
+    var _this4 = this;
+
+    var direction = event.keyCode in keyCodeToDirection ? keyCodeToDirection[event.keyCode] : 0;
+
+    if (direction !== 0 || event.keyCode === keyCodes.ENTER) {
+      (function () {
+
+        var visibleChoices = _this4.visibleChoices();
+        var hoverValue = _this4.state.hoverValue;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (direction !== 0) {
+          if (visibleChoices) {
+            var hoverIndex = -1;
+            if (hoverValue === 'search') {
+              hoverIndex = -1;
+            } else {
+              _.find(visibleChoices, function (choice, i) {
+                if (hoverValue === _this4.choiceValue(choice)) {
+                  hoverIndex = i;
+                  return true;
+                }
+              });
+            }
+            var nextHoverIndex = hoverIndex + direction;
+            if (nextHoverIndex < 0) {
+              nextHoverIndex = 0;
+              if (_this4.refs.container) {
+                var containerNode = ReactDOM.findDOMNode(_this4.refs.container);
+                containerNode.scrollTop = 0;
+              }
+            } else if (nextHoverIndex + 1 > visibleChoices.length) {
+              nextHoverIndex = visibleChoices.length - 1;
+            }
+            var nextHoverComponent = _this4.refs['choice-' + nextHoverIndex];
+            if (nextHoverComponent && _this4.refs.container) {
+              var node = ReactDOM.findDOMNode(nextHoverComponent);
+              var containerNode = ReactDOM.findDOMNode(_this4.refs.container);
+              scrollIntoContainerView(node, containerNode);
+            }
+            var nextHoverValue = nextHoverIndex > -1 ? _this4.choiceValue(visibleChoices[nextHoverIndex]) : 'search';
+            if (nextHoverValue === 'search') {
+              if (_this4.refs.search) {
+                _this4.refs.search.focus();
+              }
+            }
+            _this4.setState({
+              hoverValue: nextHoverValue
+            });
+          }
+        }
+
+        if (event.keyCode === keyCodes.ENTER) {
+          var selectedChoice = _.find(visibleChoices, function (choice) {
+            return _this4.choiceValue(choice) === hoverValue;
+          });
+          if (selectedChoice) {
+            if (hoverValue.indexOf('value:') === 0) {
+              _this4.onSelect(selectedChoice, event);
+            } else if (selectedChoice.action) {
+              _this4.onChoiceAction(selectedChoice);
+            } else if (selectedChoice.sectionKey) {
+              _this4.onHeaderClick(selectedChoice);
+            } else {
+              _this4.onClose();
+            }
+          }
+        }
+      })();
+    }
+  },
+
   renderDefault: function renderDefault() {
+
+    if (!this.props.open) {
+      return null;
+    }
+
     var config = this.props.config;
 
     var choices = this.visibleChoices();
 
     var search = null;
 
-    var hasSearch = !!this.state.searchString;
-
-    if (!hasSearch) {
-      if (this.props.choices.length > 2) {
-        if (_.find(choices, function (choice) {
-          return !choice.action && choice.value !== '///loading///';
-        })) {
-          hasSearch = true;
-        }
-      }
-    }
+    var hasSearch = this.hasSearch(choices);
 
     if (hasSearch) {
-      search = config.createElement('choices-search', { key: 'choices-search', field: this.props.field, onChange: this.onChangeSearch });
+      search = config.createElement('choices-search', { ref: 'search', key: 'choices-search', field: this.props.field, onChange: this.onChangeSearch });
     }
 
-    if (this.props.open) {
-      return R.div({
-        ref: 'container', onClick: this.onClick, className: 'choices-container', style: {
-          userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
-          maxHeight: this.state.maxHeight ? this.state.maxHeight : null
-        }
-      }, config.cssTransitionWrapper(search, R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
+    return R.div({
+      ref: 'container', onClick: this.onClick, className: 'choices-container', style: {
+        userSelect: 'none', WebkitUserSelect: 'none', position: 'absolute',
+        maxHeight: this.state.maxHeight ? this.state.maxHeight : null
+      }
+    }, config.cssTransitionWrapper(search, R.ul({ key: 'choices', ref: 'choices', className: 'choices' }, choices.map((function (choice, i) {
 
-        var choiceElement = null;
+      var choiceElement = null;
+      var choiceValue = null;
 
-        if (choice.value === '///loading///') {
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onClose }, R.span({ className: 'choice-label' }, config.createElement('loading-choice', { field: this.props.field })));
-        } else if (choice.value === '///empty///') {
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onClose }, R.span({ className: 'choice-label' }, 'No choices available.'));
-        } else if (choice.action) {
-          var labelClasses = 'choice-label ' + choice.action;
+      if (choice.value === '///loading///') {
+        choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onClose }, R.span({ className: 'choice-label' }, config.createElement('loading-choice', { field: this.props.field })));
+        choiceValue = 'loading';
+      } else if (choice.value === '///empty///') {
+        choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onClose }, R.span({ className: 'choice-label' }, 'No choices available.'));
+        choiceValue = 'empty';
+      } else if (choice.action) {
+        var labelClasses = 'choice-label ' + choice.action;
 
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onChoiceAction.bind(this, choice) }, R.span({ className: labelClasses }, choice.label || this.props.config.actionChoiceLabel(choice.action)), this.props.config.createElement('choice-action-sample', { action: choice.action, choice: choice }));
-        } else if (choice.sectionKey) {
-          choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onHeaderClick.bind(this, choice) }, config.createElement('choice-section-header', { choice: choice }));
-        } else {
-          choiceElement = config.createElement('choice', {
-            onSelect: this.onSelect, choice: choice, field: this.props.field
-          });
-        }
+        choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onChoiceAction.bind(this, choice) }, R.span({ className: labelClasses }, choice.label || this.props.config.actionChoiceLabel(choice.action)), this.props.config.createElement('choice-action-sample', { action: choice.action, choice: choice }));
+        choiceValue = 'action:' + choice.action;
+      } else if (choice.sectionKey) {
+        choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onHeaderClick.bind(this, choice) }, config.createElement('choice-section-header', { choice: choice }));
+        choiceValue = 'section:' + choice.sectionKey;
+      } else {
+        choiceElement = config.createElement('choice', {
+          onSelect: this.onSelect, choice: choice, field: this.props.field
+        });
+        choiceValue = 'value:' + choice.value;
+      }
 
-        return R.li({ key: i, className: 'choice' }, choiceElement);
-      }).bind(this)))));
-    }
-
-    // not open
-    return null;
+      return config.createElement('choices-item', {
+        ref: 'choice-' + i, key: i, isHovering: this.state.hoverValue && this.state.hoverValue === choiceValue
+      }, choiceElement);
+    }).bind(this)))));
   }
 });
