@@ -390,6 +390,9 @@ module.exports = React.createClass({
             return _this4.choiceValue(choice) === hoverValue;
           });
           if (selectedChoice) {
+            if (_this4.props.onFocusSelect) {
+              _this4.props.onFocusSelect();
+            }
             if (hoverValue.indexOf('value:') === 0) {
               _this4.onSelect(selectedChoice, event);
             } else if (selectedChoice.action) {
