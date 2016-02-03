@@ -60,18 +60,18 @@ var config = Formatic.createConfig(
 
 var fields = [
   {label: 'Array', type: 'array', key: 'yoArray'},
-  {label: 'single line string', type: 'single-line-string', key: 'single-line-string'},
-  {label: 'Code', type: 'code', key: 'somecode', language: 'javascript'},
-  {label: 'Readonly Code', type: 'code', key: 'readonlyCode', language: 'javascript', readOnly: true, default: 'x = 3;'},
-  {label: 'Code Python', type: 'code', key: 'somepycode', language: 'python'}
+  {label: 'single line string', type: 'single-line-string', key: 'single-line-string'}
+  //{label: 'Code', type: 'code', key: 'somecode', language: 'javascript'},
+  //{label: 'Readonly Code', type: 'code', key: 'readonlyCode', language: 'javascript', readOnly: true, default: 'x = 3;'},
+  //{label: 'Code Python', type: 'code', key: 'somepycode', language: 'python'}
 ];
 
 var prettyNum = 2;
 _.each(_.range(prettyNum), function(x){
   fields.push({
     label: 'Pretty Text 2', key: 'prettyText2-' + x, type: 'pretty-text',
-    default: 'Hi there {{firstName}} {{lastName}} {{middleName}}. A lot more text to do a wrap. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam metus tellus, suscipit eget gravida rhoncus, convallis sed justo. Aenean at condimentum ipsum, ut rutrum nisi. Vestibulum tincidunt nisl vel lectus varius semper. Ut tortor nunc, lacinia non mi convallis, iaculis posuere ipsum.',
-    tabIndex: x + 1,
+    default: 'Hi there {{firstName}} {{lastName}} {{middleName}}.',
+    //tabIndex: x + 1,
     replaceChoices: [
       {
         value: 'firstName',
@@ -110,7 +110,7 @@ fields = fields.concat([
     label: 'Pretty Text 2', key: 'nestedPrettyText', type: 'pretty-text',
     isAccordion: true,
     default: 'Hi there {{firstName}} {{lastName}} {{middleName}}.',
-    tabIndex: prettyNum + 1,
+    //tabIndex: prettyNum + 1,
     isLoading: true,
     replaceChoices: [
       {
@@ -335,6 +335,12 @@ var onClearCurrentChoice = function (info) {
 var onOrderGroceries = function (info) {
   console.log('ordering...', info);
 };
+
+//fields = [
+//{type: 'pretty-text', key: 'a', label: 'pretty'},
+//{type: 'pretty-text', key: 'b', label: 'pretty'},
+//{type: 'pretty-text', key: 'c', label: 'pretty'}
+//];
 
 // Controlled version:
 
