@@ -302,9 +302,13 @@ module.exports = React.createClass({
         isChoicesOpen: false
       }, function () {
         if (this.hasCustomField()) {
-          this.refs.customFieldInput.focus();
+          if (this.refs.cusomFieldInput && this.refs.customFieldInput.focus) {
+            this.refs.customFieldInput.focus();
+          }
         } else {
-          this.refs.customInput.focus();
+          if (this.refs.customInput && this.refs.customInput.focus) {
+            this.refs.customInput.focus();
+          }
         }
       });
     } else if (choice.action === 'insert-field') {

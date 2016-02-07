@@ -19,7 +19,9 @@ module.exports = React.createClass({
   },
 
   focus: function focus() {
-    this.refs.textBox.focus();
+    if (this.refs.textBox && this.refs.textBox.focus) {
+      this.refs.textBox.focus();
+    }
   },
 
   setChoicesOpen: function setChoicesOpen(isOpenChoices) {
@@ -28,6 +30,7 @@ module.exports = React.createClass({
 
   renderDefault: function renderDefault() {
     return this.props.config.createElement('pretty-text-input', {
+      ref: 'textBox',
       classes: this.props.classes,
       onChange: this.props.onChange,
       onFocus: this.props.onFocus,

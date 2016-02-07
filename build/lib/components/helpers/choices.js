@@ -220,7 +220,7 @@ module.exports = React.createClass({
     var sectionHeaders = this.props.choices.filter(function (c) {
       return c.sectionKey;
     });
-    return sectionHeaders.length === 1;
+    return sectionHeaders.length < 2;
   },
 
   visibleChoices: function visibleChoices() {

@@ -130,6 +130,18 @@ module.exports = React.createClass({
     });
   },
 
+  focus: function focus() {
+    var _this3 = this;
+
+    if (this.codeMirror) {
+      this.focusCodeMirror();
+    } else {
+      this.switchToCodeMirror(function () {
+        _this3.focusCodeMirror();
+      });
+    }
+  },
+
   focusCodeMirror: function focusCodeMirror() {
     if (this.codeMirror) {
       this.codeMirror.focus();
@@ -400,7 +412,7 @@ module.exports = React.createClass({
   },
 
   switchToCodeMirror: function switchToCodeMirror(cb) {
-    var _this3 = this;
+    var _this4 = this;
 
     if (this.isReadOnly()) {
       return; // never render in code mirror if read-only
@@ -408,7 +420,7 @@ module.exports = React.createClass({
 
     if (!this.state.codeMirrorMode && !this.props.readOnly) {
       this.setState({ codeMirrorMode: true }, function () {
-        if (_this3.codeMirror && _.isFunction(cb)) {
+        if (_this4.codeMirror && _.isFunction(cb)) {
           cb();
         }
       });
