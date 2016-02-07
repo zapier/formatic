@@ -302,7 +302,7 @@ module.exports = React.createClass({
         isChoicesOpen: false
       }, function () {
         if (this.hasCustomField()) {
-          if (this.refs.cusomFieldInput && this.refs.customFieldInput.focus) {
+          if (this.refs.customFieldInput && this.refs.customFieldInput.focus) {
             this.refs.customFieldInput.focus();
           }
         } else {
