@@ -307,6 +307,30 @@ fields = fields.concat([
         ]
       }
     ]
+  },
+  {
+    type: 'pretty-select',
+    key: 'prettyBoolean',
+    isAccordion: true,
+    choices: [
+      {
+        label: 'yes',
+        value: 'true'
+      },
+      {
+        label: 'no',
+        value: 'false'
+      },
+      {
+        action: 'enter-custom-value',
+        label: 'Use a Custom Value'
+      },
+      {
+        value: '',
+        action: 'clear-current-choice',
+        label: 'Clear Current Choice'
+      }
+    ]
   }
 ]);
 
