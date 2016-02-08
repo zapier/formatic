@@ -274,7 +274,7 @@ fields = fields.concat([
   },
   {label: 'More colors', key: 'moreColors', extends: 'colors'},
   {label: "I'm alive!", type: 'checkbox-boolean', key: 'isAlive', default: true, readOnly: true},
-  {label: 'Loading', key: 'loading', type: 'pretty-select', isLoading: true},
+  {label: 'Loading', key: 'loading', type: 'pretty-select', isLoading: true, isAccordion: true},
   {
     label: 'Grouped Fields', key: 'groupedFields', type: 'grouped-fields',
     fields: [

@@ -254,13 +254,12 @@ module.exports = React.createClass({
     var inSection;
 
     choices.forEach(function (choice) {
-      if (choice.value && choice.value.match(magicChoiceRe)) {
-        visibleChoices.push(choice);
-      }
       if (choice.sectionKey) {
         inSection = choice.sectionKey === openSection;
       }
-      if (alwaysExanded || choice.sectionKey || inSection) {
+      if (choice.value && choice.value.match(magicChoiceRe)) {
+        visibleChoices.push(choice);
+      } else if (alwaysExanded || choice.sectionKey || inSection) {
         visibleChoices.push(choice);
       }
     });
