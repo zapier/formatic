@@ -145,6 +145,12 @@ fields = fields.concat([
         value: 'lastName',
         label: 'Last Name',
         sample: 'Brown'
+      },
+      {
+        sectionKey: null,
+        value: 'extraName',
+        label: 'Extra Name',
+        sample: 'Extra'
       }
     ]
   },
