@@ -224,6 +224,10 @@ module.exports = React.createClass({
   },
 
   visibleChoices: function visibleChoices() {
+    return this.visibleChoicesInfo.apply(this, arguments).choices;
+  },
+
+  visibleChoicesInfo: function visibleChoicesInfo() {
     var _this3 = this;
 
     var props = arguments.length <= 0 || arguments[0] === undefined ? this.props : arguments[0];
@@ -232,7 +236,10 @@ module.exports = React.createClass({
     var config = props.config;
 
     if (choices && choices.length === 0) {
-      return [{ value: '///empty///' }];
+      return {
+        choices: [{ value: '///empty///' }],
+        hasDisabledSections: true
+      };
     }
 
     if (this.state.searchString) {
@@ -245,7 +252,10 @@ module.exports = React.createClass({
     }
 
     if (!props.isAccordion) {
-      return choices;
+      return {
+        choices: choices,
+        hasDisabledSections: true
+      };
     }
 
     var openSection = this.state.openSection;
@@ -268,7 +278,10 @@ module.exports = React.createClass({
       }
     });
 
-    return visibleChoices;
+    return {
+      choices: visibleChoices,
+      hasDisabledSections: alwaysExanded
+    };
   },
 
   hasSearch: function hasSearch() {
@@ -419,7 +432,10 @@ module.exports = React.createClass({
 
     var config = this.props.config;
 
-    var choices = this.visibleChoices();
+    var _visibleChoicesInfo = this.visibleChoicesInfo();
+
+    var choices = _visibleChoicesInfo.choices;
+    var hasDisabledSections = _visibleChoicesInfo.hasDisabledSections;
 
     var search = null;
 
@@ -451,7 +467,7 @@ module.exports = React.createClass({
         choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onChoiceAction.bind(this, choice) }, R.span({ className: labelClasses }, choice.label || this.props.config.actionChoiceLabel(choice.action)), this.props.config.createElement('choice-action-sample', { action: choice.action, choice: choice }));
         choiceValue = 'action:' + choice.action;
       } else if (choice.sectionKey) {
-        choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onHeaderClick.bind(this, choice) }, config.createElement('choice-section-header', { choice: choice }));
+        choiceElement = R.a({ href: 'JavaScript' + ':', onClick: this.onHeaderClick.bind(this, choice) }, config.createElement('choice-section-header', { choice: choice, isOpen: this.state.openSection === choice.sectionKey, isDisabled: hasDisabledSections }));
         choiceValue = 'section:' + choice.sectionKey;
       } else {
         choiceElement = config.createElement('choice', {
