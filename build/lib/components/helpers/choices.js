@@ -251,15 +251,17 @@ module.exports = React.createClass({
     var openSection = this.state.openSection;
     var alwaysExanded = this.hasOneSection() || this.state.searchString;
     var visibleChoices = [];
-    var inSection;
+    var isInOpenSection;
+    var isInSection = false;
 
     choices.forEach(function (choice) {
       if (choice.sectionKey) {
-        inSection = choice.sectionKey === openSection;
+        isInSection = true;
+        isInOpenSection = choice.sectionKey === openSection;
       }
       if (choice.value && choice.value.match(magicChoiceRe)) {
         visibleChoices.push(choice);
-      } else if (alwaysExanded || choice.sectionKey || inSection) {
+      } else if (alwaysExanded || choice.sectionKey || isInOpenSection || !isInSection) {
         visibleChoices.push(choice);
       }
     });

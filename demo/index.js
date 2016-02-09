@@ -107,12 +107,16 @@ fields = fields.concat([
     readOnly: true
   },
   {
-    label: 'Pretty Text 2', key: 'nestedPrettyText', type: 'pretty-text',
+    label: 'Accordion Names', key: 'nestedPrettyText', type: 'pretty-text',
     isAccordion: true,
     default: 'Hi there {{firstName}} {{lastName}} {{middleName}}.',
     //tabIndex: prettyNum + 1,
     isLoading: true,
     replaceChoices: [
+      {
+        label: 'Name',
+        value: 'name'
+      },
       {
         label: 'Hi Class People',
         sectionKey: 'hiClass'
