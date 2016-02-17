@@ -287,6 +287,7 @@ fields = fields.concat([
   {label: 'Loading', key: 'loading', type: 'pretty-select', isLoading: true, isAccordion: true},
   {
     label: 'Grouped Fields', key: 'groupedFields', type: 'grouped-fields',
+    helpTextHtml: 'Grouped fields are the best!',
     fields: [
       {label: 'Top Level', key: 'topLevel', type: 'unicode'},
       {label: 'Section 1 field 1', type: 'unicode', key: 'section1Field1', groupKey: 'section1'},

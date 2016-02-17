@@ -59,7 +59,9 @@ module.exports = React.createClass({
       'legend',
       null,
       config.fieldLabel(field)
-    ) : null, fields.map((function (childField, i) {
+    ) : null, isGroup ? config.createElement('label', {
+      config: config, field: field
+    }) : null, fields.map((function (childField, i) {
       var key = childField.key || i;
       return config.createFieldElement({
         key: key || i,
