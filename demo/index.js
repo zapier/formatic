@@ -298,12 +298,14 @@ fields = fields.concat([
   },
   {
     label: 'Grouped Fields Classic',
+    helpTextHtml: 'Grouped fields are the bestest!',
     key: 'groupedFieldsClassic',
     type: 'fields',
     fields: [
       {
         label: 'Section 1',
         type: 'fields',
+        helpTextHtml: 'Section 1 is the best',
         fields: [
           {label: 'Section 1 field 1', type: 'unicode', key: 'section1Field1'},
           {label: 'Section 1 field 2', type: 'unicode', key: 'section1Field2'}
@@ -312,6 +314,7 @@ fields = fields.concat([
       {
         label: 'Section 2',
         type: 'fields',
+        helpTextHtml: 'Section 2 is the best',
         fields: [
           {label: 'Section 2 field 1', type: 'unicode', key: 'section2Field1'},
           {label: 'Section 2 field 2', type: 'unicode', key: 'section2Field2'}
