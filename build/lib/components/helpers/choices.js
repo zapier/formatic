@@ -471,7 +471,8 @@ module.exports = React.createClass({
         choiceValue = 'section:' + choice.sectionKey;
       } else {
         choiceElement = config.createElement('choice', {
-          onSelect: this.onSelect, choice: choice, field: this.props.field
+          onSelect: this.onSelect, choice: choice, field: this.props.field,
+          index: i, total: choices.length
         });
         choiceValue = 'value:' + choice.value;
       }
