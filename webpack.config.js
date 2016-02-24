@@ -6,7 +6,7 @@ var webpack = require('webpack');
 module.exports = {
   devtool: 'source-map',
   entry: [
-    'webpack-dev-server/client?http://localhost:3000',
+    'webpack-dev-server/client?http://localhost:3001',
     'webpack/hot/only-dev-server',
     './demo/index.js'
   ],
