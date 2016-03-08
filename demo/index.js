@@ -165,6 +165,7 @@ fields = fields.concat([
   {label: 'Colors 3', helpText: 'Tres colores', type: 'pretty-select', key: 'colors3', customField: {label: 'Custom Value', helpText: null}, choices: [
     { value: 'r', label: 'Red', sample: 'cherry'},
     { value: 'g', label: 'Green', sample: 'lime'},
+    { value: 'false', label: 'False', sample: false},
     { value: '', action: 'clear-current-choice', label: 'Clear Current Choice'},
     { action: 'enter-custom-value', label: 'Type a custom value' },
     { action: 'insert-field', label: 'Choose an available field' },
