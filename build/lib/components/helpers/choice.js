@@ -22,6 +22,13 @@ module.exports = React.createClass({
     this.props.onSelect(this.props.choice);
   },
 
+  sampleString: function sampleString(sample) {
+    if (typeof sample === 'boolean') {
+      return String(sample);
+    }
+    return sample;
+  },
+
   renderDefault: function renderDefault() {
     var choice = this.props.choice;
 
@@ -36,7 +43,7 @@ module.exports = React.createClass({
       React.createElement(
         'span',
         { className: 'choice-sample' },
-        choice.sample
+        this.sampleString(choice.sample)
       )
     );
   }
