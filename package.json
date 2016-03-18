@@ -2,7 +2,6 @@
   "name": "formatic",
   "version": "0.3.38",
   "description": "Automatic, pluggable form generation",
-  "main": "./build/lib/formatic",
   "scripts": {
     "test": "jest",
     "build": "babel lib --out-dir build/lib",
