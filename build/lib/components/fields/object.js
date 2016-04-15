@@ -37,57 +37,65 @@ module.exports = React.createClass({
     };
   },
 
-  componentWillReceiveProps: function componentWillReceiveProps(newProps) {
+  orderedAssocList: function orderedAssocList(props) {
     var _this = this;
 
-    if (hasDuplicateKeys(this.state.assocList)) {
-      return; // talk to the hand
-    }
     var config = this.props.config;
-    var newAssocList = config.objectToAssocList(newProps.field.value);
-    // If we came from an onChange, use the previous sort order for keys.
-    if (this.keysBeforeChange) {
-      (function () {
+    var newAssocList = config.objectToAssocList(props.field.value);
+
+    // If we have an existing key order, use that.
+    if (this.keyOrder) {
+      var _ret = (function () {
         var keyToItem = newAssocList.reduce(function (obj, item) {
           obj[item.key] = item;
           return obj;
         }, {});
-        var keysBeforeChangeSet = _this.keysBeforeChange.reduce(function (obj, key) {
+        var keyOrderSet = _this.keyOrder.reduce(function (obj, key) {
           obj[key] = true;
           return obj;
         }, {});
         // Make a list in order of old keys.
-        var orderedAssocList = _this.keysBeforeChange.reduce(function (list, key) {
+        var orderedAssocList = _this.keyOrder.reduce(function (list, key) {
           list.push(keyToItem[key]);
           return list;
         }, []);
         // Add any new keys at the end.
         newAssocList.reduce(function (list, item) {
-          if (!(item.key in keysBeforeChangeSet)) {
+          if (!(item.key in keyOrderSet)) {
             list.push(item);
           }
           return list;
         }, orderedAssocList);
-        _this.setState({
-          assocList: orderedAssocList
-        });
+        return {
+          v: orderedAssocList
+        };
       })();
-    } else {
-      this.setState({
-        assocList: newAssocList
-      });
+
+      if (typeof _ret === 'object') return _ret.v;
     }
-    this.keysBeforeChange = null;
+    return newAssocList;
+  },
+
+  componentWillReceiveProps: function componentWillReceiveProps(newProps) {
+    if (hasDuplicateKeys(this.state.assocList)) {
+      return; // talk to the hand
+    }
+    var newAssocList = this.orderedAssocList(newProps);
+    this.keyOrder = newAssocList.map(function (item) {
+      return item.key;
+    });
+    this.setState({
+      assocList: newAssocList
+    });
   },
 
   onChange: function onChange(assocList) {
     var config = this.props.config;
     var value = config.assocListToObject(assocList);
-    var keys = assocList.map(function (item) {
+    // Need to hold onto keys to compare when receiving props.
+    this.keyOrder = assocList.map(function (item) {
       return item.key;
     });
-    // Need to hold onto keys to compare when receiving props.
-    this.keysBeforeChange = keys;
     this.setState({ assocList: assocList });
     if (!hasDuplicateKeys(assocList)) {
       var field = update(this.props.field, {
