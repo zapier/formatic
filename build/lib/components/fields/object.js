@@ -38,20 +38,56 @@ module.exports = React.createClass({
   },
 
   componentWillReceiveProps: function componentWillReceiveProps(newProps) {
+    var _this = this;
+
     if (hasDuplicateKeys(this.state.assocList)) {
       return; // talk to the hand
     }
-
     var config = this.props.config;
-    this.setState({
-      assocList: config.objectToAssocList(newProps.field.value)
-    });
+    var newAssocList = config.objectToAssocList(newProps.field.value);
+    // If we came from an onChange, use the previous sort order for keys.
+    if (this.keysBeforeChange) {
+      (function () {
+        var keyToItem = newAssocList.reduce(function (obj, item) {
+          obj[item.key] = item;
+          return obj;
+        }, {});
+        var keysBeforeChangeSet = _this.keysBeforeChange.reduce(function (obj, key) {
+          obj[key] = true;
+          return obj;
+        }, {});
+        // Make a list in order of old keys.
+        var orderedAssocList = _this.keysBeforeChange.reduce(function (list, key) {
+          list.push(keyToItem[key]);
+          return list;
+        }, []);
+        // Add any new keys at the end.
+        newAssocList.reduce(function (list, item) {
+          if (!(item.key in keysBeforeChangeSet)) {
+            list.push(item);
+          }
+          return list;
+        }, orderedAssocList);
+        _this.setState({
+          assocList: orderedAssocList
+        });
+      })();
+    } else {
+      this.setState({
+        assocList: newAssocList
+      });
+    }
+    this.keysBeforeChange = null;
   },
 
   onChange: function onChange(assocList) {
     var config = this.props.config;
     var value = config.assocListToObject(assocList);
-
+    var keys = assocList.map(function (item) {
+      return item.key;
+    });
+    // Need to hold onto keys to compare when receiving props.
+    this.keysBeforeChange = keys;
     this.setState({ assocList: assocList });
     if (!hasDuplicateKeys(assocList)) {
       var field = update(this.props.field, {
