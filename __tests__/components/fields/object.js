@@ -141,8 +141,9 @@ describe('object field', () => {
 
     expect(object.state).toEqual({
       assocList: [
-        { key: 'keyNew', value: 'value1' },
-        { key: 'key2', value: 'value2' } ]
+        { key: 'key2', value: 'value2' },
+        { key: 'keyNew', value: 'value1' }
+      ]
     });
   });
 

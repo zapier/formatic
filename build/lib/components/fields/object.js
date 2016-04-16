@@ -56,7 +56,9 @@ module.exports = React.createClass({
         }, {});
         // Make a list in order of old keys.
         var orderedAssocList = _this.keyOrder.reduce(function (list, key) {
-          list.push(keyToItem[key]);
+          if (key in keyToItem) {
+            list.push(keyToItem[key]);
+          }
           return list;
         }, []);
         // Add any new keys at the end.
