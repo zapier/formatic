@@ -108,7 +108,7 @@ module.exports = React.createClass({
   onChoiceAction: function onChoiceAction(choice) {
     this.setState({
       openSection: null,
-      searchString: ''
+      searchString: choice.keepSearchString ? this.state.searchString : ''
     });
     this.props.onChoiceAction(choice);
   },
