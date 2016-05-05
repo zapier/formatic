@@ -1082,6 +1082,10 @@ module.exports = function (config) {
       return utils.capitalize(action).replace(/[-]/g, ' ');
     },
 
+    sortChoices: function sortChoices(choices) {
+      return choices;
+    },
+
     isSearchStringInChoice: function isSearchStringInChoice(searchString, choice) {
       return choice.label && choice.label.toLowerCase().indexOf(searchString.toLowerCase()) > -1;
     },

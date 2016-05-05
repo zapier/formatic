@@ -251,6 +251,8 @@ module.exports = React.createClass({
       });
     }
 
+    choices = config.sortChoices(choices, this.state.searchString);
+
     if (!props.isAccordion) {
       return {
         choices: choices,
