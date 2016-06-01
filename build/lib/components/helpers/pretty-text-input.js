@@ -100,11 +100,13 @@ module.exports = React.createClass({
       var pos = _this.state.selectedTagPos;
       var tag = '{{' + key + '}}';
 
+      _this.isInserting = true;
       if (pos) {
         _this.codeMirror.replaceRange(tag, { line: pos.line, ch: pos.start }, { line: pos.line, ch: pos.stop });
       } else {
         _this.codeMirror.replaceSelection(tag, 'end');
       }
+      _this.isInserting = false;
       _this.codeMirror.focus();
 
       _this.setState({ isChoicesOpen: false, selectedTagPos: null });
@@ -114,7 +116,9 @@ module.exports = React.createClass({
     } else if (this.props.readOnly) {
       // hackety hack to stop dropdown choices from toggling
       event.stopPropagation();
+      this.isInserting = true;
       this.onChange('{{' + key + '}}');
+      this.isInserting = false;
       this.setState({ isChoicesOpen: false });
     } else {
       this.switchToCodeMirror(selectChoice);
@@ -353,17 +357,30 @@ module.exports = React.createClass({
     this.codeMirror.operation(tagOps);
   },
 
+  onChangeAndTagCodeMirror: function onChangeAndTagCodeMirror() {
+    this.onChange(this.codeMirror.getValue());
+    this.tagCodeMirror();
+  },
+
   onCodeMirrorChange: function onCodeMirrorChange() {
-    if (this.updatingCodeMirror) {
-      // avoid recursive update cycle, and mark the code mirror manual update as done
-      this.updatingCodeMirror = false;
+    var _this4 = this;
+
+    var newValue = this.codeMirror.getValue();
+    this.setState({ value: newValue });
+
+    // Immediately change and tag if inserting.
+    if (this.isInserting) {
+      this.onChangeAndTagCodeMirror();
       return;
     }
 
-    var newValue = this.codeMirror.getValue();
-    this.onChange(newValue);
-    this.setState({ value: newValue });
-    this.tagCodeMirror();
+    // Otherwise, debounce so CodeMirror doesn't die.
+    if (!this.debounceCodeMirrorChange) {
+      this.debounceCodeMirrorChange = _.debounce(function () {
+        _this4.onChangeAndTagCodeMirror();
+      }, 200);
+    }
+    this.debounceCodeMirrorChange();
   },
 
   /* Return true if we should render the placeholder */
@@ -412,7 +429,7 @@ module.exports = React.createClass({
   },
 
   switchToCodeMirror: function switchToCodeMirror(cb) {
-    var _this4 = this;
+    var _this5 = this;
 
     if (this.isReadOnly()) {
       return; // never render in code mirror if read-only
@@ -420,7 +437,7 @@ module.exports = React.createClass({
 
     if (!this.state.codeMirrorMode && !this.props.readOnly) {
       this.setState({ codeMirrorMode: true }, function () {
-        if (_this4.codeMirror && _.isFunction(cb)) {
+        if (_this5.codeMirror && _.isFunction(cb)) {
           cb();
         }
       });
