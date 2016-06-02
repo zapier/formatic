@@ -81,10 +81,12 @@ module.exports = React.createClass({
           this.onFocus();
         }
       } else if (!this.state.isChoicesOpen) {
-        if (event.keyCode === keyCodes.UP || event.keyCode === keyCodes.DOWN || event.keyCode === keyCodes.ENTER) {
-          event.preventDefault();
-          event.stopPropagation();
-          this.onToggleChoices();
+        if (!this.state.isEnteringCustomValue) {
+          if (event.keyCode === keyCodes.UP || event.keyCode === keyCodes.DOWN || event.keyCode === keyCodes.ENTER) {
+            event.preventDefault();
+            event.stopPropagation();
+            this.onToggleChoices();
+          }
         }
       } else {
         if (this.refs.choices && this.refs.choices.onKeyDown) {
