@@ -37,7 +37,6 @@
     "gulp-load-plugins": "^0.5.3",
     "gulp-run": "^1.6.6",
     "gulp-shell": "^0.2.8",
-    "history": "1.13.x",
     "jest-cli": "^0.4.0",
     "jquery": "^2.1.4",
     "lodash": "^3.10.1",
