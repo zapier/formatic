@@ -71,6 +71,12 @@ module.exports = React.createClass({
   },
 
   componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+    // If we're debouncing a change, then we should just ignore this props change,
+    // because there will be another when we hit the trailing edge of the debounce.
+    if (this.isDebouncingCodeMirrorChange) {
+      return;
+    }
+
     var selectedChoices = nextProps.selectedChoices;
     var replaceChoices = nextProps.replaceChoices;
     var nextState = {
@@ -358,6 +364,14 @@ module.exports = React.createClass({
   },
 
   onChangeAndTagCodeMirror: function onChangeAndTagCodeMirror() {
+    if (!this.codeMirror) {
+      // We might have erased our codemirror instance before hitting the trailing
+      // end of the debounce. If so, get the value out of state.
+      if (this.props.value !== this.state.value) {
+        this.onChange(this.state.value);
+      }
+      return;
+    }
     this.onChange(this.codeMirror.getValue());
     this.tagCodeMirror();
   },
@@ -377,9 +391,11 @@ module.exports = React.createClass({
     // Otherwise, debounce so CodeMirror doesn't die.
     if (!this.debounceCodeMirrorChange) {
       this.debounceCodeMirrorChange = _.debounce(function () {
+        _this4.isDebouncingCodeMirrorChange = false;
         _this4.onChangeAndTagCodeMirror();
       }, 200);
     }
+    this.isDebouncingCodeMirrorChange = true;
     this.debounceCodeMirrorChange();
   },
 
