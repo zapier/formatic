@@ -325,7 +325,7 @@ module.exports = React.createClass({
   },
 
   createCodeMirrorEditor: function createCodeMirrorEditor() {
-    var value = this.hasPlaceholder() ? this.props.config.fieldPlaceholder(this.props.field) : String(this.state.value);
+    var value = this.hasPlaceholder() ? String(this.props.config.fieldPlaceholder(this.props.field)) : String(this.state.value);
 
     var options = {
       tabindex: this.props.tabIndex || 0,

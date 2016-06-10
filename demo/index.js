@@ -97,7 +97,21 @@ fields = fields.concat([
     label: 'Pretty Text with integer default',
     key: 'integerPrettyText',
     type: 'pretty-text',
-    default: 0
+    default: 1,
+    placeholder: 1
+  },
+  {
+    label: 'Group',
+    type: 'fields',
+    fields: [
+      {
+        label: 'Pretty Text with integer default',
+        key: 'integerPrettyTextGrouped',
+        type: 'pretty-text',
+        default: 1,
+        placeholder: 1
+      }
+    ]
   },
   {
     label: 'Readonly pretty text',
