@@ -60,7 +60,7 @@ var config = Formatic.createConfig(
 
 var fields = [
   {label: 'Array', type: 'array', key: 'yoArray'},
-  {label: 'single line string', type: 'single-line-string', key: 'single-line-string'}
+  {label: 'single line string', type: 'single-line-string', key: 'single-line-string', autoFocus: true}
   //{label: 'Code', type: 'code', key: 'somecode', language: 'javascript'},
   //{label: 'Readonly Code', type: 'code', key: 'readonlyCode', language: 'javascript', readOnly: true, default: 'x = 3;'},
   //{label: 'Code Python', type: 'code', key: 'somepycode', language: 'python'}
