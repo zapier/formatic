@@ -60,7 +60,8 @@ var config = Formatic.createConfig(
 
 var fields = [
   {label: 'Array', type: 'array', key: 'yoArray'},
-  {label: 'single line string', type: 'single-line-string', key: 'single-line-string', autoFocus: true, placeholder: 'type something...'}
+  {label: 'single line string', type: 'single-line-string', key: 'single-line-string',
+   autoFocus: true, placeholder: 'type something...', autoComplete: 'on'}
   //{label: 'Code', type: 'code', key: 'somecode', language: 'javascript'},
   //{label: 'Readonly Code', type: 'code', key: 'readonlyCode', language: 'javascript', readOnly: true, default: 'x = 3;'},
   //{label: 'Code Python', type: 'code', key: 'somepycode', language: 'python'}
@@ -194,7 +195,7 @@ fields = fields.concat([
   ]},
   {label: 'Name (R)', type: 'unicode', key: 'name', required: true, default: 'Unknown'},
   {label: 'Readonly Name', type: 'unicode', key: 'readonlyName', default: 'Bob', readOnly: true},
-  {label: 'Password (R)', type: 'password', key: 'password', required: true},
+  {label: 'Password (R)', type: 'password', key: 'password', required: true, placeholder: 'type something secret...'},
   {id: 'silly', type: 'copy', help_text_html: 'What the hey? <b>Seriously?</b>'},
   {label: 'Note', type: 'text', key: 'note', required: true},
   {label: 'Mood', type: 'select', key: 'mood', choices: ['happy', 'sad']},

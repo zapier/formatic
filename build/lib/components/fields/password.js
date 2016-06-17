@@ -38,6 +38,9 @@ module.exports = React.createClass({
       onChange: this.onChange,
       onFocus: this.onFocusAction,
       onBlur: this.onBlurAction,
+      autoComplete: field.autoComplete,
+      autoFocus: field.autoFocus,
+      placeholder: field.placeholder,
       disabled: this.isReadOnly()
     }));
   }
