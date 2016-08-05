@@ -14,8 +14,7 @@ module.exports = React.createClass({
   displayName: 'InsertButton',
 
   propTypes: {
-    onClick: React.PropTypes.func.isRequired,
-    ref: React.PropTypes.string
+    onClick: React.PropTypes.func.isRequired
   },
 
   mixins: [require('../../mixins/helper')],
@@ -27,7 +26,7 @@ module.exports = React.createClass({
   renderDefault: function renderDefault() {
     return React.createElement(
       'a',
-      { ref: this.props.ref, href: 'JavaScript' + ':', onClick: this.props.onClick,
+      { href: 'JavaScript' + ':', onClick: this.props.onClick,
         className: cx({ 'readonly-control': this.props.readOnly }) },
       this.props.children
     );
