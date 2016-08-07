@@ -4,6 +4,7 @@
 describe('actions', function() {
 
   var React = require('react');
+  var ReactDOM = require('react-dom');
   var TestUtils = require('react-addons-test-utils');
 
   var mounted = function (element) {
@@ -43,7 +44,7 @@ describe('actions', function() {
       config: formaticConfig
     }));
 
-    var node = component.getDOMNode().getElementsByClassName('string')[0];
+    var node = ReactDOM.findDOMNode(component).getElementsByClassName('string')[0];
 
     TestUtils.Simulate.focus(node);
 

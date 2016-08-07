@@ -15,6 +15,7 @@ var printTree = function (node, indent) {
 describe('types and value changes', function() {
 
   var React = require('react');
+  var ReactDOM = require('react-dom');
   var TestUtils = require('react-addons-test-utils');
   var _ = require('lodash');
 
@@ -65,7 +66,7 @@ describe('types and value changes', function() {
           }
         }));
 
-        var node = component.getDOMNode().getElementsByTagName(options.tagName)[0];
+        var node = ReactDOM.findDOMNode(component).getElementsByTagName(options.tagName)[0];
 
         var nodeValue = node.value;
 
@@ -165,7 +166,7 @@ describe('types and value changes', function() {
       config: formaticConfig
     }));
 
-    var node = component.getDOMNode().getElementsByClassName('copy')[0];
+    var node = ReactDOM.findDOMNode(component).getElementsByClassName('copy')[0];
 
     expect(node.textContent).toEqual(msg);
   });
@@ -194,7 +195,7 @@ describe('types and value changes', function() {
         }
       }));
 
-      var node = component.getDOMNode().getElementsByClassName('single-line-string')[0];
+      var node = ReactDOM.findDOMNode(component).getElementsByClassName('single-line-string')[0];
 
       expect(node.value).toEqual('red');
 
@@ -230,7 +231,7 @@ describe('types and value changes', function() {
         }
       }));
 
-      var node = component.getDOMNode().getElementsByClassName('single-line-string')[0];
+      var node = ReactDOM.findDOMNode(component).getElementsByClassName('single-line-string')[0];
 
       expect(node.value).toEqual('foo');
 
@@ -240,7 +241,7 @@ describe('types and value changes', function() {
 
       expect(formValue.myObject).toEqual({x: 'baz', y: 'bar'});
 
-      node = component.getDOMNode().getElementsByClassName('assoc-list-item-key')[0];
+      node = ReactDOM.findDOMNode(component).getElementsByClassName('assoc-list-item-key')[0];
 
       node.value = 'z';
 
