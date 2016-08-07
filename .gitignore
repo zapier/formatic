@@ -3,6 +3,7 @@ node_modules
 /live
 /demo/test.html
 /build-docs
+/build
 .DS_Store
 .tern-port
 *~
