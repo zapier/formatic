@@ -7,7 +7,7 @@ var classSet = require('react/lib/cx');
 var CodeMirror = global.CodeMirror;
 var JSXTransformer = global.JSXTransformer;
 var Bootstrap = require('react-bootstrap');
-var Formatic = require('../../');
+var Formatic = require('../../lib/formatic');
 
 var IS_MOBILE = typeof navigator !== 'undefined' && (
   navigator.userAgent.match(/Android/i)

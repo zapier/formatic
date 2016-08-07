@@ -12,7 +12,7 @@ describe('actions', function() {
     return rendered;
   };
 
-  var Formatic = require('../');
+  var Formatic = require('../lib/formatic');
 
   var formaticConfig = Formatic.createConfig(
     Formatic.plugins.elementClasses,

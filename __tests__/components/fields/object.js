@@ -5,7 +5,7 @@ const React = require('react');
 const TestUtils = require('react-addons-test-utils');
 const ReactDOM = require('react-dom');
 
-const Formatic = require('../../..');
+const Formatic = require('../../../lib/formatic');
 
 const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
@@ -121,6 +121,7 @@ describe('object field', () => {
     const formatic = renderToNode(value);
 
     const ObjectClass = require('../../../lib/components/fields/object');
+
     const object = TestUtils.findRenderedComponentWithType(formatic, ObjectClass);
 
     expect(object.state).toEqual({
@@ -159,6 +160,7 @@ describe('object field', () => {
     const formatic = renderToNode(value);
 
     const ObjectClass = require('../../../lib/components/fields/object');
+
     const object = TestUtils.findRenderedComponentWithType(formatic, ObjectClass);
 
     expect(object.state).toEqual({

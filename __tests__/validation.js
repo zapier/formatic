@@ -3,7 +3,7 @@
 
 describe('types and value changes', function() {
 
-  var Formatic = require('../');
+  var Formatic = require('../lib/formatic');
 
   var config = Formatic.createConfig();
 

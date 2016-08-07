@@ -3,7 +3,7 @@
 
 describe('plugins', function() {
 
-  var Formatic = require('../');
+  var Formatic = require('../lib/formatic');
 
   it('can create a new default configuration', function () {
 

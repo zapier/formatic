@@ -4,7 +4,7 @@
 const React = require('react');
 const TestUtils = require('react-addons-test-utils');
 
-const Formatic = require('../../..');
+const Formatic = require('../../../lib/formatic');
 
 const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
