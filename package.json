@@ -46,6 +46,7 @@
     "jquery": "^2.1.4",
     "lodash": "^3.10.1",
     "marked": "^0.3.6",
+    "portscanner": "^2.1.1",
     "react": "^15.3.0",
     "react-addons-css-transition-group": "^15.3.0",
     "react-addons-test-utils": "^15.3.0",
