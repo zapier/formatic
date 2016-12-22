@@ -11,7 +11,7 @@ var Form = React.createFactory(Formatic);
 var plugin = function (config) {
 
   var initField = config.initField;
-  var origCreatePrettyTag = config.createElement_PrettyTag;
+  var createElement_PrettyTag = config.createElement_PrettyTag;
 
   config.createElement_PrettyTag = function (props, children) {
     //var choice = _.find(this.props.replaceChoices, (c) => c.value === tag);
@@ -20,7 +20,7 @@ var plugin = function (config) {
     var classes = choice && choice.tagClasses || {};
     var newProps = _.extend({}, props, {classes: classes});
 
-    return origCreatePrettyTag(newProps, children);
+    return createElement_PrettyTag(newProps, children);
   };
 
   return {
