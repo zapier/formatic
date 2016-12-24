@@ -2,6 +2,7 @@
 /* global describe it expect */
 
 var TagTranslator = require('../../../lib/components/helpers/tag-translator');
+const Formatic = require('../../../lib/formatic');
 
 describe('editor-util', function () {
   var replaceChoices = [
@@ -23,7 +24,9 @@ describe('editor-util', function () {
   it('should tokenize tagged text', function () {
     var tagged = 'Hi there {{lastName}}, {{firstName}}.';
 
-    expect(translator.tokenize(tagged)).toEqual([
+    const config = Formatic.createConfig();
+
+    expect(config.tokenize(tagged)).toEqual([
       {type: 'string', value: 'Hi there '},
       {type: 'tag', value: 'lastName'},
       {type: 'string', value: ', '},
