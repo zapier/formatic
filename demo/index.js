@@ -374,7 +374,7 @@ fields = fields.concat([
     label: 'Select with No Search',
     type: 'pretty-select',
     key: 'no-search',
-    disableSearch: true,
+    hasSearch: false,
     default: 'S',
     choices: {
       S: 'Small',
