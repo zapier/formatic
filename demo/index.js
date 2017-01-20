@@ -169,8 +169,16 @@ fields = fields.concat([
       }
     ]
   },
-  {label: 'Size', type: 'pretty-select', key: 'size', default: 'S',
-   choices: { S: 'Small', M: 'Medium', L: 'Large' }
+  {
+    label: 'Size',
+    type: 'pretty-select',
+    key: 'size',
+    default: 'S',
+    choices: {
+      S: 'Small',
+      M: 'Medium',
+      L: 'Large'
+    }
   },
   {label: 'Readonly Size', type: 'pretty-select', key: 'readonlySize', default: 'S', readOnly: true,
    choices: { S: 'Small', M: 'Medium', L: 'Large' }
@@ -361,6 +369,18 @@ fields = fields.concat([
         label: 'Clear Current Choice'
       }
     ]
+  },
+  {
+    label: 'Select with No Search',
+    type: 'pretty-select',
+    key: 'no-search',
+    hasSearch: false,
+    default: 'S',
+    choices: {
+      S: 'Small',
+      M: 'Medium',
+      L: 'Large'
+    }
   }
 ]);
 
