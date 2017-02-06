@@ -47,6 +47,16 @@ var plugin = function (config) {
 
     isRemovalOfLastAssocListItemAllowed(/*field*/) {
       return false;
+    },
+
+    createElement_Fieldset: function (props, ...children) {
+      const newProps = { children };
+      return (
+        <div className="test-custom-fieldset">
+          <p>I'm a custom fieldset!</p>
+          <div {...newProps} />
+        </div>
+      );
     }
   };
 };
