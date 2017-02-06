@@ -12,6 +12,7 @@ var plugin = function (config) {
 
   var initField = config.initField;
   var createElement_PrettyTag = config.createElement_PrettyTag;
+  var createFieldset = config.createElement_Fieldset;
 
   config.createElement_PrettyTag = function (props, children) {
     //var choice = _.find(this.props.replaceChoices, (c) => c.value === tag);
@@ -50,13 +51,18 @@ var plugin = function (config) {
     },
 
     createElement_Fieldset: function (props, ...children) {
-      const newProps = { children };
-      return (
-        <div className="test-custom-fieldset">
-          <p>I'm a custom fieldset!</p>
-          <div {...newProps} />
-        </div>
-      );
+      if (props.config.useCustomFieldset) {
+        const newProps = { children };
+
+        return (
+          <div className="test-custom-fieldset">
+            <p>I have a custom fieldset!</p>
+            <div {...newProps} />
+          </div>
+        );
+      }
+
+      return createFieldset(props, ...children);
     }
   };
 };
@@ -420,35 +426,59 @@ var onOrderGroceries = function (info) {
   console.log('ordering...', info);
 };
 
-//fields = [
-//{type: 'pretty-text', key: 'a', label: 'pretty'},
-//{type: 'pretty-text', key: 'b', label: 'pretty'},
-//{type: 'pretty-text', key: 'c', label: 'pretty'}
-//];
+const formTwoConfig = Formatic.createConfig(
+  Formatic.plugins.reference,
+  Formatic.plugins.meta,
+  Formatic.plugins.bootstrap,
+  plugin
+);
+
+formTwoConfig.useCustomFieldset = true;
+
+const formTwo = {
+  config: formTwoConfig,
+  fields: [
+    {type: 'pretty-text', key: 'a', label: 'pretty'}
+  ],
+  value: {}
+};
 
 // Controlled version:
 
 var render = function (value) {
   window.value = value;
-  ReactDOM.render(Form({
-    meta: {msg: "That's a fine name you have there!"},
-    config: config,
-    fields: fields,
-    value: value,
-    onChange: function (newValue, info) {
-      console.log('new value:', newValue);
-      console.log('info:', info);
-      formValue = newValue;
-      render(newValue);
-    },
-    onFocus: onFocus,
-    onBlur: onBlur,
-    onOpenReplacements: onOpenReplacements,
-    onCloseReplacements: onCloseReplacements,
-    onClearCurrentChoice: onClearCurrentChoice,
-    onOrderGroceries: onOrderGroceries,
-    readOnly: false
-  }), document.getElementById('user'));
+  ReactDOM.render((
+    <div>
+      <h1>Form #1 - Examples</h1>
+      <Form
+        meta={{msg: "That's a fine name you have there!"}}
+        config={config}
+        fields={fields}
+        value={value}
+        onChange={function (newValue, info) {
+          console.log('new value:', newValue);
+          console.log('info:', info);
+          formValue = newValue;
+          render(newValue);
+        }}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        onOpenReplacements={onOpenReplacements}
+        onCloseReplacements={onCloseReplacements}
+        onClearCurrentChoice={onClearCurrentChoice}
+        onOrderGroceries={onOrderGroceries}
+        readOnly={false}
+      />
+
+      <h1>Form #2 - Custom Fieldset</h1>
+      <Form
+        config={formTwo.config}
+        fields={formTwo.fields}
+        value={formTwo.value}
+        readOnly={true}
+      />
+    </div>
+  ), document.getElementById('user'));
 };
 
 var setValue = function (value) {
