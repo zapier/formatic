@@ -2,9 +2,36 @@ body {
   padding-bottom: 200px;
 }
 
+.content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.primary {
+  bottom: 0;
+  padding: 15px 30px;
+  left: 0;
+  overflow: auto;
+  position: absolute;
+  right: 440px;
+  top: 0;
+}
+
+.debugger {
+  bottom: 0;
+  width: 440px;
+  overflow: auto;
+  padding: 15px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
 .floating-debugger {
-  position: fixed;
-  overflow-x: auto;
+  width: 100%;
 }
 
 .CodeMirror {

@@ -1,6 +1,12 @@
 const fields = [
   {
-    label: 'More colors',
+    label: 'Colors',
+    type: 'checkbox-list',
+    key: 'colors',
+    choices: ['red', 'green', 'blue']
+  },
+  {
+    label: 'More colors (extended)',
     key: 'moreColors',
     extends: 'colors'
   }
