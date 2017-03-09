@@ -30,8 +30,9 @@ body {
   top: 0;
 }
 
-.floating-debugger {
-  width: 100%;
+.floating-menu {
+  position: fixed;
+  margin-top: 20px;
 }
 
 .CodeMirror {

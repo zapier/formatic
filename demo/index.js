@@ -16,8 +16,10 @@ const config = Formatic.createConfig(
   customPlugin,
 );
 
+const convertTitleToId = (title) => title.toLowerCase().replace(/ /g, '-');
+
 const DisplayFormValue = (props) => (
-  <div className="floating-debugger">
+  <div>
     <h5>{props.title} Form State:</h5>
     <pre>{JSON.stringify(props.value, null, 2)}</pre>
   </div>
@@ -50,11 +52,13 @@ class FormDemo extends Component {
   }
 
   render() {
+    const { title } = this.props;
+
     return (
-      <div className="container-fluid">
+      <div id={convertTitleToId(title)}>
         <div className="row">
           <div className="col-sm-12">
-            <h3>{this.props.title}</h3>
+            <h3>{title}</h3>
             <hr />
           </div>
         </div>
@@ -75,7 +79,7 @@ class FormDemo extends Component {
           </div>
           <div className="col-sm-4">
             <DisplayFormValue
-              title={this.props.title}
+              title={title}
               value={this.state.formState} />
           </div>
         </div>
@@ -85,23 +89,35 @@ class FormDemo extends Component {
 }
 
 ReactDOM.render(
-  <div>
-    <div className="container-fluid">
-      <div className="row">
-        <div className="col-sm-12">
-          <h1>Formatic Demo</h1>
+  <div className="container-fluid">
+    <div className="row">
+      <div className="col-sm-9">
+        <h1>Formatic Demo</h1>
+
+        {
+          examples.map((form, idx) => (
+            <FormDemo
+              key={idx}
+              fields={form.fields}
+              title={form.title} />
+          ))
+        }
+      </div>
+      <div className="col-sm-3">
+        <div className="floating-menu">
+          <p>Examples</p>
+
+          <ul>
+            {
+              examples.map((form, idx) => (
+                <li key={idx}>
+                  <a href={`#${convertTitleToId(form.title)}`}>{form.title}</a>
+                </li>
+              ))
+            }
+          </ul>
         </div>
       </div>
-    </div>
-    <div>
-      {
-        examples.map((form, idx) => (
-          <FormDemo
-            key={idx}
-            fields={form.fields}
-            title={form.title} />
-        ))
-      }
     </div>
   </div>,
   document.getElementById('main')

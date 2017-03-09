@@ -4,6 +4,7 @@ import booleanExample from './boolean';
 import checkboxArrayExample from './checkbox-array';
 import checkboxBooleanExample from './checkbox-boolean';
 import checkboxListExample from './checkbox-list';
+import codeExample from './code';
 import copyExample from './copy';
 import extendsExample from './extends';
 import fieldsExample from './fields';
@@ -45,6 +46,10 @@ export default [
   {
     title: 'Checkbox List',
     fields: checkboxListExample
+  },
+  {
+    title: 'Code',
+    fields: codeExample
   },
   {
     title: 'Copy',
