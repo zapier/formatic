@@ -30,6 +30,20 @@ body {
   top: 0;
 }
 
+.form-example {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.form-link {
+  position: relative;
+  float: right;
+  left: calc(-100% - 10px);
+  color: #ccc;
+}
+
 .floating-menu {
   position: fixed;
   margin-top: 20px;

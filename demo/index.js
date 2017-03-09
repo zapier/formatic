@@ -60,24 +60,31 @@ class FormDemo extends Component {
       <div id={convertTitleToId(title)}>
         <div className="row">
           <div className="col-sm-12">
-            <h3>{title}</h3>
+            <h3>
+              {title}
+              <a className="form-link" href={`#${convertTitleToId(title)}`}>
+                <span className="glyphicon glyphicon-link" />
+              </a>
+            </h3>
             <hr />
           </div>
         </div>
         <div className="row">
           <div className="col-sm-8">
-            <Form
-              config={config}
-              fields={this.props.fields}
-              value={this.state.formState}
-              onChange={this.onChange.bind(this)}
-              onFocus={(e) => this.onEvent('onFocus', e)}
-              onBlur={(e) => this.onEvent('onBlur', e)}
-              onOpenReplacements={(info) => this.onCustomEvent('onOpenReplacements', info)}
-              onCloseReplacements={(info) => this.onCustomEvent('onCloseReplacements', info)}
-              onClearCurrentChoice={(info) => this.onCustomEvent('onClearCurrentChoice', info)}
-              onOrderGroceries={(info) => this.onCustomEvent('onOrderGroceries', info)}
-              readOnly={false} />
+            <div className="form-example">
+              <Form
+                config={config}
+                fields={this.props.fields}
+                value={this.state.formState}
+                onChange={this.onChange.bind(this)}
+                onFocus={(e) => this.onEvent('onFocus', e)}
+                onBlur={(e) => this.onEvent('onBlur', e)}
+                onOpenReplacements={(info) => this.onCustomEvent('onOpenReplacements', info)}
+                onCloseReplacements={(info) => this.onCustomEvent('onCloseReplacements', info)}
+                onClearCurrentChoice={(info) => this.onCustomEvent('onClearCurrentChoice', info)}
+                onOrderGroceries={(info) => this.onCustomEvent('onOrderGroceries', info)}
+                readOnly={false} />
+            </div>
           </div>
           <div className="col-sm-4">
             <DisplayFormValue
