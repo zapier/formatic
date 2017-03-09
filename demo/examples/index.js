@@ -19,6 +19,7 @@ import prettyTextExample from './pretty-text';
 import prettyText2Example from './pretty-text2';
 import selectExample from './select';
 import singleLineStringExample from './single-line-string';
+import stringExample from './string';
 import textExample from './text';
 import unicodeExample from './unicode';
 import unknownExample from './unknown';
@@ -107,6 +108,10 @@ export default [
   {
     title: 'Single Line String',
     fields: singleLineStringExample
+  },
+  {
+    title: 'String',
+    fields: stringExample
   },
   {
     title: 'Text',
