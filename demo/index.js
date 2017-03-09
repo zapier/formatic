@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import _ from 'lodash';
 import Formatic from '../lib/formatic';
 
 import '../style/formatic.css';
@@ -15,8 +16,6 @@ const config = Formatic.createConfig(
   Formatic.plugins.bootstrap,
   customPlugin,
 );
-
-console.log('config', config);
 
 const convertTitleToId = (title) => title.toLowerCase().replace(/ /g, '-');
 
@@ -97,14 +96,17 @@ class FormDemo extends Component {
   }
 }
 
+const sortedExamples = _.sortBy(examples, ['title']);
+
 ReactDOM.render(
   <div className="container">
     <div className="row">
       <div className="col-sm-9">
         <h1>Formatic Demo</h1>
+        <hr />
 
         {
-          examples.map((form, idx) => (
+          sortedExamples.map((form, idx) => (
             <FormDemo
               key={idx}
               fields={form.fields}
@@ -114,11 +116,11 @@ ReactDOM.render(
       </div>
       <div className="col-sm-3">
         <div className="floating-menu">
-          <p>Examples</p>
+          <h6>Examples</h6>
 
           <ul>
             {
-              examples.map((form, idx) => (
+              sortedExamples.map((form, idx) => (
                 <li key={idx}>
                   <a href={`#${convertTitleToId(form.title)}`}>{form.title}</a>
                 </li>
