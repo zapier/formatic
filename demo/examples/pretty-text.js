@@ -2,6 +2,23 @@ import _ from 'lodash';
 
 const fields = [
   {
+    label: 'Pretty Text',
+    key: 'prettyText',
+    type: 'pretty-text',
+    default: 'Hi there {{firstName}} {{lastName}} {{middleName}}.',
+    choices: [
+      {
+        value: 'lastName',
+        label: 'Last Name',
+        sample: 'Smith'
+      },
+      {
+        value: 'middleName',
+        label: 'A really long label that should break somewhere in the middle and then definitely fill up all the space.'
+      }
+    ]
+  },
+  {
     label: 'Pretty Text with integer default',
     key: 'integerPrettyText',
     type: 'pretty-text',

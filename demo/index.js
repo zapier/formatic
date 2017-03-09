@@ -16,6 +16,8 @@ const config = Formatic.createConfig(
   customPlugin,
 );
 
+console.log('config', config);
+
 const convertTitleToId = (title) => title.toLowerCase().replace(/ /g, '-');
 
 const DisplayFormValue = (props) => (
