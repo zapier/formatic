@@ -28,11 +28,11 @@ const DisplayFormValue = (props) => (
 );
 
 class FormDemo extends Component {
-  constructor() {
+  constructor(props) {
     super();
 
     this.state = {
-      formState: {}
+      formState: config.createRootValue(props)
     };
   }
 
@@ -91,7 +91,7 @@ class FormDemo extends Component {
 }
 
 ReactDOM.render(
-  <div className="container-fluid">
+  <div className="container">
     <div className="row">
       <div className="col-sm-9">
         <h1>Formatic Demo</h1>
