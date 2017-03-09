@@ -16,6 +16,7 @@ import passwordExample from './password';
 import prettyBooleanExample from './pretty-boolean';
 import prettySelectExample from './pretty-select';
 import prettyTextExample from './pretty-text';
+import prettyText2Example from './pretty-text2';
 import selectExample from './select';
 import singleLineStringExample from './single-line-string';
 import textExample from './text';
@@ -94,6 +95,10 @@ export default [
   {
     title: 'Pretty Text',
     fields: prettyTextExample
+  },
+  {
+    title: 'Pretty Text 2',
+    fields: prettyText2Example
   },
   {
     title: 'Select',
