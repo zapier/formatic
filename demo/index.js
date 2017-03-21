@@ -36,8 +36,8 @@ class FormDemo extends Component {
   }
 
   onChange(newValue, info) {
-    console.log('onChange:', newValue);
-    console.log('Field Info:', info);
+    console.info('onChange:', newValue);
+    console.info('Field Info:', info);
 
     this.setState({
       formState: newValue

@@ -33,9 +33,9 @@
     "css-loader": "0.23.0",
     "envify": "1.2.1",
     "es6-promise": "3.0.2",
-    "eslint": "1.2.1",
+    "eslint": "3.13.1",
     "eslint-loader": "1.1.1",
-    "eslint-plugin-react": "2.3.0",
+    "eslint-plugin-react": "6.9.0",
     "groc": "https://registry.npmjs.org/groc/-/groc-0.7.0.tgz",
     "gulp": "3.8.11",
     "gulp-gh-pages": "0.4.0",
@@ -66,6 +66,8 @@
   "dependencies": {
     "classnames": "^2.1.1",
     "deep-equal": "^1.0.0",
+    "eslint-plugin-react": "^6.10.3",
+    "node-libs-browser": "^2.0.0",
     "object-assign": "^2.0.0",
     "react-scroll-lock": "git+https://github.com/Laiff/react-scroll-lock.git#267bf5bcf84d334aecc20908657088007b698dc2"
   },
