@@ -6,4 +6,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Copy',
+  notes: null,
+  fields
+};

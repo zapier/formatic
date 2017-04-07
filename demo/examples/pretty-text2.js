@@ -26,4 +26,8 @@ const fields = _.range(2).map((idx) => ({
   ]
 }));
 
-export default fields;
+export default {
+  title: 'Pretty Text2',
+  notes: null,
+  fields
+};

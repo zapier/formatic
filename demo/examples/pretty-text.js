@@ -113,4 +113,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Pretty Text',
+  notes: 'Pretty Text can also be accessed under the alias of `pretty-textarea`',
+  fields
+};

@@ -7,4 +7,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Boolean',
+  notes: 'Boolean can also be accessed using the alias of `bool`',
+  fields
+};

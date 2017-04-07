@@ -53,7 +53,7 @@ class FormDemo extends Component {
   }
 
   render() {
-    const { title } = this.props;
+    const { title, notes } = this.props;
 
     return (
       <div id={convertTitleToId(title)}>
@@ -66,6 +66,7 @@ class FormDemo extends Component {
               </a>
             </h3>
             <hr />
+            <p>{notes}</p>
           </div>
         </div>
         <div className="row">
@@ -110,6 +111,7 @@ ReactDOM.render(
             <FormDemo
               key={idx}
               fields={form.fields}
+              notes={form.notes}
               title={form.title} />
           ))
         }

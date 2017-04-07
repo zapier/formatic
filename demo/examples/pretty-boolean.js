@@ -7,4 +7,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Pretty Boolean',
+  notes: null,
+  fields
+};

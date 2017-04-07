@@ -38,4 +38,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Grouped Fields',
+  notes: null,
+  fields
+};

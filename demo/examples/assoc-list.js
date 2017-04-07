@@ -17,4 +17,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Associative List',
+  notes: null,
+  fields
+};

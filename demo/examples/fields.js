@@ -98,4 +98,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Fields',
+  notes: 'Fields can also be accessed under the alias of `fieldset`',
+  fields
+};

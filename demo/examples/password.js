@@ -8,4 +8,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Password',
+  notes: null,
+  fields
+};

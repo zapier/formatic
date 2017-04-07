@@ -3,8 +3,11 @@ const fields = [
     label: 'The Blob',
     type: 'json',
     key: 'blob',
-    readOnly: true
   }
 ];
 
-export default fields;
+export default {
+  title: 'JSON',
+  notes: null,
+  fields
+};

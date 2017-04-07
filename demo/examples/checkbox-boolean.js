@@ -12,7 +12,18 @@ const fields = [
     key: 'checkbox-boolean',
     default: true,
     readOnly: false
+  },
+  {
+    label: 'Is this a checkbox?',
+    type: 'checkbox',
+    key: 'checkbox',
+    default: true,
+    readOnly: false
   }
 ];
 
-export default fields;
+export default {
+  title: 'Checkbox Boolean',
+  notes: 'Checkbox Boolean can also be accessed under the alias `checkbox`',
+  fields
+};

@@ -12,4 +12,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Extends',
+  notes: null,
+  fields
+};

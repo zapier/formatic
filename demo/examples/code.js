@@ -5,4 +5,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Code',
+  notes: null,
+  fields
+};

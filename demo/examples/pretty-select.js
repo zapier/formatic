@@ -153,4 +153,8 @@ const fields = [
   }
 ];
 
-export default fields;
+export default {
+  title: 'Pretty Select',
+  notes: null,
+  fields
+};

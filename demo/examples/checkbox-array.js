@@ -14,7 +14,17 @@ const fields = [
     choices: ['red', 'green', 'blue'],
     default: 'green',
     readOnly: true
+  },
+  {
+    label: 'Colors',
+    type: 'checkbox-list',
+    key: 'colors-alt',
+    choices: ['blue', 'yellow', 'purple']
   }
 ];
 
-export default fields;
+export default {
+  title: 'Checkbox Array',
+  notes: 'Checkbox Array can also be accessed using the alias `checkbox-list`',
+  fields
+};
