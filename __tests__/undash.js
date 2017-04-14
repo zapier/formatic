@@ -10,6 +10,17 @@ describe('utils', () => {
     expect(_.flatten([['foo', 'bar'], 'baz'])).toEqual(['foo', 'bar', 'baz']);
   });
 
+  it('should compact', () => {
+
+    expect(_.compact([])).toEqual([]);
+    expect(_.compact(null)).toEqual([]);
+    expect(_.compact(undefined)).toEqual([]);
+    expect(_.compact([1, 2, 3])).toEqual([1, 2, 3]);
+    expect(_.compact([0, 1, 2, 3, NaN, null, undefined, false])).toEqual([1, 2, 3]);
+    expect(() => _.compact('asdf')).toThrow();
+    expect(() => _.compact({})).toThrow();
+  });
+
   it('should each over object', () => {
 
     var obj = {a: 1, b: 2};
