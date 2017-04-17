@@ -31,6 +31,7 @@ const fields = [
 
 export default {
   title: 'Single Line String',
-  notes: 'Single List String can also be accessed under the alias of `unicode` and `string`',
+  aliases: ['single-line-string', 'unicode', 'string'],
+  notes: null,
   fields
 };

@@ -9,6 +9,7 @@ const fields = [
 
 export default {
   title: 'Boolean',
-  notes: 'Boolean can also be accessed using the alias of `bool`',
+  aliases: ['boolean', 'bool'],
+  notes: null,
   fields
 };

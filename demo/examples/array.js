@@ -56,6 +56,7 @@ const fields = [
 
 export default {
   title: 'Array',
-  notes: 'Array can also be accessed under the alias `list`',
+  aliases: ['array', 'list'],
+  notes: null,
   fields
 };

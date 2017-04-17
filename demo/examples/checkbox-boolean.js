@@ -24,6 +24,7 @@ const fields = [
 
 export default {
   title: 'Checkbox Boolean',
-  notes: 'Checkbox Boolean can also be accessed under the alias `checkbox`',
+  aliases: ['checkbox-boolean', 'checkbox'],
+  notes: null,
   fields
 };

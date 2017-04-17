@@ -25,6 +25,7 @@ const fields = [
 
 export default {
   title: 'Checkbox Array',
-  notes: 'Checkbox Array can also be accessed using the alias `checkbox-list`',
+  aliases: ['checkbox-array', 'checkbox-list'],
+  notes: null,
   fields
 };

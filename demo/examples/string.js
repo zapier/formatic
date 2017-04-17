@@ -31,6 +31,7 @@ const fields = [
 
 export default {
   title: 'String',
-  notes: 'String can also be accessed under the alias of `text`',
+  aliases: ['string', 'text'],
+  notes: null,
   fields
 };

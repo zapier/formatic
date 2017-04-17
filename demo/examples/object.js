@@ -29,6 +29,7 @@ const fields = [
 
 export default {
   title: 'Object',
-  notes: 'Object can also be accessed using the alias of `dict`',
+  aliases: ['object', 'dict'],
+  notes: null,
   fields
 };

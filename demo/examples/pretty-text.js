@@ -115,6 +115,7 @@ const fields = [
 
 export default {
   title: 'Pretty Text',
-  notes: 'Pretty Text can also be accessed under the alias of `pretty-textarea`',
+  aliases: ['pretty-text', 'pretty-textarea'],
+  notes: null,
   fields
 };

@@ -62,3 +62,11 @@ body {
   padding: 0;
   color: #555;
 }
+
+.code {
+  background-color: lightgray;
+  color: #333;
+  padding: 3px;
+  border-radius: 2px;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}

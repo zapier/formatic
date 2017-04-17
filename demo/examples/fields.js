@@ -100,6 +100,7 @@ const fields = [
 
 export default {
   title: 'Fields',
-  notes: 'Fields can also be accessed under the alias of `fieldset`',
+  aliases: ['fields', 'fieldset'],
+  notes: null,
   fields
 };

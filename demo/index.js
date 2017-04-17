@@ -26,6 +26,10 @@ const DisplayFormValue = (props) => (
   </div>
 );
 
+const generateAliases = (aliases) => aliases
+  .map((alias, idx) => <span key={idx} className="code">{alias}</span>)
+  .reduce((acc, elem) => acc === null ? [elem] : [...acc, ', ', elem], null);
+
 class FormDemo extends Component {
   constructor(props) {
     super();
@@ -53,7 +57,11 @@ class FormDemo extends Component {
   }
 
   render() {
-    const { title, notes } = this.props;
+    const { title, notes, aliases } = this.props;
+
+    const aliasContent = !aliases ? null : (
+      <p>Aliases: {generateAliases(aliases)}</p>
+    );
 
     return (
       <div id={convertTitleToId(title)}>
@@ -66,6 +74,7 @@ class FormDemo extends Component {
               </a>
             </h3>
             <hr />
+            {aliasContent}
             <p>{notes}</p>
           </div>
         </div>
@@ -103,16 +112,12 @@ ReactDOM.render(
   <div className="container">
     <div className="row">
       <div className="col-sm-9">
-        <h1>Formatic Demo</h1>
+        <h1>Formatic</h1>
         <hr />
 
         {
           sortedExamples.map((form, idx) => (
-            <FormDemo
-              key={idx}
-              fields={form.fields}
-              notes={form.notes}
-              title={form.title} />
+            <FormDemo key={idx} {...form} />
           ))
         }
       </div>
