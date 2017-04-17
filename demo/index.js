@@ -35,7 +35,8 @@ class FormDemo extends Component {
     super();
 
     this.state = {
-      formState: config.createRootValue(props)
+      formState: config.createRootValue(props),
+      fields: props.fields
     };
   }
 
@@ -45,6 +46,12 @@ class FormDemo extends Component {
 
     this.setState({
       formState: newValue
+    });
+  }
+
+  onChangeFields(newValue) {
+    this.setState({
+      fields: newValue.source
     });
   }
 
@@ -63,6 +70,12 @@ class FormDemo extends Component {
       <p>Aliases: {generateAliases(aliases)}</p>
     );
 
+    const typeName = convertTitleToId(title);
+
+    const typeContent = typeName === 'unknown-field' ? null : (
+      <p>Type: <span className="code">{convertTitleToId(title)}</span></p>
+    );
+
     return (
       <div id={convertTitleToId(title)}>
         <div className="row">
@@ -74,6 +87,7 @@ class FormDemo extends Component {
               </a>
             </h3>
             <hr />
+            {typeContent}
             {aliasContent}
             <p>{notes}</p>
           </div>
@@ -83,7 +97,7 @@ class FormDemo extends Component {
             <div className="form-example">
               <Form
                 config={config}
-                fields={this.props.fields}
+                fields={this.state.fields}
                 value={this.state.formState}
                 onChange={this.onChange.bind(this)}
                 onFocus={(e) => this.onEvent('onFocus', e)}
@@ -99,6 +113,19 @@ class FormDemo extends Component {
             <DisplayFormValue
               title={title}
               value={this.state.formState} />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-sm-12">
+            <Form
+              config={config}
+              fields={{type: 'fieldset', collapsed: true, label: 'Example JSON', fields: [{
+                key: 'source',
+                type: 'json',
+                default: this.state.fields
+              }]}}
+              onChange={this.onChangeFields.bind(this)}
+            />
           </div>
         </div>
       </div>
