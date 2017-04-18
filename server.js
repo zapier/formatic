@@ -2,8 +2,11 @@ var webpack = require('webpack');
 var WebpackDevServer = require('webpack-dev-server');
 var portscanner = require('portscanner');
 var config = require('./webpack.config');
+var open = require('open');
 
-portscanner.findAPortNotInUse(3000, 3100, '127.0.0.1', function(portErr, port) {
+const ipAddress = '127.0.0.1';
+
+portscanner.findAPortNotInUse(3000, 3100, ipAddress, function(portErr, port) {
 
   config.entry[0] = config.entry[0].replace('3000', port);
 
@@ -15,11 +18,13 @@ portscanner.findAPortNotInUse(3000, 3100, '127.0.0.1', function(portErr, port) {
     historyApiFallback: true
   });
 
-  server.listen(port, '127.0.0.1', function (err) {
+  server.listen(port, ipAddress, function (err) {
     if (err) {
       console.log(err);
     }
 
-    console.log('Listening at localhost:' + port);
+    console.log(`Listening at ${ipAddress}:` + port);
+
+    open(`http://${ipAddress}:${port}/demo/index.html`);
   });
 });

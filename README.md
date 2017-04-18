@@ -17,8 +17,8 @@ npm install
 npm start
 ```
 
-Point your browser to `localhost:3000/demo/index.html`. Hack away on the code, the
-styles or the HTML in the demo directory, and the browser will automatically
+Your browser should automatically open to [http://localhost:3000/demo/index.html](http://localhost:3000/demo/index.html).
+Hack away on the code, the styles or the HTML in the demo directory, and the browser will automatically
 reload with your changes.
 
 __Note__: Don't mess with the files in the `live` directory. All those are copied
