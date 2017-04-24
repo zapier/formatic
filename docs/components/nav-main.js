@@ -1,5 +1,7 @@
 'use strict';
 
+var PropTypes = require('prop-types');
+
 var React = require('react');
 var Router = require('react-router');
 var Bootstrap = require('react-bootstrap');
@@ -25,7 +27,7 @@ var NAV_LINKS = {
 module.exports = React.createClass({
 
   propTypes: {
-    activePage: React.PropTypes.string
+    activePage: PropTypes.string
   },
 
   render: function () {

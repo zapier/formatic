@@ -2,6 +2,8 @@
 /*eslint no-unused-vars:0 no-empty:0*/
 'use strict';
 
+var PropTypes = require('prop-types');
+
 var React = require('react');
 var classSet = require('react/lib/cx');
 var CodeMirror = global.CodeMirror;
@@ -87,9 +89,9 @@ var ReactPlayground = React.createClass({
   MODES: {JSX: 'JSX', JS: 'JS', OUTPUT: 'OUTPUT', NONE: null},
 
   propTypes: {
-    code: React.PropTypes.string.isRequired,
-    transformer: React.PropTypes.func,
-    renderCode: React.PropTypes.bool
+    code: PropTypes.string.isRequired,
+    transformer: PropTypes.func,
+    renderCode: PropTypes.bool
   },
 
   getDefaultProps: function() {
