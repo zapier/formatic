@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var createReactClass = require('create-react-class');
 var NavMain = require('./nav-main');
 var Header = require('./header');
 var Footer = require('./footer');
@@ -13,7 +14,7 @@ var NavItem = Bootstrap.NavItem;
 var fs = require('fs');
 var path = require('path');
 
-module.exports = React.createClass({
+module.exports = createReactClass({
 
   getInitialState: function () {
     return {

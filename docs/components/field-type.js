@@ -5,9 +5,8 @@ var React = require('react');
 var Snippet = require('./snippet');
 var ReactPlayground = require('./react-playground');
 
-module.exports = React.createClass({
-
-  render: function () {
+module.exports = class extends React.Component {
+  render() {
 
     return (
       <div className="bs-docs-section">
@@ -44,4 +43,4 @@ module.exports = React.createClass({
     );
 
   }
-});
+};

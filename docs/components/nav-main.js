@@ -24,13 +24,12 @@ var NAV_LINKS = {
   }
 };
 
-module.exports = React.createClass({
-
-  propTypes: {
+module.exports = class extends React.Component {
+  static propTypes = {
     activePage: PropTypes.string
-  },
+  };
 
-  render: function () {
+  render() {
     var brand = E(Router.Link, {to: '/formatic/', className: 'navbar-brand'}, 'Formatic');
 
     return (
@@ -44,9 +43,9 @@ module.exports = React.createClass({
         )
       )
     );
-  },
+  }
 
-  renderNavItem: function (linkName) {
+  renderNavItem = (linkName) => {
     var link = NAV_LINKS[linkName];
 
     return (
@@ -54,6 +53,5 @@ module.exports = React.createClass({
         E(Router.Link, {to: link.link}, link.title)
       )
     );
-  }
-
-});
+  };
+};

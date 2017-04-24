@@ -5,6 +5,7 @@
 var PropTypes = require('prop-types');
 
 var React = require('react');
+var createReactClass = require('create-react-class');
 var classSet = require('react/lib/cx');
 var CodeMirror = global.CodeMirror;
 var JSXTransformer = global.JSXTransformer;
@@ -21,7 +22,9 @@ var IS_MOBILE = typeof navigator !== 'undefined' && (
     || navigator.userAgent.match(/Windows Phone/i)
   );
 
-var CodeMirrorEditor = React.createClass({
+var CodeMirrorEditor = createReactClass({
+  displayName: 'CodeMirrorEditor',
+
   componentDidMount: function() {
     if (IS_MOBILE) {
       return;
@@ -69,7 +72,7 @@ var CodeMirrorEditor = React.createClass({
         {editor}
       </div>
       );
-  }
+  },
 });
 
 var selfCleaningTimeout = {
@@ -83,9 +86,9 @@ var selfCleaningTimeout = {
   }
 };
 
-var ReactPlayground = React.createClass({
+var ReactPlayground = createReactClass({
+  displayName: 'ReactPlayground',
   mixins: [selfCleaningTimeout],
-
   MODES: {JSX: 'JSX', JS: 'JS', OUTPUT: 'OUTPUT', NONE: null},
 
   propTypes: {
@@ -262,7 +265,7 @@ var ReactPlayground = React.createClass({
         );
       }, 500);
     }
-  }
+  },
 });
 
 module.exports = ReactPlayground;

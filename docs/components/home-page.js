@@ -6,9 +6,8 @@ var E = React.createElement;
 var NavMain = require('./nav-main');
 var Footer = require('./footer');
 
-module.exports = React.createClass({
-
-  render: function () {
+module.exports = class extends React.Component {
+  render() {
     return (
       R.div({},
         E(NavMain, {activePage: 'home'}),
@@ -22,5 +21,4 @@ module.exports = React.createClass({
       )
     );
   }
-
-});
+};

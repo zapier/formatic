@@ -6,8 +6,8 @@ var NavMain = require('./nav-main');
 var Header = require('./header');
 var Footer = require('./footer');
 
-module.exports = React.createClass({
-  render: function () {
+module.exports = class extends React.Component {
+  render() {
     return (
         <div>
           <NavMain activePage="" />
@@ -20,4 +20,4 @@ module.exports = React.createClass({
         </div>
       );
   }
-});
+};
