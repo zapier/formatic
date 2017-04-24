@@ -1,5 +1,7 @@
 'use strict';
 
+var PropTypes = require('prop-types');
+
 var React = require('react');
 var Router = require('react-router');
 var Bootstrap = require('react-bootstrap');
@@ -22,13 +24,12 @@ var NAV_LINKS = {
   }
 };
 
-module.exports = React.createClass({
+module.exports = class extends React.Component {
+  static propTypes = {
+    activePage: PropTypes.string
+  };
 
-  propTypes: {
-    activePage: React.PropTypes.string
-  },
-
-  render: function () {
+  render() {
     var brand = E(Router.Link, {to: '/formatic/', className: 'navbar-brand'}, 'Formatic');
 
     return (
@@ -42,9 +43,9 @@ module.exports = React.createClass({
         )
       )
     );
-  },
+  }
 
-  renderNavItem: function (linkName) {
+  renderNavItem = (linkName) => {
     var link = NAV_LINKS[linkName];
 
     return (
@@ -52,6 +53,5 @@ module.exports = React.createClass({
         E(Router.Link, {to: link.link}, link.title)
       )
     );
-  }
-
-});
+  };
+};

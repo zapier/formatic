@@ -3,8 +3,8 @@
 var React = require('react');
 //var R = React.DOM;
 
-module.exports = React.createClass({
-  render: function () {
+module.exports = class extends React.Component {
+  render() {
     return (
       <div className="bs-docs-header" id="content">
         <div className="container">
@@ -14,4 +14,4 @@ module.exports = React.createClass({
       </div>
     );
   }
-});
+};

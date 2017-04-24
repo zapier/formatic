@@ -9,9 +9,8 @@ var ReactPlayground = require('./react-playground');
 var fs = require('fs');
 var path = require('path');
 
-module.exports = React.createClass({
-
-  render: function () {
+module.exports = class extends React.Component {
+  render() {
 
     return (
       <div>
@@ -73,5 +72,4 @@ module.exports = React.createClass({
       </div>
     );
   }
-
-});
+};

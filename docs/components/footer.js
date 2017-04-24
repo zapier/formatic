@@ -4,8 +4,8 @@ var React = require('react');
 var R = React.DOM;
 var pkg = require('../../package.json');
 
-module.exports = React.createClass({
-  render: function () {
+module.exports = class extends React.Component {
+  render() {
     return (
       R.footer({className: 'bs-docs-footer', role: 'contentinfo'},
         R.div({className: 'container'},
@@ -37,4 +37,4 @@ module.exports = React.createClass({
       )
     );
   }
-});
+};

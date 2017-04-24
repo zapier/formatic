@@ -3,17 +3,16 @@
 var React = require('react');
 var R = React.DOM;
 
-module.exports = React.createClass({
-
-  componentDidMount: function () {
+module.exports = class extends React.Component {
+  componentDidMount() {
     window.prettyPrint();
-  },
+  }
 
-  componentDidUpdate: function () {
+  componentDidUpdate() {
     window.prettyPrint();
-  },
+  }
 
-  render: function () {
+  render() {
     var snippet = this.props.code;
 
     if (!snippet && this.props.json) {
@@ -32,5 +31,4 @@ module.exports = React.createClass({
       )
     );
   }
-
-});
+};
