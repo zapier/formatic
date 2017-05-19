@@ -1,11 +1,11 @@
 /*global describe, it, expect*/
 'use strict';
 
-describe('actions', function() {
+import React from 'react';
+import ReactDOM from 'react-dom';
+import TestUtils from 'react-addons-test-utils';
 
-  var React = require('react');
-  var ReactDOM = require('react-dom');
-  var TestUtils = require('react-addons-test-utils');
+describe('actions', function() {
 
   var mounted = function (element) {
     var rendered = TestUtils.renderIntoDocument(element);

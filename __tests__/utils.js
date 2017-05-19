@@ -1,9 +1,9 @@
 /*global describe, it, expect*/
 'use strict';
 
-describe('utils', function() {
+import utils from '../lib/utils';
 
-  var utils = require('../lib/utils');
+describe('utils', function() {
 
   it('should deep copy primitives', function () {
 

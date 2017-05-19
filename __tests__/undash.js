@@ -1,9 +1,9 @@
 /*global describe, it, expect*/
 'use strict';
 
-describe('utils', () => {
+import _ from '../lib/undash';
 
-  var _ = require('../lib/undash');
+describe('utils', () => {
 
   it('should flatten', () => {
 
