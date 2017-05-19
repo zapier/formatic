@@ -1,7 +1,7 @@
 import babel from 'rollup-plugin-babel';
 
 export default {
-  entry: 'lib/formatic.js',
+  entry: './lib/formatic.js',
   format: 'cjs',
   external: [
     'react',
@@ -17,5 +17,5 @@ export default {
       plugins: ['external-helpers']
     }),
   ],
-  dest: 'build/lib/index.js'
+  dest: './build/lib/index.js'
 };
