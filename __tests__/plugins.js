@@ -1,9 +1,9 @@
 /*global describe, it, expect*/
 'use strict';
 
-describe('plugins', function() {
+import Formatic from '../lib/formatic';
 
-  var Formatic = require('../lib/formatic');
+describe('plugins', function() {
 
   it('can create a new default configuration', function () {
 

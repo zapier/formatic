@@ -1,8 +1,10 @@
 'use strict';
+
 /* global describe it expect */
 
-var TagTranslator = require('../../../lib/components/helpers/tag-translator');
-const Formatic = require('../../../lib/formatic');
+import TagTranslator from '../../../lib/components/helpers/tag-translator';
+
+import Formatic from '../../../lib/formatic';
 
 describe('editor-util', function () {
   var replaceChoices = [

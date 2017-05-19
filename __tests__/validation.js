@@ -1,9 +1,9 @@
 /*global describe, it, expect*/
 'use strict';
 
-describe('types and value changes', function() {
+import Formatic from '../lib/formatic';
 
-  var Formatic = require('../lib/formatic');
+describe('types and value changes', function() {
 
   var config = Formatic.createConfig();
 

@@ -1,6 +1,12 @@
 /*global describe, it, expect*/
 'use strict';
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+import TestUtils from 'react-addons-test-utils';
+import _ from 'lodash';
+import Formatic from '../lib/formatic';
+
 var printTree = function (node, indent) {
   indent = indent || '';
   if (node && node.childNodes) {
@@ -14,17 +20,10 @@ var printTree = function (node, indent) {
 
 describe('types and value changes', function() {
 
-  var React = require('react');
-  var ReactDOM = require('react-dom');
-  var TestUtils = require('react-addons-test-utils');
-  var _ = require('lodash');
-
   var mounted = function (element) {
     var rendered = TestUtils.renderIntoDocument(element);
     return rendered;
   };
-
-  var Formatic = require('../lib/formatic');
 
   var formaticConfig = Formatic.createConfig(
     Formatic.plugins.elementClasses,
