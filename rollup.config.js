@@ -5,6 +5,7 @@ export default {
   format: 'cjs',
   external: [
     'react',
+    'react-addons-css-transition-group',
     'react-dom'
   ],
   plugins: [
