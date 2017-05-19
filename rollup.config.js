@@ -4,9 +4,14 @@ export default {
   entry: './lib/formatic.js',
   format: 'cjs',
   external: [
+    'classnames',
+    'deep-equal',
+    'object-assign',
     'react',
     'react-addons-css-transition-group',
-    'react-dom'
+    'react-addons-update',
+    'react-dom',
+    'react-scroll-lock'
   ],
   plugins: [
     babel({
