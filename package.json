@@ -27,7 +27,6 @@
     "babel-loader": "6.2.5",
     "babel-preset-es2015": "6.13.2",
     "babel-preset-react": "6.11.1",
-    "babelify": "5.0.3",
     "bootstrap": "3.3.5",
     "codemirror": "5.9.0",
     "css-loader": "0.23.0",
@@ -83,19 +82,5 @@
       "__tests__"
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/setup-jasmine-env.js"
-  },
-  "browserify": {
-    "transform": [
-      "babelify",
-      "browserify-shim",
-      "brfs"
-    ]
-  },
-  "browserify-shim": {
-    "react": "global:React",
-    "react-addons-css-transition-group": "global:React.addons.CSSTransitionGroup",
-    "react-dom": "global:ReactDOM",
-    "underscore": "global:_",
-    "codemirror": "global:CodeMirror"
   }
 }
