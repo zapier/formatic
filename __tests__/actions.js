@@ -5,14 +5,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-addons-test-utils';
 
+import Formatic from '../lib/formatic';
+
 describe('actions', function() {
 
   var mounted = function (element) {
     var rendered = TestUtils.renderIntoDocument(element);
     return rendered;
   };
-
-  var Formatic = require('../lib/formatic');
 
   var formaticConfig = Formatic.createConfig(
     Formatic.plugins.elementClasses,
