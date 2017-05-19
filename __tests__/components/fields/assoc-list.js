@@ -1,10 +1,9 @@
 /*global describe, it, expect*/
 'use strict';
 
-const React = require('react');
-const TestUtils = require('react-addons-test-utils');
-
-const Formatic = require('../../../lib/formatic');
+import React from 'react';
+import TestUtils from 'react-addons-test-utils';
+import Formatic from '../../../lib/formatic';
 
 const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
