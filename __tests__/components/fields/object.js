@@ -157,8 +157,6 @@ describe('object field', () => {
     renderToNode(value);
     const formatic = renderToNode(value);
 
-    const ObjectClass = require('../../../lib/components/fields/object');
-
     const object = TestUtils.findRenderedComponentWithType(formatic, ObjectClass);
 
     expect(object.state).toEqual({
