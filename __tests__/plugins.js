@@ -62,4 +62,34 @@ describe('plugins', function() {
 
   });
 
+  describe('coerceValueToBoolean', () => {
+
+    it('properly coerces values to false', () => {
+
+      var config = Formatic.createConfig();
+
+      expect(config.coerceValueToBoolean(false)).toEqual(false);
+      expect(config.coerceValueToBoolean(0)).toEqual(false);
+      expect(config.coerceValueToBoolean(undefined)).toEqual(false);
+      expect(config.coerceValueToBoolean(null)).toEqual(false);
+      expect(config.coerceValueToBoolean('0')).toEqual(false);
+      expect(config.coerceValueToBoolean('')).toEqual(false);
+      expect(config.coerceValueToBoolean('no')).toEqual(false);
+      expect(config.coerceValueToBoolean('off')).toEqual(false);
+      expect(config.coerceValueToBoolean('false')).toEqual(false);
+    });
+
+    it('properly coerces values to true', () => {
+
+      var config = Formatic.createConfig();
+
+      expect(config.coerceValueToBoolean(true)).toEqual(true);
+      expect(config.coerceValueToBoolean(1)).toEqual(true);
+      expect(config.coerceValueToBoolean('1')).toEqual(true);
+      expect(config.coerceValueToBoolean('true')).toEqual(true);
+      expect(config.coerceValueToBoolean('any other string')).toEqual(true);
+    });
+
+  });
+
 });
