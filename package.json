@@ -5,7 +5,7 @@
   "main": "./build/lib/index.js",
   "scripts": {
     "test": "jest --no-cache",
-    "prebuild": "rm -rf build && mkdir -p build/lib",
+    "prebuild": "npm install && rm -rf build && mkdir -p build/lib",
     "build": "babel lib --out-dir build/lib && rollup -c",
     "prepublish": "npm run build",
     "docs-build": "gulp docs-build",
