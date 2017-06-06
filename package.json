@@ -1,11 +1,11 @@
 {
   "name": "formatic",
-  "version": "0.3.82",
+  "version": "0.3.83",
   "description": "Automatic, pluggable form generation",
   "main": "./build/lib/index.js",
   "scripts": {
     "test": "jest --no-cache",
-    "prebuild": "npm install && rm -rf build && mkdir -p build/lib",
+    "prebuild": "rm -rf build && mkdir -p build/lib",
     "build": "babel lib --out-dir build/lib && rollup -c",
     "prepublish": "npm run build",
     "docs-build": "gulp docs-build",
