@@ -2,7 +2,7 @@
   "name": "formatic",
   "version": "0.3.84",
   "description": "Automatic, pluggable form generation",
-  "main": "./build/lib/index.js",
+  "main": "./lib/formatic.js",
   "scripts": {
     "test": "jest --no-cache",
     "prebuild": "rm -rf build && mkdir -p build/lib",
