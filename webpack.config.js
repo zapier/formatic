@@ -29,11 +29,11 @@ module.exports = {
     }],
 
     preLoaders: [
-      {
-        test: /\.js$/,
-        loader: 'eslint-loader',
-        include: [path.join(__dirname, 'lib'), path.join(__dirname, 'demo')]
-      }
+      /* {
+       *   test: /\.js$/,
+       *   loader: 'eslint-loader',
+       *   include: [path.join(__dirname, 'lib'), path.join(__dirname, 'demo')]
+       * }*/
     ]
   }
 };
