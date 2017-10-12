@@ -1,6 +1,10 @@
+var React = require('react');
+var createReactClass = require('create-react-class');
+var Formatic = require('../../lib/formatic');
+
 // Our new field type is mostly represented by a React class. To make it play
 // well with others, there are some conventions to follow.
-var Tweet = React.createClass({
+var Tweet = createReactClass({
   displayName: 'Tweet',
 
   // This mixin provides the renderWithConfig method so that this fields render

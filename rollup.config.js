@@ -5,11 +5,12 @@ export default {
   format: 'cjs',
   external: [
     'classnames',
+    'create-react-class',
     'deep-equal',
     'object-assign',
     'react',
-    'react-addons-css-transition-group',
-    'react-addons-update',
+    'react-transition-group',
+    'immutability-helper',
     'react-dom',
     'react-scroll-lock'
   ],
