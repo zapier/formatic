@@ -10,4 +10,5 @@ node_modules
 \#*\#
 .\#*
 .projectile
+.vscode
 npm-debug.log
