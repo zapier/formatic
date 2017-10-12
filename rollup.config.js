@@ -7,12 +7,13 @@ export default {
     'classnames',
     'create-react-class',
     'deep-equal',
-    'object-assign',
-    'react',
-    'react-transition-group',
     'immutability-helper',
+    'object-assign',
+    'prop-types',
+    'react',
     'react-dom',
-    'react-scroll-lock'
+    'react-scroll-lock',
+    'react-transition-group'
   ],
   plugins: [
     babel({
