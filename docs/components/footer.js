@@ -1,10 +1,11 @@
 'use strict';
 
 var React = require('react');
+var createReactClass = require('create-react-class');
 var R = React.DOM;
 var pkg = require('../../package.json');
 
-module.exports = React.createClass({
+module.exports = createReactClass({
   render: function () {
     return (
       R.footer({className: 'bs-docs-footer', role: 'contentinfo'},

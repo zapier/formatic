@@ -2,20 +2,20 @@
 'use strict';
 
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 import Formatic from '../../../lib/formatic';
 
-const renderedKeys = doc => {
+const renderedKeys = (doc) => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
   return inputs.map(i => i.value);
 };
 
-const renderedKeyClasses = doc => {
+const renderedKeyClasses = (doc) => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
   return inputs.map(i => i.getAttribute('class'));
 };
 
-const renderedValues = doc => {
+const renderedValues =(doc) => {
   const textBoxes = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'textarea');
   return textBoxes.map(b => b.textContent);
 };

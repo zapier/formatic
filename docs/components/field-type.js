@@ -1,11 +1,12 @@
 'use strict';
 
 var React = require('react');
+var createReactClass = require('create-react-class');
 
 var Snippet = require('./snippet');
 var ReactPlayground = require('./react-playground');
 
-module.exports = React.createClass({
+module.exports = createReactClass({
 
   render: function () {
 

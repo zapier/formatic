@@ -2,24 +2,24 @@
 'use strict';
 
 import React from 'react';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 import Formatic from '../../../lib/formatic';
 import ObjectClass from '../../../lib/components/fields/object';
 
-const renderedKeys = doc => {
+const renderedKeys = (doc) => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
-  return inputs.map(i => i.value);
+  return inputs.map((i) => i.value);
 };
 
-const renderedKeyClasses = doc => {
+const renderedKeyClasses = (doc) => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
-  return inputs.map(i => i.getAttribute('class'));
+  return inputs.map((i) => i.getAttribute('class'));
 };
 
-const renderedValues = doc => {
+const renderedValues = (doc) => {
   const textBoxes = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'textarea');
-  return textBoxes.map(b => b.textContent);
+  return textBoxes.map((b) => b.textContent);
 };
 
 describe('object field', () => {
@@ -39,8 +39,8 @@ describe('object field', () => {
   let newValue;
   let node;
 
-  const render = value => {
-    const onChange = val => {
+  const render = (value) => {
+    const onChange = (val) => {
       newValue = val;
       doc = render(newValue);
     };
@@ -51,7 +51,7 @@ describe('object field', () => {
     return TestUtils.renderIntoDocument(form);
   };
 
-  const renderToNode = value => {
+  const renderToNode = (value) => {
     const onChange = () => {};
 
     if (!node) {

@@ -1,12 +1,13 @@
 'use strict';
 
 var React = require('react');
+var createReactClass = require('create-react-class');
 var R = React.DOM;
 var E = React.createElement;
 var NavMain = require('./nav-main');
 var Footer = require('./footer');
 
-module.exports = React.createClass({
+module.exports = createReactClass({
 
   render: function () {
     return (

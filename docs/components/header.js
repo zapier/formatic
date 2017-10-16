@@ -1,9 +1,10 @@
 'use strict';
 
 var React = require('react');
+var createReactClass = require('create-react-class');
 //var R = React.DOM;
 
-module.exports = React.createClass({
+module.exports = createReactClass({
   render: function () {
     return (
       <div className="bs-docs-header" id="content">
