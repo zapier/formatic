@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react');
+var createReactClass = require('create-react-class');
 var R = React.DOM;
 var E = React.createElement;
 var Router = require('react-router');
@@ -36,7 +37,7 @@ var pages = {
 
 var routes;
 
-var Root = module.exports = React.createClass({
+var Root = module.exports = createReactClass({
 
   statics: {
     renderToString: function (name) {

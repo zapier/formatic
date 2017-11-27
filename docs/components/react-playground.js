@@ -3,6 +3,8 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
+var createReactClass = require('create-react-class');
 var classSet = require('react/lib/cx');
 var CodeMirror = global.CodeMirror;
 var JSXTransformer = global.JSXTransformer;
@@ -19,7 +21,7 @@ var IS_MOBILE = typeof navigator !== 'undefined' && (
     || navigator.userAgent.match(/Windows Phone/i)
   );
 
-var CodeMirrorEditor = React.createClass({
+var CodeMirrorEditor = createReactClass({
   componentDidMount: function() {
     if (IS_MOBILE) {
       return;
@@ -81,15 +83,15 @@ var selfCleaningTimeout = {
   }
 };
 
-var ReactPlayground = React.createClass({
+var ReactPlayground = createReactClass({
   mixins: [selfCleaningTimeout],
 
   MODES: {JSX: 'JSX', JS: 'JS', OUTPUT: 'OUTPUT', NONE: null},
 
   propTypes: {
-    code: React.PropTypes.string.isRequired,
-    transformer: React.PropTypes.func,
-    renderCode: React.PropTypes.bool
+    code: PropTypes.string.isRequired,
+    transformer: PropTypes.func,
+    renderCode: PropTypes.bool
   },
 
   getDefaultProps: function() {

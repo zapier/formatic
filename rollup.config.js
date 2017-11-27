@@ -5,13 +5,15 @@ export default {
   format: 'cjs',
   external: [
     'classnames',
+    'create-react-class',
     'deep-equal',
+    'immutability-helper',
     'object-assign',
+    'prop-types',
     'react',
-    'react-addons-css-transition-group',
-    'react-addons-update',
     'react-dom',
-    'react-scroll-lock'
+    'react-scroll-lock',
+    'react-transition-group'
   ],
   plugins: [
     babel({

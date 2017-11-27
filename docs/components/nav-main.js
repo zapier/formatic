@@ -1,6 +1,8 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
+var createReactClass = require('create-react-class');
 var Router = require('react-router');
 var Bootstrap = require('react-bootstrap');
 
@@ -22,10 +24,10 @@ var NAV_LINKS = {
   }
 };
 
-module.exports = React.createClass({
+module.exports = createReactClass({
 
   propTypes: {
-    activePage: React.PropTypes.string
+    activePage: PropTypes.string
   },
 
   render: function () {
