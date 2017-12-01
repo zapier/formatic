@@ -1,8 +1,7 @@
 import babel from 'rollup-plugin-babel';
 
 export default {
-  entry: './lib/formatic.js',
-  format: 'cjs',
+  input: './lib/formatic.js',
   external: [
     'classnames',
     'create-react-class',
@@ -25,5 +24,8 @@ export default {
       plugins: ['external-helpers']
     }),
   ],
-  dest: './build/lib/index.js'
+  output: {
+    format: 'cjs',
+    file: './build/lib/index.js'
+  }
 };
