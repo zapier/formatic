@@ -8,32 +8,31 @@ module.exports = {
   entry: [
     'webpack-dev-server/client?http://localhost:3000',
     'webpack/hot/only-dev-server',
-    './demo/index.js'
+    './demo/index.js',
   ],
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'bundle.js',
-    publicPath: '/static/'
+    publicPath: '/static/',
   },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ],
+  plugins: [new webpack.HotModuleReplacementPlugin()],
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loaders: ['react-hot-loader/webpack', 'babel-loader'],
-      include: [path.join(__dirname, 'lib'), path.join(__dirname, 'demo')]
-    }, {
-      test: /\.css$/,
-      loader: 'style-loader!css-loader?importLoaders=1'
-    }],
-
-    preLoaders: [
+    rules: [
       {
         test: /\.js$/,
+        enforce: 'pre',
         loader: 'eslint-loader',
-        include: [path.join(__dirname, 'lib'), path.join(__dirname, 'demo')]
-      }
-    ]
-  }
+        include: [path.join(__dirname, 'lib'), path.join(__dirname, 'demo')],
+      },
+      {
+        test: /\.js$/,
+        loaders: ['react-hot-loader/webpack', 'babel-loader'],
+        include: [path.join(__dirname, 'lib'), path.join(__dirname, 'demo')],
+      },
+      {
+        test: /\.css$/,
+        loader: 'style-loader!css-loader?importLoaders=1',
+      },
+    ],
+  },
 };
