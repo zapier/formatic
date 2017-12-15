@@ -68,6 +68,7 @@
     "classnames": "^2.2.5",
     "create-react-class": "^15.6.2",
     "deep-equal": "^1.0.1",
+    "draft-js": "^0.10.4",
     "immutability-helper": "^2.5.1",
     "object-assign": "^2.1.1",
     "prop-types": "^15.6.0",
