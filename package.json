@@ -1,6 +1,6 @@
 {
   "name": "formatic",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Automatic, pluggable form generation",
   "main": "./build/lib/index.js",
   "scripts": {
@@ -45,7 +45,7 @@
     "jest-cli": "^21.2.1",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
-    "marked": "^0.3.6",
+    "marked": "^0.3.9",
     "node-libs-browser": "^2.1.0",
     "open": "^0.0.5",
     "portscanner": "^2.1.1",
