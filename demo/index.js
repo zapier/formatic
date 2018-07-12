@@ -10,11 +10,45 @@ import customPlugin from './examples/custom-plugin';
 
 var Form = React.createFactory(Formatic);
 
+// Draws a hint box around each component.
+const HintBox = (props) => (
+  <div style={{padding: '1px', margin: '1px', border: '1px solid black', display: 'inline-block'}}>
+    <span style={{fontStyle: 'italic', fontSize: '12px'}}>{props.name}</span>
+    {props.children}
+  </div>
+);
+
+// Inject a HintBox into each createElement_ hook to show hints
+// for plugin methods.
+const hintPlugin = (config) => {
+  config = _.extend({}, config);
+  return Object.keys(config).reduce((newConfig, key) => {
+    if (key.startsWith('createElement_')) {
+      newConfig[key] = (...args) => (
+        <HintBox name={key}>
+          {config[key](...args)}
+        </HintBox>
+      );
+    } else {
+      newConfig[key] = config[key];
+    }
+    return newConfig;
+  }, {});
+};
+
 const config = Formatic.createConfig(
   Formatic.plugins.reference,
   Formatic.plugins.meta,
   Formatic.plugins.bootstrap,
   customPlugin,
+);
+
+const hintConfig = Formatic.createConfig(
+  Formatic.plugins.reference,
+  Formatic.plugins.meta,
+  Formatic.plugins.bootstrap,
+  customPlugin,
+  hintPlugin,
 );
 
 const convertTitleToId = (title) => title.toLowerCase().replace(/ /g, '-');
@@ -36,7 +70,8 @@ class FormDemo extends Component {
 
     this.state = {
       formState: config.createRootValue(props),
-      fields: props.fields
+      fields: props.fields,
+      hints: {}
     };
   }
 
@@ -52,6 +87,14 @@ class FormDemo extends Component {
   onChangeFields(newValue) {
     this.setState({
       fields: newValue.source
+    });
+  }
+
+  onChangeHint(id) {
+    const hints = _.extend({}, this.state.hints);
+    hints[id] = !hints[id];
+    this.setState({
+      hints: hints
     });
   }
 
@@ -76,8 +119,10 @@ class FormDemo extends Component {
       <p>Type: <span className="code">{convertTitleToId(title)}</span></p>
     );
 
+    const id = convertTitleToId(title);
+
     return (
-      <div id={convertTitleToId(title)}>
+      <div id={id}>
         <div className="row">
           <div className="col-sm-12">
             <h3>
@@ -89,6 +134,9 @@ class FormDemo extends Component {
             <hr />
             {typeContent}
             {aliasContent}
+            <p>
+              <button className="btn btn-default btn-sm" onClick={() => this.onChangeHint(id)}>Toggle Plugin Hints</button>
+            </p>
             <p>{notes}</p>
           </div>
         </div>
@@ -96,7 +144,7 @@ class FormDemo extends Component {
           <div className="col-sm-8">
             <div className="form-example">
               <Form
-                config={config}
+                config={this.state.hints[id] ? hintConfig : config}
                 fields={this.state.fields}
                 value={this.state.formState}
                 onChange={this.onChange.bind(this)}
