@@ -1,6 +1,6 @@
 const fields = [
   {
-    id: 'code',
+    key: 'code',
     type: 'code'
   }
 ];

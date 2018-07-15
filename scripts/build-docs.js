@@ -1,16 +1,16 @@
-'use strict';
+/* global __dirname */
 
 require('babel/register');
 
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-var RootClass = require('../docs/components/root');
+const RootClass = require('../docs/components/root');
 
-var DOCTYPE = '<!doctype html>';
+const DOCTYPE = '<!doctype html>';
 
 Object.keys(RootClass.pages).forEach(function (name) {
-  var page = RootClass.pages[name];
-  var html = DOCTYPE + '\n' + RootClass.renderToString(name);
+  const page = RootClass.pages[name];
+  const html = DOCTYPE + '\n' + RootClass.renderToString(name);
   fs.writeFileSync(path.join(__dirname, '../live/formatic', page.filename), html);
 });

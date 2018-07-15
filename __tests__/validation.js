@@ -5,19 +5,19 @@ import Formatic from '../lib/formatic';
 
 describe('types and value changes', function() {
 
-  var config = Formatic.createConfig();
+  const config = Formatic.createConfig();
 
   it('should validate a form with no required value', function () {
 
-    var fields = [
+    const fields = [
       {
         type: 'string',
         key: 'greeting'
       }
     ];
 
-    var isValid = config.isValidRootValue({
-      fields: fields
+    const isValid = config.isValidRootValue({
+      fields
     });
 
     expect(isValid).toEqual(true);
@@ -25,7 +25,7 @@ describe('types and value changes', function() {
 
   it('should invalidate a form with required value', function () {
 
-    var fields = [
+    const fields = [
       {
         type: 'string',
         key: 'greeting',
@@ -33,8 +33,8 @@ describe('types and value changes', function() {
       }
     ];
 
-    var isValid = config.isValidRootValue({
-      fields: fields
+    const isValid = config.isValidRootValue({
+      fields
     });
 
     expect(isValid).toEqual(false);
@@ -42,7 +42,7 @@ describe('types and value changes', function() {
 
   it('should validate a form with a required/default value', function () {
 
-    var fields = [
+    const fields = [
       {
         type: 'string',
         key: 'greeting',
@@ -51,8 +51,8 @@ describe('types and value changes', function() {
       }
     ];
 
-    var isValid = config.isValidRootValue({
-      fields: fields
+    const isValid = config.isValidRootValue({
+      fields
     });
 
     expect(isValid).toEqual(true);

@@ -23,10 +23,10 @@ describe('utils', () => {
 
   it('should each over object', () => {
 
-    var obj = {a: 1, b: 2};
+    const obj = {a: 1, b: 2};
 
-    var keys = [];
-    var values = [];
+    const keys = [];
+    const values = [];
 
     _.each(obj, (value, key) => {
       values.push(value);
@@ -39,9 +39,9 @@ describe('utils', () => {
 
   it('should clone object', () => {
 
-    var obj = {a: 1, b: 2};
+    const obj = {a: 1, b: 2};
 
-    var clone = _.clone(obj);
+    const clone = _.clone(obj);
 
     expect(obj === clone).toEqual(false);
     expect(clone).toEqual(obj);
@@ -50,9 +50,9 @@ describe('utils', () => {
 
   it('should find item', () => {
 
-    var array = [1, 2, 3, 4, 5];
+    const array = [1, 2, 3, 4, 5];
 
-    var foundItem = _.find(array, (item) => {
+    const foundItem = _.find(array, (item) => {
       return item > 3;
     });
 

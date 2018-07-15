@@ -7,12 +7,12 @@ import TestUtils from 'react-dom/test-utils';
 import _ from 'lodash';
 import Formatic from '../lib/formatic';
 
-var printTree = function (node, indent) {
+const printTree = function (node, indent) {
   indent = indent || '';
   if (node && node.childNodes) {
-    for (var i = 0; i < node.childNodes.length; i++) {
-      var childNode = node.childNodes[i];
-      console.log(indent + node.tagName);
+    for (let i = 0; i < node.childNodes.length; i++) {
+      const childNode = node.childNodes[i];
+      console.info(indent + node.tagName);
       printTree(childNode, indent + '  ');
     }
   }
@@ -20,12 +20,12 @@ var printTree = function (node, indent) {
 
 describe('types and value changes', function() {
 
-  var mounted = function (element) {
-    var rendered = TestUtils.renderIntoDocument(element);
+  const mounted = function (element) {
+    const rendered = TestUtils.renderIntoDocument(element);
     return rendered;
   };
 
-  var formaticConfig = Formatic.createConfig(
+  const formaticConfig = Formatic.createConfig(
     Formatic.plugins.elementClasses,
     function (config) {
       config.addElementClass('single-line-string', 'single-line-string');
@@ -35,11 +35,11 @@ describe('types and value changes', function() {
     }
   );
 
-  var Form = React.createFactory(Formatic);
+  const Form = React.createFactory(Formatic);
 
-  var testValueType = function (options) {
+  const testValueType = function (options) {
 
-    var types = options.type;
+    let types = options.type;
 
     if (!_.isArray(types)) {
       types = [types];
@@ -48,12 +48,12 @@ describe('types and value changes', function() {
     types.forEach(function (type) {
       it('should change value of ' + type + ' field', function () {
 
-        var formValue;
+        let formValue;
 
-        var component = mounted(Form({
+        const component = mounted(Form({
           fields: [
             {
-              type: type,
+              type,
               key: 'myValue'
             }
           ],
@@ -65,9 +65,9 @@ describe('types and value changes', function() {
           }
         }));
 
-        var node = ReactDOM.findDOMNode(component).getElementsByTagName(options.tagName)[0];
+        const node = ReactDOM.findDOMNode(component).getElementsByTagName(options.tagName)[0];
 
-        var nodeValue = node.value;
+        let nodeValue = node.value;
 
         if (options.getNodeValue) {
           nodeValue = options.getNodeValue(node);
@@ -122,14 +122,14 @@ describe('types and value changes', function() {
     type: 'boolean',
     from: false,
     getNodeValue: function (node) {
-      var optionNode = node.childNodes[node.selectedIndex];
+      const optionNode = node.childNodes[node.selectedIndex];
       return formaticConfig.coerceValueToBoolean(optionNode.textContent);
     },
     to: true,
     setNodeValue: function (node, value) {
-      var optionNodes = node.childNodes;
-      for (var i = 0; i < optionNodes.length; i++) {
-        var optionValue = formaticConfig.coerceValueToBoolean(optionNodes[i].textContent);
+      const optionNodes = node.childNodes;
+      for (let i = 0; i < optionNodes.length; i++) {
+        const optionValue = formaticConfig.coerceValueToBoolean(optionNodes[i].textContent);
         if (optionValue === value) {
           node.selectedIndex = i;
         }
@@ -153,9 +153,9 @@ describe('types and value changes', function() {
 
   it('should set value for copy field', function () {
 
-    var msg = 'Just something to read.';
+    const msg = 'Just something to read.';
 
-    var component = mounted(Form({
+    const component = mounted(Form({
       fields: [
         {
           type: 'copy',
@@ -165,7 +165,7 @@ describe('types and value changes', function() {
       config: formaticConfig
     }));
 
-    var node = ReactDOM.findDOMNode(component).getElementsByClassName('copy')[0];
+    const node = ReactDOM.findDOMNode(component).getElementsByClassName('copy')[0];
 
     expect(node.textContent).toEqual(msg);
   });
@@ -173,12 +173,12 @@ describe('types and value changes', function() {
   ['array', 'list'].forEach(function (type) {
     it('should set value for an ' + type, function () {
 
-      var formValue;
+      let formValue;
 
-      var component = mounted(Form({
+      const component = mounted(Form({
         fields: [
           {
-            type: type,
+            type,
             key: 'myArray',
             itemFields: [
               {
@@ -194,7 +194,7 @@ describe('types and value changes', function() {
         }
       }));
 
-      var node = ReactDOM.findDOMNode(component).getElementsByClassName('single-line-string')[0];
+      const node = ReactDOM.findDOMNode(component).getElementsByClassName('single-line-string')[0];
 
       expect(node.value).toEqual('red');
 
@@ -209,12 +209,12 @@ describe('types and value changes', function() {
   ['object', 'dict'].forEach(function (type) {
     it('should set value and key for an ' + type, function () {
 
-      var formValue;
+      let formValue;
 
-      var component = mounted(Form({
+      const component = mounted(Form({
         fields: [
           {
-            type: type,
+            type,
             key: 'myObject',
             itemFields: [
               {
@@ -230,7 +230,7 @@ describe('types and value changes', function() {
         }
       }));
 
-      var node = ReactDOM.findDOMNode(component).getElementsByClassName('single-line-string')[0];
+      let node = ReactDOM.findDOMNode(component).getElementsByClassName('single-line-string')[0];
 
       expect(node.value).toEqual('foo');
 

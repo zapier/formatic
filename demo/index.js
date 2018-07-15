@@ -8,7 +8,7 @@ import '../style/formatic.css';
 import examples from './examples';
 import customPlugin from './examples/custom-plugin';
 
-var Form = React.createFactory(Formatic);
+const Form = React.createFactory(Formatic);
 
 // Draws a hint box around each component.
 const HintBox = (props) => (
@@ -94,7 +94,7 @@ class FormDemo extends Component {
     const hints = _.extend({}, this.state.hints);
     hints[id] = !hints[id];
     this.setState({
-      hints: hints
+      hints
     });
   }
 

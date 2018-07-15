@@ -7,12 +7,12 @@ import TagTranslator from '../../../lib/components/helpers/tag-translator';
 import Formatic from '../../../lib/formatic';
 
 describe('editor-util', function () {
-  var replaceChoices = [
+  const replaceChoices = [
     { value: 'firstName', label: 'First Name' },
     { value: 'lastName', label: 'Last Name' }
   ];
-  var humanize = function (s) { return s.toUpperCase(); };
-  var translator = TagTranslator(replaceChoices, humanize);
+  const humanize = function (s) { return s.toUpperCase(); };
+  const translator = TagTranslator(replaceChoices, humanize);
 
   it('should get labels', function () {
     expect(translator.getLabel('firstName')).toBe('First Name');
@@ -24,7 +24,7 @@ describe('editor-util', function () {
   });
 
   it('should tokenize tagged text', function () {
-    var tagged = 'Hi there {{lastName}}, {{firstName}}.';
+    const tagged = 'Hi there {{lastName}}, {{firstName}}.';
 
     const config = Formatic.createConfig();
 
@@ -39,8 +39,8 @@ describe('editor-util', function () {
 
   it('should get tag start and stop positions', function () {
     //         '0123456789012345678901234567890123456789 01234567890123456789012345'
-    var text = 'Here there {{lastName}}, {{firstName}}.\nHow are you {{firstName}}?';
-    var positions = translator.getTagPositions(text);
+    const text = 'Here there {{lastName}}, {{firstName}}.\nHow are you {{firstName}}?';
+    const positions = translator.getTagPositions(text);
 
     expect(positions).toEqual([
       {line: 0, start: 11, stop: 23, tag: 'lastName'},

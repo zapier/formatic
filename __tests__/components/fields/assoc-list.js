@@ -51,7 +51,7 @@ describe('assoc-list field', () => {
     expect(renderedKeyClasses(doc)).toEqual(['', '']);
     expect(renderedValues(doc)).toEqual(['value1', 'value2']);
 
-    let input = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input')[1];
+    const input = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input')[1];
     input.value = 'key1';
     TestUtils.Simulate.change(input);
 

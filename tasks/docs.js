@@ -1,8 +1,8 @@
 'use strict';
 
-var gulp = require('gulp');
-var plugins = require('gulp-load-plugins')();
-var run = require('run-sequence');
+const gulp = require('gulp');
+const plugins = require('gulp-load-plugins')();
+const run = require('run-sequence');
 
 gulp.task('docs-build-annotated-source', plugins.shell.task(
   'groc index.js "lib/**/*.js" -o ./live/formatic/annotated-source'
