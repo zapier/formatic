@@ -14,7 +14,6 @@ import passwordExample from './password';
 import prettyBooleanExample from './pretty-boolean';
 import prettySelectExample from './pretty-select';
 import prettyTextExample from './pretty-text';
-import prettyText2Example from './pretty-text2';
 import selectExample from './select';
 import singleLineStringExample from './single-line-string';
 import stringExample from './string';
@@ -37,7 +36,6 @@ export default [
   prettyBooleanExample,
   prettySelectExample,
   prettyTextExample,
-  prettyText2Example,
   selectExample,
   singleLineStringExample,
   stringExample,
