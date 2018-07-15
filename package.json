@@ -33,6 +33,7 @@
     "css-loader": "^0.28.7",
     "envify": "^4.1.0",
     "es6-promise": "^4.1.1",
+    "eslint-loader": "^2.0.0",
     "groc": "https://registry.npmjs.org/groc/-/groc-0.7.0.tgz",
     "gulp": "^3.9.1",
     "gulp-gh-pages": "^0.5.4",
