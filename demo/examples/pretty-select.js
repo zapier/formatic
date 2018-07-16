@@ -7,8 +7,8 @@ const fields = [
     choices: {
       S: 'Small',
       M: 'Medium',
-      L: 'Large'
-    }
+      L: 'Large',
+    },
   },
   {
     label: 'Readonly Size',
@@ -19,8 +19,8 @@ const fields = [
     choices: {
       S: 'Small',
       M: 'Medium',
-      L: 'Large'
-    }
+      L: 'Large',
+    },
   },
   {
     label: 'Colors (R)',
@@ -28,7 +28,7 @@ const fields = [
     required: true,
     key: 'colors1',
     placeholder: 'Pick a color...',
-    choices: 'red, green, yellow'
+    choices: 'red, green, yellow',
   },
   {
     label: 'Colors 2',
@@ -36,8 +36,8 @@ const fields = [
     key: 'colors2',
     choices: {
       r: 'Red',
-      g: 'Green'
-    }
+      g: 'Green',
+    },
   },
   {
     label: 'Colors 3',
@@ -46,74 +46,97 @@ const fields = [
     key: 'colors3',
     customField: {
       label: 'Custom Value',
-      helpText: null
+      helpText: null,
     },
     choices: [
       {
         value: 'r',
         label: 'Red',
-        sample: 'cherry'
+        sample: 'cherry',
       },
       {
         value: 'g',
         label: 'Green',
-        sample: 'lime'
+        sample: 'lime',
       },
       {
         value: 'false',
         label: 'False',
-        sample: false
+        sample: false,
       },
       {
         value: '',
         action: 'clear-current-choice',
-        label: 'Clear Current Choice'
+        label: 'Clear Current Choice',
       },
       {
         action: 'enter-custom-value',
-        label: 'Type a custom value'
+        label: 'Type a custom value',
       },
       {
         action: 'insert-field',
-        label: 'Choose an available field'
+        label: 'Choose an available field',
       },
       {
         value: 'loadMore',
         label: 'Load more choices..',
         action: 'load-more-choices',
-        isOpen: true
-      }
+        isOpen: true,
+      },
     ],
     replaceChoices: [
       {
         value: 'yellow',
         label: 'Yellow',
-        sample: 'lemon'
+        sample: 'lemon',
       },
       {
         value: 'purple',
         label: 'Purple',
-        sample: 'grape'
-      }
+        sample: 'grape',
+      },
     ],
-    default: 'some default value'
+    default: 'some default value',
   },
   {
     label: 'Alphabet',
     type: 'pretty-select',
     key: 'alphabet',
     choices: [
-      'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-      'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-      'w', 'x', 'y', 'z'
-    ]
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f',
+      'g',
+      'h',
+      'i',
+      'j',
+      'k',
+      'l',
+      'm',
+      'n',
+      'o',
+      'p',
+      'q',
+      'r',
+      's',
+      't',
+      'u',
+      'v',
+      'w',
+      'x',
+      'y',
+      'z',
+    ],
   },
   {
     label: 'Loading',
     key: 'loading',
     type: 'pretty-select',
     isLoading: true,
-    isAccordion: true
+    isAccordion: true,
   },
   {
     type: 'pretty-select',
@@ -122,22 +145,22 @@ const fields = [
     choices: [
       {
         label: 'yes',
-        value: 'true'
+        value: 'true',
       },
       {
         label: 'no',
-        value: 'false'
+        value: 'false',
       },
       {
         action: 'enter-custom-value',
-        label: 'Use a Custom Value'
+        label: 'Use a Custom Value',
       },
       {
         value: '',
         action: 'clear-current-choice',
-        label: 'Clear Current Choice'
-      }
-    ]
+        label: 'Clear Current Choice',
+      },
+    ],
   },
   {
     label: 'Select with No Search',
@@ -148,13 +171,13 @@ const fields = [
     choices: {
       S: 'Small',
       M: 'Medium',
-      L: 'Large'
-    }
-  }
+      L: 'Large',
+    },
+  },
 ];
 
 export default {
   title: 'Pretty Select',
   notes: null,
-  fields
+  fields,
 };

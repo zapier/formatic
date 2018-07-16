@@ -1,24 +1,24 @@
 import React from 'react';
 import _ from 'lodash';
 
-const customPlugin = (config) => {
+const customPlugin = config => {
   const initField = config.initField;
   const createElement_PrettyTag = config.createElement_PrettyTag;
 
-  config.createElement_PrettyTag = function (props, children) {
+  config.createElement_PrettyTag = function(props, children) {
     const tag = props.tag;
-    const choice = _.find(props.replaceChoices, function(c) { return c.value === tag; });
-    const classes = choice && choice.tagClasses || {};
-    const newProps = _.extend({}, props, {classes});
+    const choice = _.find(props.replaceChoices, function(c) {
+      return c.value === tag;
+    });
+    const classes = (choice && choice.tagClasses) || {};
+    const newProps = _.extend({}, props, { classes });
 
     return createElement_PrettyTag(newProps, children);
   };
 
   return {
     createElement_ChoiceActionSample() {
-      return (
-        <span>X</span>
-      );
+      return <span>X</span>;
     },
 
     initField(field) {
@@ -37,7 +37,7 @@ const customPlugin = (config) => {
 
     isRemovalOfLastAssocListItemAllowed() {
       return false;
-    }
+    },
   };
 };
 

@@ -4,7 +4,7 @@ const fields = [
     type: 'fields',
     key: 'folder',
     match: {
-      type: 'folder'
+      type: 'folder',
     },
     readOnly: true,
     fields: [
@@ -12,12 +12,12 @@ const fields = [
         type: 'unicode',
         key: 'type',
         hidden: true,
-        default: 'folder'
+        default: 'folder',
       },
       {
         label: 'Name',
         type: 'unicode',
-        key: 'name'
+        key: 'name',
       },
       {
         label: 'Children',
@@ -28,31 +28,31 @@ const fields = [
             label: 'File',
             type: 'fields',
             match: {
-              type: 'file'
+              type: 'file',
             },
             fields: [
               {
                 type: 'unicode',
                 key: 'type',
                 hidden: true,
-                default: 'file'
+                default: 'file',
               },
               {
                 label: 'Name',
                 type: 'unicode',
-                key: 'name'
+                key: 'name',
               },
               {
                 label: 'Content',
                 type: 'text',
-                key: 'content'
-              }
-            ]
+                key: 'content',
+              },
+            ],
           },
-          'folder'
-        ]
-      }
-    ]
+          'folder',
+        ],
+      },
+    ],
   },
   {
     label: 'Grouped Fields Classic',
@@ -68,14 +68,14 @@ const fields = [
           {
             label: 'Section 1 field 1',
             type: 'unicode',
-            key: 'section1Field1'
+            key: 'section1Field1',
           },
           {
             label: 'Section 1 field 2',
             type: 'unicode',
-            key: 'section1Field2'
-          }
-        ]
+            key: 'section1Field2',
+          },
+        ],
       },
       {
         label: 'Section 2',
@@ -85,22 +85,22 @@ const fields = [
           {
             label: 'Section 2 field 1',
             type: 'unicode',
-            key: 'section2Field1'
+            key: 'section2Field1',
           },
           {
             label: 'Section 2 field 2',
             type: 'unicode',
-            key: 'section2Field2'
-          }
-        ]
-      }
-    ]
-  }
+            key: 'section2Field2',
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export default {
   title: 'Fields',
   aliases: ['fields', 'fieldset'],
   notes: null,
-  fields
+  fields,
 };

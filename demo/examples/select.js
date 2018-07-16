@@ -3,12 +3,12 @@ const fields = [
     label: 'Mood',
     type: 'select',
     key: 'mood',
-    choices: ['happy', 'sad']
-  }
+    choices: ['happy', 'sad'],
+  },
 ];
 
 export default {
   title: 'Select',
   notes: null,
-  fields
+  fields,
 };

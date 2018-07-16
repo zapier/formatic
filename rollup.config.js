@@ -12,20 +12,17 @@ export default {
     'react',
     'react-dom',
     'react-scroll-lock',
-    'react-transition-group'
+    'react-transition-group',
   ],
   plugins: [
     babel({
       babelrc: false,
-      presets: [
-        ['es2015', {modules: false}],
-        ['react']
-      ],
-      plugins: ['external-helpers']
+      presets: [['es2015', { modules: false }], ['react']],
+      plugins: ['external-helpers'],
     }),
   ],
   output: {
     format: 'cjs',
-    file: './build/lib/index.js'
-  }
+    file: './build/lib/index.js',
+  },
 };
