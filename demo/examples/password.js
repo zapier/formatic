@@ -4,12 +4,12 @@ const fields = [
     type: 'password',
     key: 'password',
     required: true,
-    placeholder: 'type something secret...'
-  }
+    placeholder: 'type something secret...',
+  },
 ];
 
 export default {
   title: 'Password',
   notes: null,
-  fields
+  fields,
 };

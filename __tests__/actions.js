@@ -8,43 +8,45 @@ import TestUtils from 'react-dom/test-utils';
 import Formatic from '../lib/formatic';
 
 describe('actions', function() {
-
-  const mounted = function (element) {
+  const mounted = function(element) {
     const rendered = TestUtils.renderIntoDocument(element);
     return rendered;
   };
 
   const formaticConfig = Formatic.createConfig(
     Formatic.plugins.elementClasses,
-    function (config) {
+    function(config) {
       config.addElementClass('string', 'string');
     }
   );
 
   const Form = React.createFactory(Formatic);
 
-  it('should send action on focus and blur', function () {
-
+  it('should send action on focus and blur', function() {
     let wasFocused = false;
     let wasBlurred = false;
 
-    const component = mounted(Form({
-      fields: [
-        {
-          type: 'text',
-          key: 'firstName'
-        }
-      ],
-      onFocus: function () {
-        wasFocused = true;
-      },
-      onBlur: function () {
-        wasBlurred = true;
-      },
-      config: formaticConfig
-    }));
+    const component = mounted(
+      Form({
+        fields: [
+          {
+            type: 'text',
+            key: 'firstName',
+          },
+        ],
+        onFocus: function() {
+          wasFocused = true;
+        },
+        onBlur: function() {
+          wasBlurred = true;
+        },
+        config: formaticConfig,
+      })
+    );
 
-    const node = ReactDOM.findDOMNode(component).getElementsByClassName('string')[0];
+    const node = ReactDOM.findDOMNode(component).getElementsByClassName(
+      'string'
+    )[0];
 
     TestUtils.Simulate.focus(node);
 

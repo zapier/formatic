@@ -4,55 +4,51 @@
 import Formatic from '../lib/formatic';
 
 describe('types and value changes', function() {
-
   const config = Formatic.createConfig();
 
-  it('should validate a form with no required value', function () {
-
+  it('should validate a form with no required value', function() {
     const fields = [
       {
         type: 'string',
-        key: 'greeting'
-      }
+        key: 'greeting',
+      },
     ];
 
     const isValid = config.isValidRootValue({
-      fields
+      fields,
     });
 
     expect(isValid).toEqual(true);
   });
 
-  it('should invalidate a form with required value', function () {
-
+  it('should invalidate a form with required value', function() {
     const fields = [
       {
         type: 'string',
         key: 'greeting',
-        required: true
-      }
+        required: true,
+      },
     ];
 
     const isValid = config.isValidRootValue({
-      fields
+      fields,
     });
 
     expect(isValid).toEqual(false);
   });
 
-  it('should validate a form with a required/default value', function () {
-
+  it('should validate a form with a required/default value', function() {
     const fields = [
       {
         type: 'string',
         key: 'greeting',
         default: 'hello',
-        required: true
-      }
+        required: true,
+      },
     ];
 
     const isValid = config.isValidRootValue({
-      fields
+      fields,
     });
 
     expect(isValid).toEqual(true);

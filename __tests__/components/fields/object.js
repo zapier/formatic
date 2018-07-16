@@ -7,19 +7,19 @@ import ReactDOM from 'react-dom';
 import Formatic from '../../../lib/formatic';
 import ObjectClass from '../../../lib/components/fields/object';
 
-const renderedKeys = (doc) => {
+const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
-  return inputs.map((i) => i.value);
+  return inputs.map(i => i.value);
 };
 
-const renderedKeyClasses = (doc) => {
+const renderedKeyClasses = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
-  return inputs.map((i) => i.getAttribute('class'));
+  return inputs.map(i => i.getAttribute('class'));
 };
 
-const renderedValues = (doc) => {
+const renderedValues = doc => {
   const textBoxes = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'textarea');
-  return textBoxes.map((b) => b.textContent);
+  return textBoxes.map(b => b.textContent);
 };
 
 describe('object field', () => {
@@ -28,39 +28,45 @@ describe('object field', () => {
   const initialValue = {
     object: {
       key1: 'value1',
-      key2: 'value2'
-    }
+      key2: 'value2',
+    },
   };
 
-  const fields = [
-    {key: 'object', type: 'object'}
-  ];
+  const fields = [{ key: 'object', type: 'object' }];
 
   let newValue;
   let node;
 
-  const render = (value) => {
-    const onChange = (val) => {
+  const render = value => {
+    const onChange = val => {
       newValue = val;
       doc = render(newValue);
     };
-    const form = <Formatic config={Formatic.createConfig()}
-                           fields={fields}
-                           value={value}
-                           onChange={onChange}/>;
+    const form = (
+      <Formatic
+        config={Formatic.createConfig()}
+        fields={fields}
+        value={value}
+        onChange={onChange}
+      />
+    );
     return TestUtils.renderIntoDocument(form);
   };
 
-  const renderToNode = (value) => {
+  const renderToNode = value => {
     const onChange = () => {};
 
     if (!node) {
       node = document.createElement('div');
     }
-    const form = <Formatic config={Formatic.createConfig()}
-                           fields={fields}
-                           value={value}
-                           onChange={onChange}/>;
+    const form = (
+      <Formatic
+        config={Formatic.createConfig()}
+        fields={fields}
+        value={value}
+        onChange={onChange}
+      />
+    );
     return ReactDOM.render(form, node);
   };
 
@@ -87,8 +93,8 @@ describe('object field', () => {
     expect(newValue).toEqual({
       object: {
         key1: 'value1',
-        key3: 'value2'
-      }
+        key3: 'value2',
+      },
     });
 
     expect(renderedKeyClasses(doc)).toEqual(['', '']);
@@ -104,7 +110,10 @@ describe('object field', () => {
     TestUtils.Simulate.change(input);
 
     expect(newValue).toBeUndefined(); // should not have fired on change
-    expect(renderedKeyClasses(doc)).toEqual(['validation-error-duplicate-key', 'validation-error-duplicate-key']);
+    expect(renderedKeyClasses(doc)).toEqual([
+      'validation-error-duplicate-key',
+      'validation-error-duplicate-key',
+    ]);
     expect(renderedKeys(doc)).toEqual(['key1', 'key1']);
     expect(renderedValues(doc)).toEqual(['value1', 'value2']);
   });
@@ -113,27 +122,30 @@ describe('object field', () => {
     let value = {
       object: {
         key1: 'value1',
-        key2: 'value2'
-      }
+        key2: 'value2',
+      },
     };
 
     renderToNode(value);
     const formatic = renderToNode(value);
 
-    const object = TestUtils.findRenderedComponentWithType(formatic, ObjectClass);
+    const object = TestUtils.findRenderedComponentWithType(
+      formatic,
+      ObjectClass
+    );
 
     expect(object.state).toEqual({
       assocList: [
         { key: 'key1', value: 'value1' },
-        { key: 'key2', value: 'value2' }
-      ]
+        { key: 'key2', value: 'value2' },
+      ],
     });
 
     value = {
       object: {
         keyNew: 'value1',
-        key2: 'value2'
-      }
+        key2: 'value2',
+      },
     };
 
     renderToNode(value);
@@ -141,8 +153,8 @@ describe('object field', () => {
     expect(object.state).toEqual({
       assocList: [
         { key: 'key2', value: 'value2' },
-        { key: 'keyNew', value: 'value1' }
-      ]
+        { key: 'keyNew', value: 'value1' },
+      ],
     });
   });
 
@@ -150,25 +162,31 @@ describe('object field', () => {
     let value = {
       object: {
         key1: 'value1',
-        key2: 'value2'
-      }
+        key2: 'value2',
+      },
     };
 
     renderToNode(value);
     const formatic = renderToNode(value);
 
-    const object = TestUtils.findRenderedComponentWithType(formatic, ObjectClass);
+    const object = TestUtils.findRenderedComponentWithType(
+      formatic,
+      ObjectClass
+    );
 
     expect(object.state).toEqual({
       assocList: [
         { key: 'key1', value: 'value1' },
-        { key: 'key2', value: 'value2' }
-      ]
+        { key: 'key2', value: 'value2' },
+      ],
     });
 
     renderToNode(value);
 
-    const input = TestUtils.scryRenderedDOMComponentsWithTag(formatic, 'input')[1];
+    const input = TestUtils.scryRenderedDOMComponentsWithTag(
+      formatic,
+      'input'
+    )[1];
     input.value = 'key1';
     TestUtils.Simulate.change(input);
 
@@ -176,14 +194,14 @@ describe('object field', () => {
     expect(object.state).toEqual({
       assocList: [
         { key: 'key1', value: 'value1' },
-        { key: 'key1', value: 'value2' }
-      ]
+        { key: 'key1', value: 'value2' },
+      ],
     });
 
     value = {
       object: {
-        key99: 'value99'
-      }
+        key99: 'value99',
+      },
     };
 
     renderToNode(value);
@@ -192,8 +210,8 @@ describe('object field', () => {
     expect(object.state).toEqual({
       assocList: [
         { key: 'key1', value: 'value1' },
-        { key: 'key1', value: 'value2' }
-      ]
+        { key: 'key1', value: 'value2' },
+      ],
     });
   });
 });

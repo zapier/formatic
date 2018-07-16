@@ -8,12 +8,13 @@ const fields = [
       {
         value: 'lastName',
         label: 'Last Name',
-        sample: 'Smith'
+        sample: 'Smith',
       },
       {
         value: 'middleName',
-        label: 'A really long label that should break somewhere in the middle and then definitely fill up all the space.'
-      }
+        label:
+          'A really long label that should break somewhere in the middle and then definitely fill up all the space.',
+      },
     ],
     replaceChoices: [
       {
@@ -21,44 +22,47 @@ const fields = [
         label: 'First Name',
         sample: 'Bob',
         tagClasses: {
-          special: true
-        }
+          special: true,
+        },
       },
       {
         value: 'lastName',
         label: 'Last Name',
-        sample: 'Smith'
+        sample: 'Smith',
       },
       {
         value: 'middleName',
-        label: 'A really long label that should break somewhere in the middle and then definitely fill up all the space.'
-      }
-    ]
+        label:
+          'A really long label that should break somewhere in the middle and then definitely fill up all the space.',
+      },
+    ],
   },
   {
     label: 'Pretty Text with integer default',
     key: 'integerPrettyText',
     type: 'pretty-text',
     default: 1,
-    placeholder: 1
+    placeholder: 1,
   },
   {
     label: 'Group',
     type: 'fields',
-    fields: [{
-      label: 'Pretty Text with integer default',
-      key: 'integerPrettyTextGrouped',
-      type: 'pretty-text',
-      default: 1,
-      placeholder: 1
-    }]
+    fields: [
+      {
+        label: 'Pretty Text with integer default',
+        key: 'integerPrettyTextGrouped',
+        type: 'pretty-text',
+        default: 1,
+        placeholder: 1,
+      },
+    ],
   },
   {
     label: 'Readonly pretty text',
     key: 'readonlyPrettyText',
     type: 'pretty-text',
     default: "Nah nah you can't edit me",
-    readOnly: true
+    readOnly: true,
   },
   {
     label: 'Accordion Names',
@@ -70,52 +74,52 @@ const fields = [
     replaceChoices: [
       {
         label: 'Name',
-        value: 'name'
+        value: 'name',
       },
       {
         label: 'Hi Class People',
-        sectionKey: 'hiClass'
+        sectionKey: 'hiClass',
       },
       {
         value: 'givenName',
         label: 'Given Name',
         sample: 'Sir Duke',
         tagClasses: {
-          special: true
-        }
+          special: true,
+        },
       },
       {
         value: 'surname',
         label: 'Surname',
-        sample: 'Ellington'
+        sample: 'Ellington',
       },
       {
         label: 'Lo Class People',
-        sectionKey: 'loClass'
+        sectionKey: 'loClass',
       },
       {
         value: 'firstName',
         label: 'First Name',
-        sample: 'Peasant'
+        sample: 'Peasant',
       },
       {
         value: 'lastName',
         label: 'Last Name',
-        sample: 'Brown'
+        sample: 'Brown',
       },
       {
         sectionKey: null,
         value: 'extraName',
         label: 'Extra Name',
-        sample: 'Extra'
-      }
-    ]
-  }
+        sample: 'Extra',
+      },
+    ],
+  },
 ];
 
 export default {
   title: 'Pretty Text',
   aliases: ['pretty-text', 'pretty-textarea'],
   notes: null,
-  fields
+  fields,
 };

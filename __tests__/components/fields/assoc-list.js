@@ -5,17 +5,17 @@ import React from 'react';
 import TestUtils from 'react-dom/test-utils';
 import Formatic from '../../../lib/formatic';
 
-const renderedKeys = (doc) => {
+const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
   return inputs.map(i => i.value);
 };
 
-const renderedKeyClasses = (doc) => {
+const renderedKeyClasses = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
   return inputs.map(i => i.getAttribute('class'));
 };
 
-const renderedValues =(doc) => {
+const renderedValues = doc => {
   const textBoxes = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'textarea');
   return textBoxes.map(b => b.textContent);
 };
@@ -24,25 +24,27 @@ describe('assoc-list field', () => {
   let doc;
 
   const render = value => {
-    const fields = [
-      {key: 'assocList', type: 'assoc-list'}
-    ];
+    const fields = [{ key: 'assocList', type: 'assoc-list' }];
     const onChange = newValue => {
       doc = render(newValue);
     };
-    const form = <Formatic config={Formatic.createConfig()}
-                           fields={fields}
-                           value={value}
-                           onChange={onChange}/>;
+    const form = (
+      <Formatic
+        config={Formatic.createConfig()}
+        fields={fields}
+        value={value}
+        onChange={onChange}
+      />
+    );
     return TestUtils.renderIntoDocument(form);
   };
 
   it('should mark last duplicate key entered as invalid', () => {
     const initialValue = {
       assocList: [
-        {key: 'key1', value: 'value1'},
-        {key: 'key2', value: 'value2'}
-      ]
+        { key: 'key1', value: 'value1' },
+        { key: 'key2', value: 'value2' },
+      ],
     };
 
     doc = render(initialValue);

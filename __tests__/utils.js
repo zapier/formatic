@@ -4,9 +4,7 @@
 import utils from '../lib/utils';
 
 describe('utils', function() {
-
-  it('should deep copy primitives', function () {
-
+  it('should deep copy primitives', function() {
     const name = 'Joe';
 
     const copy = utils.deepCopy(name);
@@ -14,12 +12,11 @@ describe('utils', function() {
     expect(copy).toEqual('Joe');
   });
 
-  it('should deep copy array', function () {
-
+  it('should deep copy array', function() {
     const array = [
       {
-        x: 1
-      }
+        x: 1,
+      },
     ];
 
     const copy = utils.deepCopy(array);
@@ -29,13 +26,12 @@ describe('utils', function() {
     expect(array[0].x).toEqual(1);
   });
 
-  it('should deep copy object', function () {
-
+  it('should deep copy object', function() {
     const obj = {
       name: {
         first: 'Joe',
-        last: 'Foo'
-      }
+        last: 'Foo',
+      },
     };
 
     const copy = utils.deepCopy(obj);
@@ -45,44 +41,38 @@ describe('utils', function() {
     expect(obj.name.last).toEqual('Foo');
   });
 
-  it('should convert blank to pascal case', function () {
-
+  it('should convert blank to pascal case', function() {
     expect(utils.dashToPascal('')).toEqual('');
   });
 
-  it('should convert dashes to pascal case', function () {
-
+  it('should convert dashes to pascal case', function() {
     expect(utils.dashToPascal('foo-bar')).toEqual('FooBar');
   });
 
-  it('should convert pascal case to pascal case', function () {
-
+  it('should convert pascal case to pascal case', function() {
     expect(utils.dashToPascal('FooBar')).toEqual('FooBar');
   });
 
-  it('should convert camel case to pascal case', function () {
-
+  it('should convert camel case to pascal case', function() {
     expect(utils.dashToPascal('fooBar')).toEqual('FooBar');
   });
 
-  it('should delegate a method', function () {
-
+  it('should delegate a method', function() {
     const dog = {
-      bark: function () {
+      bark: function() {
         return 'woof';
       },
-      speak: utils.delegateTo('bark')
+      speak: utils.delegateTo('bark'),
     };
 
     expect(dog.bark()).toEqual(dog.speak());
   });
 
-  it('should create a delegator', function () {
-
+  it('should create a delegator', function() {
     const dog = {
-      bark: function () {
+      bark: function() {
         return 'woof';
-      }
+      },
     };
 
     const delegateTo = utils.delegator(dog);
