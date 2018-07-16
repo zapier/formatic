@@ -12,6 +12,7 @@
     "live": "node server.js",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "prebuild": "rm -rf build && mkdir -p build/lib",
+    "precommit": "zapier-scripts format-staged",
     "prepublish": "npm run build",
     "start": "node server.js",
     "test": "jest --no-cache"
