@@ -2,14 +2,14 @@ import React from 'react';
 import _ from 'lodash';
 
 const customPlugin = (config) => {
-  var initField = config.initField;
-  var createElement_PrettyTag = config.createElement_PrettyTag;
+  const initField = config.initField;
+  const createElement_PrettyTag = config.createElement_PrettyTag;
 
   config.createElement_PrettyTag = function (props, children) {
-    var tag = props.tag;
-    var choice = _.find(props.replaceChoices, function(c) { return c.value === tag; });
-    var classes = choice && choice.tagClasses || {};
-    var newProps = _.extend({}, props, {classes: classes});
+    const tag = props.tag;
+    const choice = _.find(props.replaceChoices, function(c) { return c.value === tag; });
+    const classes = choice && choice.tagClasses || {};
+    const newProps = _.extend({}, props, {classes});
 
     return createElement_PrettyTag(newProps, children);
   };

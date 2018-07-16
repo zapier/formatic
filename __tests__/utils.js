@@ -7,22 +7,22 @@ describe('utils', function() {
 
   it('should deep copy primitives', function () {
 
-    var name = 'Joe';
+    const name = 'Joe';
 
-    var copy = utils.deepCopy(name);
+    const copy = utils.deepCopy(name);
 
     expect(copy).toEqual('Joe');
   });
 
   it('should deep copy array', function () {
 
-    var array = [
+    const array = [
       {
         x: 1
       }
     ];
 
-    var copy = utils.deepCopy(array);
+    const copy = utils.deepCopy(array);
 
     copy[0].x = 2;
 
@@ -31,14 +31,14 @@ describe('utils', function() {
 
   it('should deep copy object', function () {
 
-    var obj = {
+    const obj = {
       name: {
         first: 'Joe',
         last: 'Foo'
       }
     };
 
-    var copy = utils.deepCopy(obj);
+    const copy = utils.deepCopy(obj);
 
     copy.name.last = 'Bar';
 
@@ -67,7 +67,7 @@ describe('utils', function() {
 
   it('should delegate a method', function () {
 
-    var dog = {
+    const dog = {
       bark: function () {
         return 'woof';
       },
@@ -79,13 +79,13 @@ describe('utils', function() {
 
   it('should create a delegator', function () {
 
-    var dog = {
+    const dog = {
       bark: function () {
         return 'woof';
       }
     };
 
-    var delegateTo = utils.delegator(dog);
+    const delegateTo = utils.delegator(dog);
 
     dog.speak = delegateTo('bark');
 

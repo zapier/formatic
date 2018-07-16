@@ -10,6 +10,7 @@
     "prepublish": "npm run build",
     "docs-build": "gulp docs-build",
     "docs-publish": "gulp docs-publish",
+    "lint": "zapier-scripts lint '__tests/**/*.js' 'demo/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
     "live": "node server.js",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "start": "node server.js"
@@ -22,7 +23,6 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
-    "babel-eslint": "^8.0.2",
     "babel-jest": "^21.2.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-external-helpers": "^6.22.0",
@@ -33,9 +33,7 @@
     "css-loader": "^0.28.7",
     "envify": "^4.1.0",
     "es6-promise": "^4.1.1",
-    "eslint": "^4.12.1",
-    "eslint-loader": "^1.9.0",
-    "eslint-plugin-react": "^7.5.1",
+    "eslint-loader": "^2.0.0",
     "groc": "https://registry.npmjs.org/groc/-/groc-0.7.0.tgz",
     "gulp": "^3.9.1",
     "gulp-gh-pages": "^0.5.4",
@@ -60,9 +58,10 @@
     "run-sequence": "^2.2.0",
     "shelljs": "^0.7.8",
     "style-loader": "^0.19.0",
+    "uglify-js": "^3.2.0",
     "webpack": "^3.9.1",
     "webpack-dev-server": "^2.9.5",
-    "uglify-js": "^3.2.0"
+    "zapier-scripts": "^3.0.1"
   },
   "dependencies": {
     "classnames": "^2.2.5",

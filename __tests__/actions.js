@@ -9,26 +9,26 @@ import Formatic from '../lib/formatic';
 
 describe('actions', function() {
 
-  var mounted = function (element) {
-    var rendered = TestUtils.renderIntoDocument(element);
+  const mounted = function (element) {
+    const rendered = TestUtils.renderIntoDocument(element);
     return rendered;
   };
 
-  var formaticConfig = Formatic.createConfig(
+  const formaticConfig = Formatic.createConfig(
     Formatic.plugins.elementClasses,
     function (config) {
       config.addElementClass('string', 'string');
     }
   );
 
-  var Form = React.createFactory(Formatic);
+  const Form = React.createFactory(Formatic);
 
   it('should send action on focus and blur', function () {
 
-    var wasFocused = false;
-    var wasBlurred = false;
+    let wasFocused = false;
+    let wasBlurred = false;
 
-    var component = mounted(Form({
+    const component = mounted(Form({
       fields: [
         {
           type: 'text',
@@ -44,7 +44,7 @@ describe('actions', function() {
       config: formaticConfig
     }));
 
-    var node = ReactDOM.findDOMNode(component).getElementsByClassName('string')[0];
+    const node = ReactDOM.findDOMNode(component).getElementsByClassName('string')[0];
 
     TestUtils.Simulate.focus(node);
 
