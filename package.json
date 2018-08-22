@@ -8,6 +8,7 @@
     "prebuild": "rm -rf build && mkdir -p build/lib",
     "build": "babel lib --out-dir build/lib && rollup -c",
     "prepublish": "npm run build",
+    "prepack": "npm run build",
     "docs-build": "gulp docs-build",
     "docs-publish": "gulp docs-publish",
     "live": "node server.js",
