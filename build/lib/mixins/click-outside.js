@@ -1,0 +1,115 @@
+// # click-outside mixin
+
+/*
+There's no native React way to detect clicking outside an element. Sometimes
+this is useful, so that's what this mixin does. To use it, mix it in and use it
+from your component like this:
+
+```js
+import createReactClass from 'create-react-class';
+
+import ClickOutsideMixin from '../../mixins/click-outside';
+
+exports default createReactClass({
+
+  mixins: [ClickOutsideMixin],
+
+  onClickOutside: function () {
+    console.log('clicked outside!');
+  },
+
+  componentDidMount: function () {
+    this.setOnClickOutside('myDiv', this.onClickOutside);
+  },
+
+  render: function () {
+    return React.DOM.div({ref: 'myDiv'},
+      'Hello!'
+    )
+  }
+});
+```
+*/
+
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _undash = require('../undash');
+
+var _undash2 = _interopRequireDefault(_undash);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var hasAncestor = function hasAncestor(child, parent) {
+  if (child.parentNode === parent) {
+    return true;
+  }
+  if (child.parentNode === null) {
+    return false;
+  }
+  return hasAncestor(child.parentNode, parent);
+};
+
+exports.default = {
+
+  isNodeOutside: function isNodeOutside(nodeOut, nodeIn) {
+    if (nodeOut === nodeIn) {
+      return false;
+    }
+    if (hasAncestor(nodeOut, nodeIn)) {
+      return false;
+    }
+    return true;
+  },
+
+  isNodeInside: function isNodeInside(nodeIn, nodeOut) {
+    return !this.isNodeOutside(nodeIn, nodeOut);
+  },
+
+  _onClickMousedown: function _onClickMousedown() {
+    _undash2.default.each(this.clickOutsideHandlers, function (funcs, ref) {
+      if (this[ref + 'Ref']) {
+        this._mousedownRefs[ref] = true;
+      }
+    }.bind(this));
+  },
+
+  _onClickMouseup: function _onClickMouseup(event) {
+    _undash2.default.each(this.clickOutsideHandlers, function (funcs, ref) {
+      if (this[ref + 'Ref'] && this._mousedownRefs[ref]) {
+        if (this.isNodeOutside(event.target, this[ref + 'Ref'])) {
+          funcs.forEach(function (fn) {
+            fn.call(this, event);
+          }.bind(this));
+        }
+      }
+      this._mousedownRefs[ref] = false;
+    }.bind(this));
+  },
+
+  setOnClickOutside: function setOnClickOutside(ref, fn) {
+    if (!this.clickOutsideHandlers[ref]) {
+      this.clickOutsideHandlers[ref] = [];
+    }
+    this.clickOutsideHandlers[ref].push(fn);
+  },
+
+  componentDidMount: function componentDidMount() {
+    this.clickOutsideHandlers = {};
+    this._didMouseDown = false;
+    document.addEventListener('mousedown', this._onClickMousedown);
+    document.addEventListener('mouseup', this._onClickMouseup);
+    //document.addEventListener('click', this._onClickDocument);
+    this._mousedownRefs = {};
+  },
+
+  componentWillUnmount: function componentWillUnmount() {
+    this.clickOutsideHandlers = {};
+    //document.removeEventListener('click', this._onClickDocument);
+    document.removeEventListener('mouseup', this._onClickMouseup);
+    document.removeEventListener('mousedown', this._onClickMousedown);
+  }
+};
