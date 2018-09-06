@@ -298,7 +298,8 @@ var keyCodes = utils.keyCodes = {
   ENTER: 13,
   ESC: 27,
   '[': 219,
-  SHIFT: 16
+  SHIFT: 16,
+  '2': 50
 };
 
 // utils.scrollIntoViewIfOutside = (node, container) => {
@@ -4499,7 +4500,7 @@ var PrettyTextInputHelper = createReactClass({
   },
 
   onTextareaKeyDown: function onTextareaKeyDown(event) {
-    if (event.keyCode === keyCodes['[']) {
+    if (event.shiftKey && event.keyCode === keyCodes['2']) {
       event.preventDefault();
       event.stopPropagation();
       this.setState({ isChoicesOpen: true });
@@ -4508,9 +4509,11 @@ var PrettyTextInputHelper = createReactClass({
   createTextarea: function createTextarea() {
     return React.createElement('textarea', {
       ref: ref(this, 'textarea'),
+      className: 'pretty-text-textarea',
       value: this.state.value,
       onChange: this.onChange,
-      onKeyDown: this.onTextareaKeyDown
+      onKeyDown: this.onTextareaKeyDown,
+      onKeyUp: this.onTextareaKeyUp
     });
   },
 

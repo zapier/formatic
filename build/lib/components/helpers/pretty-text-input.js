@@ -406,7 +406,7 @@ exports.default = (0, _createReactClass2.default)({
   },
 
   onTextareaKeyDown: function onTextareaKeyDown(event) {
-    if (event.keyCode === _utils.keyCodes['[']) {
+    if (event.shiftKey && event.keyCode === _utils.keyCodes['2']) {
       event.preventDefault();
       event.stopPropagation();
       this.setState({ isChoicesOpen: true });
@@ -415,9 +415,11 @@ exports.default = (0, _createReactClass2.default)({
   createTextarea: function createTextarea() {
     return _react2.default.createElement('textarea', {
       ref: (0, _utils.ref)(this, 'textarea'),
+      className: 'pretty-text-textarea',
       value: this.state.value,
       onChange: this.onChange,
-      onKeyDown: this.onTextareaKeyDown
+      onKeyDown: this.onTextareaKeyDown,
+      onKeyUp: this.onTextareaKeyUp
     });
   },
 

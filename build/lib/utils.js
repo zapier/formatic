@@ -139,7 +139,8 @@ var keyCodes = exports.keyCodes = utils.keyCodes = {
   ENTER: 13,
   ESC: 27,
   '[': 219,
-  SHIFT: 16
+  SHIFT: 16,
+  '2': 50
 };
 
 // utils.scrollIntoViewIfOutside = (node, container) => {

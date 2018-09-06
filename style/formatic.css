@@ -182,6 +182,11 @@ div.pretty-text-box:hover {
   border: 1px solid blue;
 }
 
+.pretty-text-textarea {
+  border: none;
+  resize: none;
+  width: 100%;
+};
 
 .formatic .pretty-part-left, .formatic .pretty-part-right {
 }
