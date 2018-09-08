@@ -1,4 +1,13 @@
 {
   "presets": ["next/babel"],
-  "plugins": ["emotion"]
+  "plugins": [
+    [
+      "emotion",
+      {
+        "autoLabel": true,
+        "labelFormat": "[filename]--[local]",
+        "sourceMap": true
+      }
+    ]
+  ]
 }
