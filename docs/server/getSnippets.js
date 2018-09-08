@@ -1,10 +1,13 @@
 /* global __dirname */
 import fs from 'mz/fs';
 
+const cleanSnippet = snippet =>
+  snippet.replace(/^\/\/CUT$((?!\/\/CUT)(.|\n))+^\/\/CUT$\n?/gm, '');
+
 const getSnippet = async key => {
   try {
     const file = await fs.readFile(`${__dirname}/snippets/${key}.js`);
-    return file.toString();
+    return cleanSnippet(file.toString());
   } catch (e) {
     console.error(e);
   }
