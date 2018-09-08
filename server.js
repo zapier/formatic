@@ -1,27 +1,33 @@
-const webpack = require('webpack');
-const WebpackDevServer = require('webpack-dev-server');
-const portscanner = require('portscanner');
-const config = require('./webpack.config');
-const open = require('open');
+/* global __dirname */
+import express from 'express';
+import next from 'next';
+import _ from 'lodash';
 
-const ipAddress = '127.0.0.1';
+import getSnippets from './docs/server/getSnippets';
 
-portscanner.findAPortNotInUse(3000, 3100, ipAddress, function(portErr, port) {
-  config.entry[0] = config.entry[0].replace('3000', port);
+const port = parseInt(process.env.PORT, 10) || 3333;
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
+const handle = app.getRequestHandler();
 
-  const server = new WebpackDevServer(webpack(config), {
-    publicPath: config.output.publicPath,
-    hot: true,
-    historyApiFallback: true,
+app.prepare().then(() => {
+  const server = express();
+
+  server.use('/node_modules', express.static(__dirname + '/node_modules'));
+
+  server.get('/api/snippets', async (req, res) => {
+    const snippets = await getSnippets(
+      _.compact((req.query.keys || '').split(','))
+    );
+    res.json(snippets);
   });
 
-  server.listen(port, ipAddress, function(err) {
-    if (err) {
-      console.error(err);
-    }
+  server.get('*', (req, res) => {
+    return handle(req, res);
+  });
 
-    console.error(`Listening at ${ipAddress}:` + port);
-
-    open(`http://${ipAddress}:${port}/demo/index.html`);
+  server.listen(port, err => {
+    if (err) throw err;
+    console.info(`> Ready on http://localhost:${port}`);
   });
 });
