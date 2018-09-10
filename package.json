@@ -25,50 +25,22 @@
   "devDependencies": {
     "@babel/core": "^7.0.0",
     "@babel/register": "^7.0.0",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "^23.6.0",
     "babel-plugin-emotion": "^9.2.6",
+    "babel-preset-env": "^1.7.0",
     "bootstrap": "^3.3.7",
     "codemirror": "^5.32.0",
     "emotion": "^9.2.6",
     "emotion-server": "^9.2.8",
     "express": "^4.16.3",
+    "jest": "^23.6.0",
     "mz": "^2.7.0",
     "next": "^6.1.1",
     "react": "^16.4.1",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.1",
     "react-syntax-highlighter": "^8.0.1",
-    "zapier-scripts": "^3.0.1"
-  },
-  "xdevDependencies": {
-    "@babel/cli": "7.0.0-beta.54",
-    "bootstrap": "^3.3.7",
-    "codemirror": "^5.32.0",
-    "envify": "^4.1.0",
-    "es6-promise": "^4.1.1",
-    "groc": "https://registry.npmjs.org/groc/-/groc-0.7.0.tgz",
-    "gulp": "^3.9.1",
-    "gulp-gh-pages": "^0.5.4",
-    "gulp-load-plugins": "^1.5.0",
-    "gulp-run": "^1.7.1",
-    "gulp-shell": "^0.6.3",
-    "jest-cli": "^21.2.1",
-    "jquery": "^3.2.1",
-    "lodash": "^4.17.4",
-    "marked": "^0.3.9",
-    "next": "^6.1.1",
-    "node-libs-browser": "^2.1.0",
-    "open": "^0.0.5",
-    "portscanner": "^2.1.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "react-helmet": "^5.2.0",
-    "react-tools": "^0.13.3",
-    "require-dir": "^0.3.2",
-    "rollup": "^0.52.0",
-    "rollup-plugin-babel": "^4.0.0-beta.7",
-    "run-sequence": "^2.2.0",
-    "shelljs": "^0.7.8",
-    "uglify-js": "^3.2.0",
     "zapier-scripts": "^3.0.1"
   },
   "dependencies": {
@@ -86,15 +58,5 @@
     "codemirror": ">= 5.32.0",
     "react": ">= 0.16",
     "react-dom": ">= 16.0.0"
-  },
-  "jest": {
-    "preprocessorIgnorePatterns": [
-      "<rootDir>/node_modules/"
-    ],
-    "automock": false,
-    "testPathDirs": [
-      "__tests__"
-    ],
-    "setupTestFrameworkScriptFile": "<rootDir>/setup-jest-env.js"
   }
 }
