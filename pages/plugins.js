@@ -3,9 +3,7 @@ import 'isomorphic-unfetch';
 
 import Page from '../docs/components/Page';
 import Section from '../docs/components/Section';
-import SubSection from '../docs/components/SubSection';
 import CodeBlock from '../docs/components/CodeBlock';
-import Example from '../docs/components/Example';
 import Sections from '../docs/components/Sections';
 import Code from '../docs/components/Code';
 
