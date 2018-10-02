@@ -169,7 +169,9 @@ exports.default = (0, _createReactClass2.default)({
      *   this.setState({ hasFocus: false });
      *   this.props.onBlur();
      * }*/
-    this.setState({ hasFocus: false, isEditing: true });
+    //this.setState({ hasFocus: false, isEditing: true });
+    //this.setState({ hasFocus: false, isEditing: false }, this.props.onBlur);
+    this.setState({ hasFocus: false, isEditing: false });
   },
 
 

@@ -4263,7 +4263,9 @@ var PrettyTextInputHelper = createReactClass({
      *   this.setState({ hasFocus: false });
      *   this.props.onBlur();
      * }*/
-    this.setState({ hasFocus: false, isEditing: true });
+    //this.setState({ hasFocus: false, isEditing: true });
+    //this.setState({ hasFocus: false, isEditing: false }, this.props.onBlur);
+    this.setState({ hasFocus: false, isEditing: false });
   },
 
 
