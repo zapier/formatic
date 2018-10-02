@@ -4158,8 +4158,13 @@ var PrettyTextInputHelper = createReactClass({
     this.setOnClickOutside('inputContainer', this.onClickOutside);
   },
 
+  componentWillUnmount: function componentWillUnmount() {
+    this.textareaRef = null;
+  },
   onClickOutside: function onClickOutside() {
-    this.setState({ isEditing: false });
+    if (this.textareaRef) {
+      this.setState({ isEditing: false });
+    }
   },
 
 
@@ -4346,7 +4351,11 @@ var PrettyTextInputHelper = createReactClass({
     }
   },
   switchToTextarea: function switchToTextarea() {
-    this.setState({ isEditing: true });
+    var _this2 = this;
+
+    this.setState({ isEditing: true }, function () {
+      _this2.focusTextarea();
+    });
   },
 
 
@@ -4361,7 +4370,25 @@ var PrettyTextInputHelper = createReactClass({
       'has-focus': this.state.hasFocus
     }));
 
-    var editor = this.state.isEditing ? this.createTextarea() : this.createReadonlyEditor();
+    var editor = this.state.isEditing ? React.createElement('textarea', {
+      className: textBoxClasses,
+      value: this.state.value,
+      tabIndex: this.wrapperTabIndex(),
+      onBlur: this.onBlur,
+      onChange: this.onChange,
+      onKeyDown: this.onTextareaKeyDown,
+      onKeyUp: this.onTextareaKeyUp,
+      ref: ref(this, 'textarea')
+    }) : React.createElement(
+      'div',
+      {
+        className: textBoxClasses,
+        tabIndex: this.wrapperTabIndex(),
+        onBlur: this.onBlur,
+        ref: ref(this, 'textBox')
+      },
+      this.createReadonlyEditor()
+    );
 
     // Render read-only version.
     return React.createElement(
@@ -4386,19 +4413,7 @@ var PrettyTextInputHelper = createReactClass({
           , onFocus: this.onFocusClick,
           role: 'textbox'
         },
-        React.createElement(
-          'div',
-          {
-            className: textBoxClasses,
-            tabIndex: this.wrapperTabIndex(),
-            onBlur: this.onBlur
-          },
-          React.createElement(
-            'div',
-            { ref: ref(this, 'textBox'), className: 'internal-text-wrapper' },
-            editor
-          )
-        )
+        editor
       ),
       this.insertBtn(),
       this.choices()

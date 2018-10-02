@@ -14,6 +14,11 @@
  * import prettyBooleanExample from './pretty-boolean';
  * import prettySelectExample from './pretty-select';*/
 import prettyTextExample from './pretty-text';
+/* import selectExample from './select';
+ * import singleLineStringExample from './single-line-string';
+ * import stringExample from './string';
+ * import unknownExample from './unknown';
+ * */
 export default [
   /* arrayExample,
    * assocListExample,
