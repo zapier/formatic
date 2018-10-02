@@ -4255,17 +4255,7 @@ var PrettyTextInputHelper = createReactClass({
     }
   },
   onBlur: function onBlur() {
-    /* if (this.isDebouncingCodeMirrorChange) {
-     *   //this.onChangeAndTagCodeMirror();
-     *   this.isDebouncingCodeMirrorChange = false;
-     *   this.setState({ hasFocus: false }, this.props.onBlur);
-     * } else {
-     *   this.setState({ hasFocus: false });
-     *   this.props.onBlur();
-     * }*/
-    //this.setState({ hasFocus: false, isEditing: true });
-    //this.setState({ hasFocus: false, isEditing: false }, this.props.onBlur);
-    this.setState({ hasFocus: false, isEditing: false });
+    this.setState({ hasFocus: false }, this.props.onBlur);
   },
 
 
