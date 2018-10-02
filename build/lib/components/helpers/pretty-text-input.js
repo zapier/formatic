@@ -257,6 +257,12 @@ exports.default = (0, _createReactClass2.default)({
       _this2.focusTextarea();
     });
   },
+  getTextAreaValue: function getTextAreaValue() {
+    if (this.state.isEditing) {
+      return this.props.config.formatTextValue(this.state.value);
+    }
+    return this.state.value;
+  },
 
 
   render: function render() {
@@ -272,7 +278,7 @@ exports.default = (0, _createReactClass2.default)({
 
     var editor = this.state.isEditing ? _react2.default.createElement('textarea', {
       className: textBoxClasses,
-      value: this.state.value,
+      value: this.getTextAreaValue(),
       tabIndex: this.wrapperTabIndex(),
       onBlur: this.onBlur,
       onChange: this.onChange,

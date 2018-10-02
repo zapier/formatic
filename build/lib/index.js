@@ -4351,6 +4351,12 @@ var PrettyTextInputHelper = createReactClass({
       _this2.focusTextarea();
     });
   },
+  getTextAreaValue: function getTextAreaValue() {
+    if (this.state.isEditing) {
+      return this.props.config.formatTextValue(this.state.value);
+    }
+    return this.state.value;
+  },
 
 
   render: function render() {
@@ -4366,7 +4372,7 @@ var PrettyTextInputHelper = createReactClass({
 
     var editor = this.state.isEditing ? React.createElement('textarea', {
       className: textBoxClasses,
-      value: this.state.value,
+      value: this.getTextAreaValue(),
       tabIndex: this.wrapperTabIndex(),
       onBlur: this.onBlur,
       onChange: this.onChange,
@@ -5668,6 +5674,9 @@ var defaultConfigPlugin = function (config) {
     },
     isRemovalOfLastAssocListItemAllowed: function isRemovalOfLastAssocListItemAllowed() /* field */{
       return true;
+    },
+    formatTextValue: function formatTextValue(value) {
+      return value;
     }
   };
 };

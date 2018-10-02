@@ -1130,6 +1130,9 @@ exports.default = function (config) {
     },
     isRemovalOfLastAssocListItemAllowed: function isRemovalOfLastAssocListItemAllowed() /* field */{
       return true;
+    },
+    formatTextValue: function formatTextValue(value) {
+      return value;
     }
   };
 };
