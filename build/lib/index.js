@@ -4222,6 +4222,8 @@ var PrettyTextInputHelper = createReactClass({
         isChoicesOpen: false,
         selectedTagPos: null,
         value: newValue
+      }, function () {
+        return _this.props.onChange(newValue);
       });
     };
     if (this.state.isEditing) {
@@ -4512,16 +4514,6 @@ var PrettyTextInputHelper = createReactClass({
       event.stopPropagation();
       this.setState({ isChoicesOpen: true });
     }
-  },
-  createTextarea: function createTextarea() {
-    return React.createElement('textarea', {
-      ref: ref(this, 'textarea'),
-      className: 'pretty-text-textarea',
-      value: this.state.value,
-      onChange: this.onChange,
-      onKeyDown: this.onTextareaKeyDown,
-      onKeyUp: this.onTextareaKeyUp
-    });
   },
 
 

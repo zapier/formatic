@@ -128,6 +128,8 @@ exports.default = (0, _createReactClass2.default)({
         isChoicesOpen: false,
         selectedTagPos: null,
         value: newValue
+      }, function () {
+        return _this.props.onChange(newValue);
       });
     };
     if (this.state.isEditing) {
@@ -418,16 +420,6 @@ exports.default = (0, _createReactClass2.default)({
       event.stopPropagation();
       this.setState({ isChoicesOpen: true });
     }
-  },
-  createTextarea: function createTextarea() {
-    return _react2.default.createElement('textarea', {
-      ref: (0, _utils.ref)(this, 'textarea'),
-      className: 'pretty-text-textarea',
-      value: this.state.value,
-      onChange: this.onChange,
-      onKeyDown: this.onTextareaKeyDown,
-      onKeyUp: this.onTextareaKeyUp
-    });
   },
 
 
