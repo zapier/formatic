@@ -1,25 +1,26 @@
 import React from 'react';
 import Link from './Link';
 import Colors from '../styles/Colors';
+import { buildStyles } from '../utils';
 
-const styles = {
-  nav: () => ({
+const styles = buildStyles('NavMenu', {
+  nav: {
     display: 'flex',
     borderBottom: `1px solid ${Colors.neutral[5]}`,
-  }),
-  brand: () => ({
+  },
+  brand: {
     display: 'inline-block',
     padding: 10,
-  }),
-  items: () => ({
+  },
+  items: {
     display: 'flex',
     padding: 0,
-  }),
-  item: () => ({
+  },
+  item: {
     display: 'inline-block',
     padding: 10,
-  }),
-};
+  },
+});
 
 const NavItem = props => {
   const title = props.navTitle || props.title;
