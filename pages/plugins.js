@@ -81,6 +81,9 @@ const Plugins = props => (
           {props.snippets['plugin-using-multiple']}
         </CodeBlock>
       </Section>
+
+      <Section title="Adding Field Types" />
+
       {/* <Section title="Basic Usage">
         <p>
           Basic usage of Formatic is pretty simple. Formatic is just a React
