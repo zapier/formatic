@@ -46,6 +46,7 @@
     "zapier-scripts": "^3.0.1"
   },
   "dependencies": {
+    "@babel/cli": "^7.1.2",
     "classnames": "^2.2.5",
     "create-react-class": "^15.6.2",
     "deep-equal": "^1.0.1",
