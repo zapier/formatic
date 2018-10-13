@@ -23,16 +23,17 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
     "@babel/register": "^7.0.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
-    "babel-plugin-emotion": "^9.2.6",
+    "babel-plugin-emotion": "^10.0.0-beta.0",
     "babel-preset-env": "^1.7.0",
     "bootstrap": "^3.3.7",
     "codemirror": "^5.32.0",
-    "emotion": "^9.2.6",
-    "emotion-server": "^9.2.8",
+    "@emotion/core": "10.0.0-beta.0",
+    "@emotion/css": "10.0.0-beta.0",
     "enzyme": "^3.6.0",
     "enzyme-adapter-react-16": "^1.5.0",
     "express": "^4.16.3",
@@ -46,7 +47,6 @@
     "zapier-scripts": "^3.0.1"
   },
   "dependencies": {
-    "@babel/cli": "^7.1.2",
     "classnames": "^2.2.5",
     "create-react-class": "^15.6.2",
     "deep-equal": "^1.0.1",

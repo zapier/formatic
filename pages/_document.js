@@ -1,14 +1,7 @@
 import React from 'react';
 import Document, { Head, Main, NextScript } from 'next/document';
-import { extractCritical } from 'emotion-server';
 
 export default class MyDocument extends Document {
-  static async getInitialProps(ctx) {
-    const page = ctx.renderPage();
-    const styles = extractCritical(page.html);
-    return { ...page, ...styles };
-  }
-
   render() {
     return (
       <html>
@@ -119,7 +112,6 @@ export default class MyDocument extends Document {
             type="text/css"
             href="/static/css/formatic.css"
           />
-          <style dangerouslySetInnerHTML={{ __html: this.props.css }} />
         </Head>
         <body className="custom_class">
           <Main />

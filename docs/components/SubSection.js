@@ -1,11 +1,12 @@
-import React from 'react';
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core';
 
 const styles = {
-  subSection: () => ({}),
+  subSection: css({}),
 };
 
 const SubSection = props => (
-  <div css={styles.subSection(props)}>
+  <div css={styles.subSection}>
     <h3>{props.title}</h3>
     <div>{props.children}</div>
   </div>

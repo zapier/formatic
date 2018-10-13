@@ -1,7 +1,8 @@
-import React from 'react';
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core';
 
 const styles = {
-  container: () => ({
+  container: css({
     paddingRight: 15,
     paddingLeft: 15,
     marginRight: 'auto',
@@ -9,8 +10,6 @@ const styles = {
   }),
 };
 
-const Container = props => (
-  <div css={styles.container(props)}>{props.children}</div>
-);
+const Container = props => <div css={styles.container}>{props.children}</div>;
 
 export default Container;

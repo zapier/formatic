@@ -1,21 +1,22 @@
-import React from 'react';
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core';
 
 import Icon from './Icon';
 
 import { dashify } from '../utils';
 
 const styles = {
-  section: () => ({}),
-  link: () => ({
+  section: css({}),
+  link: css({
     paddingLeft: 5,
   }),
 };
 
 const Section = props => (
-  <div css={styles.section(props)}>
+  <div css={styles.section}>
     <h3>
       {props.title}
-      <a css={styles.link(props)} href={`#${dashify(props.title)}`}>
+      <a css={styles.link} href={`#${dashify(props.title)}`}>
         <Icon name="link" />
       </a>
     </h3>
