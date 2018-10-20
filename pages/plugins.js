@@ -82,7 +82,15 @@ const Plugins = props => (
         </CodeBlock>
       </Section>
 
-      <Section title="Adding Field Types" />
+      <Section title="Adding Field Types">
+        <p>
+          To add a new field type, you can use the `FieldContainer` component to
+          create the field component, and you point to it with a plugin.
+        </p>
+        <CodeBlock language="jsx">
+          {props.snippets['plugin-field-type']}
+        </CodeBlock>
+      </Section>
 
       {/* <Section title="Basic Usage">
         <p>
@@ -136,6 +144,7 @@ const snippetKeys = [
   'plugin-delegate',
   'plugin-using',
   'plugin-using-multiple',
+  'plugin-field-type',
 ];
 
 Plugins.getInitialProps = async ({ req }) => {

@@ -42,7 +42,7 @@
     "react": "^16.4.1",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.1",
-    "react-syntax-highlighter": "^8.0.1",
+    "react-syntax-highlighter": "^9.0.0",
     "zapier-scripts": "^3.0.1"
   },
   "dependencies": {
