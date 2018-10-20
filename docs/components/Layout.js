@@ -3,6 +3,7 @@ import React from 'react';
 import NavMenu from './NavMenu';
 import Header from './Header';
 import Container from './Container';
+import Footer from './Footer';
 
 const Layout = props => {
   const page = props.pages[props.pageKey] || {};
@@ -11,6 +12,7 @@ const Layout = props => {
       <NavMenu pages={props.pages} pageKey={props.pageKey} />
       <Header {...page} />
       <Container>{props.children}</Container>
+      <Footer />
     </div>
   );
 };
