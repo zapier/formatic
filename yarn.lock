@@ -901,34 +901,34 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@emotion/cache@^10.0.0-beta.0":
-  version "10.0.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@emotion/cache/-/cache-10.0.0-beta.0.tgz#eab227cb65533ce594882f0798339784668dcfbb"
-  integrity sha512-PLoonrQMzQCKgetCdQBKeTLXRpYfX0IyLB1/VBVXlR9fMMjbkaQyQzT/i8r0fplMSSGunsW4WcI+qVmriEDE/Q==
+"@emotion/cache@^10.0.0-beta.5":
+  version "10.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@emotion/cache/-/cache-10.0.0-beta.5.tgz#7be0745d6f40f957d3ba9dfbbf1d85aa48243f3e"
+  integrity sha512-q9k6/D/2LxpGieCvKyJ8izEc7Zxxctoy9MRuu3cSp1gMHg9Og71OzJ9ETg2sqpJt9B9DKhReda7+j7msrj7BxQ==
   dependencies:
     "@emotion/sheet" "^0.9.0"
     "@emotion/stylis" "^0.8.0"
     "@emotion/utils" "^0.9.0"
 
-"@emotion/core@10.0.0-beta.0":
-  version "10.0.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.0-beta.0.tgz#57a995373f4afd348263718d4d4f6fbea55dbded"
-  integrity sha512-ML7k7PpsEu1dN23KyVHHxXID7zpQ+7T3cIbmTu9WRd3LbZsTv7B4Ag7zylTrlC5wMWT1oIvCKGrMpFqcWrm4qQ==
+"@emotion/core@10.0.0-beta.5":
+  version "10.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.0-beta.5.tgz#11a49b02316a96a026a2a2bb3f41bbdf711cd009"
+  integrity sha512-MCPDvFktx5gbiyQpf/sMyV/s+mzPxDmKxnltxjJO1i0p1Fa5gUGlyWn12028JBJhRP1m7dC34SbLAUmkfR/52g==
   dependencies:
-    "@emotion/cache" "^10.0.0-beta.0"
-    "@emotion/css" "^10.0.0-beta.0"
+    "@emotion/cache" "^10.0.0-beta.5"
+    "@emotion/css" "^10.0.0-beta.5"
     "@emotion/serialize" "^0.10.0"
     "@emotion/sheet" "^0.9.0"
     "@emotion/utils" "^0.9.0"
 
-"@emotion/css@^10.0.0-beta.0":
-  version "10.0.0-beta.0"
-  resolved "https://registry.yarnpkg.com/@emotion/css/-/css-10.0.0-beta.0.tgz#5d7e641016ea30f320674ec4b0abf54827cd402a"
-  integrity sha512-KOb4/1IQNwCgIBOmeVFQx0I4k0JJOPeOFMrl5GURoUs6Kv9Go/Gw8pp1KTg8PtSU6qAp2iwP6AW5j5+9IP/WXg==
+"@emotion/css@^10.0.0-beta.5":
+  version "10.0.0-beta.5"
+  resolved "https://registry.yarnpkg.com/@emotion/css/-/css-10.0.0-beta.5.tgz#1fc41dd2fb76999c20c3eb3fd85a4f5de799bc18"
+  integrity sha512-9WUN4UzH/Ufbe6muS0lTMVkUiFExMoUcu7v/hb/hU0NqaLVk5J5eZFYsQDNueFDA2pVtf+Lk0otcHuftGaHv1g==
   dependencies:
     "@emotion/serialize" "^0.10.0"
     "@emotion/utils" "^0.9.0"
-    babel-plugin-emotion "^10.0.0-beta.0"
+    babel-plugin-emotion "^10.0.0-beta.5"
 
 "@emotion/css@^10.0.0-really-unsafe-please-do-not-use.2":
   version "10.0.0-really-unsafe-please-do-not-use.2"
@@ -1865,7 +1865,7 @@ babel-plugin-check-es2015-constants@^6.22.0:
   dependencies:
     babel-runtime "^6.22.0"
 
-babel-plugin-emotion@^10.0.0-beta.0, babel-plugin-emotion@^10.0.0-really-unsafe-please-do-not-use.2:
+babel-plugin-emotion@^10.0.0-beta.0, babel-plugin-emotion@^10.0.0-beta.5, babel-plugin-emotion@^10.0.0-really-unsafe-please-do-not-use.2:
   version "10.0.0-really-unsafe-please-do-not-use.2"
   resolved "https://registry.yarnpkg.com/babel-plugin-emotion/-/babel-plugin-emotion-10.0.0-really-unsafe-please-do-not-use.2.tgz#7479dcc73b33ceb6b49857360ae7891298b0a157"
   integrity sha512-giGEFIIZfSDOtIfQN9m4foE829D6Pu5ZbEyuYfcKb+I0rFRe5s3d0oU72FxDnh8wRwH8Sr/vFUEV+8MUNMGhGw==

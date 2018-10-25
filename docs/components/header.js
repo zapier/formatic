@@ -5,12 +5,13 @@ import Container from './Container';
 import Colors from '../styles/Colors';
 
 const styles = {
-  leadHeader: css({
-    borderBottom: `1px solid ${Colors.neutral[5]}`,
-  }),
   header: css({
     borderBottom: `1px solid ${Colors.neutral[5]}`,
+    padding: 60,
+    fontSize: 24,
+    marginBottom: 40,
   }),
+  leadHeader: css({}),
   logo: css({
     display: 'block',
     margin: '0 auto 30px',
@@ -21,13 +22,15 @@ const styles = {
     textAlign: 'center',
     fontSize: 30,
   }),
-  title: css({}),
+  title: css({
+    fontSize: 60,
+  }),
   subTitle: css({}),
 };
 
 const Header = props =>
   !props.title ? (
-    <div css={styles.leadHeader}>
+    <div css={[styles.header, styles.leadHeader]}>
       <Container>
         <img css={styles.logo} src="static/images/logo.png" alt="Formatic" />
         <p css={styles.lead}>Automatic Forms for React</p>

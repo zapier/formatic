@@ -7,6 +7,15 @@ const styles = {
     paddingLeft: 15,
     marginRight: 'auto',
     marginLeft: 'auto',
+    '@media (min-width: 768px)': {
+      width: 750,
+    },
+    '@media (min-width: 992px)': {
+      width: 970,
+    },
+    '@media (min-width: 1200px)': {
+      width: 1170,
+    },
   }),
 };
 
