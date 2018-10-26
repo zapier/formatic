@@ -3,13 +3,24 @@ import { jsx, css } from '@emotion/core';
 
 import Container from './Container';
 import Colors from '../styles/Colors';
+import { getStyleForWidth } from '../styles/Media';
 
 const styles = {
   header: css({
     borderBottom: `1px solid ${Colors.neutral[5]}`,
-    padding: 60,
-    fontSize: 24,
     marginBottom: 40,
+    ...getStyleForWidth(
+      {
+        fontSize: 18,
+        paddingTop: 20,
+        paddingBottom: 20,
+      },
+      {
+        fontSize: 24,
+        paddingTop: 60,
+        paddingBottom: 60,
+      }
+    ),
   }),
   leadHeader: css({}),
   logo: css({
@@ -23,7 +34,14 @@ const styles = {
     fontSize: 30,
   }),
   title: css({
-    fontSize: 60,
+    ...getStyleForWidth(
+      {
+        fontSize: 30,
+      },
+      {
+        fontSize: 60,
+      }
+    ),
   }),
   subTitle: css({}),
 };
