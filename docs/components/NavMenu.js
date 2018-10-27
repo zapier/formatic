@@ -1,8 +1,15 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
+import { Toggle } from 'react-powerplug';
+
 import { RawLink, NavLink } from './Link';
 import Container from './Container';
+import Icon from './Icon';
 import Colors from '../styles/Colors';
+import { getStyleForWidth } from '../styles/Media';
+
+import MenuIcon from '../../static/icons/menu.svg';
+import DeleteIcon from '../../static/icons/delete.svg';
 
 const styles = {
   navWrapper: css({
@@ -18,26 +25,82 @@ const styles = {
     display: 'inline-block',
     padding: 10,
     fontSize: 18,
+    paddingLeft: 0,
+    ...getStyleForWidth(
+      {
+        flex: 1,
+      },
+      {
+        flex: 'initial',
+      }
+    ),
   }),
   brandLink: css({
     color: Colors.brand[1],
+    textDecoration: 'none',
     '&:focus, &:hover': {
       textDecoration: 'none',
       color: Colors.brand[1],
     },
   }),
   items: css({
-    display: 'flex',
     padding: 0,
     margin: 0,
+    ...getStyleForWidth(
+      {
+        display: 'none',
+      },
+      {
+        display: 'flex',
+      }
+    ),
+  }),
+  menuItemsActive: css({
+    width: '100%',
+    backgroundColor: 'white',
+    position: 'absolute',
+    borderBottom: `1px solid ${Colors.neutral[4]}`,
+    paddingLeft: 5,
+    ...getStyleForWidth(
+      {
+        display: 'block',
+      },
+      {
+        display: 'none',
+      }
+    ),
+  }),
+  menuItemsNotActive: css({
+    display: 'none',
   }),
   item: css({
-    display: 'inline-block',
     padding: 10,
     borderBottom: `solid 3px rgb(0, 0, 0, 0)`,
+    ...getStyleForWidth(
+      {
+        display: 'block',
+      },
+      {
+        display: 'inline-block',
+      }
+    ),
   }),
   itemIsCurrent: css({
-    borderBottom: `solid 3px ${Colors.main[1]}`,
+    ...getStyleForWidth(
+      {},
+      {
+        borderBottom: `solid 3px ${Colors.main[1]}`,
+      }
+    ),
+  }),
+  toggle: css({
+    paddingTop: 9,
+    ...getStyleForWidth(
+      {},
+      {
+        display: 'none',
+      }
+    ),
   }),
 };
 
@@ -54,15 +117,42 @@ const NavItem = props => {
 };
 
 const NavMenu = props => (
-  <div css={styles.navWrapper}>
-    <Container>
-      <nav css={styles.nav}>
-        <div css={styles.brand}>
-          <RawLink href="/" css={styles.brandLink}>
-            Formatic
-          </RawLink>
+  <Toggle>
+    {menuToggle => (
+      <div>
+        <div css={styles.navWrapper}>
+          <Container>
+            <nav css={styles.nav}>
+              <div css={styles.brand}>
+                <RawLink href="/" css={styles.brandLink}>
+                  Formatic
+                </RawLink>
+              </div>
+              <ul css={styles.items}>
+                {Object.keys(props.pages).map(pageKey => (
+                  <NavItem
+                    {...props.pages[pageKey]}
+                    isCurrent={props.pageKey === pageKey}
+                  />
+                ))}
+              </ul>
+              <div css={styles.toggle} onClick={menuToggle.toggle}>
+                {menuToggle.on ? (
+                  <Icon svg={DeleteIcon} />
+                ) : (
+                  <Icon svg={MenuIcon} />
+                )}
+              </div>
+            </nav>
+          </Container>
         </div>
-        <ul css={styles.items}>
+        <ul
+          css={[
+            styles.items,
+            styles.menuItemsActive,
+            !menuToggle.on && styles.menuItemsNotActive,
+          ]}
+        >
           {Object.keys(props.pages).map(pageKey => (
             <NavItem
               {...props.pages[pageKey]}
@@ -70,9 +160,9 @@ const NavMenu = props => (
             />
           ))}
         </ul>
-      </nav>
-    </Container>
-  </div>
+      </div>
+    )}
+  </Toggle>
 );
 
 export default NavMenu;

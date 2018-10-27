@@ -2,11 +2,20 @@
 import { jsx, css } from '@emotion/core';
 
 const styles = {
-  icon: css({ fontSize: '.75em' }),
+  icon: css({
+    display: 'inline-block',
+    width: 16,
+    height: 16,
+  }),
 };
 
-const Icon = props => (
-  <span css={styles.icon} className={`glyphicon glyphicon-${props.name}`} />
-);
+const Icon = props => {
+  const SvgIcon = props.svg;
+  return (
+    <span css={styles.icon}>
+      <SvgIcon />
+    </span>
+  );
+};
 
 export default Icon;

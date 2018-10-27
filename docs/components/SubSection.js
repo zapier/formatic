@@ -1,13 +1,18 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
+import Typography from '../styles/Typography';
+
 const styles = {
   subSection: css({}),
+  subSectionHead: css({
+    ...Typography['sub-head'],
+  }),
 };
 
 const SubSection = props => (
   <div css={styles.subSection}>
-    <h3>{props.title}</h3>
+    <h3 css={styles.subSectionHead}>{props.title}</h3>
     <div>{props.children}</div>
   </div>
 );

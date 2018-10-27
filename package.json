@@ -26,13 +26,14 @@
     "@babel/cli": "^7.1.2",
     "@babel/core": "^7.1.2",
     "@babel/register": "^7.0.0",
+    "@emotion/core": "10.0.0-beta.5",
+    "@zeit/next-css": "^1.0.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.6.0",
     "babel-plugin-emotion": "^10.0.0-beta.0",
     "babel-preset-env": "^1.7.0",
     "bootstrap": "^3.3.7",
     "codemirror": "^5.32.0",
-    "@emotion/core": "10.0.0-beta.5",
     "enzyme": "^3.6.0",
     "enzyme-adapter-react-16": "^1.5.0",
     "express": "^4.16.3",
@@ -42,7 +43,9 @@
     "react": "^16.4.1",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.1",
+    "react-svg-loader": "^2.1.0",
     "react-syntax-highlighter": "^9.0.0",
+    "sanitize.css": "^8.0.0",
     "zapier-scripts": "^3.0.1"
   },
   "dependencies": {
@@ -53,6 +56,7 @@
     "isomorphic-unfetch": "^2.1.1",
     "object-assign": "^2.1.1",
     "prop-types": "^15.6.0",
+    "react-powerplug": "^1.0.0-rc.1",
     "react-scroll-lock": "git+https://github.com/Laiff/react-scroll-lock.git#267bf5bcf84d334aecc20908657088007b698dc2",
     "react-transition-group": "^1.2.1"
   },

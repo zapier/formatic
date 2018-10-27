@@ -4,9 +4,15 @@ import { jsx, css } from '@emotion/core';
 import Icon from './Icon';
 
 import { dashify } from '../utils';
+import Typography from '../styles/Typography';
+
+import LinkIcon from '../../static/icons/link.svg';
 
 const styles = {
   section: css({}),
+  sectionHead: css({
+    ...Typography['main-head'],
+  }),
   link: css({
     paddingLeft: 5,
   }),
@@ -14,12 +20,12 @@ const styles = {
 
 const Section = props => (
   <div css={styles.section}>
-    <h3>
+    <h2 css={styles.sectionHead}>
       {props.title}
       <a css={styles.link} href={`#${dashify(props.title)}`}>
-        <Icon name="link" />
+        <Icon svg={LinkIcon} />
       </a>
-    </h3>
+    </h2>
     <div>{props.children}</div>
   </div>
 );

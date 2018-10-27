@@ -3,6 +3,7 @@ import { jsx, css } from '@emotion/core';
 
 import Container from './Container';
 import Colors from '../styles/Colors';
+import Typography from '../styles/Typography';
 import { getStyleForWidth } from '../styles/Media';
 
 const styles = {
@@ -11,12 +12,12 @@ const styles = {
     marginBottom: 40,
     ...getStyleForWidth(
       {
-        fontSize: 18,
+        ...Typography['sub-head'],
         paddingTop: 20,
         paddingBottom: 20,
       },
       {
-        fontSize: 24,
+        ...Typography['main-head'],
         paddingTop: 60,
         paddingBottom: 60,
       }
@@ -31,15 +32,15 @@ const styles = {
   }),
   lead: css({
     textAlign: 'center',
-    fontSize: 30,
+    ...Typography['main-head'],
   }),
   title: css({
     ...getStyleForWidth(
       {
-        fontSize: 30,
+        ...Typography['main-head'],
       },
       {
-        fontSize: 60,
+        ...Typography['mega-head'],
       }
     ),
   }),

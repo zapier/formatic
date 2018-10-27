@@ -1,5 +1,12 @@
-import React from 'react';
+/** @jsx jsx */
+import { jsx, css } from '@emotion/core';
 import Layout from './Layout';
+
+import Typography from '../styles/Typography';
+
+import '../../static/css/app.css';
+import '../../static/css/formatic.css';
+import 'sanitize.css';
 
 const pages = {
   start: {
@@ -23,9 +30,15 @@ const pages = {
   },
 };
 
+const styles = {
+  body: css({
+    ...Typography['body-large'],
+  }),
+};
+
 const Page = props => (
   <Layout pages={pages} pageKey={props.pageKey}>
-    {props.children}
+    <div css={styles.body}>{props.children}</div>
   </Layout>
 );
 

@@ -10,6 +10,7 @@ const styles = {
   }),
   navLink: css({
     color: Colors.neutral[2],
+    textDecoration: 'none',
     '&:focus, &:hover': {
       textDecoration: 'none',
       color: Colors.main[1],

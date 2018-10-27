@@ -95,22 +95,7 @@ export default class MyDocument extends Document {
           />
           <link
             rel="stylesheet"
-            href="/node_modules/bootstrap/dist/css/bootstrap.min.css"
-          />
-          <link
-            rel="stylesheet"
-            href="/node_modules/bootstrap/dist/css/bootstrap-theme.min.css"
-          />
-          <link
-            rel="stylesheet"
             href="/node_modules/codemirror/lib/codemirror.css"
-          />
-          <link rel="stylesheet" type="text/css" href="/static/css/docs.css" />
-          <link rel="stylesheet" type="text/css" href="/static/css/app.css" />
-          <link
-            rel="stylesheet"
-            type="text/css"
-            href="/static/css/formatic.css"
           />
         </Head>
         <body className="custom_class">
