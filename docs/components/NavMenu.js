@@ -94,7 +94,8 @@ const styles = {
     ),
   }),
   toggle: css({
-    paddingTop: 9,
+    borderWidth: 0,
+    backgroundColor: 'white',
     ...getStyleForWidth(
       {},
       {
@@ -136,13 +137,13 @@ const NavMenu = props => (
                   />
                 ))}
               </ul>
-              <div css={styles.toggle} onClick={menuToggle.toggle}>
+              <button css={styles.toggle} onClick={menuToggle.toggle}>
                 {menuToggle.on ? (
                   <Icon svg={DeleteIcon} />
                 ) : (
                   <Icon svg={MenuIcon} />
                 )}
-              </div>
+              </button>
             </nav>
           </Container>
         </div>
