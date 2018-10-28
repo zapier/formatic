@@ -7,6 +7,7 @@ import Formatic from '../lib/formatic';
 import Page from '../docs/components/Page';
 import Sections from '../docs/components/Sections';
 import Section from '../docs/components/Section';
+import Button from '../docs/components/Button';
 
 import examples from '../demo/examples';
 
@@ -155,12 +156,9 @@ class FormDemo extends Component {
             {typeContent}
             {aliasContent}
             <p>
-              <button
-                className="btn btn-default btn-sm"
-                onClick={() => this.onChangeHint(id)}
-              >
+              <Button onClick={() => this.onChangeHint(id)}>
                 Toggle Plugin Hints
-              </button>
+              </Button>
             </p>
             <p>{notes}</p>
           </div>
