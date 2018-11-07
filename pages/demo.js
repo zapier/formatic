@@ -49,14 +49,12 @@ const hintPlugin = config => {
 const config = Formatic.createConfig(
   Formatic.plugins.reference,
   Formatic.plugins.meta,
-  Formatic.plugins.bootstrap,
   customPlugin
 );
 
 const hintConfig = Formatic.createConfig(
   Formatic.plugins.reference,
   Formatic.plugins.meta,
-  Formatic.plugins.bootstrap,
   customPlugin,
   hintPlugin
 );
