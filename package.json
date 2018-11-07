@@ -47,7 +47,7 @@
     "react-svg-loader": "^2.1.0",
     "react-syntax-highlighter": "^9.0.0",
     "sanitize.css": "^8.0.0",
-    "zapier-scripts": "^3.0.1"
+    "zapier-scripts": "^3.4.1"
   },
   "dependencies": {
     "classnames": "^2.2.5",
