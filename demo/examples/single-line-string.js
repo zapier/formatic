@@ -2,7 +2,6 @@ const fields = [
   {
     label: 'single line string',
     helpText: 'help for the single line string field',
-    helpTextPlacement: 'after',
     type: 'single-line-string',
     key: 'single-line-string',
     placeholder: 'type something...',

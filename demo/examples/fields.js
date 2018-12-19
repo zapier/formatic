@@ -85,14 +85,12 @@ const fields = [
           {
             label: 'Section 2 field 1',
             helpText: 'Help for section 2 field 1',
-            helpTextPlacement: 'after',
             type: 'unicode',
             key: 'section2Field1',
           },
           {
             label: 'Section 2 field 2',
             helpText: 'Help for section 2 field 2',
-            helpTextPlacement: 'after',
             type: 'unicode',
             key: 'section2Field2',
           },
