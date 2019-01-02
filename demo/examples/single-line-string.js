@@ -1,6 +1,7 @@
 const fields = [
   {
     label: 'single line string',
+    helpText: 'help for the single line string field',
     type: 'single-line-string',
     key: 'single-line-string',
     placeholder: 'type something...',
@@ -8,6 +9,7 @@ const fields = [
   },
   {
     label: 'Name (R)',
+    helpText: 'help for the required name field',
     type: 'unicode',
     key: 'name',
     required: true,

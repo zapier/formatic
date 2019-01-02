@@ -1,6 +1,6 @@
 {
   "name": "formatic",
-  "version": "1.1.11",
+  "version": "1.2.0",
   "description": "Automatic, pluggable form generation",
   "main": "./build/lib/index.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "lint": "zapier-scripts lint '__tests__/**/*.js' 'demo/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
     "live": "node server.js",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
+    "minor-release": "npm version minor && npm publish && git push --follow-tags",
     "prebuild": "rm -rf build && mkdir -p build/lib",
     "precommit": "zapier-scripts format-staged",
     "prepublish": "npm run build",
