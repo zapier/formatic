@@ -10,13 +10,13 @@
     "docs-publish": "gulp docs-publish",
     "format": "zapier-scripts format '__tests__/**/*.js' 'demo/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
     "lint": "zapier-scripts lint '__tests__/**/*.js' 'demo/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
-    "live": "node server.js",
+    "live": "webpack-dev-server",
     "patch-release": "npm version patch && npm publish && git push --follow-tags",
     "minor-release": "npm version minor && npm publish && git push --follow-tags",
     "prebuild": "rm -rf build && mkdir -p build/lib",
     "precommit": "zapier-scripts format-staged",
     "prepublish": "npm run build",
-    "start": "node server.js",
+    "start": "webpack-dev-server",
     "test": "jest --no-cache"
   },
   "repository": {
@@ -50,7 +50,6 @@
     "marked": "^0.3.9",
     "node-libs-browser": "^2.1.0",
     "open": "^0.0.5",
-    "portscanner": "^2.1.1",
     "react": "^16.2.0",
     "react-bootstrap": "^0.31.5",
     "react-dom": "^16.2.0",
@@ -63,8 +62,9 @@
     "shelljs": "^0.7.8",
     "style-loader": "^0.19.0",
     "uglify-js": "^3.2.0",
-    "webpack": "^3.9.1",
-    "webpack-dev-server": "^2.9.5",
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.11",
     "zapier-scripts": "^3.0.1"
   },
   "dependencies": {
