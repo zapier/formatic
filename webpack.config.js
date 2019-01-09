@@ -44,7 +44,6 @@ module.exports = {
     hot: true,
     open: true,
     openPage: 'demo/index.html',
-    port: 3040,
     publicPath,
   },
 };
