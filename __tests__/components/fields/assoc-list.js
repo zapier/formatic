@@ -3,7 +3,10 @@
 
 import React from 'react';
 import TestUtils from 'react-dom/test-utils';
+
 import Formatic from '../../../lib/formatic';
+import { renderFieldsToHtml } from '../../../FormaticTestUtils';
+import assocListExample from '../../../demo/examples/assoc-list';
 
 const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
@@ -60,4 +63,10 @@ describe('assoc-list field', () => {
     expect(renderedKeys(doc)).toEqual(['key1', 'key1']);
     expect(renderedValues(doc)).toEqual(['value1', 'value2']);
   });
+
+  it('should render correctly', () => {
+    expect(renderFieldsToHtml(assocListExample.fields)).toMatchSnapshot();
+  });
 });
+
+/*global describe, it, expect*/
