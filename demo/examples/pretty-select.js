@@ -139,6 +139,13 @@ const fields = [
     isAccordion: true,
   },
   {
+    label: 'Empty',
+    key: 'empty',
+    type: 'pretty-select',
+    choices: [],
+  },
+  {
+    label: 'Yes/No',
     type: 'pretty-select',
     key: 'prettyBoolean',
     isAccordion: true,
@@ -173,6 +180,45 @@ const fields = [
       M: 'Medium',
       L: 'Large',
     },
+  },
+  {
+    label: 'Select with Sections',
+    type: 'pretty-select',
+    key: 'section-select',
+    choices: [
+      {
+        sectionKey: 'size',
+        label: 'Size',
+      },
+      {
+        label: 'Large',
+        value: 'large',
+      },
+      {
+        label: 'Medium',
+        value: 'medium',
+      },
+      {
+        label: 'Small',
+        value: 'small',
+      },
+      {
+        sectionKey: 'color',
+        label: 'Color',
+      },
+      {
+        label: 'Red',
+        value: 'red',
+      },
+      {
+        label: 'Green',
+        value: 'green',
+      },
+      {
+        label: 'Blue',
+        value: 'blue',
+      },
+    ],
   },
 ];
 

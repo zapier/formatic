@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 
 import Formatic from './lib/formatic';
 
-export const renderFieldsToHtml = fields => {
+export const renderFieldsToHtml = (fields, handleComponent = () => {}) => {
   const config = Formatic.createConfig();
   const value = config.createRootValue({
     fields,
@@ -17,6 +17,7 @@ export const renderFieldsToHtml = fields => {
       onChange={() => {}}
     />
   );
+  handleComponent(component);
   const html = component.html();
   component.unmount();
   return html;
