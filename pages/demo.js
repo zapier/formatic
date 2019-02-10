@@ -12,6 +12,7 @@ import Button from '../docs/components/Button';
 import examples from '../demo/examples';
 
 import customPlugin from '../demo/examples/custom-plugin';
+import cssPlugin from '../lib/plugins/css-plugin';
 
 const Form = React.createFactory(Formatic);
 
@@ -47,12 +48,14 @@ const hintPlugin = config => {
 };
 
 const config = Formatic.createConfig(
+  cssPlugin,
   Formatic.plugins.reference,
   Formatic.plugins.meta,
   customPlugin
 );
 
 const hintConfig = Formatic.createConfig(
+  cssPlugin,
   Formatic.plugins.reference,
   Formatic.plugins.meta,
   customPlugin,
@@ -172,13 +175,17 @@ class FormDemo extends Component {
                 onFocus={e => this.onEvent('onFocus', e)}
                 onBlur={e => this.onEvent('onBlur', e)}
                 onOpenReplacements={info =>
-                  this.onCustomEvent('onOpenReplacements', info)}
+                  this.onCustomEvent('onOpenReplacements', info)
+                }
                 onCloseReplacements={info =>
-                  this.onCustomEvent('onCloseReplacements', info)}
+                  this.onCustomEvent('onCloseReplacements', info)
+                }
                 onClearCurrentChoice={info =>
-                  this.onCustomEvent('onClearCurrentChoice', info)}
+                  this.onCustomEvent('onClearCurrentChoice', info)
+                }
                 onOrderGroceries={info =>
-                  this.onCustomEvent('onOrderGroceries', info)}
+                  this.onCustomEvent('onOrderGroceries', info)
+                }
                 readOnly={false}
               />
             </div>
