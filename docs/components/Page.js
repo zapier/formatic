@@ -4,6 +4,7 @@ import Layout from './Layout';
 
 import Typography from '../styles/Typography';
 
+import 'codemirror/lib/codemirror.css';
 import '../../static/css/app.css';
 import '../../static/css/formatic.css';
 import 'sanitize.css';

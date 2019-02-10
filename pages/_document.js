@@ -93,10 +93,6 @@ export default class MyDocument extends Document {
             href="./static/favicons/manifest.json"
             data-reactid=".2bkozp1wjk0.0.l"
           />
-          <link
-            rel="stylesheet"
-            href="/node_modules/codemirror/lib/codemirror.css"
-          />
         </Head>
         <body className="custom_class">
           <Main />
