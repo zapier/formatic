@@ -9,114 +9,70 @@ exports[`assoc-list field should render correctly 1`] = `
       </span>
     </div>
     <span>
-      <span>
-      </span>
-      <fieldset class>
-        <div class="optional">
-          <div class>
-            <label>
-              Associative List
-            </label>
-            <span class="required-label not-required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <div class>
-              <span>
-                <div class>
-                  <input class="validation-error-duplicate-key"
-                         type="text"
-                         value
-                  >
-                  <div class>
-                    <div role="presentation"
-                         class="pretty-text-wrapper"
-                    >
-                      <div class="pretty-text-click-wrapper"
-                           tabindex="0"
-                           role="textbox"
-                      >
-                        <div role="presentation"
-                             class="pretty-text-box placeholder"
-                             tabindex="0"
-                        >
-                          <div class="internal-text-wrapper">
-                            <span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <a href="JavaScript:"
-                         class
-                      >
-                        Insert...
-                      </a>
-                    </div>
-                  </div>
-                  <div class>
-                    <span role="button"
-                          tabindex="0"
-                          class
-                    >
-                      [remove]
-                    </span>
-                  </div>
-                </div>
-                <div class>
-                  <input class="validation-error-duplicate-key"
-                         type="text"
-                         value
-                  >
-                  <div class>
-                    <div role="presentation"
-                         class="pretty-text-wrapper"
-                    >
-                      <div class="pretty-text-click-wrapper"
-                           tabindex="0"
-                           role="textbox"
-                      >
-                        <div role="presentation"
-                             class="pretty-text-box placeholder"
-                             tabindex="0"
-                        >
-                          <div class="internal-text-wrapper">
-                            <span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <a href="JavaScript:"
-                         class
-                      >
-                        Insert...
-                      </a>
-                    </div>
-                  </div>
-                  <div class>
-                    <span role="button"
-                          tabindex="0"
-                          class
-                    >
-                      [remove]
-                    </span>
-                  </div>
-                </div>
-              </span>
-              <div class>
-                <span role="button"
-                      tabindex="0"
-                      class
-                >
-                  [add]
-                </span>
-              </div>
-            </div>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Associative List
+          </label>
+          <span class="required-label not-required-text">
           </span>
         </div>
-      </fieldset>
-    </span>
+        <span>
+        </span>
+        <div class>
+          <div class>
+            <input class="validation-error-duplicate-key"
+                   type="text"
+                   value
+            >
+            <div class>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+            <div class>
+              <button tabindex="0"
+                      class
+              >
+                -
+              </button>
+            </div>
+          </div>
+          <div class>
+            <input class="validation-error-duplicate-key"
+                   type="text"
+                   value
+            >
+            <div class>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+            <div class>
+              <button tabindex="0"
+                      class
+              >
+                -
+              </button>
+            </div>
+          </div>
+          <div class>
+            <button role="button"
+                    tabindex="0"
+                    class
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+    </fieldset>
   </div>
 </div>
 

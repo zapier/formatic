@@ -9,34 +9,30 @@ exports[`select field should render correctly 1`] = `
       </span>
     </div>
     <span>
-      <span>
-      </span>
-      <fieldset class>
-        <div class="optional">
-          <div class>
-            <label>
-              Mood
-            </label>
-            <span class="required-label not-required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <select class>
-              <option value="value:">
-              </option>
-              <option value="choice:0">
-                Happy
-              </option>
-              <option value="choice:1">
-                Sad
-              </option>
-            </select>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Mood
+          </label>
+          <span class="required-label not-required-text">
           </span>
         </div>
-      </fieldset>
-    </span>
+        <span>
+        </span>
+        <select class>
+          <option value="value:">
+          </option>
+          <option value="choice:0">
+            Happy
+          </option>
+          <option value="choice:1">
+            Sad
+          </option>
+        </select>
+      </div>
+    </fieldset>
   </div>
 </div>
 

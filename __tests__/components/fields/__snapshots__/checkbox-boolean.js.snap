@@ -9,42 +9,40 @@ exports[`checkbox-boolean field should render correctly 1`] = `
       </span>
     </div>
     <span>
-      <span>
-      </span>
-      <fieldset class>
-        <span style="white-space: nowrap;">
-          <input type="checkbox"
-                 class
-                 disabled
-          >
-          <span>
-          </span>
-          <span>
-            Enable Read-only
-          </span>
-        </span>
-        <span style="white-space: nowrap;">
-          <input type="checkbox"
-                 class
-          >
-          <span>
-          </span>
-          <span>
-            Is this checked?
-          </span>
-        </span>
-        <span style="white-space: nowrap;">
-          <input type="checkbox"
-                 class
-          >
-          <span>
-          </span>
-          <span>
-            Is this a checkbox?
-          </span>
-        </span>
-      </fieldset>
     </span>
+    <fieldset class>
+      <span style="white-space: nowrap;">
+        <input type="checkbox"
+               class
+               disabled
+        >
+        <span>
+        </span>
+        <span>
+          Enable Read-only
+        </span>
+      </span>
+      <span style="white-space: nowrap;">
+        <input type="checkbox"
+               class
+        >
+        <span>
+        </span>
+        <span>
+          Is this checked?
+        </span>
+      </span>
+      <span style="white-space: nowrap;">
+        <input type="checkbox"
+               class
+        >
+        <span>
+        </span>
+        <span>
+          Is this a checkbox?
+        </span>
+      </span>
+    </fieldset>
   </div>
 </div>
 

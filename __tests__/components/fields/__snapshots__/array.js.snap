@@ -9,100 +9,86 @@ exports[`array field should render correctly 1`] = `
       </span>
     </div>
     <span>
-      <span>
-      </span>
-      <fieldset class>
-        <div class="optional">
-          <div class>
-            <label>
-              Array
-            </label>
-            <span class="required-label not-required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <div class
-                 tabindex="0"
-            >
-              <span>
-              </span>
-              <div class>
-                <span role="button"
-                      tabindex="0"
-                      class
-                >
-                  [add]
-                </span>
-              </div>
-            </div>
-          </span>
-        </div>
-        <div class="required">
-          <div class>
-            <label>
-              Robots (R)
-            </label>
-            <span class="required-label required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <div class
-                 tabindex="0"
-            >
-              <span>
-              </span>
-              <div class>
-                <select class>
-                  <option value="0">
-                    Simple
-                  </option>
-                  <option value="1">
-                    Complex
-                  </option>
-                </select>
-                <span role="button"
-                      tabindex="0"
-                      class
-                >
-                  [add]
-                </span>
-              </div>
-            </div>
-          </span>
-        </div>
-        <div class="optional">
-          <div class>
-            <label>
-              Listing Pretty Text
-            </label>
-            <span class="required-label not-required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <div class
-                 tabindex="0"
-            >
-              <span>
-              </span>
-              <div class>
-                <span role="button"
-                      tabindex="0"
-                      class
-                >
-                  [add]
-                </span>
-              </div>
-            </div>
-          </span>
-        </div>
-      </fieldset>
     </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Array
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div class
+             tabindex="0"
+        >
+          <div class>
+            <button role="button"
+                    tabindex="0"
+                    class
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="required">
+        <div class>
+          <label>
+            Robots (R)
+          </label>
+          <span class="required-label required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div class
+             tabindex="0"
+        >
+          <div class>
+            <select class>
+              <option value="0">
+                Simple
+              </option>
+              <option value="1">
+                Complex
+              </option>
+            </select>
+            <button role="button"
+                    tabindex="0"
+                    class
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Listing Pretty Text
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div class
+             tabindex="0"
+        >
+          <div class>
+            <button role="button"
+                    tabindex="0"
+                    class
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+    </fieldset>
   </div>
 </div>
 

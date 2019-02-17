@@ -9,184 +9,178 @@ exports[`fields field should render correctly 1`] = `
       </span>
     </div>
     <span>
-      <span>
-      </span>
-      <fieldset class>
-        <div class="optional readonly">
-          <div class>
-            <label>
-              Folder
-            </label>
-            <span class="required-label not-required-text">
-            </span>
-          </div>
-          <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Folder
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <fieldset class>
+          <div class="optional"
+               style="display: none;"
+          >
+            <div class>
+              <span class="required-label not-required-text">
+              </span>
+            </div>
             <span>
             </span>
-            <fieldset class>
-              <div class="optional readonly"
-                   style="display: none;"
-              >
-                <div class>
-                  <span class="required-label not-required-text">
-                  </span>
-                </div>
-                <span>
-                  <span>
-                  </span>
-                  <input tabindex="-1"
-                         type="text"
-                         class
-                         readonly
-                         value="folder"
-                  >
-                </span>
-              </div>
-              <div class="optional readonly">
-                <div class>
-                  <label>
-                    Name
-                  </label>
-                  <span class="required-label not-required-text">
-                  </span>
-                </div>
-                <span>
-                  <span>
-                  </span>
-                  <input tabindex="-1"
-                         type="text"
-                         class
-                         readonly
-                         value
-                  >
-                </span>
-              </div>
-              <div class="optional readonly">
-                <div class>
-                  <label>
-                    Children
-                  </label>
-                  <span class="required-label not-required-text">
-                  </span>
-                </div>
-                <span>
-                  <span>
-                  </span>
-                  <div class>
-                    <span>
-                    </span>
-                  </div>
-                </span>
-              </div>
-            </fieldset>
-          </span>
-        </div>
-        <div class="optional">
-          <div class>
-            <label>
-              Grouped Fields Classic
-            </label>
-            <span class="required-label not-required-text">
-            </span>
+            <input tabindex="0"
+                   type="text"
+                   class
+                   value="folder"
+            >
           </div>
-          <span>
+          <div class="optional">
             <div class>
-              Grouped fields are the bestest!
+              <label>
+                Name
+              </label>
+              <span class="required-label not-required-text">
+              </span>
             </div>
-            <fieldset class>
-              <fieldset class="child-fields-group">
-                <legend>
-                  Section 1
-                </legend>
-                <div class>
-                  Section 1 is the best
-                </div>
-                <div class="optional">
-                  <div class>
-                    <label>
-                      Section 1 field 1
-                    </label>
-                    <span class="required-label not-required-text">
-                    </span>
-                  </div>
-                  <span>
-                    <span>
-                    </span>
-                    <input tabindex="0"
-                           type="text"
-                           class
-                           value
-                    >
-                  </span>
-                </div>
-                <div class="optional">
-                  <div class>
-                    <label>
-                      Section 1 field 2
-                    </label>
-                    <span class="required-label not-required-text">
-                    </span>
-                  </div>
-                  <span>
-                    <span>
-                    </span>
-                    <input tabindex="0"
-                           type="text"
-                           class
-                           value
-                    >
-                  </span>
-                </div>
-              </fieldset>
-              <fieldset class="child-fields-group">
-                <legend>
-                  Section 2
-                </legend>
-                <div class>
-                  Section 2 is the best
-                </div>
-                <div class="optional">
-                  <div class>
-                    <label>
-                      Section 2 field 1
-                    </label>
-                    <span class="required-label not-required-text">
-                    </span>
-                  </div>
-                  <span>
-                    <span>
-                    </span>
-                    <input tabindex="0"
-                           type="text"
-                           class
-                           value
-                    >
-                  </span>
-                </div>
-                <div class="optional">
-                  <div class>
-                    <label>
-                      Section 2 field 2
-                    </label>
-                    <span class="required-label not-required-text">
-                    </span>
-                  </div>
-                  <span>
-                    <span>
-                    </span>
-                    <input tabindex="0"
-                           type="text"
-                           class
-                           value
-                    >
-                  </span>
-                </div>
-              </fieldset>
-            </fieldset>
+            <span>
+            </span>
+            <input tabindex="0"
+                   type="text"
+                   class
+                   value
+            >
+          </div>
+          <div class="optional">
+            <div class>
+              <label>
+                Children
+              </label>
+              <span class="required-label not-required-text">
+              </span>
+            </div>
+            <span>
+            </span>
+            <div class
+                 tabindex="0"
+            >
+              <div class>
+                <select class>
+                  <option value="0">
+                    File
+                  </option>
+                  <option value="1">
+                    1
+                  </option>
+                </select>
+                <button role="button"
+                        tabindex="0"
+                        class
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Grouped Fields Classic
+          </label>
+          <span class="required-label not-required-text">
           </span>
         </div>
-      </fieldset>
-    </span>
+        <div class>
+          Grouped fields are the bestest!
+        </div>
+        <fieldset class>
+          <fieldset class="child-fields-group">
+            <legend>
+              Section 1
+            </legend>
+            <div class>
+              Section 1 is the best
+            </div>
+            <div class="optional">
+              <div class>
+                <label>
+                  Section 1 field 1
+                </label>
+                <span class="required-label not-required-text">
+                </span>
+              </div>
+              <span>
+              </span>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+            <div class="optional">
+              <div class>
+                <label>
+                  Section 1 field 2
+                </label>
+                <span class="required-label not-required-text">
+                </span>
+              </div>
+              <span>
+              </span>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+          </fieldset>
+          <fieldset class="child-fields-group">
+            <legend>
+              Section 2
+            </legend>
+            <div class>
+              Section 2 is the best
+            </div>
+            <div class="optional">
+              <div class>
+                <label>
+                  Section 2 field 1
+                </label>
+                <span class="required-label not-required-text">
+                </span>
+              </div>
+              <span>
+              </span>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+            <div class="optional">
+              <div class>
+                <label>
+                  Section 2 field 2
+                </label>
+                <span class="required-label not-required-text">
+                </span>
+              </div>
+              <span>
+              </span>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+          </fieldset>
+        </fieldset>
+      </div>
+    </fieldset>
   </div>
 </div>
 

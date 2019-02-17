@@ -9,32 +9,28 @@ exports[`boolean field should render correctly 1`] = `
       </span>
     </div>
     <span>
-      <span>
-      </span>
-      <fieldset class>
-        <div class="optional">
-          <div class>
-            <label>
-              Do you like cookies?
-            </label>
-            <span class="required-label not-required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <select class>
-              <option value="choice:0">
-                yes
-              </option>
-              <option value="choice:1">
-                no
-              </option>
-            </select>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Do you like cookies?
+          </label>
+          <span class="required-label not-required-text">
           </span>
         </div>
-      </fieldset>
-    </span>
+        <span>
+        </span>
+        <select class>
+          <option value="choice:0">
+            yes
+          </option>
+          <option value="choice:1">
+            no
+          </option>
+        </select>
+      </div>
+    </fieldset>
   </div>
 </div>
 

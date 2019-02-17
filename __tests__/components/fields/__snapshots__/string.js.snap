@@ -9,77 +9,69 @@ exports[`string field should render correctly 1`] = `
       </span>
     </div>
     <span>
-      <span>
-      </span>
-      <fieldset class>
-        <div class="optional">
-          <div class>
-            <label>
-              String
-            </label>
-            <span class="required-label not-required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <textarea class>
-            </textarea>
-          </span>
-        </div>
-        <div class="validation-error-required required">
-          <div class>
-            <label>
-              Note
-            </label>
-            <span class="required-label required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <textarea class>
-            </textarea>
-          </span>
-        </div>
-        <div class="optional">
-          <div class>
-            <label>
-              Groceries
-            </label>
-            <span class="required-label not-required-text">
-            </span>
-          </div>
-          <span>
-            <span>
-            </span>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
-            >
-              <div class="pretty-text-click-wrapper"
-                   tabindex="0"
-                   role="textbox"
-              >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
-                     tabindex="0"
-                >
-                  <div class="internal-text-wrapper">
-                    <span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <a href="JavaScript:"
-                 class
-              >
-                Insert...
-              </a>
-            </div>
-          </span>
-        </div>
-      </fieldset>
     </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            String
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <textarea class>
+        </textarea>
+      </div>
+      <div class="validation-error-required required">
+        <div class>
+          <label>
+            Note
+          </label>
+          <span class="required-label required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <textarea class>
+        </textarea>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Groceries
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="presentation"
+             class="pretty-text-wrapper"
+        >
+          <div class="pretty-text-click-wrapper"
+               tabindex="0"
+               role="textbox"
+          >
+            <div role="presentation"
+                 class="pretty-text-box placeholder"
+                 tabindex="0"
+            >
+              <div class="internal-text-wrapper">
+                <span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <a href="JavaScript:"
+             class
+          >
+            Insert...
+          </a>
+        </div>
+      </div>
+    </fieldset>
   </div>
 </div>
 

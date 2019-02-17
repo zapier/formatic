@@ -9,17 +9,15 @@ exports[`copy field should render correctly 1`] = `
       </span>
     </div>
     <span>
-      <span>
-      </span>
-      <fieldset class>
-        <div class>
-          What the hey?
-          <b>
-            Seriously?
-          </b>
-        </div>
-      </fieldset>
     </span>
+    <fieldset class>
+      <div class>
+        What the hey?
+        <b>
+          Seriously?
+        </b>
+      </div>
+    </fieldset>
   </div>
 </div>
 
