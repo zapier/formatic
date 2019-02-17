@@ -93,8 +93,12 @@ export default class MyDocument extends Document {
             href="./static/favicons/manifest.json"
             data-reactid=".2bkozp1wjk0.0.l"
           />
+          <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans"
+            rel="stylesheet"
+          />
         </Head>
-        <body className="custom_class">
+        <body>
           <Main />
           <NextScript />
         </body>

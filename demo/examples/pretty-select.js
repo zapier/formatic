@@ -47,6 +47,18 @@ const fields = [
     customField: {
       label: 'Custom Value',
       helpText: null,
+      replaceChoices: [
+        {
+          value: 'yellow',
+          label: 'Yellow',
+          sample: 'lemon',
+        },
+        {
+          value: 'purple',
+          label: 'Purple',
+          sample: 'grape',
+        },
+      ],
     },
     choices: [
       {
@@ -84,18 +96,7 @@ const fields = [
         isOpen: true,
       },
     ],
-    replaceChoices: [
-      {
-        value: 'yellow',
-        label: 'Yellow',
-        sample: 'lemon',
-      },
-      {
-        value: 'purple',
-        label: 'Purple',
-        sample: 'grape',
-      },
-    ],
+
     default: 'some default value',
   },
   {

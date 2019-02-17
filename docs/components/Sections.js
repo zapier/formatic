@@ -8,29 +8,35 @@ import { getStyleForWidth } from '../styles/Media';
 const styles = {
   wrapper: css({
     display: 'flex',
-    ...getStyleForWidth({
-      flexDirection: 'column-reverse'
-    }, {
-      flexDirection: 'row'
-    }),
+    ...getStyleForWidth(
+      {
+        flexDirection: 'column-reverse',
+      },
+      {
+        flexDirection: 'row',
+      }
+    ),
   }),
   toc: css({
-    ...getStyleForWidth({
-
-    }, {
-      top: 0,
-      position: 'sticky',
-      height: '90vh',
-      width: '25%',
-    }),
+    ...getStyleForWidth(
+      {},
+      {
+        top: 0,
+        position: 'sticky',
+        height: '90vh',
+        width: '25%',
+        overflowY: 'scroll',
+      }
+    ),
   }),
   content: css({
-    ...getStyleForWidth({
-      
-    }, {
-      width: '75%',
-    }),
-  })
+    ...getStyleForWidth(
+      {},
+      {
+        width: '75%',
+      }
+    ),
+  }),
 };
 
 const Sections = props => (
@@ -38,7 +44,8 @@ const Sections = props => (
     <div css={styles.content}>
       {React.Children.map(props.children, child => (
         <>
-          <a name={dashify(child.props.title)}/>{child}
+          <a name={dashify(child.props.title)} />
+          {child}
         </>
       ))}
     </div>

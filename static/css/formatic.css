@@ -1,278 +1,285 @@
 @charset "UTF-8";
 
-.formatic {
-  /*font-family: 'Open Sans', Helvetica, arial, sans-serif;*/
+.Formatic_Field {
+  margin: 0 0 30px;
 }
 
-.formatic fieldset {
-  margin-left: 5px;
+.Formatic_Field:last-child {
+  margin: 0;
 }
 
-.formatic .field-label {
-  /*padding-bottom: 10px;*/
+.Formatic_Field-IsReadOnly {
+  opacity: 0.5;
 }
 
-.formatic .field-help {
-  color: #777;
+.Formatic_Fields_FieldBody,
+.Formatic_GroupedFields_FieldBody {
+  border: 2px solid #dadfe2;
+  border-radius: 3px;
 }
 
-.formatic .required-text, .formatic .not-required-text {
+.Formatic_RequiredLabel {
   font-size: 80%;
-  color: #aaa;
+  color: #969ea2;
 }
 
-.formatic .required-text:after {
-  content: '(required)'
+.Formatic_RequiredLabel-IsRequired:after {
+  content: '(required)';
 }
 
-.formatic .not-required-text:after {
-  content: ''
+.Formatic_RequiredLabel-IsNotRequired:after {
+  content: '';
 }
 
-.formatic .validation-error-required .required-text:after {
+.Formatic_RequiredLabel-IsRequiredError {
   color: #ff4a00;
 }
 
-.formatic .dropdown-field {
+.Formatic_TextInput,
+.Formatic_ListItemKeyInput,
+.Formatic_TextareaInput,
+.Formatic_PasswordInput {
+  background-color: #fff;
+  border: 1px solid #969ea2;
+  border-radius: 3px;
+  height: 48px;
+  padding: 8px;
+}
+
+.Formatic_ListItemKeyInput {
+  margin-right: 8px;
+}
+
+.Formatic_TextInput,
+.Formatic_TextareaInput,
+.Formatic_PasswordInput {
+  width: 100%;
+}
+
+.Formatic_PrettyText_PrettyTextInputWrapper {
   position: relative;
-  /*max-width: 870px;*/
 }
 
-.formatic .field-value {
-  border: 1px solid #ccc;
+.Formatic_PrettyTextInputTabTarget,
+.Formatic_TextInput {
+  height: auto;
+  min-height: 48px;
+}
+
+.Formatic_PrettyTextInputTabTarget {
+  border-radius: 3px;
+  border: 1px solid #969ea2;
+  line-height: 26px;
+  overflow: auto;
   padding: 10px;
+  white-space: pre-wrap;
 }
 
-.formatic .field-toggle {
-  top: 0;
-  bottom: 0;
-  right: 0;
-  position: absolute;
-  width: 42px;
+.Formatic_PrettySelect_PrettyTextInputTabTarget,
+.Formatic_PrettyBoolean_PrettyTextInputTabTarget {
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-right: 0px;
+}
+
+.Formatic_PrettyText_PrettyTextInputTabTarget,
+.Formatic_TextareaInput {
+  height: auto;
+  min-height: 98px;
+}
+
+.Formatic_PrettyText_PrettyTextInputTabTarget-IsSingleLine,
+.Formatic_CustomValueWrapper .Formatic_PrettyText_PrettyTextInputTabTarget {
+  min-height: 48px;
+}
+
+.Formatic_PrettyTextInputInternalTextWrapper .CodeMirror {
+  height: auto;
+}
+
+.Formatic_PrettyTag {
+  background: #d1e6fc;
+  border-radius: 12px;
+  cursor: pointer;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.Formatic_PrettyTag:hover {
+  background: #428ddb;
+  color: #fff;
+}
+
+.Formatic_PrettySelect_PrettyTextInputWrapper,
+.Formatic_PrettyBoolean_PrettyTextInputWrapper {
+  flex: 1;
+}
+
+.Formatic_SelectArrow {
+  align-content: center;
+  border: 1px solid #969ea2;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: center;
-  line-height: 40px;
-  border: 1px solid #ccc;
+  width: 48px;
 }
 
-.formatic .field-toggle.field-open::before {
-  content: '▲';
-  vertical-align: middle;
-}
-
-.formatic .field-toggle.field-closed::before {
+.Formatic_SelectArrow::before {
   content: '▼';
-  vertical-align: middle;
+  color: #969ea2;
 }
 
-.formatic .dropdown-field .field-choices-container {
+.Formatic_SelectArrow-IsOpen::before {
+  content: '▲';
+  color: #969ea2;
+}
+
+.Formatic_PrettySelect_ChoicesSearchInput,
+.Formatic_PrettyBoolean_ChoicesSearchInput,
+.Formatic_PrettyText_ChoicesSearchInput {
+  width: 100%;
+}
+
+.Formatic_ChoicesWrapper {
+  position: relative;
+}
+
+.Formatic_PrettySelect_Choices,
+.Formatic_PrettyBoolean_Choices,
+.Formatic_PrettyText_Choices {
+  width: 100%;
+}
+
+.Formatic_PrettySelect_Choice,
+.Formatic_PrettyBoolean_Choice,
+.Formatic_PrettyText_Choice {
+  border-bottom: 1px solid #969ea2;
+  display: block;
+  overflow: hidden;
+  padding: 10px;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.Formatic_PrettySelect_Choice:hover,
+.Formatic_PrettyBoolean_Choice:hover,
+.Formatic_PrettyText_Choice:hover {
+  background-color: #eef0f2;
+}
+
+.Formatic_PrettySelect_ChoiceLabel,
+.Formatic_PrettyBoolean_ChoiceLabel,
+.Formatic_PrettyText_ChoiceLabel {
+  font-weight: 600;
+  padding-right: 10px;
+}
+
+.Formatic_PrettySelect_ChoiceSample,
+.Formatic_PrettyBoolean_ChoiceSample,
+.Formatic_PrettyText_ChoiceSample {
+  color: #aeb7bc;
+  font-weight: 400;
+}
+
+.Formatic_Choices {
+  background: #fff;
+  border: 1px solid #969ea2;
   max-height: 400px;
   overflow-y: auto;
-  position: absolute;
+  width: 100%;
   z-index: 1000;
-  background: #fff;
-  border-bottom: 1px solid #ccc;
 }
 
-.formatic .dropdown-field .field-choices {
-  list-style-type: none;
-  margin-top: 0px;
-  padding-left: 0px;
-}
-
-.formatic .choices-container {
-  max-height: 400px;
-  overflow-y: auto;
-  position: absolute;
-  z-index: 1000;
-  background: #fff;
-  border: 1px solid #ccc;
-}
-
-.formatic .choices {
+.Formatic_ChoicesList {
   list-style-type: none;
   margin: 0px;
   padding-left: 0px;
 }
 
-.formatic .choice-label {
-  font-weight: 600;
-  padding-right: 10px;
+.Formatic_ChoicesInputWrapper {
+  display: flex;
 }
 
-.formatic .choice-sample {
-  color: #999;
+.Formatic_ListItem {
+  display: flex;
 }
 
-.formatic .dropdown-field .field-choice {
-  border-left: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  padding: 10px;
+.Formatic_ListItem {
+  margin-bottom: 8px;
 }
 
-.formatic .choice {
-  /*border-left: 1px solid #ccc;
-  border-right: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;*/
-  border-bottom: 1px solid #ccc;
-  padding: 0px;
+.Formatic_ListItemValue {
+  flex: 1;
 }
 
-.formatic .choice a {
-  padding: 10px;
-  text-decoration: none;
-  color: #333;
-  display: inline-block;
-  max-width: 600px;
-  overflow-x: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.Formatic_ListItemControl {
+  align-items: center;
+  display: flex;
 }
 
-.formatic .choice.hover {
-  background-color: #ddd;
+.Formatic_AssocList_ListItemControl {
+  align-items: flex-start;
 }
 
-.formatic .reveal-enter {
-  opacity: 0.01;
-  transition: opacity .1s ease-in;
+.Formatic_ListItemMoveControl {
+  display: flex;
+  flex-direction: column;
+  margin-left: 8px;
 }
 
-.formatic .reveal-enter.reveal-enter-active {
-  opacity: 1;
-}
-
-.formatic .reveal-leave {
-  opacity: 1;
-  transition: opacity .1s ease-in;
-}
-
-.formatic .reveal-leave.reveal-leave-active {
-  opacity: 0.01;
-}
-
-.pretty-part {
-  border-radius: 12px;
-  background: #ff9266;
-  cursor: pointer;
-  padding-left: 7px;
-  padding-right: 7px;
-}
-
-.pretty-part:hover {
-  background: rgb(255, 74, 0);
-}
-
-/* use div. to make this rule more specific than BS .form-control */
-div.pretty-text-box {
-  overflow: auto;
-  height: 54px;
-  resize: both;
-  white-space: pre-wrap;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  box-sizing: border-box;
-  line-height: 1.42857143;
-  padding: 6px 12px;
-}
-
-div.pretty-text-box:hover {
-  border: 1px solid blue;
-}
-
-
-.formatic .pretty-part-left, .formatic .pretty-part-right {
-}
-
-.formatic .pretty-overlay {
-}
-
-.formatic .pretty-content {
-}
-
-.formatic .pretty-part-hover {
-  background: rgb(255, 74, 0);
-}
-
-.formatic .add-item, .formatic .object-control-add {
-  color: green;
+.Formatic_MoveItemForward,
+.Formatic_MoveItemBack,
+.Formatic_AddItem,
+.Formatic_RemoveItem,
+.Formatic_ReadOnlyRemoveItem {
+  border: 1px solid #969ea2;
+  border-radius: 3px;
   cursor: pointer;
 }
 
-.formatic .remove-item, .formatic .object-control-remove {
-  color: red;
-  cursor: pointer;
-  padding-right: 1em;
+.Formatic_MoveItemForward,
+.Formatic_MoveItemBack {
+  height: 24px;
+  line-height: 100%;
+  text-align: center;
+  width: 48px;
 }
 
-.formatic .maybe-removing {
-  background: rgba(255, 0, 0, 0.25);
+.Formatic_AddItem,
+.Formatic_RemoveItem,
+.Formatic_ReadOnlyRemoveItem {
+  height: 48px;
+  width: 48px;
 }
 
-.formatic .move-item-back {
-  cursor: pointer;
-  padding-right: 1em;
+.Formatic_RemoveItem,
+.Formatic_ReadOnlyRemoveItem {
+  margin-left: 8px;
 }
 
-.formatic .move-item-forward {
-  cursor: pointer;
-  padding-right: 1em;
-}
-
-.form-control {
-  display: block;
+.Formatic_Json_TextareaInput {
   width: 100%;
-  height: 34px;
-  padding: 6px 12px;
-  font-size: 14px;
-  line-height: 1.42857143;
-  color: #555;
-  background-color: #fff;
-  background-image: none;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  /* -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075); */
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  /* -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s; */
-  /* -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s; */
-  transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-  box-sizing: border-box;
 }
 
-:before, :after {
-  /* -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box; */
-  box-sizing: border-box;
+.Formatic_Json_TextareaInput-HasError {
+  color: #c63a00;
 }
 
-:before, :after {
-  /* -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box; */
-  box-sizing: border-box;
+.Formatic_FieldTemplateChoicesSelectInput,
+.Formatic_SelectValueSelectInput {
+  height: 48px;
 }
 
-.formatic .select-arrow {
-  line-height: 23px;
-  border: 1px solid #ccc;
-  display: inline-block;
+.Formatic_CheckboxBoolean_FieldBody,
+.Formatic_CheckboxArray_Choice {
+  margin-left: 8px;
 }
 
-.formatic .select-arrow::before {
-  content: '▼';
-  vertical-align: middle;
-}
-
-.formatic .readonly {
-  background-color: LightGrey;
-}
-
-.formatic .placeholder {
-  font-style: italic;
-}
-
-.formatic .validation-error-duplicate-key {
-  background-color: pink;
+.Formatic_CheckboxBoolean_FieldBody:first-child,
+.Formatic_CheckboxArray_Choice:first-child {
+  margin-left: 0px;
 }

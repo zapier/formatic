@@ -5,7 +5,7 @@ const fields = [
     key: 'assoc-list',
     itemFields: [
       {
-        type: 'pretty-text',
+        type: 'single-line-string',
         hideLabel: true,
       },
     ],

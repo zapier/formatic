@@ -8,21 +8,22 @@ const fields = [
   },
   {
     label: 'Name (R)',
-    type: 'unicode',
+    type: 'string',
+    isSingleLine: true,
     key: 'name',
     required: true,
     default: 'Unknown',
   },
   {
     label: 'Readonly Name',
-    type: 'unicode',
+    type: 'single-line-string',
     key: 'readonlyName',
     default: 'Bob',
     readOnly: true,
   },
   {
     label: 'Path',
-    type: 'unicode',
+    type: 'single-line-string',
     key: 'path',
     replaceChoices: ['tacos', 'nachos', 'bread', 'milk', 'eggs'],
   },
@@ -30,7 +31,7 @@ const fields = [
 
 export default {
   title: 'Single Line String',
-  aliases: ['single-line-string', 'unicode', 'string'],
+  aliases: ['single-line-string', 'string'],
   notes: null,
   fields,
 };

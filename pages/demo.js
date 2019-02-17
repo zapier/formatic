@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import Formatic from '../lib/formatic';
 
-//import '../style/formatic.css';
-
 import Page from '../docs/components/Page';
 import Sections from '../docs/components/Sections';
 import Section from '../docs/components/Section';
