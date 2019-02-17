@@ -44,14 +44,12 @@ const hintPlugin = config => {
 const config = Formatic.createConfig(
   Formatic.plugins.reference,
   Formatic.plugins.meta,
-  Formatic.plugins.bootstrap,
   customPlugin
 );
 
 const hintConfig = Formatic.createConfig(
   Formatic.plugins.reference,
   Formatic.plugins.meta,
-  Formatic.plugins.bootstrap,
   customPlugin,
   hintPlugin
 );
@@ -172,13 +170,17 @@ class FormDemo extends Component {
                 onFocus={e => this.onEvent('onFocus', e)}
                 onBlur={e => this.onEvent('onBlur', e)}
                 onOpenReplacements={info =>
-                  this.onCustomEvent('onOpenReplacements', info)}
+                  this.onCustomEvent('onOpenReplacements', info)
+                }
                 onCloseReplacements={info =>
-                  this.onCustomEvent('onCloseReplacements', info)}
+                  this.onCustomEvent('onCloseReplacements', info)
+                }
                 onClearCurrentChoice={info =>
-                  this.onCustomEvent('onClearCurrentChoice', info)}
+                  this.onCustomEvent('onClearCurrentChoice', info)
+                }
                 onOrderGroceries={info =>
-                  this.onCustomEvent('onOrderGroceries', info)}
+                  this.onCustomEvent('onOrderGroceries', info)
+                }
                 readOnly={false}
               />
             </div>
@@ -221,7 +223,9 @@ ReactDOM.render(
         <h1>Formatic</h1>
         <hr />
 
-        {sortedExamples.map((form, idx) => <FormDemo key={idx} {...form} />)}
+        {sortedExamples.map((form, idx) => (
+          <FormDemo key={idx} {...form} />
+        ))}
       </div>
       <div className="col-sm-3">
         <div className="floating-menu">
