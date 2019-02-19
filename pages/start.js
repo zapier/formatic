@@ -9,6 +9,8 @@ import CodeBlock from '../docs/components/CodeBlock';
 import Example from '../docs/components/Example';
 import Sections from '../docs/components/Sections';
 
+import { fetchSnippets } from '../docs/utils';
+
 const basicExampleFields = [
   {
     type: 'single-line-string',
@@ -90,11 +92,7 @@ const snippetKeys = [
 ];
 
 Start.getInitialProps = async ({ req }) => {
-  const baseUrl = req ? `${req.protocol}://${req.get('Host')}` : '';
-  const keysParam = snippetKeys.join(',');
-  const res = await fetch(`${baseUrl}/api/snippets?keys=${keysParam}`);
-  const snippets = await res.json();
-  return { snippets };
+  return { snippets: await fetchSnippets(req, snippetKeys) };
 };
 
 export default Start;

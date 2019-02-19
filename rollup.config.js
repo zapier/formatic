@@ -17,8 +17,6 @@ export default {
   plugins: [
     babel({
       babelrc: false,
-      presets: [['es2015', { modules: false }], ['react']],
-      plugins: ['external-helpers'],
     }),
   ],
   output: {

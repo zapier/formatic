@@ -7,6 +7,8 @@ import CodeBlock from '../docs/components/CodeBlock';
 import Sections from '../docs/components/Sections';
 import Code from '../docs/components/Code';
 
+import { fetchSnippets } from '../docs/utils';
+
 const Plugins = props => (
   <Page pageKey="plugins">
     <Sections>
@@ -66,7 +68,8 @@ const Plugins = props => (
 
       <Section title="Using Plugins">
         <p>
-          To use a plugin, just pass it in to <Code>Formatic.createConfig</Code>.
+          To use a plugin, just pass it in to <Code>Formatic.createConfig</Code>
+          .
         </p>
         <CodeBlock language="javascript">
           {props.snippets['plugin-using']}
@@ -148,11 +151,7 @@ const snippetKeys = [
 ];
 
 Plugins.getInitialProps = async ({ req }) => {
-  const baseUrl = req ? `${req.protocol}://${req.get('Host')}` : '';
-  const keysParam = snippetKeys.join(',');
-  const res = await fetch(`${baseUrl}/api/snippets?keys=${keysParam}`);
-  const snippets = await res.json();
-  return { snippets };
+  return { snippets: await fetchSnippets(req, snippetKeys) };
 };
 
 export default Plugins;
