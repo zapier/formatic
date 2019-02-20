@@ -11,6 +11,7 @@ import examples from '../demo/examples';
 
 import customPlugin from '../demo/examples/custom-plugin';
 import cssPlugin from '../lib/plugins/css-plugin';
+import { ConnectableObservable } from 'rx';
 
 const Form = React.createFactory(Formatic);
 
@@ -32,17 +33,30 @@ const HintBox = props => (
 // Inject a HintBox into each createElement_ hook to show hints
 // for plugin methods.
 const hintPlugin = config => {
-  config = _.extend({}, config);
-  return Object.keys(config).reduce((newConfig, key) => {
-    if (key.startsWith('createElement_')) {
-      newConfig[key] = (...args) => (
-        <HintBox name={key}>{config[key](...args)}</HintBox>
-      );
-    } else {
-      newConfig[key] = config[key];
+  const prevConfig = _.extend({}, config);
+  return Object.keys(config).reduce(
+    (newConfig, key) => {
+      if (key.startsWith('createElement_')) {
+        newConfig[key] = (...args) => (
+          <HintBox name={key}>{prevConfig[key](...args)}</HintBox>
+        );
+      }
+      return newConfig;
+    },
+    {
+      renderTag: (tag, tagProps, metaProps, ...children) => {
+        return (
+          <HintBox
+            name={`renderTag:(${tag}:${metaProps.typeName}:${
+              metaProps.elementName
+            })`}
+          >
+            {prevConfig.renderTag(tag, tagProps, metaProps, ...children)}
+          </HintBox>
+        );
+      },
     }
-    return newConfig;
-  }, {});
+  );
 };
 
 const config = Formatic.createConfig(
