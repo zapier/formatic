@@ -1,7 +1,7 @@
 /*global describe, it, expect*/
 'use strict';
 
-import utils from '../lib/utils';
+import utils, { argumentsToArray } from '../lib/utils';
 
 describe('utils', function() {
   it('should deep copy primitives', function() {
@@ -80,6 +80,23 @@ describe('utils', function() {
     dog.speak = delegateTo('bark');
 
     expect(dog.bark()).toEqual(dog.speak());
+  });
+
+  it('should convert arguments to an array', () => {
+    function someFunction() {
+      expect(argumentsToArray(arguments)).toEqual(['a', 'b', 'c']);
+      expect(argumentsToArray(arguments, 1)).toEqual(['b', 'c']);
+      expect(argumentsToArray(arguments, 1, ['x'])).toEqual(['x', 'b', 'c']);
+    }
+
+    function someFunctionWithLessArgs() {
+      expect(argumentsToArray(arguments)).toEqual([]);
+      expect(argumentsToArray(arguments, 1)).toEqual([]);
+      expect(argumentsToArray(arguments, 1, ['x'])).toEqual(['x']);
+    }
+
+    someFunction('a', 'b', 'c');
+    someFunctionWithLessArgs();
   });
 
   // May pull parsing back out of pretty-text component in the future, so
