@@ -243,25 +243,6 @@ const DemoPage = () => (
         </Section>
       ))}
     </Sections>
-
-    {/* <div className="row">
-      <div className="col-sm-9">
-        {sortedExamples.map((form, idx) => <FormDemo key={idx} {...form} />)}
-      </div>
-      <div className="col-sm-3">
-        <div className="floating-menu">
-          <h6>Examples</h6>
-
-          <ul>
-            {sortedExamples.map((form, idx) => (
-              <li key={idx}>
-                <a href={`#${convertTitleToId(form.title)}`}>{form.title}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div> */}
   </Page>
 );
 
