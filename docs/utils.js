@@ -15,3 +15,12 @@ export const loadSnippets = snippets =>
     cleaned[key] = cleanSnippet(rawSnippet);
     return cleaned;
   }, {});
+
+const assetPrefix = process.env.NODE_ENV === 'production' ? '/formatic' : '';
+
+export const prefixHref = href => {
+  if (href && href[0] === '/' && assetPrefix) {
+    return `${assetPrefix}${href}`;
+  }
+  return href;
+};

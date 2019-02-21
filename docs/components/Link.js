@@ -3,8 +3,7 @@ import { jsx, css } from '@emotion/core';
 import NextLink from 'next/link';
 
 import Colors from '../styles/Colors';
-
-const assetPrefix = process.env.ASSET_PREFIX;
+import { prefixHref } from '../utils';
 
 const styles = {
   link: css({
@@ -21,13 +20,6 @@ const styles = {
   navLinkIsActive: css({
     color: Colors.neutral[1],
   }),
-};
-
-const prefixHref = href => {
-  if (href && href[0] === '/' && assetPrefix) {
-    return `${assetPrefix}${href}`;
-  }
-  return href;
 };
 
 export const RawLink = props => {
