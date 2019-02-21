@@ -8,8 +8,7 @@
     "/build/lib"
   ],
   "scripts": {
-    "build-docs-with-api-server": "next build && next export -o build-docs",
-    "build-docs": "PORT=`get-port`; node start-server.js --port $PORT --api-only & wait-on http://localhost:$PORT/api/alive && API_PORT=$PORT yarn build-docs-with-api-server; kill %1",
+    "build-docs": "next build && next export -o build-docs",
     "build": "rollup -c",
     "format": "zapier-scripts format '__tests__/**/*.js' 'demo/**/*.js' 'docs/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
     "lint": "zapier-scripts lint '__tests__/**/*.js' 'demo/**/*.js' 'docs/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
@@ -19,7 +18,7 @@
     "prebuild": "rm -rf build && mkdir -p build/lib",
     "precommit": "zapier-scripts format-staged",
     "prepublish": "yarn build",
-    "publish-docs": "yarn build-docs && touch build-docs/.nojekyll && gh-pages -d build-docs",
+    "publish-docs": "yarn build-docs && touch build-docs/.nojekyll && gh-pages -d build-docs --dotfiles",
     "start": "PORT=`get-port 3333` node start-server.js --open",
     "test": "jest"
   },
@@ -52,6 +51,7 @@
     "jest-serializer-html": "^6.0.0",
     "next": "^7.0.2",
     "polished": "^2.3.0",
+    "raw-loader": "^1.0.0",
     "react": "^16.8.2",
     "react-dom": "^16.8.2",
     "react-powerplug": "^1.0.0",
@@ -60,7 +60,6 @@
     "rollup": "^1.2.1",
     "rollup-plugin-babel": "^4.3.2",
     "sanitize.css": "^8.0.0",
-    "wait-on": "^3.2.0",
     "yargs": "^13.2.1",
     "zapier-scripts": "^3.4.1"
   },

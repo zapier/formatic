@@ -4,24 +4,24 @@ import Layout from './Layout';
 
 import Typography from '../styles/Typography';
 
+import 'sanitize.css';
 import 'codemirror/lib/codemirror.css';
 import '../../static/css/app.css';
 import '../../static/css/formatic.css';
-import 'sanitize.css';
 
 const pages = {
   start: {
-    url: 'start',
+    url: '/start',
     title: 'Getting Started',
     subTitle: 'Installing and using Formatic',
   },
   demo: {
-    url: 'demo',
+    url: '/demo',
     title: 'Field Types',
     subTitle: 'The whole kitchen sink',
   },
   plugins: {
-    url: 'plugins',
+    url: '/plugins',
     navTitle: 'Plugins',
     title: 'Extending Formatic',
   },

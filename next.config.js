@@ -1,4 +1,7 @@
 const withCSS = require('@zeit/next-css');
+const webpack = require('webpack');
+
+const assetPrefix = process.env.NODE_ENV === 'production' ? '/formatic' : '';
 
 module.exports = withCSS({
   webpack(config) {
@@ -25,7 +28,13 @@ module.exports = withCSS({
       ],
     });
 
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        'process.env.ASSET_PREFIX': JSON.stringify(assetPrefix),
+      })
+    );
+
     return config;
   },
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/formatic' : '',
+  assetPrefix,
 });

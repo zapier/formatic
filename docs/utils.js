@@ -1,24 +1,17 @@
 export const dashify = s => s.split(' ').join('-');
 
-export const getBaseUrl = req => {
-  if (!req) {
-    return '';
-  }
-  if (req) {
-    if (req.protocol) {
-      return `${req.protocol}://${req.get('Host')}`;
-    }
-    if (process.env.API_PORT) {
-      return `http://localhost:${process.env.API_PORT}`;
-    }
-  }
-  return '';
-};
+const cleanSnippet = snippet =>
+  snippet.replace(/^\/\/CUT$((?!\/\/CUT)(.|\n))+^\/\/CUT$\n?/gm, '');
 
-export const fetchSnippets = async (req, snippetKeys) => {
-  const keysParam = snippetKeys.join(',');
-  const baseUrl = getBaseUrl(req);
-  const res = await fetch(`${baseUrl}/api/snippets?keys=${keysParam}`);
-  const snippets = await res.json();
-  return snippets;
-};
+export const cleanSnippets = snippets =>
+  Object.keys(snippets).reduce((cleaned, key) => {
+    cleaned[key] = cleanSnippet(snippets[key]);
+    return cleaned;
+  }, {});
+
+export const loadSnippets = snippets =>
+  snippets.reduce((cleaned, key) => {
+    const rawSnippet = require(`!!raw-loader!./snippets/${key}.js`);
+    cleaned[key] = cleanSnippet(rawSnippet);
+    return cleaned;
+  }, {});

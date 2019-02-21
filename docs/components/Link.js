@@ -4,6 +4,8 @@ import NextLink from 'next/link';
 
 import Colors from '../styles/Colors';
 
+const assetPrefix = process.env.ASSET_PREFIX;
+
 const styles = {
   link: css({
     color: Colors.main[1],
@@ -21,10 +23,18 @@ const styles = {
   }),
 };
 
+const prefixHref = href => {
+  if (href && href[0] === '/' && assetPrefix) {
+    return `${assetPrefix}${href}`;
+  }
+  return href;
+};
+
 export const RawLink = props => {
   const { href, ...linkProps } = props;
+
   return (
-    <NextLink href={href} passHref={true}>
+    <NextLink href={href} as={prefixHref(href)} passHref={true}>
       <a {...linkProps} />
     </NextLink>
   );
@@ -38,10 +48,8 @@ const Link = props => {
     isNav && isActive && styles.navLinkIsActive
   );
   return (
-    <NextLink href={href} passHref={true}>
+    <NextLink href={href} as={prefixHref(href)} passHref={true}>
       <a css={linkCss} {...linkProps} />
-      {/* <a {...linkProps}/> */}
-      {/* <a css={[styles.link, isNav && styles.navLink]} {...linkProps}/> */}
     </NextLink>
   );
 };

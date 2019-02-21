@@ -7,7 +7,7 @@ import CodeBlock from '../docs/components/CodeBlock';
 import Sections from '../docs/components/Sections';
 import Code from '../docs/components/Code';
 
-import { fetchSnippets } from '../docs/utils';
+import { loadSnippets } from '../docs/utils';
 
 const Plugins = props => (
   <Page pageKey="plugins">
@@ -94,47 +94,6 @@ const Plugins = props => (
           {props.snippets['plugin-field-type']}
         </CodeBlock>
       </Section>
-
-      {/* <Section title="Basic Usage">
-        <p>
-          Basic usage of Formatic is pretty simple. Formatic is just a React
-          component. Pass in the fields as props to render your fields.
-        </p>
-        <CodeBlock language="javascript">
-          {props.snippets['basic-example']}
-        </CodeBlock>
-        <p>That example gives us this form:</p>
-        <Example>
-          <Formatic fields={basicExampleFields} />
-        </Example>
-        <p>You can also pass a value for the fields.</p>
-        <CodeBlock language="javascript">
-          {props.snippets['basic-example-with-value']}
-        </CodeBlock>
-        <p>
-          Used this way, Formatic is a controlled component. So if you try to
-          edit the values in this form, you'll notice you can't.
-        </p>
-        <Example>
-          <Formatic fields={basicExampleFields} value={basicExampleValue} />
-        </Example>
-        <p>
-          That's because we're always setting it to a fixed value. We need to
-          use the `onChange` handler to keep the value in sync with the changes,
-          just like with an `input` element.
-        </p>
-        <CodeBlock language="javascript">
-          {props.snippets['basic-example-with-on-change']}
-        </CodeBlock>
-        <p>
-          Now above, when we didn't supply a value, we were using Formatic as an
-          uncontrolled component. You can also pass a `defaultValue` and use
-          Formatic as an uncontrolled component.
-        </p>
-        <CodeBlock language="javascript">
-          {props.snippets['basic-example-uncontrolled']}
-        </CodeBlock>
-      </Section> */}
     </Sections>
   </Page>
 );
@@ -150,8 +109,8 @@ const snippetKeys = [
   'plugin-field-type',
 ];
 
-Plugins.getInitialProps = async ({ req }) => {
-  return { snippets: await fetchSnippets(req, snippetKeys) };
+Plugins.getInitialProps = async () => {
+  return { snippets: loadSnippets(snippetKeys) };
 };
 
 export default Plugins;

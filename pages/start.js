@@ -9,7 +9,7 @@ import CodeBlock from '../docs/components/CodeBlock';
 import Example from '../docs/components/Example';
 import Sections from '../docs/components/Sections';
 
-import { fetchSnippets } from '../docs/utils';
+import { loadSnippets } from '../docs/utils';
 
 const basicExampleFields = [
   {
@@ -91,8 +91,8 @@ const snippetKeys = [
   'basic-example-uncontrolled',
 ];
 
-Start.getInitialProps = async ({ req }) => {
-  return { snippets: await fetchSnippets(req, snippetKeys) };
+Start.getInitialProps = async () => {
+  return { snippets: loadSnippets(snippetKeys) };
 };
 
 export default Start;
