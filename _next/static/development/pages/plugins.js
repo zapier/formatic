@@ -826,6 +826,51 @@ var Sections = function Sections(props) {
 
 /***/ }),
 
+/***/ "./docs/server/snippets sync recursive ./!./!./node_modules/raw-loader/index.js!./ ^\\.\\/.*\\.js$":
+/*!***************************************************************************!*\
+  !*** ./docs/server/snippets sync !./node_modules/raw-loader ^\.\/.*\.js$ ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var map = {
+	"./basic-example-uncontrolled.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/basic-example-uncontrolled.js",
+	"./basic-example-with-on-change.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/basic-example-with-on-change.js",
+	"./basic-example-with-value.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/basic-example-with-value.js",
+	"./basic-example.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/basic-example.js",
+	"./plugin-default-config.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-default-config.js",
+	"./plugin-delegate.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-delegate.js",
+	"./plugin-field-type.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-field-type.js",
+	"./plugin-fieldLabel.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-fieldLabel.js",
+	"./plugin-humanize.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-humanize.js",
+	"./plugin-no-config.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-no-config.js",
+	"./plugin-using-multiple.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-using-multiple.js",
+	"./plugin-using.js": "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-using.js"
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	var id = map[req];
+	if(!(id + 1)) { // check for number or string
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return id;
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = "./docs/server/snippets sync recursive ./!./!./node_modules/raw-loader/index.js!./ ^\\.\\/.*\\.js$";
+
+/***/ }),
+
 /***/ "./docs/styles/Colors.js":
 /*!*******************************!*\
   !*** ./docs/styles/Colors.js ***!
@@ -1035,7 +1080,7 @@ var Typography = {
 /*!***********************!*\
   !*** ./docs/utils.js ***!
   \***********************/
-/*! exports provided: dashify, getBaseUrl, fetchSnippets */
+/*! exports provided: dashify, getBaseUrl, fetchSnippets, cleanSnippets, loadSnippets */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1043,6 +1088,8 @@ __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(process) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "dashify", function() { return dashify; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getBaseUrl", function() { return getBaseUrl; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchSnippets", function() { return fetchSnippets; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cleanSnippets", function() { return cleanSnippets; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadSnippets", function() { return loadSnippets; });
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/next/node_modules/@babel/runtime/regenerator/index.js");
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 
@@ -1108,6 +1155,25 @@ function () {
     return _ref.apply(this, arguments);
   };
 }();
+
+var cleanSnippet = function cleanSnippet(snippet) {
+  return snippet.replace(/^\/\/CUT$((?!\/\/CUT)(.|\n))+^\/\/CUT$\n?/gm, '');
+};
+
+var cleanSnippets = function cleanSnippets(snippets) {
+  return Object.keys(snippets).reduce(function (cleaned, key) {
+    cleaned[key] = cleanSnippet(snippets[key]);
+    return cleaned;
+  }, {});
+};
+var loadSnippets = function loadSnippets(snippets) {
+  return snippets.reduce(function (cleaned, key) {
+    var rawSnippet = __webpack_require__("./docs/server/snippets sync recursive ./!./!./node_modules/raw-loader/index.js!./ ^\\.\\/.*\\.js$")("./".concat(key, ".js"));
+
+    cleaned[key] = cleanSnippet(rawSnippet);
+    return cleaned;
+  }, {});
+};
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../node_modules/process/browser.js */ "./node_modules/process/browser.js")))
 
 /***/ }),
@@ -17373,6 +17439,138 @@ var objectKeys = Object.keys || function (obj) {
 exports.decode = exports.parse = __webpack_require__(/*! ./decode */ "./node_modules/querystring-es3/decode.js");
 exports.encode = exports.stringify = __webpack_require__(/*! ./encode */ "./node_modules/querystring-es3/encode.js");
 
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/basic-example-uncontrolled.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/basic-example-uncontrolled.js ***!
+  \**************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "import React from 'react';\n// Get the Formatic component.\nimport Formatic from 'formatic';\n\n// Create some fields.\nconst fields = [\n  {\n    type: 'single-line-string',\n    key: 'firstName',\n    label: 'First Name',\n  },\n  {\n    type: 'single-line-string',\n    key: 'lastName',\n    label: 'Last Name',\n  },\n];\n\nconst value = { firstName: 'Joe', lastName: 'Foo' };\n\n// Render the form with a value.\nReact.render(\n  <Formatic fields={fields} defaultValue={value} />,\n  document.getElementById('some-element')\n);\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/basic-example-with-on-change.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/basic-example-with-on-change.js ***!
+  \****************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "import React from 'react';\n// Get the Formatic component.\nimport Formatic from 'formatic';\n\n// Create some fields.\nconst fields = [\n  {\n    type: 'single-line-string',\n    key: 'firstName',\n    label: 'First Name',\n  },\n  {\n    type: 'single-line-string',\n    key: 'lastName',\n    label: 'Last Name',\n  },\n];\n\nclass App extends React.Component {\n  state = { firstName: 'Joe', lastName: 'Foo' };\n\n  onChange = newValue => {\n    this.setState(newValue);\n  };\n\n  render() {\n    return (\n      <Formatic fields={fields} value={this.state} onChange={this.onChange} />\n    );\n  }\n}\n\nReact.render(<App />, document.getElementById('some-element'));\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/basic-example-with-value.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/basic-example-with-value.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "import React from 'react';\n// Get the Formatic component.\nimport Formatic from 'formatic';\n\n// Create some fields.\nconst fields = [\n  {\n    type: 'single-line-string',\n    key: 'firstName',\n    label: 'First Name',\n  },\n  {\n    type: 'single-line-string',\n    key: 'lastName',\n    label: 'Last Name',\n  },\n];\n\nconst value = { firstName: 'Joe', lastName: 'Foo' };\n\n// Render the form with a value.\nReact.render(\n  <Formatic fields={fields} value={value} />,\n  document.getElementById('some-element')\n);\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/basic-example.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/basic-example.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "import React from 'react';\n// Get the Formatic component.\nimport Formatic from 'formatic';\n\n// Create some fields.\nconst fields = [\n  {\n    type: 'single-line-string',\n    key: 'firstName',\n    label: 'First Name',\n  },\n  {\n    type: 'single-line-string',\n    key: 'lastName',\n    label: 'Last Name',\n  },\n];\n\n// Render the form.\nReact.render(\n  <Formatic fields={fields} />,\n  document.getElementById('some-element')\n);\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-default-config.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/plugin-default-config.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "//CUT\nimport React from 'react';\nimport Formatic from 'formatic';\n\nconst fields = [];\n//CUT\nconst config = Formatic.createConfig();\n\nReact.render(<Formatic fields={fields} config={config} />, document.body);\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-delegate.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/plugin-delegate.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "const plugin = config => {\n  // Need to save off existing function so we can delegate to it.\n  const fieldLabel = config.fieldLabel;\n\n  return {\n    // This will become the new method for the next plugin if there is one or\n    // ultimately the method available on the config if nothing overrides it.\n    fieldLabel: field => {\n      if (!field.label) {\n        if (field.key) {\n          return config.humanize(field.key);\n        }\n      }\n      // Delegate to the function originally passed in above.\n      return fieldLabel(field);\n    },\n  };\n};\n//CUT\nconsole.info(plugin);\n//CUT\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-field-type.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/plugin-field-type.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "import React from 'react';\nimport Formatic, { FieldContainer } from 'formatic';\n\nconst config = Formatic.createConfig(() => ({\n  createElement_Upper: props => (\n    <FieldContainer {...props}>\n      {({ onChangeValue, onFocus, onBlur }) => (\n        <input\n          onChange={event => onChangeValue(event.target.value.toUpperCase())}\n          onFocus={onFocus}\n          onBlur={onBlur}\n          value={props.field.value}\n        />\n      )}\n    </FieldContainer>\n  ),\n}));\n\nconst fields = [{ type: 'upper', key: 'name' }];\n\nclass App extends React.Component {\n  state = { name: '' };\n\n  onChange = newValue => {\n    // newValue.name will always be upper-cased\n    this.setState(newValue);\n  };\n\n  render() {\n    return (\n      <Formatic\n        config={config}\n        fields={fields}\n        value={this.state}\n        onChange={this.onChange}\n      />\n    );\n  }\n}\n\nReact.render(<App />, document.getElementById('some-element'));\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-fieldLabel.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/plugin-fieldLabel.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "const plugin = () => {\n  return {\n    fieldLabel: field => {\n      if (!field.label) {\n        return field.key;\n      }\n      return field.label;\n    },\n  };\n};\n//CUT\nconsole.info(plugin);\n//CUT\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-humanize.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/plugin-humanize.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "const plugin = config => {\n  return {\n    fieldLabel: field => {\n      if (!field.label) {\n        if (field.key) {\n          return config.humanize(field.key);\n        }\n      }\n      return field.label;\n    },\n  };\n};\n//CUT\nconsole.info(plugin);\n//CUT\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-no-config.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/plugin-no-config.js ***!
+  \****************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "//CUT\nimport React from 'react';\nimport Formatic from 'formatic';\n\nconst fields = [];\n//CUT\nReact.render(<Formatic fields={fields} />, document.body);\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-using-multiple.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/plugin-using-multiple.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "//CUT\nimport React from 'react';\nimport Formatic from 'formatic';\n\nconst fields = [];\nconst pluginA = () => ({});\nconst pluginB = () => ({});\nconst pluginC = () => ({});\n//CUT\nconst config = Formatic.createConfig(pluginA, pluginB, pluginC);\n\nReact.render(<Formatic fields={fields} config={config} />, document.body);\n"
+
+/***/ }),
+
+/***/ "./node_modules/raw-loader/index.js!./docs/server/snippets/plugin-using.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/raw-loader!./docs/server/snippets/plugin-using.js ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "//CUT\nimport React from 'react';\nimport Formatic from 'formatic';\n\nconst fields = [];\nconst plugin = () => ({});\n//CUT\nconst config = Formatic.createConfig(plugin);\n\nReact.render(<Formatic fields={fields} config={config} />, document.body);\n"
 
 /***/ }),
 
@@ -36000,41 +36198,26 @@ var Plugins = function Plugins(props) {
 };
 
 var snippetKeys = ['plugin-no-config', 'plugin-default-config', 'plugin-fieldLabel', 'plugin-humanize', 'plugin-delegate', 'plugin-using', 'plugin-using-multiple', 'plugin-field-type'];
-
 Plugins.getInitialProps =
 /*#__PURE__*/
-function () {
-  var _ref2 = _asyncToGenerator(
-  /*#__PURE__*/
-  _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(_ref) {
-    var req;
-    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            req = _ref.req;
-            _context.next = 3;
-            return Object(_docs_utils__WEBPACK_IMPORTED_MODULE_8__["fetchSnippets"])(req, snippetKeys);
+_asyncToGenerator(
+/*#__PURE__*/
+_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          return _context.abrupt("return", {
+            snippets: Object(_docs_utils__WEBPACK_IMPORTED_MODULE_8__["loadSnippets"])(snippetKeys)
+          });
 
-          case 3:
-            _context.t0 = _context.sent;
-            return _context.abrupt("return", {
-              snippets: _context.t0
-            });
-
-          case 5:
-          case "end":
-            return _context.stop();
-        }
+        case 1:
+        case "end":
+          return _context.stop();
       }
-    }, _callee, this);
-  }));
-
-  return function (_x) {
-    return _ref2.apply(this, arguments);
-  };
-}();
-
+    }
+  }, _callee, this);
+}));
 /* harmony default export */ __webpack_exports__["default"] = (Plugins);
     (function (Component, route) {
       if(!Component) return
@@ -36153,7 +36336,7 @@ function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in ob
 
 /***/ }),
 
-/***/ 9:
+/***/ 8:
 /*!********************************!*\
   !*** multi ./pages/plugins.js ***!
   \********************************/
@@ -36178,5 +36361,5 @@ module.exports = dll_66fd95e2530e78050c4d;
 
 /***/ })
 
-},[[9,"static/runtime/webpack.js","styles"]]]));;
+},[[8,"static/runtime/webpack.js","styles"]]]));;
 //# sourceMappingURL=plugins.js.map
