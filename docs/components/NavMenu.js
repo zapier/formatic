@@ -132,6 +132,7 @@ const NavMenu = props => (
               <ul css={styles.items}>
                 {Object.keys(props.pages).map(pageKey => (
                   <NavItem
+                    key={pageKey}
                     {...props.pages[pageKey]}
                     isCurrent={props.pageKey === pageKey}
                   />
@@ -156,6 +157,7 @@ const NavMenu = props => (
         >
           {Object.keys(props.pages).map(pageKey => (
             <NavItem
+              key={pageKey}
               {...props.pages[pageKey]}
               isCurrent={props.pageKey === pageKey}
             />

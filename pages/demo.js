@@ -37,8 +37,10 @@ const hintPlugin = config => {
   return Object.keys(config).reduce(
     (newConfig, key) => {
       if (key.startsWith('createElement_')) {
-        newConfig[key] = (...args) => (
-          <HintBox name={key}>{prevConfig[key](...args)}</HintBox>
+        newConfig[key] = props => (
+          <HintBox key={props.key} name={key}>
+            {prevConfig[key](props)}
+          </HintBox>
         );
       }
       return newConfig;
@@ -237,7 +239,7 @@ const DemoPage = () => (
   <Page pageKey="demo">
     <Sections>
       {sortedExamples.map((form, idx) => (
-        <Section title={form.title}>
+        <Section key={form.title} title={form.title}>
           <FormDemo key={idx} {...form} />
         </Section>
       ))}
