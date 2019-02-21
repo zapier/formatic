@@ -13,7 +13,8 @@ describe('FieldContainer', () => {
           {({ onChangeValue }) => (
             <input
               onChange={event =>
-                onChangeValue(event.target.value.toUpperCase())}
+                onChangeValue(event.target.value.toUpperCase())
+              }
               value={props.field.value}
             />
           )}

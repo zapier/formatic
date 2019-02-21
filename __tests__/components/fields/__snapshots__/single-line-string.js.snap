@@ -19,8 +19,9 @@ exports[`single-line-string field should render correctly 1`] = `
           <span class="required-label not-required-text">
           </span>
         </div>
-        <span>
-        </span>
+        <div class>
+          help for the single line string field
+        </div>
         <input tabindex="0"
                type="text"
                class
@@ -37,8 +38,9 @@ exports[`single-line-string field should render correctly 1`] = `
           <span class="required-label required-text">
           </span>
         </div>
-        <span>
-        </span>
+        <div class>
+          help for the required name field
+        </div>
         <input tabindex="0"
                type="text"
                class

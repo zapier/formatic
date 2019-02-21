@@ -153,8 +153,9 @@ exports[`fields field should render correctly 1`] = `
                 <span class="required-label not-required-text">
                 </span>
               </div>
-              <span>
-              </span>
+              <div class>
+                Help for section 2 field 1
+              </div>
               <input tabindex="0"
                      type="text"
                      class
@@ -169,8 +170,9 @@ exports[`fields field should render correctly 1`] = `
                 <span class="required-label not-required-text">
                 </span>
               </div>
-              <span>
-              </span>
+              <div class>
+                Help for section 2 field 2
+              </div>
               <input tabindex="0"
                      type="text"
                      class
