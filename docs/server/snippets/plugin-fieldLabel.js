@@ -1,6 +1,6 @@
 const plugin = () => {
   return {
-    fieldLabel: function(field) {
+    fieldLabel: field => {
       if (!field.label) {
         return field.key;
       }
