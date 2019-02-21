@@ -1,4 +1,4 @@
-/*global jasmine, describe, it, expect */
+/*global jest, describe, it, expect */
 
 import React from 'react';
 import createReactClass from 'create-react-class';
@@ -40,25 +40,25 @@ const field = {
 
 describe('shared mixin', () => {
   it('should start action', () => {
-    const onActionSpy = jasmine.createSpy('onAction');
+    const onActionSpy = jest.fn();
     const component = mount(<MyField field={field} onAction={onActionSpy} />);
     const button = component.find('button');
     button.simulate('click');
-    const actionCall = onActionSpy.calls.mostRecent();
-    expect(actionCall.args[0].action).toBe('click-me');
-    expect(actionCall.args[0].field.key).toBe('name');
+    const actionCall = onActionSpy.mock.calls[0];
+    expect(actionCall[0].action).toBe('click-me');
+    expect(actionCall[0].field.key).toBe('name');
   });
   it('should send focus and blur actions', () => {
-    const onActionSpy = jasmine.createSpy('onAction');
+    const onActionSpy = jest.fn();
     const component = mount(<MyField field={field} onAction={onActionSpy} />);
     const button = component.find('button');
     button.simulate('focus');
-    const focusCall = onActionSpy.calls.mostRecent();
-    expect(focusCall.args[0].action).toBe('focus');
-    expect(focusCall.args[0].field.key).toBe('name');
+    const focusCall = onActionSpy.mock.calls[0];
+    expect(focusCall[0].action).toBe('focus');
+    expect(focusCall[0].field.key).toBe('name');
     button.simulate('blur');
-    const blurCall = onActionSpy.calls.mostRecent();
-    expect(blurCall.args[0].action).toBe('blur');
-    expect(blurCall.args[0].field.key).toBe('name');
+    const blurCall = onActionSpy.mock.calls[1];
+    expect(blurCall[0].action).toBe('blur');
+    expect(blurCall[0].field.key).toBe('name');
   });
 });

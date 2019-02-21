@@ -1,4 +1,4 @@
-/*global jasmine, describe, it, expect*/
+/*global jest, describe, it, expect*/
 import React from 'react';
 import { mount } from 'enzyme';
 
@@ -23,7 +23,7 @@ describe('FieldContainer', () => {
     }));
     const fields = [{ type: 'upper', key: 'name' }];
     const value = { name: 'foo' };
-    const onChangeFormSpy = jasmine.createSpy('onChangeForm');
+    const onChangeFormSpy = jest.fn();
     const component = mount(
       <Formatic
         config={config}
@@ -36,7 +36,7 @@ describe('FieldContainer', () => {
     const props = input.props();
     expect(props.value).toBe('foo');
     input.simulate('change', { target: { value: 'fooz' } });
-    expect(onChangeFormSpy.calls.mostRecent().args[0]).toEqual({
+    expect(onChangeFormSpy.mock.calls[0][0]).toEqual({
       name: 'FOOZ',
     });
   });
