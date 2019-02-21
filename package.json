@@ -50,7 +50,6 @@
     "isomorphic-unfetch": "^2.1.1",
     "jest": "^23.6.0",
     "jest-serializer-html": "^6.0.0",
-    "mz": "^2.7.0",
     "next": "^7.0.2",
     "polished": "^2.3.0",
     "react": "^16.8.2",
