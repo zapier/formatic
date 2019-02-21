@@ -11,7 +11,6 @@ import examples from '../demo/examples';
 
 import customPlugin from '../demo/examples/custom-plugin';
 import cssPlugin from '../lib/plugins/css-plugin';
-import { ConnectableObservable } from 'rx';
 
 const Form = React.createFactory(Formatic);
 
