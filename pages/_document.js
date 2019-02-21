@@ -6,6 +6,7 @@ export default class MyDocument extends Document {
     return (
       <html>
         <Head>
+          <meta name="viewport" content="initial-scale=1.0" />
           <link
             rel="apple-touch-icon"
             sizes="57x57"
