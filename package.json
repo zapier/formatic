@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build-docs-with-api-server": "next build && next export -o build-docs",
-    "build-docs": "PORT=`get-port`; yarn start --port $PORT --api-only & wait-on http://localhost:$PORT/api/alive && API_PORT=$PORT yarn build-docs-with-api-server; kill %1",
+    "build-docs": "PORT=`get-port`; node start-server.js --port $PORT --api-only & wait-on http://localhost:$PORT/api/alive && API_PORT=$PORT yarn build-docs-with-api-server; kill %1",
     "build": "rollup -c",
     "format": "zapier-scripts format '__tests__/**/*.js' 'demo/**/*.js' 'docs/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
     "lint": "zapier-scripts lint '__tests__/**/*.js' 'demo/**/*.js' 'docs/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
@@ -20,7 +20,7 @@
     "precommit": "zapier-scripts format-staged",
     "prepublish": "yarn build",
     "publish-docs": "yarn build-docs && touch build-docs/.nojekyll && gh-pages -d build-docs",
-    "start": "node start-server.js",
+    "start": "PORT=`get-port 3333` node start-server.js --open",
     "test": "jest"
   },
   "repository": {
@@ -70,6 +70,7 @@
     "deep-equal": "^1.0.1",
     "immutability-helper": "^2.5.1",
     "object-assign": "^2.1.1",
+    "opener": "^1.5.1",
     "prop-types": "^15.6.0",
     "react-scroll-lock": "git+https://github.com/Laiff/react-scroll-lock.git#267bf5bcf84d334aecc20908657088007b698dc2",
     "react-transition-group": "^1.2.1"

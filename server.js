@@ -3,6 +3,7 @@ import express from 'express';
 import next from 'next';
 import _ from 'lodash';
 import { argv } from 'yargs';
+import opener from 'opener';
 
 import getSnippets from './docs/server/getSnippets';
 
@@ -28,6 +29,9 @@ const createServer = (name = 'API Server', modifyServer = () => {}) => {
   server.listen(port, err => {
     if (err) throw err;
     console.info(`> ${name} ready on http://localhost:${port}`);
+    if (argv.open) {
+      opener(`http://localhost:${port}/demo`);
+    }
   });
 };
 
