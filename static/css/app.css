@@ -1,0 +1,20 @@
+body {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 26px;
+  padding-bottom: 200px;
+}
+
+.CodeMirror {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 26px;
+}
+
+.CodeMirror-lines {
+  padding: 0;
+}
+
+.CodeMirror pre {
+  padding: 0;
+}

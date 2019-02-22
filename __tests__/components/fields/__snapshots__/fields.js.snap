@@ -1,0 +1,189 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`fields field should render correctly 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Folder
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <fieldset class>
+          <div class="optional"
+               style="display: none;"
+          >
+            <div class>
+              <span class="required-label not-required-text">
+              </span>
+            </div>
+            <span>
+            </span>
+            <input tabindex="0"
+                   type="text"
+                   class
+                   value="folder"
+            >
+          </div>
+          <div class="optional">
+            <div class>
+              <label>
+                Name
+              </label>
+              <span class="required-label not-required-text">
+              </span>
+            </div>
+            <span>
+            </span>
+            <input tabindex="0"
+                   type="text"
+                   class
+                   value
+            >
+          </div>
+          <div class="optional">
+            <div class>
+              <label>
+                Children
+              </label>
+              <span class="required-label not-required-text">
+              </span>
+            </div>
+            <span>
+            </span>
+            <div class
+                 tabindex="0"
+            >
+              <div class>
+                <select class>
+                  <option value="0">
+                    File
+                  </option>
+                  <option value="1">
+                    1
+                  </option>
+                </select>
+                <button role="button"
+                        tabindex="0"
+                        class
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Grouped Fields Classic
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <div class>
+          Grouped fields are the bestest!
+        </div>
+        <fieldset class>
+          <fieldset class="child-fields-group">
+            <legend>
+              Section 1
+            </legend>
+            <div class>
+              Section 1 is the best
+            </div>
+            <div class="optional">
+              <div class>
+                <label>
+                  Section 1 field 1
+                </label>
+                <span class="required-label not-required-text">
+                </span>
+              </div>
+              <span>
+              </span>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+            <div class="optional">
+              <div class>
+                <label>
+                  Section 1 field 2
+                </label>
+                <span class="required-label not-required-text">
+                </span>
+              </div>
+              <span>
+              </span>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+          </fieldset>
+          <fieldset class="child-fields-group">
+            <legend>
+              Section 2
+            </legend>
+            <div class>
+              Section 2 is the best
+            </div>
+            <div class="optional">
+              <div class>
+                <label>
+                  Section 2 field 1
+                </label>
+                <span class="required-label not-required-text">
+                </span>
+              </div>
+              <div class>
+                Help for section 2 field 1
+              </div>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+            <div class="optional">
+              <div class>
+                <label>
+                  Section 2 field 2
+                </label>
+                <span class="required-label not-required-text">
+                </span>
+              </div>
+              <div class>
+                Help for section 2 field 2
+              </div>
+              <input tabindex="0"
+                     type="text"
+                     class
+                     value
+              >
+            </div>
+          </fieldset>
+        </fieldset>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;

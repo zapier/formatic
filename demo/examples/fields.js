@@ -6,7 +6,6 @@ const fields = [
     match: {
       type: 'folder',
     },
-    readOnly: true,
     fields: [
       {
         type: 'unicode',

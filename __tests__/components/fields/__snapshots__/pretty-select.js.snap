@@ -1,0 +1,1824 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pretty-select field should render correctly 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Size
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      <span>
+                        Small
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional readonly">
+        <div class>
+          <label>
+            Readonly Size
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      <span>
+                        Small
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="validation-error-required required">
+        <div class>
+          <label>
+            Colors (R)
+          </label>
+          <span class="required-label required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      Pick a color...
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Colors 2
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Colors 3
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <div class>
+          Tres colores
+        </div>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      <span>
+                        some default value
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Alphabet
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Loading
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Empty
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Yes/No
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Select with No Search
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      <span>
+                        Small
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Select with Sections
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Alphabet) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Alphabet
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <div class="choices-search">
+              <input type="text"
+                     placeholder="Search..."
+              >
+            </div>
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    A
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    B
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    C
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    D
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    E
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    F
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    G
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    H
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    I
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    J
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    K
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    L
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    M
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    N
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    O
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    P
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Q
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    R
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    S
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    T
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    U
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    V
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    W
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    X
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Y
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Z
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Colors (R)) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="validation-error-required required">
+        <div class>
+          <label>
+            Colors (R)
+          </label>
+          <span class="required-label required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      Pick a color...
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <div class="choices-search">
+              <input type="text"
+                     placeholder="Search..."
+              >
+            </div>
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Red
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Green
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Yellow
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Colors 2) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Colors 2
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Red
+                  </span>
+                  <span class="choice-sample">
+                    r
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Green
+                  </span>
+                  <span class="choice-sample">
+                    g
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Colors 3) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Colors 3
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <div class>
+          Tres colores
+        </div>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      <span>
+                        some default value
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <div class="choices-search">
+              <input type="text"
+                     placeholder="Search..."
+              >
+            </div>
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Red
+                  </span>
+                  <span class="choice-sample">
+                    cherry
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Green
+                  </span>
+                  <span class="choice-sample">
+                    lime
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    False
+                  </span>
+                  <span class="choice-sample">
+                    false
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                   class="action-choice clear-current-choice"
+                >
+                  <span class="choice-label clear-current-choice">
+                    Clear Current Choice
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                   class="action-choice enter-custom-value"
+                >
+                  <span class="choice-label enter-custom-value">
+                    Type a custom value
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                   class="action-choice insert-field"
+                >
+                  <span class="choice-label insert-field">
+                    Choose an available field
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                   class="action-choice load-more-choices"
+                >
+                  <span class="choice-label load-more-choices">
+                    Load more choices..
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Empty) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Empty
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    No choices available.
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Loading) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Loading
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    <span>
+                      Loading choices...
+                    </span>
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Readonly Size) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional readonly">
+        <div class>
+          <label>
+            Readonly Size
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      <span>
+                        Small
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Select with No Search) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Select with No Search
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      <span>
+                        Small
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Small
+                  </span>
+                  <span class="choice-sample">
+                    S
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Medium
+                  </span>
+                  <span class="choice-sample">
+                    M
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Large
+                  </span>
+                  <span class="choice-sample">
+                    L
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Select with Sections) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Select with Sections
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <div class="choices-search">
+              <input type="text"
+                     placeholder="Search..."
+              >
+            </div>
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class>
+                    Size
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Large
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Medium
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Small
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class>
+                    Color
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Red
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Green
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Blue
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Size) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Size
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                      <span>
+                        Small
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <div class="choices-search">
+              <input type="text"
+                     placeholder="Search..."
+              >
+            </div>
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Small
+                  </span>
+                  <span class="choice-sample">
+                    S
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Medium
+                  </span>
+                  <span class="choice-sample">
+                    M
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    Large
+                  </span>
+                  <span class="choice-sample">
+                    L
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;
+
+exports[`pretty-select field should render open choices correctly (Yes/No) 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Yes/No
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div role="listbox"
+             tabindex="0"
+             class="choices-open"
+        >
+          <div>
+            <div role="presentation"
+                 class="pretty-text-wrapper"
+            >
+              <div class="pretty-text-click-wrapper"
+                   tabindex="0"
+                   role="textbox"
+              >
+                <div role="presentation"
+                     class="pretty-text-box placeholder"
+                >
+                  <div class="internal-text-wrapper">
+                    <span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="select-arrow">
+            </span>
+          </div>
+          <div role="presentation"
+               class="choices-container"
+               style="position: absolute; max-height: 768px;"
+          >
+            <div class="choices-search">
+              <input type="text"
+                     placeholder="Search..."
+              >
+            </div>
+            <ul class="choices">
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    yes
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                >
+                  <span class="choice-label">
+                    no
+                  </span>
+                  <span class="choice-sample">
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                   class="action-choice enter-custom-value"
+                >
+                  <span class="choice-label enter-custom-value">
+                    Use a Custom Value
+                  </span>
+                </a>
+              </li>
+              <li class="choice">
+                <a role="option"
+                   style="cursor: pointer;"
+                   class="action-choice clear-current-choice"
+                >
+                  <span class="choice-label clear-current-choice">
+                    Clear Current Choice
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;

@@ -6,7 +6,22 @@ const fields = [
     itemFields: [
       {
         type: 'pretty-text',
+        isSingleLine: true,
         hideLabel: true,
+        replaceChoices: [
+          {
+            label: 'Red',
+            value: 'red',
+          },
+          {
+            label: 'Green',
+            value: 'green',
+          },
+          {
+            label: 'Blue',
+            value: 'blue',
+          },
+        ],
       },
     ],
     default: {
@@ -20,7 +35,7 @@ const fields = [
     key: 'dict',
     itemFields: [
       {
-        type: 'pretty-text',
+        type: 'single-line-string',
         hideLabel: true,
       },
     ],

@@ -1,1 +1,0 @@
-$ bower install formatic

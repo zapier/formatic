@@ -1,0 +1,52 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`checkbox-boolean field should render correctly 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <span style="white-space: nowrap;">
+        <input type="checkbox"
+               class
+               disabled
+               checked
+        >
+        <span>
+        </span>
+        <span>
+          Enable Read-only
+        </span>
+      </span>
+      <span style="white-space: nowrap;">
+        <input type="checkbox"
+               class
+               checked
+        >
+        <span>
+        </span>
+        <span>
+          Is this checked?
+        </span>
+      </span>
+      <span style="white-space: nowrap;">
+        <input type="checkbox"
+               class
+               checked
+        >
+        <span>
+        </span>
+        <span>
+          Is this a checkbox?
+        </span>
+      </span>
+    </fieldset>
+  </div>
+</div>
+
+`;

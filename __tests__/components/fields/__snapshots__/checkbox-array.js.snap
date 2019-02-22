@@ -1,0 +1,179 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`checkbox-array field should render correctly 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class="optional">
+        <div class>
+          <label>
+            Colors
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div class>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="colors"
+                     type="checkbox"
+                     value="red"
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Red
+              </span>
+            </span>
+          </span>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="colors"
+                     type="checkbox"
+                     value="green"
+                     checked
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Green
+              </span>
+            </span>
+          </span>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="colors"
+                     type="checkbox"
+                     value="blue"
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Blue
+              </span>
+            </span>
+          </span>
+        </div>
+      </div>
+      <div class="optional readonly">
+        <div class>
+          <label>
+            Readonly Colors
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div class>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="readonly-colors"
+                     type="checkbox"
+                     disabled
+                     value="red"
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Red
+              </span>
+            </span>
+          </span>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="readonly-colors"
+                     type="checkbox"
+                     disabled
+                     value="green"
+                     checked
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Green
+              </span>
+            </span>
+          </span>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="readonly-colors"
+                     type="checkbox"
+                     disabled
+                     value="blue"
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Blue
+              </span>
+            </span>
+          </span>
+        </div>
+      </div>
+      <div class="optional">
+        <div class>
+          <label>
+            Colors
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <div class>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="colors-alt"
+                     type="checkbox"
+                     value="blue"
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Blue
+              </span>
+            </span>
+          </span>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="colors-alt"
+                     type="checkbox"
+                     value="yellow"
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Yellow
+              </span>
+            </span>
+          </span>
+          <span class="field-choice">
+            <span style="white-space: nowrap;">
+              <input name="colors-alt"
+                     type="checkbox"
+                     value="purple"
+              >
+              <span>
+              </span>
+              <span class="field-choice-label">
+                Purple
+              </span>
+            </span>
+          </span>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;

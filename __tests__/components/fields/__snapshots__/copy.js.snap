@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`copy field should render correctly 1`] = `
+
+<div class="formatic">
+  <div class="optional">
+    <div class>
+      <span class="required-label not-required-text">
+      </span>
+    </div>
+    <span>
+    </span>
+    <fieldset class>
+      <div class>
+        What the hey?
+        <b>
+          Seriously?
+        </b>
+      </div>
+    </fieldset>
+  </div>
+</div>
+
+`;

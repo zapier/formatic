@@ -6,6 +6,8 @@ import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 import Formatic from '../../../lib/formatic';
 import ObjectClass from '../../../lib/components/fields/object';
+import { renderFieldsToHtml } from '../../../FormaticTestUtils';
+import objectExample from '../../../demo/examples/object';
 
 const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');
@@ -213,5 +215,9 @@ describe('object field', () => {
         { key: 'key1', value: 'value2' },
       ],
     });
+  });
+
+  it('should render correctly', () => {
+    expect(renderFieldsToHtml(objectExample.fields)).toMatchSnapshot();
   });
 });
