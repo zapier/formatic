@@ -3,12 +3,12 @@ import * as React from 'react';
 import { jsx, css } from '@emotion/core';
 
 import { dashify } from '../utils';
-import { getStyleForWidth } from '../styles/Media';
+import { getMediaQueriesForWidths } from '../styles/Media';
 
 const styles = {
   wrapper: css({
     display: 'flex',
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {
         flexDirection: 'column-reverse',
       },
@@ -18,7 +18,7 @@ const styles = {
     ),
   }),
   toc: css({
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {},
       {
         top: 0,
@@ -30,7 +30,7 @@ const styles = {
     ),
   }),
   content: css({
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {},
       {
         width: '75%',

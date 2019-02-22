@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
-import { getStyleForWidth } from '../styles/Media';
+import { getMediaQueriesForWidths } from '../styles/Media';
 
 const styles = {
   container: css({
@@ -9,7 +9,7 @@ const styles = {
     paddingLeft: 15,
     marginRight: 'auto',
     marginLeft: 'auto',
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {},
       width => ({
         width: width - 30,

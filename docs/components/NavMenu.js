@@ -6,7 +6,7 @@ import { RawLink, NavLink } from './Link';
 import Container from './Container';
 import Icon from './Icon';
 import Colors from '../styles/Colors';
-import { getStyleForWidth } from '../styles/Media';
+import { getMediaQueriesForWidths } from '../styles/Media';
 
 import MenuIcon from '../../static/icons/menu.svg';
 import DeleteIcon from '../../static/icons/delete.svg';
@@ -26,7 +26,7 @@ const styles = {
     padding: 10,
     fontSize: 18,
     paddingLeft: 0,
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {
         flex: 1,
       },
@@ -46,7 +46,7 @@ const styles = {
   items: css({
     padding: 0,
     margin: 0,
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {
         display: 'none',
       },
@@ -61,7 +61,7 @@ const styles = {
     position: 'absolute',
     borderBottom: `1px solid ${Colors.neutral[4]}`,
     paddingLeft: 5,
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {
         display: 'block',
       },
@@ -76,7 +76,7 @@ const styles = {
   item: css({
     padding: 10,
     borderBottom: `solid 3px rgb(0, 0, 0, 0)`,
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {
         display: 'block',
       },
@@ -86,7 +86,7 @@ const styles = {
     ),
   }),
   itemIsCurrent: css({
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {},
       {
         borderBottom: `solid 3px ${Colors.main[1]}`,
@@ -96,7 +96,7 @@ const styles = {
   toggle: css({
     borderWidth: 0,
     backgroundColor: 'white',
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {},
       {
         display: 'none',

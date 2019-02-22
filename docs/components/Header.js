@@ -4,13 +4,13 @@ import { jsx, css } from '@emotion/core';
 import Container from './Container';
 import Colors from '../styles/Colors';
 import Typography from '../styles/Typography';
-import { getStyleForWidth } from '../styles/Media';
+import { getMediaQueriesForWidths } from '../styles/Media';
 
 const styles = {
   header: css({
     borderBottom: `1px solid ${Colors.neutral[5]}`,
     marginBottom: 40,
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {
         ...Typography['sub-head'],
         paddingTop: 20,
@@ -35,7 +35,7 @@ const styles = {
     ...Typography['main-head'],
   }),
   title: css({
-    ...getStyleForWidth(
+    ...getMediaQueriesForWidths(
       {
         ...Typography['main-head'],
       },
