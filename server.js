@@ -2,7 +2,7 @@
 import express from 'express';
 import next from 'next';
 import { argv } from 'yargs';
-import opener from 'opener';
+import openBrowser from 'react-dev-utils/openBrowser';
 
 const port = parseInt(argv.port, 10) || parseInt(process.env.PORT, 10) || 3333;
 const dev = process.env.NODE_ENV !== 'production';
@@ -20,7 +20,7 @@ const createServer = (name = 'Server', modifyServer = () => {}) => {
     if (err) throw err;
     console.info(`> ${name} ready on http://localhost:${port}`);
     if (argv.open) {
-      opener(`http://localhost:${port}/demo`);
+      openBrowser(`http://localhost:${port}/demo`);
     }
   });
 };

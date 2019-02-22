@@ -55,6 +55,7 @@
     "polished": "^2.3.0",
     "raw-loader": "^1.0.0",
     "react": "^16.8.2",
+    "react-dev-utils": "^7.0.3",
     "react-dom": "^16.8.2",
     "react-powerplug": "^1.0.0",
     "react-svg-loader": "^2.1.0",
@@ -72,7 +73,6 @@
     "deep-equal": "^1.0.1",
     "immutability-helper": "^2.5.1",
     "object-assign": "^2.1.1",
-    "opener": "^1.5.1",
     "prop-types": "^15.6.0",
     "react-scroll-lock": "git+https://github.com/Laiff/react-scroll-lock.git#267bf5bcf84d334aecc20908657088007b698dc2",
     "react-transition-group": "^1.2.1"
