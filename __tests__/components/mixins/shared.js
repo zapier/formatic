@@ -15,9 +15,9 @@ const MyHelper = createReactClass({
   render() {
     return (
       <button
+        onBlur={this.onBlurAction}
         onClick={() => this.onStartAction('click-me')}
         onFocus={this.onFocusAction}
-        onBlur={this.onBlurAction}
       />
     );
   },

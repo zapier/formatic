@@ -25,7 +25,7 @@ class App extends React.Component {
 
   render() {
     return (
-      <Formatic fields={fields} value={this.state} onChange={this.onChange} />
+      <Formatic fields={fields} onChange={this.onChange} value={this.state} />
     );
   }
 }

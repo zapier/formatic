@@ -31,9 +31,9 @@ exports[`fields field should render correctly 1`] = `
             </div>
             <span>
             </span>
-            <input tabindex="0"
+            <input class
+                   tabindex="0"
                    type="text"
-                   class
                    value="folder"
             >
           </div>
@@ -47,9 +47,9 @@ exports[`fields field should render correctly 1`] = `
             </div>
             <span>
             </span>
-            <input tabindex="0"
+            <input class
+                   tabindex="0"
                    type="text"
-                   class
                    value
             >
           </div>
@@ -75,9 +75,8 @@ exports[`fields field should render correctly 1`] = `
                     1
                   </option>
                 </select>
-                <button role="button"
+                <button class
                         tabindex="0"
-                        class
                 >
                   +
                 </button>
@@ -115,9 +114,9 @@ exports[`fields field should render correctly 1`] = `
               </div>
               <span>
               </span>
-              <input tabindex="0"
+              <input class
+                     tabindex="0"
                      type="text"
-                     class
                      value
               >
             </div>
@@ -131,9 +130,9 @@ exports[`fields field should render correctly 1`] = `
               </div>
               <span>
               </span>
-              <input tabindex="0"
+              <input class
+                     tabindex="0"
                      type="text"
-                     class
                      value
               >
             </div>
@@ -156,9 +155,9 @@ exports[`fields field should render correctly 1`] = `
               <div class>
                 Help for section 2 field 1
               </div>
-              <input tabindex="0"
+              <input class
+                     tabindex="0"
                      type="text"
-                     class
                      value
               >
             </div>
@@ -173,9 +172,9 @@ exports[`fields field should render correctly 1`] = `
               <div class>
                 Help for section 2 field 2
               </div>
-              <input tabindex="0"
+              <input class
+                     tabindex="0"
                      type="text"
-                     class
                      value
               >
             </div>

@@ -38,7 +38,7 @@ const styles = {
 };
 
 const Page = props => (
-  <Layout pages={pages} pageKey={props.pageKey}>
+  <Layout pageKey={props.pageKey} pages={pages}>
     <div css={styles.body}>{props.children}</div>
   </Layout>
 );

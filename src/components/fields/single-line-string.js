@@ -43,18 +43,18 @@ export default createReactClass({
         plain: this.props.plain,
       },
       <input
+        autoComplete={field.autoComplete}
+        autoFocus={field.autoFocus}
+        className={cx(this.props.classes)}
+        onBlur={this.onBlurAction}
+        onChange={this.onChange}
+        onFocus={this.onFocusAction}
+        placeholder={field.placeholder}
+        readOnly={readOnly}
         renderWith={this.renderWith('TextInput')}
         tabIndex={tabIndex}
         type="text"
         value={this.props.field.value}
-        className={cx(this.props.classes)}
-        onChange={this.onChange}
-        onFocus={this.onFocusAction}
-        onBlur={this.onBlurAction}
-        autoComplete={field.autoComplete}
-        autoFocus={field.autoFocus}
-        placeholder={field.placeholder}
-        readOnly={readOnly}
       />
     );
   },

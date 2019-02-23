@@ -28,15 +28,15 @@ exports[`assoc-list field should render correctly 1`] = `
                    value
             >
             <div class>
-              <input tabindex="0"
+              <input class
+                     tabindex="0"
                      type="text"
-                     class
                      value
               >
             </div>
             <div class>
-              <button tabindex="0"
-                      class
+              <button class
+                      tabindex="0"
               >
                 -
               </button>
@@ -48,24 +48,23 @@ exports[`assoc-list field should render correctly 1`] = `
                    value
             >
             <div class>
-              <input tabindex="0"
+              <input class
+                     tabindex="0"
                      type="text"
-                     class
                      value
               >
             </div>
             <div class>
-              <button tabindex="0"
-                      class
+              <button class
+                      tabindex="0"
               >
                 -
               </button>
             </div>
           </div>
           <div class>
-            <button role="button"
+            <button class
                     tabindex="0"
-                    class
             >
               +
             </button>

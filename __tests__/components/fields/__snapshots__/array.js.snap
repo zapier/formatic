@@ -25,9 +25,8 @@ exports[`array field should render correctly 1`] = `
              tabindex="0"
         >
           <div class>
-            <button role="button"
+            <button class
                     tabindex="0"
-                    class
             >
               +
             </button>
@@ -56,9 +55,8 @@ exports[`array field should render correctly 1`] = `
                 Complex
               </option>
             </select>
-            <button role="button"
+            <button class
                     tabindex="0"
-                    class
             >
               +
             </button>
@@ -79,9 +77,8 @@ exports[`array field should render correctly 1`] = `
              tabindex="0"
         >
           <div class>
-            <button role="button"
+            <button class
                     tabindex="0"
-                    class
             >
               +
             </button>

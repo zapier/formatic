@@ -23,25 +23,27 @@ const styles = {
 };
 
 export const RawLink = props => {
-  const { href, ...linkProps } = props;
+  const { href, children, ...linkProps } = props;
 
   return (
-    <NextLink href={href} as={prefixHref(href)} passHref={true}>
-      <a {...linkProps} />
+    <NextLink as={prefixHref(href)} href={href} passHref={true}>
+      <a {...linkProps}>{children}</a>
     </NextLink>
   );
 };
 
 const Link = props => {
-  const { isNav, isActive, href, ...linkProps } = props;
+  const { isNav, isActive, href, children, ...linkProps } = props;
   const linkCss = css(
     styles.link,
     isNav && styles.navLink,
     isNav && isActive && styles.navLinkIsActive
   );
   return (
-    <NextLink href={href} as={prefixHref(href)} passHref={true}>
-      <a css={linkCss} {...linkProps} />
+    <NextLink as={prefixHref(href)} href={href} passHref={true}>
+      <a css={linkCss} {...linkProps}>
+        {children}
+      </a>
     </NextLink>
   );
 };

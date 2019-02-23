@@ -48,8 +48,8 @@ describe('object field', () => {
       <Formatic
         config={Formatic.createConfig()}
         fields={fields}
-        value={value}
         onChange={onChange}
+        value={value}
       />
     );
     return TestUtils.renderIntoDocument(form);
@@ -65,8 +65,8 @@ describe('object field', () => {
       <Formatic
         config={Formatic.createConfig()}
         fields={fields}
-        value={value}
         onChange={onChange}
+        value={value}
       />
     );
     return ReactDOM.render(form, node);

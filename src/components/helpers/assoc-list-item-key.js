@@ -36,13 +36,13 @@ export default createReactClass({
 
     return (
       <input
-        renderWith={this.renderWith('ListItemKeyInput')}
         className={cx(classes)}
-        type="text"
-        value={this.props.displayKey}
+        onBlur={this.onBlurAction}
         onChange={this.onChange}
         onFocus={this.onFocusAction}
-        onBlur={this.onBlurAction}
+        renderWith={this.renderWith('ListItemKeyInput')}
+        type="text"
+        value={this.props.displayKey}
       />
     );
   },

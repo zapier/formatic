@@ -21,20 +21,20 @@ exports[`pretty-boolean field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>

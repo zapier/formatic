@@ -51,7 +51,7 @@ const Header = props =>
   !props.title ? (
     <div css={[styles.header, styles.leadHeader]}>
       <Container>
-        <img css={styles.logo} src="static/images/logo.png" alt="Formatic" />
+        <img alt="Formatic" css={styles.logo} src="static/images/logo.png" />
         <p css={styles.lead}>Automatic Forms for React</p>
       </Container>
     </div>

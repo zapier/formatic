@@ -77,9 +77,9 @@ exports[`checkbox-array field should render correctly 1`] = `
         <div class>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="readonly-colors"
+              <input disabled
+                     name="readonly-colors"
                      type="checkbox"
-                     disabled
                      value="red"
               >
               <span>
@@ -91,9 +91,9 @@ exports[`checkbox-array field should render correctly 1`] = `
           </span>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="readonly-colors"
+              <input disabled
+                     name="readonly-colors"
                      type="checkbox"
-                     disabled
                      value="green"
                      checked
               >
@@ -106,9 +106,9 @@ exports[`checkbox-array field should render correctly 1`] = `
           </span>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="readonly-colors"
+              <input disabled
+                     name="readonly-colors"
                      type="checkbox"
-                     disabled
                      value="blue"
               >
               <span>

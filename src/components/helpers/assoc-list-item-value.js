@@ -40,8 +40,8 @@ export default createReactClass({
 
     return (
       <div
-        renderWith={this.renderWith('ListItemValue')}
         className={cx(this.props.classes)}
+        renderWith={this.renderWith('ListItemValue')}
       >
         {fieldElem}
       </div>

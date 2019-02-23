@@ -48,9 +48,9 @@ export default createReactClass({
       if (this.props.onClick) {
         text = (
           <a
-            renderWith={this.renderWith('LabelLink')}
             href={'JavaScript' + ':'}
             onClick={this.props.onClick}
+            renderWith={this.renderWith('LabelLink')}
           >
             {text}
           </a>
@@ -62,8 +62,8 @@ export default createReactClass({
 
     return (
       <div
-        renderWith={this.renderWith('Label')}
         className={cx(this.props.classes)}
+        renderWith={this.renderWith('Label')}
       >
         {label} {requiredLabel}
       </div>

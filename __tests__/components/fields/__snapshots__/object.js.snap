@@ -28,15 +28,15 @@ exports[`object field should render correctly 1`] = `
                    value="key1"
             >
             <div class>
-              <div role="presentation"
-                   class="pretty-text-wrapper"
+              <div class="pretty-text-wrapper"
+                   role="presentation"
               >
                 <div class="pretty-text-click-wrapper"
-                     tabindex="0"
                      role="textbox"
+                     tabindex="0"
                 >
-                  <div role="presentation"
-                       class="pretty-text-box"
+                  <div class="pretty-text-box"
+                       role="presentation"
                        tabindex="0"
                   >
                     <div class="internal-text-wrapper">
@@ -48,16 +48,16 @@ exports[`object field should render correctly 1`] = `
                     </div>
                   </div>
                 </div>
-                <a href="JavaScript:"
-                   class
+                <a class
+                   href="JavaScript:"
                 >
                   Insert...
                 </a>
               </div>
             </div>
             <div class>
-              <button tabindex="0"
-                      class
+              <button class
+                      tabindex="0"
               >
                 -
               </button>
@@ -69,15 +69,15 @@ exports[`object field should render correctly 1`] = `
                    value="key2"
             >
             <div class>
-              <div role="presentation"
-                   class="pretty-text-wrapper"
+              <div class="pretty-text-wrapper"
+                   role="presentation"
               >
                 <div class="pretty-text-click-wrapper"
-                     tabindex="0"
                      role="textbox"
+                     tabindex="0"
                 >
-                  <div role="presentation"
-                       class="pretty-text-box"
+                  <div class="pretty-text-box"
+                       role="presentation"
                        tabindex="0"
                   >
                     <div class="internal-text-wrapper">
@@ -89,25 +89,24 @@ exports[`object field should render correctly 1`] = `
                     </div>
                   </div>
                 </div>
-                <a href="JavaScript:"
-                   class
+                <a class
+                   href="JavaScript:"
                 >
                   Insert...
                 </a>
               </div>
             </div>
             <div class>
-              <button tabindex="0"
-                      class
+              <button class
+                      tabindex="0"
               >
                 -
               </button>
             </div>
           </div>
           <div class>
-            <button role="button"
+            <button class
                     tabindex="0"
-                    class
             >
               +
             </button>
@@ -131,15 +130,15 @@ exports[`object field should render correctly 1`] = `
                    value="key1"
             >
             <div class>
-              <input tabindex="0"
+              <input class
+                     tabindex="0"
                      type="text"
-                     class
                      value="key1"
               >
             </div>
             <div class>
-              <button tabindex="0"
-                      class
+              <button class
+                      tabindex="0"
               >
                 -
               </button>
@@ -151,24 +150,23 @@ exports[`object field should render correctly 1`] = `
                    value="key2"
             >
             <div class>
-              <input tabindex="0"
+              <input class
+                     tabindex="0"
                      type="text"
-                     class
                      value="key2"
               >
             </div>
             <div class>
-              <button tabindex="0"
-                      class
+              <button class
+                      tabindex="0"
               >
                 -
               </button>
             </div>
           </div>
           <div class>
-            <button role="button"
+            <button class
                     tabindex="0"
-                    class
             >
               +
             </button>

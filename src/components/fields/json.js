@@ -83,16 +83,16 @@ export default createReactClass({
         plain: this.props.plain,
       },
       <textarea
+        className={cx(this.props.classes)}
+        disabled={this.isReadOnly()}
+        onBlur={this.onBlurAction}
+        onChange={this.onChange}
+        onFocus={this.onFocusAction}
         renderWith={this.renderWith('TextareaInput', {
           isValid: this.state.isValid,
         })}
-        className={cx(this.props.classes)}
-        value={this.state.value}
-        onChange={this.onChange}
         rows={config.fieldRows(field) || this.props.rows}
-        onFocus={this.onFocusAction}
-        onBlur={this.onBlurAction}
-        disabled={this.isReadOnly()}
+        value={this.state.value}
       />
     );
   },

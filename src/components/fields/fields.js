@@ -93,8 +93,8 @@ export default createReactClass({
         plain: isGroup || this.props.plain,
       },
       <fieldset
-        renderWith={this.renderWith('FieldBody')}
         className={cx(classes)}
+        renderWith={this.renderWith('FieldBody')}
       >
         {legend}
         {help}

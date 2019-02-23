@@ -34,10 +34,10 @@ export default createReactClass({
 
     return (
       <li
+        className={cx(classes)}
         renderWith={this.renderWith('ChoicesItem', {
           isHovering: this.props.isHovering,
         })}
-        className={cx(classes)}
       >
         {this.props.children}
       </li>

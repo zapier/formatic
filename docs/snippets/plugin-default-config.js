@@ -6,4 +6,4 @@ const fields = [];
 //CUT
 const config = Formatic.createConfig();
 
-React.render(<Formatic fields={fields} config={config} />, document.body);
+React.render(<Formatic config={config} fields={fields} />, document.body);

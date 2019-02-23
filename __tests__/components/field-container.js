@@ -28,8 +28,8 @@ describe('FieldContainer', () => {
       <Formatic
         config={config}
         fields={fields}
-        value={value}
         onChange={onChangeFormSpy}
+        value={value}
       />
     );
     const input = component.find('input');

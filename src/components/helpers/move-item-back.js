@@ -32,10 +32,10 @@ export default createReactClass({
   renderDefault: function() {
     return (
       <button
-        renderWith={this.renderWith('MoveItemBack')}
-        tabIndex={0}
         className={cx(this.props.classes)}
         onClick={this.props.onClick}
+        renderWith={this.renderWith('MoveItemBack')}
+        tabIndex={0}
       >
         {this.props.label}
       </button>

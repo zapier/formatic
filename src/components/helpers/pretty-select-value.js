@@ -175,11 +175,11 @@ export default createReactClass({
     if (!this.isReadOnly() || this.hasReadOnlyControls()) {
       selectArrow = (
         <span
-          renderWith={this.renderWith('SelectArrow', {
-            isOpen: this.state.isChoicesOpen,
-          })}
           className={cx('select-arrow', {
             'readonly-control': this.isReadOnly(),
+          })}
+          renderWith={this.renderWith('SelectArrow', {
+            isOpen: this.state.isChoicesOpen,
           })}
         />
       );
@@ -187,22 +187,24 @@ export default createReactClass({
 
     const choicesOrLoading = (
       <div
-        renderWith={this.renderWith('ChoicesWrapper')}
-        role="listbox"
-        ref={ref(this, 'container')}
-        tabIndex="0"
-        onKeyDown={this.onKeyDown}
         className={cx(
           _.extend({}, this.props.classes, {
             'choices-open': this.state.isChoicesOpen,
           })
         )}
         onChange={this.onChange}
+        onKeyDown={this.onKeyDown}
+        ref={ref(this, 'container')}
+        renderWith={this.renderWith('ChoicesWrapper')}
+        role="listbox"
+        tabIndex="0"
       >
+        {/* Keyboard handler is on wrapping element. */}
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
         <div
-          renderWith={this.renderWith('ChoicesInputWrapper')}
-          ref={ref(this, 'toggle')}
           onClick={this.isReadOnly() ? null : this.onToggleChoices}
+          ref={ref(this, 'toggle')}
+          renderWith={this.renderWith('ChoicesInputWrapper')}
         >
           {inputElem}
           {selectArrow}

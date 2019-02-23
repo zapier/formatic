@@ -40,12 +40,11 @@ export default createReactClass({
 
     return (
       <button
-        renderWith={this.renderWith('AddItem')}
-        role="button"
-        tabIndex={tabIndex}
-        onKeyDown={onKeyDown}
         className={cx(this.props.classes)}
         onClick={this.props.onClick}
+        onKeyDown={onKeyDown}
+        renderWith={this.renderWith('AddItem')}
+        tabIndex={tabIndex}
       >
         {this.props.label}
       </button>

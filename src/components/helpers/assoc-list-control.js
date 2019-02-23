@@ -57,8 +57,8 @@ export default createReactClass({
 
     return (
       <div
-        renderWith={this.renderWith('ListControl')}
         className={cx(this.props.classes)}
+        renderWith={this.renderWith('ListControl')}
       >
         {typeChoices}{' '}
         {config.createElement('add-item', {

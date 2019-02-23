@@ -60,8 +60,8 @@ export default createReactClass({
 
     return (
       <div
-        renderWith={this.renderWith('ListItem')}
         className={cx(this.props.classes)}
+        renderWith={this.renderWith('ListItem')}
       >
         {assocListItemKey}
         {assocListItemValue}

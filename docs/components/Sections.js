@@ -41,14 +41,7 @@ const styles = {
 
 const Sections = props => (
   <div css={styles.wrapper}>
-    <div css={styles.content}>
-      {React.Children.map(props.children, child => (
-        <>
-          <a name={dashify(child.props.title)} />
-          {child}
-        </>
-      ))}
-    </div>
+    <div css={styles.content}>{props.children}</div>
     <div css={styles.toc}>
       <ul>
         {React.Children.map(props.children, child => (

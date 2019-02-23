@@ -14,9 +14,9 @@ export const renderFieldsToHtml = (fields, handleComponent = () => {}) => {
   const component = mount(
     <Formatic
       config={config}
-      value={value}
       fields={fields}
       onChange={() => {}}
+      value={value}
     />
   );
   handleComponent(component);

@@ -34,8 +34,8 @@ export default createReactClass({
 
     return (
       <span
-        renderWith={this.renderWith('RequiredLabel')}
         className={className}
+        renderWith={this.renderWith('RequiredLabel')}
       />
     );
   },

@@ -295,37 +295,37 @@ export default createReactClass({
     // Render read-only version.
     return (
       <div
-        renderWith={this.renderWith('PrettyTextInputWrapper')}
-        role="presentation"
-        onKeyDown={this.onKeyDown}
         className={cx({
           'pretty-text-wrapper': true,
           'choices-open': this.state.isChoicesOpen,
         })}
+        onKeyDown={this.onKeyDown}
         onMouseEnter={this.switchToCodeMirror}
         onTouchStart={this.switchToCodeMirror}
+        renderWith={this.renderWith('PrettyTextInputWrapper')}
+        role="presentation"
       >
         <div
-          renderWith={this.renderWith('PrettyTextInputClickWrapper')}
           className="pretty-text-click-wrapper"
-          tabIndex="0"
+          onFocus={this.onFocusWrapper}
+          renderWith={this.renderWith('PrettyTextInputClickWrapper')}
           // we need to handle onFocus events for this div for accessibility
           // when the screen reader enters the field it should be the equivalent
           // of a focus click event
-          onFocus={this.onFocusWrapper}
           role="textbox"
+          tabIndex="0"
         >
           <div
+            className={textBoxClasses}
+            onBlur={this.onBlur}
             renderWith={this.renderWith('PrettyTextInputTabTarget')}
             role="presentation"
-            className={textBoxClasses}
             tabIndex={this.wrapperTabIndex()}
-            onBlur={this.onBlur}
           >
             <div
-              renderWith={this.renderWith('PrettyTextInputInternalTextWrapper')}
-              ref={ref(this, 'textBox')}
               className="internal-text-wrapper"
+              ref={ref(this, 'textBox')}
+              renderWith={this.renderWith('PrettyTextInputInternalTextWrapper')}
             />
           </div>
         </div>

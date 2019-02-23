@@ -31,10 +31,10 @@ export default createReactClass({
   renderDefault: function() {
     return (
       <a
-        renderWith={this.renderWith('InsertButton')}
+        className={cx({ 'readonly-control': this.props.readOnly })}
         href={'JavaScript' + ':'}
         onClick={this.props.onClick}
-        className={cx({ 'readonly-control': this.props.readOnly })}
+        renderWith={this.renderWith('InsertButton')}
       >
         {this.props.children}
       </a>

@@ -37,12 +37,12 @@ export default createReactClass({
 
     return (
       // CodeMirror widgets need some work to make them accessible.
-      // eslint-disable-next-line jsx-a11y/interactive-supports-focus
+      // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
       <span
-        renderWith={this.renderWith('PrettyTag')}
-        role="button"
         className={classes}
         onClick={this.props.onClick}
+        renderWith={this.renderWith('PrettyTag')}
+        role="button"
       >
         {this.props.children}
       </span>
