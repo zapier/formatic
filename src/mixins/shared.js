@@ -1,4 +1,4 @@
-import _ from '../undash';
+import _ from '@/src/undash';
 
 export default {
   // Start an action bubbling up through parent components.

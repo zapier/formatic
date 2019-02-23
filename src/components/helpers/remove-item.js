@@ -9,11 +9,11 @@ Remove an item.
 import createReactClass from 'create-react-class';
 import cx from 'classnames';
 
-import _ from '../../undash';
-import HelperMixin from '../../mixins/helper';
+import _ from '@/src/undash';
+import HelperMixin from '@/src/mixins/helper';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 export default createReactClass({
   displayName: 'RemoveItem',

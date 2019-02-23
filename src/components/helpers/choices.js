@@ -10,13 +10,13 @@ import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom';
 import ScrollLock from 'react-scroll-lock';
 
-import _ from '../../undash';
-import { keyCodes, ref, scrollIntoContainerView } from '../../utils';
-import HelperMixin from '../../mixins/helper';
-import ClickOutsideMixin from '../../mixins/click-outside';
+import _ from '@/src/undash';
+import { keyCodes, ref, scrollIntoContainerView } from '@/src/utils';
+import HelperMixin from '@/src/mixins/helper';
+import ClickOutsideMixin from '@/src/mixins/click-outside';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 const magicChoiceRe = /^\/\/\/[^/]+\/\/\/$/;
 

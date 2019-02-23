@@ -8,11 +8,11 @@
 
 import createReactClass from 'create-react-class';
 
-import HelperMixin from '../../mixins/helper';
-import { ref } from '../../utils';
+import HelperMixin from '@/src/mixins/helper';
+import { ref } from '@/src/utils';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 export default createReactClass({
   displayName: 'ChoicesSearch',

@@ -7,9 +7,9 @@
 'use strict';
 
 import createReactClass from 'create-react-class';
-import { ref } from '../../utils';
+import { ref } from '@/src/utils';
 
-import HelperMixin from '../../mixins/helper';
+import HelperMixin from '@/src/mixins/helper';
 
 export default createReactClass({
   displayName: 'PrettySelectInput',

@@ -9,8 +9,8 @@ methods you want to add or override.
 'use strict';
 
 import React from 'react';
-import _ from './undash';
-import utils, { argumentsToArray } from './utils';
+import _ from '@/src/undash';
+import utils, { argumentsToArray } from '@/src/utils';
 
 import FieldsField from './components/fields/fields';
 import GroupedFieldsField from './components/fields/grouped-fields';

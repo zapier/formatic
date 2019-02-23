@@ -1,3 +1,4 @@
+/* global __dirname */
 const withCSS = require('@zeit/next-css');
 const webpack = require('webpack');
 const path = require('path');
@@ -36,6 +37,10 @@ module.exports = withCustomBabelConfigFile(
           'process.env.ASSET_PREFIX': JSON.stringify(assetPrefix),
         })
       );
+
+      config.resolve = config.resolve || {};
+      config.resolve.alias = config.resolve.alias || {};
+      config.resolve.alias['@'] = __dirname;
 
       return config;
     },

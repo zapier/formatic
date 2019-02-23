@@ -9,14 +9,14 @@
 'use strict';
 
 import createReactClass from 'create-react-class';
-import _ from '../../undash';
+import _ from '@/src/undash';
 import cx from 'classnames';
 
-import { focusRefNode, keyCodes, ref } from '../../utils';
-import HelperMixin from '../../mixins/helper';
+import { focusRefNode, keyCodes, ref } from '@/src/utils';
+import HelperMixin from '@/src/mixins/helper';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 export default createReactClass({
   displayName: 'SelectValue',

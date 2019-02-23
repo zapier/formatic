@@ -2,9 +2,9 @@
 
 /* global describe it expect */
 
-import TagTranslator from '../../../src/components/helpers/tag-translator';
+import TagTranslator from '@/src/components/helpers/tag-translator';
 
-import Formatic from '../../../src/formatic';
+import Formatic from '@/src/formatic';
 
 describe('editor-util', function() {
   const replaceChoices = [

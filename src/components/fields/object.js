@@ -9,7 +9,7 @@ Render a field to edit an object with dynamic child fields.
 import createReactClass from 'create-react-class';
 import update from 'immutability-helper';
 
-import FieldMixin from '../../mixins/field';
+import FieldMixin from '@/src/mixins/field';
 
 const hasDuplicateKeys = assocList => {
   let hasDups = false;

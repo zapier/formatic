@@ -2,9 +2,9 @@
 import { jsx, css } from '@emotion/core';
 
 import Container from './Container';
-import Colors from '../styles/Colors';
-import Typography from '../styles/Typography';
-import { getMediaQueriesForWidths } from '../styles/Media';
+import Colors from '@/docs/styles/Colors';
+import Typography from '@/docs/styles/Typography';
+import { getMediaQueriesForWidths } from '@/docs/styles/Media';
 
 const styles = {
   header: css({

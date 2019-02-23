@@ -7,12 +7,12 @@ import ReactDOM from 'react-dom';
 import cx from 'classnames';
 
 import TagTranslator from './tag-translator';
-import _ from '../../undash';
-import { keyCodes, ref } from '../../utils';
-import HelperMixin from '../../mixins/helper';
+import _ from '@/src/undash';
+import { keyCodes, ref } from '@/src/utils';
+import HelperMixin from '@/src/mixins/helper';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 const toString = function(value) {
   if (_.isUndefined(value) || _.isNull(value)) {

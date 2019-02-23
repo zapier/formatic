@@ -3,10 +3,10 @@ import { jsx, css } from '@emotion/core';
 
 import Icon from './Icon';
 
-import { dashify } from '../utils';
-import Typography from '../styles/Typography';
+import { dashify } from '@/docs/utils';
+import Typography from '@/docs/styles/Typography';
 
-import LinkIcon from '../../static/icons/link.svg';
+import LinkIcon from '@/static/icons/link.svg';
 
 const styles = {
   section: css({}),

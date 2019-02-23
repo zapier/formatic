@@ -10,7 +10,7 @@ boolean values, but it _should_ work for other values.
 
 import createReactClass from 'create-react-class';
 
-import FieldMixin from '../../mixins/field';
+import FieldMixin from '@/src/mixins/field';
 
 export default createReactClass({
   displayName: 'Select',

@@ -8,7 +8,7 @@ extends: ['foo', 'bar'] where 'foo' and 'bar' refer to other keys or ids.
 
 'use strict';
 
-import _ from '../undash';
+import _ from '@/src/undash';
 
 export default function(config) {
   const initField = config.initField;

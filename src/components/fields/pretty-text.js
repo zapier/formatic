@@ -4,7 +4,7 @@
 
 import createReactClass from 'create-react-class';
 
-import FieldMixin from '../../mixins/field';
+import FieldMixin from '@/src/mixins/field';
 
 /*
    Wraps a PrettyTextInput to be a stand alone field.

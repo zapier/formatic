@@ -1,6 +1,6 @@
 import React from 'react';
 
-import fieldMixin from '../mixins/field';
+import fieldMixin from '@/src/mixins/field';
 
 // A better way to add new field types vs the old mixins approach. This
 // component abstracts away our ugly old mixins into a component with a render

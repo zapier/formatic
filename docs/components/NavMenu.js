@@ -5,11 +5,11 @@ import { Toggle } from 'react-powerplug';
 import { RawLink, NavLink } from './Link';
 import Container from './Container';
 import Icon from './Icon';
-import Colors from '../styles/Colors';
-import { getMediaQueriesForWidths } from '../styles/Media';
+import Colors from '@/docs/styles/Colors';
+import { getMediaQueriesForWidths } from '@/docs/styles/Media';
 
-import MenuIcon from '../../static/icons/menu.svg';
-import DeleteIcon from '../../static/icons/delete.svg';
+import MenuIcon from '@/static/icons/menu.svg';
+import DeleteIcon from '@/static/icons/delete.svg';
 
 const styles = {
   navWrapper: css({
