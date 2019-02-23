@@ -7,4 +7,4 @@ const plugin = () => ({});
 //CUT
 const config = Formatic.createConfig(plugin);
 
-React.render(<Formatic fields={fields} config={config} />, document.body);
+React.render(<Formatic config={config} fields={fields} />, document.body);

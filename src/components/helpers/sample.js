@@ -28,8 +28,8 @@ export default createReactClass({
 
     return !choice.sample ? null : (
       <div
-        renderWith={this.renderWith('Sample')}
         className={cx(this.props.className)}
+        renderWith={this.renderWith('Sample')}
       >
         {choice.sample}
       </div>

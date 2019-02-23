@@ -9,4 +9,4 @@ const pluginC = () => ({});
 //CUT
 const config = Formatic.createConfig(pluginA, pluginB, pluginC);
 
-React.render(<Formatic fields={fields} config={config} />, document.body);
+React.render(<Formatic config={config} fields={fields} />, document.body);

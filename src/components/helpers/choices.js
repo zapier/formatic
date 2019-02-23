@@ -553,11 +553,11 @@ export default createReactClass({
 
     return (
       <div
+        className="choices-container"
+        onClick={this.onClick}
+        ref={ref(this, 'container')}
         renderWith={this.renderWith('Choices')}
         role="presentation"
-        ref={ref(this, 'container')}
-        onClick={this.onClick}
-        className="choices-container"
         style={{
           userSelect: 'none',
           WebkitUserSelect: 'none',
@@ -567,10 +567,10 @@ export default createReactClass({
       >
         {search}
         <ul
-          renderWith={this.renderWith('ChoicesList')}
+          className="choices"
           key="choices"
           ref={ref(this, 'choices')}
-          className="choices"
+          renderWith={this.renderWith('ChoicesList')}
         >
           {choices.map((choice, i) => {
             const choiceType = findChoiceType(choice);

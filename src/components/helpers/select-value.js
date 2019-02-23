@@ -80,18 +80,18 @@ export default createReactClass({
 
       choicesOrLoading = (
         <select
-          renderWith={this.renderWith('SelectValueSelectInput')}
           className={cx(this.props.classes)}
-          onChange={this.onChange}
-          value={valueChoice.choiceValue}
-          onFocus={this.onFocusAction}
-          onBlur={this.onBlurAction}
           disabled={this.isReadOnly()}
+          onBlur={this.onBlurAction}
+          onChange={this.onChange}
+          onFocus={this.onFocusAction}
+          renderWith={this.renderWith('SelectValueSelectInput')}
+          value={valueChoice.choiceValue}
         >
           {choices.map((choice, i) => (
             <option
-              renderWith={this.renderWith('SelectValueOption')}
               key={i}
+              renderWith={this.renderWith('SelectValueOption')}
               value={choice.choiceValue}
             >
               {choice.label}

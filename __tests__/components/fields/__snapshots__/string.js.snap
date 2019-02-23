@@ -47,15 +47,15 @@ exports[`string field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="presentation"
-             class="pretty-text-wrapper"
+        <div class="pretty-text-wrapper"
+             role="presentation"
         >
           <div class="pretty-text-click-wrapper"
-               tabindex="0"
                role="textbox"
+               tabindex="0"
           >
-            <div role="presentation"
-                 class="pretty-text-box placeholder"
+            <div class="pretty-text-box placeholder"
+                 role="presentation"
                  tabindex="0"
             >
               <div class="internal-text-wrapper">
@@ -64,8 +64,8 @@ exports[`string field should render correctly 1`] = `
               </div>
             </div>
           </div>
-          <a href="JavaScript:"
-             class
+          <a class
+             href="JavaScript:"
           >
             Insert...
           </a>

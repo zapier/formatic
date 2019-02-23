@@ -9,7 +9,7 @@ const Layout = props => {
   const page = props.pages[props.pageKey] || {};
   return (
     <div>
-      <NavMenu pages={props.pages} pageKey={props.pageKey} />
+      <NavMenu pageKey={props.pageKey} pages={props.pages} />
       <Header {...page} />
       <Container>{props.children}</Container>
       <Footer />

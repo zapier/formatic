@@ -12,9 +12,9 @@ exports[`checkbox-boolean field should render correctly 1`] = `
     </span>
     <fieldset class>
       <span style="white-space: nowrap;">
-        <input type="checkbox"
-               class
+        <input class
                disabled
+               type="checkbox"
                checked
         >
         <span>
@@ -24,8 +24,8 @@ exports[`checkbox-boolean field should render correctly 1`] = `
         </span>
       </span>
       <span style="white-space: nowrap;">
-        <input type="checkbox"
-               class
+        <input class
+               type="checkbox"
                checked
         >
         <span>
@@ -35,8 +35,8 @@ exports[`checkbox-boolean field should render correctly 1`] = `
         </span>
       </span>
       <span style="white-space: nowrap;">
-        <input type="checkbox"
-               class
+        <input class
+               type="checkbox"
                checked
         >
         <span>

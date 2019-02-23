@@ -47,20 +47,20 @@ export default createReactClass({
         style={{ whiteSpace: 'nowrap' }}
       >
         <input
-          renderWith={this.renderWith('CheckboxInput')}
-          key="input"
-          type="checkbox"
           checked={field.value}
           className={cx(this.props.classes)}
+          disabled={this.isReadOnly()}
+          key="input"
+          onBlur={this.onBlurAction}
           onChange={this.onChange}
           onFocus={this.onFocusAction}
-          onBlur={this.onBlurAction}
-          disabled={this.isReadOnly()}
+          renderWith={this.renderWith('CheckboxInput')}
+          type="checkbox"
         />
-        <span renderWith={this.renderWith('InputSpacer')} key="spacer">
+        <span key="spacer" renderWith={this.renderWith('InputSpacer')}>
           {' '}
         </span>
-        <span renderWith={this.renderWith('InputLabel')} key="label">
+        <span key="label" renderWith={this.renderWith('InputLabel')}>
           {fieldLabelOrHelp}
         </span>
       </span>

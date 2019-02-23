@@ -40,17 +40,17 @@ export default createReactClass({
         plain: this.props.plain,
       },
       <input
+        autoComplete={field.autoComplete}
+        autoFocus={field.autoFocus}
+        className={cx(this.props.classes)}
+        disabled={this.isReadOnly()}
+        onBlur={this.onBlurAction}
+        onChange={this.onChange}
+        onFocus={this.onFocusAction}
+        placeholder={field.placeholder}
         renderWith={this.renderWith('PasswordInput')}
         type="password"
         value={this.props.field.value}
-        className={cx(this.props.classes)}
-        onChange={this.onChange}
-        onFocus={this.onFocusAction}
-        onBlur={this.onBlurAction}
-        autoComplete={field.autoComplete}
-        autoFocus={field.autoFocus}
-        placeholder={field.placeholder}
-        disabled={this.isReadOnly()}
       />
     );
   },

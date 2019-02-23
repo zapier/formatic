@@ -21,20 +21,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -63,20 +63,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -103,20 +103,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -143,20 +143,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -183,20 +183,20 @@ exports[`pretty-select field should render correctly 1`] = `
         <div class>
           Tres colores
         </div>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -225,20 +225,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -264,20 +264,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -303,20 +303,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -342,20 +342,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -381,20 +381,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -423,20 +423,20 @@ exports[`pretty-select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -479,20 +479,20 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -504,18 +504,19 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <div class="choices-search">
-              <input type="text"
-                     placeholder="Search..."
+              <input placeholder="Search..."
+                     type="text"
               >
             </div>
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -526,7 +527,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -537,7 +539,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -548,7 +551,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -559,7 +563,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -570,7 +575,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -581,7 +587,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -592,7 +599,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -603,7 +611,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -614,7 +623,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -625,7 +635,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -636,7 +647,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -647,7 +659,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -658,7 +671,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -669,7 +683,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -680,7 +695,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -691,7 +707,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -702,7 +719,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -713,7 +731,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -724,7 +743,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -735,7 +755,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -746,7 +767,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -757,7 +779,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -768,7 +791,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -779,7 +803,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -790,7 +815,8 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -833,20 +859,20 @@ exports[`pretty-select field should render open choices correctly (Colors (R)) 1
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -859,18 +885,19 @@ exports[`pretty-select field should render open choices correctly (Colors (R)) 1
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <div class="choices-search">
-              <input type="text"
-                     placeholder="Search..."
+              <input placeholder="Search..."
+                     type="text"
               >
             </div>
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -881,7 +908,8 @@ exports[`pretty-select field should render open choices correctly (Colors (R)) 1
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -892,7 +920,8 @@ exports[`pretty-select field should render open choices correctly (Colors (R)) 1
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -935,20 +964,20 @@ exports[`pretty-select field should render open choices correctly (Colors 2) 1`]
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -960,13 +989,14 @@ exports[`pretty-select field should render open choices correctly (Colors 2) 1`]
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -978,7 +1008,8 @@ exports[`pretty-select field should render open choices correctly (Colors 2) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1023,20 +1054,20 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
         <div class>
           Tres colores
         </div>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -1051,18 +1082,19 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <div class="choices-search">
-              <input type="text"
-                     placeholder="Search..."
+              <input placeholder="Search..."
+                     type="text"
               >
             </div>
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1074,7 +1106,8 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1086,7 +1119,8 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1098,9 +1132,10 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
-                   style="cursor: pointer;"
+                <a aria-selected="false"
                    class="action-choice clear-current-choice"
+                   role="option"
+                   style="cursor: pointer;"
                 >
                   <span class="choice-label clear-current-choice">
                     Clear Current Choice
@@ -1108,9 +1143,10 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
-                   style="cursor: pointer;"
+                <a aria-selected="false"
                    class="action-choice enter-custom-value"
+                   role="option"
+                   style="cursor: pointer;"
                 >
                   <span class="choice-label enter-custom-value">
                     Type a custom value
@@ -1118,9 +1154,10 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
-                   style="cursor: pointer;"
+                <a aria-selected="false"
                    class="action-choice insert-field"
+                   role="option"
+                   style="cursor: pointer;"
                 >
                   <span class="choice-label insert-field">
                     Choose an available field
@@ -1128,9 +1165,10 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
-                   style="cursor: pointer;"
+                <a aria-selected="false"
                    class="action-choice load-more-choices"
+                   role="option"
+                   style="cursor: pointer;"
                 >
                   <span class="choice-label load-more-choices">
                     Load more choices..
@@ -1170,20 +1208,20 @@ exports[`pretty-select field should render open choices correctly (Empty) 1`] = 
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -1195,13 +1233,14 @@ exports[`pretty-select field should render open choices correctly (Empty) 1`] = 
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1242,20 +1281,20 @@ exports[`pretty-select field should render open choices correctly (Loading) 1`] 
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -1267,13 +1306,14 @@ exports[`pretty-select field should render open choices correctly (Loading) 1`] 
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1316,20 +1356,20 @@ exports[`pretty-select field should render open choices correctly (Readonly Size
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class
+             role="listbox"
              tabindex="0"
-             class
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -1373,20 +1413,20 @@ exports[`pretty-select field should render open choices correctly (Select with N
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -1401,13 +1441,14 @@ exports[`pretty-select field should render open choices correctly (Select with N
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1419,7 +1460,8 @@ exports[`pretty-select field should render open choices correctly (Select with N
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1431,7 +1473,8 @@ exports[`pretty-select field should render open choices correctly (Select with N
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1475,20 +1518,20 @@ exports[`pretty-select field should render open choices correctly (Select with S
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -1500,18 +1543,19 @@ exports[`pretty-select field should render open choices correctly (Select with S
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <div class="choices-search">
-              <input type="text"
-                     placeholder="Search..."
+              <input placeholder="Search..."
+                     type="text"
               >
             </div>
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class>
@@ -1520,7 +1564,8 @@ exports[`pretty-select field should render open choices correctly (Select with S
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1531,7 +1576,8 @@ exports[`pretty-select field should render open choices correctly (Select with S
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1542,7 +1588,8 @@ exports[`pretty-select field should render open choices correctly (Select with S
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1553,7 +1600,8 @@ exports[`pretty-select field should render open choices correctly (Select with S
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class>
@@ -1562,7 +1610,8 @@ exports[`pretty-select field should render open choices correctly (Select with S
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1573,7 +1622,8 @@ exports[`pretty-select field should render open choices correctly (Select with S
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1584,7 +1634,8 @@ exports[`pretty-select field should render open choices correctly (Select with S
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1627,20 +1678,20 @@ exports[`pretty-select field should render open choices correctly (Size) 1`] = `
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box"
+                <div class="pretty-text-box"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -1655,18 +1706,19 @@ exports[`pretty-select field should render open choices correctly (Size) 1`] = `
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <div class="choices-search">
-              <input type="text"
-                     placeholder="Search..."
+              <input placeholder="Search..."
+                     type="text"
               >
             </div>
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1678,7 +1730,8 @@ exports[`pretty-select field should render open choices correctly (Size) 1`] = `
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1690,7 +1743,8 @@ exports[`pretty-select field should render open choices correctly (Size) 1`] = `
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1734,20 +1788,20 @@ exports[`pretty-select field should render open choices correctly (Yes/No) 1`] =
         </div>
         <span>
         </span>
-        <div role="listbox"
+        <div class="choices-open"
+             role="listbox"
              tabindex="0"
-             class="choices-open"
         >
           <div>
-            <div role="presentation"
-                 class="pretty-text-wrapper"
+            <div class="pretty-text-wrapper"
+                 role="presentation"
             >
               <div class="pretty-text-click-wrapper"
-                   tabindex="0"
                    role="textbox"
+                   tabindex="0"
               >
-                <div role="presentation"
-                     class="pretty-text-box placeholder"
+                <div class="pretty-text-box placeholder"
+                     role="presentation"
                 >
                   <div class="internal-text-wrapper">
                     <span>
@@ -1759,18 +1813,19 @@ exports[`pretty-select field should render open choices correctly (Yes/No) 1`] =
             <span class="select-arrow">
             </span>
           </div>
-          <div role="presentation"
-               class="choices-container"
+          <div class="choices-container"
+               role="presentation"
                style="user-select: none; position: absolute; max-height: 768px;"
           >
             <div class="choices-search">
-              <input type="text"
-                     placeholder="Search..."
+              <input placeholder="Search..."
+                     type="text"
               >
             </div>
             <ul class="choices">
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1781,7 +1836,8 @@ exports[`pretty-select field should render open choices correctly (Yes/No) 1`] =
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
+                <a aria-selected="false"
+                   role="option"
                    style="cursor: pointer;"
                 >
                   <span class="choice-label">
@@ -1792,9 +1848,10 @@ exports[`pretty-select field should render open choices correctly (Yes/No) 1`] =
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
-                   style="cursor: pointer;"
+                <a aria-selected="false"
                    class="action-choice enter-custom-value"
+                   role="option"
+                   style="cursor: pointer;"
                 >
                   <span class="choice-label enter-custom-value">
                     Use a Custom Value
@@ -1802,9 +1859,10 @@ exports[`pretty-select field should render open choices correctly (Yes/No) 1`] =
                 </a>
               </li>
               <li class="choice">
-                <a role="option"
-                   style="cursor: pointer;"
+                <a aria-selected="false"
                    class="action-choice clear-current-choice"
+                   role="option"
+                   style="cursor: pointer;"
                 >
                   <span class="choice-label clear-current-choice">
                     Clear Current Choice

@@ -90,9 +90,9 @@ export default createReactClass({
 
     return (
       <fieldset
-        renderWith={this.renderWith('FieldBody')}
-        key={groupKey}
         className={className}
+        key={groupKey}
+        renderWith={this.renderWith('FieldBody')}
       >
         {legend}
         {childFields}

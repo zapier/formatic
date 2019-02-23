@@ -19,8 +19,8 @@ exports[`code field should render correctly 1`] = `
         <span>
         </span>
         <div class="pretty-text-wrapper">
-          <div role="presentation"
-               class="pretty-text-box"
+          <div class="pretty-text-box"
+               role="presentation"
                tabindex="0"
           >
             <div class="internal-text-wrapper">

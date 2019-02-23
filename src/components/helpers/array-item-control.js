@@ -77,8 +77,8 @@ export default createReactClass({
 
     return (
       <div
-        renderWith={this.renderWith('ListItemControl')}
         className={cx(this.props.classes)}
+        renderWith={this.renderWith('ListItemControl')}
       >
         <span renderWith={this.renderWith('ListItemMoveControl')}>
           {moveItemBack}

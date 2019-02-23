@@ -20,7 +20,7 @@ const styles = {
 
 const Section = props => (
   <div css={styles.section}>
-    <h2 css={styles.sectionHead}>
+    <h2 css={styles.sectionHead} id={dashify(props.title)}>
       {props.title}
       <a css={styles.link} href={`#${dashify(props.title)}`}>
         <Icon svg={LinkIcon} />

@@ -35,15 +35,15 @@ export default createReactClass({
 
     return fieldTemplates.length < 2 ? null : (
       <select
-        renderWith={this.renderWith('FieldTemplateChoicesSelectInput')}
         className={cx(this.props.classes)}
-        value={this.fieldTemplateIndex}
         onChange={this.onChange}
+        renderWith={this.renderWith('FieldTemplateChoicesSelectInput')}
+        value={this.fieldTemplateIndex}
       >
         {fieldTemplates.map((fieldTemplate, i) => (
           <option
-            renderWith={this.renderWith('FieldTemplateChoicesOption')}
             key={i}
+            renderWith={this.renderWith('FieldTemplateChoicesOption')}
             value={i}
           >
             {fieldTemplate.label || i}

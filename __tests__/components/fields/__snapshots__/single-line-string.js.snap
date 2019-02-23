@@ -22,11 +22,11 @@ exports[`single-line-string field should render correctly 1`] = `
         <div class>
           help for the single line string field
         </div>
-        <input tabindex="0"
-               type="text"
+        <input autocomplete="on"
                class
-               autocomplete="on"
                placeholder="type something..."
+               tabindex="0"
+               type="text"
                value
         >
       </div>
@@ -41,9 +41,9 @@ exports[`single-line-string field should render correctly 1`] = `
         <div class>
           help for the required name field
         </div>
-        <input tabindex="0"
+        <input class
+               tabindex="0"
                type="text"
-               class
                value="Unknown"
         >
       </div>
@@ -57,10 +57,10 @@ exports[`single-line-string field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <input tabindex="-1"
-               type="text"
-               class
+        <input class
                readonly
+               tabindex="-1"
+               type="text"
                value="Bob"
         >
       </div>
@@ -74,15 +74,15 @@ exports[`single-line-string field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div role="presentation"
-             class="pretty-text-wrapper"
+        <div class="pretty-text-wrapper"
+             role="presentation"
         >
           <div class="pretty-text-click-wrapper"
-               tabindex="0"
                role="textbox"
+               tabindex="0"
           >
-            <div role="presentation"
-                 class="pretty-text-box placeholder"
+            <div class="pretty-text-box placeholder"
+                 role="presentation"
                  tabindex="0"
             >
               <div class="internal-text-wrapper">
@@ -91,8 +91,8 @@ exports[`single-line-string field should render correctly 1`] = `
               </div>
             </div>
           </div>
-          <a href="JavaScript:"
-             class
+          <a class
+             href="JavaScript:"
           >
             Insert...
           </a>

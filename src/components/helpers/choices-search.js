@@ -30,15 +30,15 @@ export default createReactClass({
   renderDefault: function() {
     return (
       <div
-        renderWith={this.renderWith('ChoicesSearch')}
         className="choices-search"
+        renderWith={this.renderWith('ChoicesSearch')}
       >
         <input
-          renderWith={this.renderWith('ChoicesSearchInput')}
-          ref={ref(this, 'input')}
-          type="text"
-          placeholder="Search..."
           onChange={this.props.onChange}
+          placeholder="Search..."
+          ref={ref(this, 'input')}
+          renderWith={this.renderWith('ChoicesSearchInput')}
+          type="text"
         />
       </div>
     );

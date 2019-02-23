@@ -27,8 +27,8 @@ export default createReactClass({
     const choice = this.props.choice;
     return (
       <span
-        renderWith={this.renderWith('ChoiceSectionHeader')}
         className={cx(this.props.classes)}
+        renderWith={this.renderWith('ChoiceSectionHeader')}
       >
         {choice.label}
       </span>

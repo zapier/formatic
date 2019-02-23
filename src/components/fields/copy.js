@@ -26,11 +26,11 @@ export default createReactClass({
   renderDefault: function() {
     return (
       <div
-        renderWith={this.renderWith('FieldBody')}
         className={cx(this.props.classes)}
         dangerouslySetInnerHTML={{
           __html: this.props.config.fieldHelpText(this.props.field),
         }}
+        renderWith={this.renderWith('FieldBody')}
       />
     );
   },

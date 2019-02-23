@@ -110,7 +110,7 @@ const NavItem = props => {
   const target = /^https?:/.test(props.url) ? title : undefined;
   return (
     <li css={[styles.item, props.isCurrent && styles.itemIsCurrent]}>
-      <NavLink target={target} href={props.url} isActive={props.isCurrent}>
+      <NavLink href={props.url} isActive={props.isCurrent} target={target}>
         {props.navTitle || props.title}
       </NavLink>
     </li>
@@ -125,7 +125,7 @@ const NavMenu = props => (
           <Container>
             <nav css={styles.nav}>
               <div css={styles.brand}>
-                <RawLink href="/" css={styles.brandLink}>
+                <RawLink css={styles.brandLink} href="/">
                   Formatic
                 </RawLink>
               </div>

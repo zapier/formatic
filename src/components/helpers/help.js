@@ -28,9 +28,9 @@ export default createReactClass({
 
     return helpText ? (
       <div
-        renderWith={this.renderWith('Help')}
         className={cx(this.props.classes)}
         dangerouslySetInnerHTML={{ __html: helpText }}
+        renderWith={this.renderWith('Help')}
       />
     ) : (
       <span renderWith={this.renderWith('EmptyHelp')} />

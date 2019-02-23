@@ -68,7 +68,7 @@ export default createReactClass({
     });
 
     return (
-      <div renderWith={this.renderWith('ListItem')} className={cx(classes)}>
+      <div className={cx(classes)} renderWith={this.renderWith('ListItem')}>
         {arrayItemValue}
         {arrayItemControl}
       </div>

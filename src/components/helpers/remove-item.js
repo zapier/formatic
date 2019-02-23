@@ -50,8 +50,8 @@ export default createReactClass({
 
       return (
         <button
-          renderWith={this.renderWith('ReadOnlyRemoveItem')}
           className={cx(classes)}
+          renderWith={this.renderWith('ReadOnlyRemoveItem')}
         >
           {this.props.label}
         </button>
@@ -65,14 +65,16 @@ export default createReactClass({
     };
 
     return (
+      // This hover is hardly useful and maybe should be removed anyway.
+      // eslint-disable-next-line jsx-a11y/mouse-events-have-key-events
       <button
+        className={cx(this.props.classes)}
+        onClick={this.props.onClick}
+        onKeyDown={onKeyDown}
+        onMouseOut={this.onMouseOutRemove}
+        onMouseOver={this.onMouseOverRemove}
         renderWith={this.renderWith('RemoveItem')}
         tabIndex={0}
-        className={cx(this.props.classes)}
-        onKeyDown={onKeyDown}
-        onClick={this.props.onClick}
-        onMouseOver={this.onMouseOverRemove}
-        onMouseOut={this.onMouseOutRemove}
       >
         {this.props.label}
       </button>

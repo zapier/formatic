@@ -40,14 +40,14 @@ export default createReactClass({
         plain: this.props.plain,
       },
       <textarea
-        renderWith={this.renderWith('TextareaInput')}
-        value={field.value}
         className={cx(this.props.classes)}
-        rows={field.rows || this.props.rows}
+        disabled={this.isReadOnly()}
+        onBlur={this.onBlurAction}
         onChange={this.onChange}
         onFocus={this.onFocusAction}
-        onBlur={this.onBlurAction}
-        disabled={this.isReadOnly()}
+        renderWith={this.renderWith('TextareaInput')}
+        rows={field.rows || this.props.rows}
+        value={field.value}
       />
     );
   },

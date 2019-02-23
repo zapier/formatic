@@ -159,8 +159,8 @@ export default createReactClass({
         plain: this.props.plain,
       },
       <div
-        renderWith={this.renderWith('FieldBody')}
         className={cx(this.props.classes)}
+        renderWith={this.renderWith('FieldBody')}
       >
         {content}
         {assocList}

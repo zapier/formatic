@@ -20,6 +20,6 @@ const value = { firstName: 'Joe', lastName: 'Foo' };
 
 // Render the form with a value.
 React.render(
-  <Formatic fields={fields} defaultValue={value} />,
+  <Formatic defaultValue={value} fields={fields} />,
   document.getElementById('some-element')
 );

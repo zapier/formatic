@@ -61,21 +61,21 @@ export default createReactClass({
     // Render read-only version.
     const element = (
       <div
-        renderWith={this.renderWith('FieldBody')}
         className="pretty-text-wrapper"
+        renderWith={this.renderWith('FieldBody')}
       >
         <div
+          className={textBoxClasses}
+          onBlur={this.onBlurAction}
+          onFocus={this.onFocusAction}
           renderWith={this.renderWith('TabTarget')}
           role="presentation"
-          className={textBoxClasses}
           tabIndex={this.tabIndex()}
-          onFocus={this.onFocusAction}
-          onBlur={this.onBlurAction}
         >
           <div
-            renderWith={this.renderWith('TextWrapper')}
-            ref={ref(this, 'textBox')}
             className="internal-text-wrapper"
+            ref={ref(this, 'textBox')}
+            renderWith={this.renderWith('TextWrapper')}
           />
         </div>
       </div>

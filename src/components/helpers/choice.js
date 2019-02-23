@@ -52,13 +52,14 @@ export default createReactClass({
 
     return (
       // Keyboard accessible with up/down arrows.
-      // eslint-disable-next-line jsx-a11y/interactive-supports-focus
+      // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/anchor-is-valid, jsx-a11y/click-events-have-key-events
       <a
+        aria-selected={false}
+        className={anchorClasses}
+        onClick={this.onSelect}
         renderWith={this.renderWith('Choice')}
         role="option"
         style={{ cursor: 'pointer' }}
-        onClick={this.onSelect}
-        className={anchorClasses}
       >
         {choice.sectionKey ? (
           this.props.config.createElement('choice-section-header', {
@@ -71,9 +72,9 @@ export default createReactClass({
         ) : (
           <React.Fragment>
             <span
-              renderWith={this.renderWith('ChoiceLabel')}
-              ref={ref(this, 'label')}
               className={labelClasses}
+              ref={ref(this, 'label')}
+              renderWith={this.renderWith('ChoiceLabel')}
             >
               {label || choice.label}
             </span>
@@ -86,8 +87,8 @@ export default createReactClass({
               })
             ) : label ? null : (
               <span
-                renderWith={this.renderWith('ChoiceSample')}
                 className="choice-sample"
+                renderWith={this.renderWith('ChoiceSample')}
               >
                 {this.sampleString(choice.sample)}
               </span>

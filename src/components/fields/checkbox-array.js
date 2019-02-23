@@ -70,22 +70,22 @@ export default createReactClass({
             style={{ whiteSpace: 'nowrap' }}
           >
             <input
-              renderWith={this.renderWith('CheckboxInput')}
-              name={field.key}
-              type="checkbox"
-              value={choice.value}
               checked={field.value.indexOf(choice.value) >= 0 ? true : false}
+              disabled={this.isReadOnly()}
+              name={field.key}
+              onBlur={this.onBlurAction}
               onChange={this.onChange}
               onFocus={this.onFocusAction}
-              onBlur={this.onBlurAction}
-              disabled={this.isReadOnly()}
+              renderWith={this.renderWith('CheckboxInput')}
+              type="checkbox"
+              value={choice.value}
             />
-            <span renderWith={this.renderWith('InputSpacer')} key="spacer">
+            <span key="spacer" renderWith={this.renderWith('InputSpacer')}>
               {' '}
             </span>
             <span
-              renderWith={this.renderWith('ChoiceLabel')}
               className="field-choice-label"
+              renderWith={this.renderWith('ChoiceLabel')}
             >
               {choice.label}
             </span>
@@ -95,9 +95,9 @@ export default createReactClass({
         if (isInline) {
           return (
             <span
-              renderWith={this.renderWith('Choice')}
-              key={i}
               className="field-choice"
+              key={i}
+              renderWith={this.renderWith('Choice')}
             >
               {inputField}{' '}
             </span>
@@ -106,9 +106,9 @@ export default createReactClass({
 
         return (
           <span
-            renderWith={this.renderWith('Choice')}
-            key={i}
             className="field-choice"
+            key={i}
+            renderWith={this.renderWith('Choice')}
           >
             {inputField}{' '}
             {config.createElement('sample', {
@@ -128,9 +128,9 @@ export default createReactClass({
         field,
       },
       <div
-        renderWith={this.renderWith('FieldBody')}
         className={cx(this.props.classes)}
         ref={ref(this, 'choices')}
+        renderWith={this.renderWith('FieldBody')}
       >
         {inputs}
       </div>

@@ -6,9 +6,9 @@ const config = Formatic.createConfig(() => ({
     <FieldContainer {...props}>
       {({ onChangeValue, onFocus, onBlur }) => (
         <input
+          onBlur={onBlur}
           onChange={event => onChangeValue(event.target.value.toUpperCase())}
           onFocus={onFocus}
-          onBlur={onBlur}
           value={props.field.value}
         />
       )}
@@ -31,8 +31,8 @@ class App extends React.Component {
       <Formatic
         config={config}
         fields={fields}
-        value={this.state}
         onChange={this.onChange}
+        value={this.state}
       />
     );
   }
