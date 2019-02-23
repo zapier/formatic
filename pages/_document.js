@@ -1,5 +1,31 @@
 import React from 'react';
-import Document, { Head, Main, NextScript } from 'next/document';
+import Document, { Head as NextHead, Main, NextScript } from 'next/document';
+
+const STYLES_CHUNK_HREF = '/_next/static/css/styles.chunk.css';
+
+// This is weird, but Next.js doesn't seem to be adding styles.chunk.css to the
+// static build. So we'll just sneak it in by extending Head and overriding the
+// getCssLinks method. Kind of yucky, but it gets the job done.
+class Head extends NextHead {
+  getCssLinks() {
+    const cssLinks = super.getCssLinks();
+    const stylesChunkLink = cssLinks.find(
+      link =>
+        link && link.props.href && link.props.href.includes(STYLES_CHUNK_HREF)
+    );
+    if (stylesChunkLink) {
+      return cssLinks;
+    }
+    return cssLinks.concat(
+      <link
+        key="static/chunks/"
+        rel="stylesheet"
+        href={this.props.prefixHref(STYLES_CHUNK_HREF)}
+      />
+    );
+  }
+}
+
 export default class MyDocument extends Document {
   render() {
     const prefixHref = href => {
@@ -11,7 +37,7 @@ export default class MyDocument extends Document {
 
     return (
       <html>
-        <Head>
+        <Head prefixHref={prefixHref}>
           <meta name="viewport" content="initial-scale=1.0" />
           <link
             rel="apple-touch-icon"
@@ -104,15 +130,6 @@ export default class MyDocument extends Document {
             href="https://fonts.googleapis.com/css?family=Open+Sans"
             rel="stylesheet"
           />
-          {process.env.NODE_ENV === 'production' && (
-            <>
-              <link rel="stylesheet" href={prefixHref('/static/css/app.css')} />
-              <link
-                rel="stylesheet"
-                href={prefixHref('/static/css/formatic.css')}
-              />
-            </>
-          )}
         </Head>
         <body>
           <Main />
