@@ -36468,7 +36468,7 @@ var Plugins = function Plugins(props) {
   }, react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement(_docs_components_Sections__WEBPACK_IMPORTED_MODULE_7__["default"], null, react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement(_docs_components_Section__WEBPACK_IMPORTED_MODULE_5__["default"], {
     title: "Config"
   }, react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement("p", null, "Plugins are simply functions that help to create a configuration object that is passed into Formatic, so first let's talk about the config."), react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement("p", null, "Almost all of Formatic's behavior is passed in via the", ' ', react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement(_docs_components_Code__WEBPACK_IMPORTED_MODULE_8__["default"], null, "config"), " property. If you pass in no config, then Formatic uses it's own", ' ', react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement("a", {
-    href: "https://github.com/zapier/formatic/blob/master/lib/default-config.js"
+    href: "https://github.com/zapier/formatic/blob/master/src/default-config.js"
   }, "default config plugin"), ' ', "to create a config for you. To change Formatic's behavior, you simply pass in a config object with different methods."), react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement("p", null, "Passing in no config:"), react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement(_docs_components_CodeBlock__WEBPACK_IMPORTED_MODULE_6__["default"], {
     language: "javascript"
   }, props.snippets['plugin-no-config']), react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement("p", null, "Is equivalent to this:"), react__WEBPACK_IMPORTED_MODULE_2___default.a.createElement(_docs_components_CodeBlock__WEBPACK_IMPORTED_MODULE_6__["default"], {
@@ -36614,7 +36614,7 @@ function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in ob
 
 /***/ }),
 
-/***/ 8:
+/***/ 1:
 /*!*******************************************************************************************************************************!*\
   !*** multi next-client-pages-loader?page=%2Fplugins&absolutePagePath=%2FUsers%2Fjustin%2Fgit%2Fformatic%2Fpages%2Fplugins.js ***!
   \*******************************************************************************************************************************/
@@ -36637,5 +36637,5 @@ module.exports = dll_41986bbe1dd678c1e031;
 
 /***/ })
 
-},[[8,"static/runtime/webpack.js","styles"]]]));;
+},[[1,"static/runtime/webpack.js","styles"]]]));;
 //# sourceMappingURL=plugins.js.map
