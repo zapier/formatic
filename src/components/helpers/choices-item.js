@@ -33,7 +33,12 @@ export default createReactClass({
     }
 
     return (
-      <li renderWith={this.renderWith('ChoicesItem')} className={cx(classes)}>
+      <li
+        renderWith={this.renderWith('ChoicesItem', {
+          isHovering: this.props.isHovering,
+        })}
+        className={cx(classes)}
+      >
         {this.props.children}
       </li>
     );

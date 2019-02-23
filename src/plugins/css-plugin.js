@@ -3,6 +3,9 @@ import cx from 'classnames';
 const plugin = config => {
   const { renderTag } = config;
   const classes = {
+    ChoicesItem: ({ isHovering }) => ({
+      'Formatic_ChoicesItem-isHovering': isHovering,
+    }),
     Field: ({ field }) => ({
       'Formatic_Field-IsReadOnly': config.fieldIsReadOnly(field),
     }),
