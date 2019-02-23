@@ -1,6 +1,6 @@
 {
   "name": "formatic",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Automatic, pluggable form generation",
   "main": "./build/lib/index.cjs.js",
   "module": "./build/lib/index.esm.js",
@@ -19,7 +19,7 @@
     "precommit": "zapier-scripts format-staged",
     "prepublish": "yarn build",
     "preversion": "yarn test",
-    "postversion": "git push --tags && yarn publish . --tag $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\"",
+    "postversion": "git push --tags && yarn publish . --new-version $npm_package_version && git push && echo \"Successfully released version $npm_package_version!\"",
     "publish-docs": "yarn build-docs && touch build-docs/.nojekyll && gh-pages -d build-docs --dotfiles",
     "start": "PORT=`get-port 3333` node start-server.js --open",
     "test": "jest"
