@@ -2,8 +2,8 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import Formatic from '../../lib/formatic';
-import FieldContainer from '../../lib/components/field-container';
+import Formatic from '../../src/formatic';
+import FieldContainer from '../../src/components/field-container';
 
 describe('FieldContainer', () => {
   it('should pass in onChangeValue', () => {

@@ -4,8 +4,8 @@
 import React from 'react';
 import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
-import Formatic from '../../../lib/formatic';
-import ObjectClass from '../../../lib/components/fields/object';
+import Formatic from '../../../src/formatic';
+import ObjectClass from '../../../src/components/fields/object';
 import { renderFieldsToHtml } from '../../../FormaticTestUtils';
 import objectExample from '../../../demo/examples/object';
 

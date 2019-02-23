@@ -1,7 +1,7 @@
 import React from 'react';
 import 'isomorphic-unfetch';
 
-import Formatic from '../lib/formatic';
+import Formatic from '../src/formatic';
 import Page from '../docs/components/Page';
 import Section from '../docs/components/Section';
 import SubSection from '../docs/components/SubSection';

@@ -1,7 +1,7 @@
 /*global describe, it, expect*/
 'use strict';
 
-import _ from '../lib/undash';
+import _ from '../src/undash';
 
 describe('utils', () => {
   it('should flatten', () => {

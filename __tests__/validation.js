@@ -1,7 +1,7 @@
 /*global describe, it, expect*/
 'use strict';
 
-import Formatic from '../lib/formatic';
+import Formatic from '../src/formatic';
 
 describe('types and value changes', function() {
   const config = Formatic.createConfig();
