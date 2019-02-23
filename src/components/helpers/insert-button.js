@@ -10,10 +10,10 @@ import PropTypes from 'prop-types';
 import createReactClass from 'create-react-class';
 import cx from 'classnames';
 
-import HelperMixin from '../../mixins/helper';
+import HelperMixin from '@/src/mixins/helper';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 export default createReactClass({
   displayName: 'InsertButton',

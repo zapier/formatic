@@ -9,10 +9,10 @@ Render a single line text input.
 import createReactClass from 'create-react-class';
 import cx from 'classnames';
 
-import FieldMixin from '../../mixins/field';
+import FieldMixin from '@/src/mixins/field';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 export default createReactClass({
   displayName: 'Password',

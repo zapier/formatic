@@ -8,7 +8,7 @@ from your component like this:
 ```js
 import createReactClass from 'create-react-class';
 
-import ClickOutsideMixin from '../../mixins/click-outside';
+import ClickOutsideMixin from '@/src/mixins/click-outside';
 
 exports default createReactClass({
 
@@ -33,7 +33,7 @@ exports default createReactClass({
 
 'use strict';
 
-import _ from '../undash';
+import _ from '@/src/undash';
 
 const hasAncestor = function(child, parent) {
   if (child.parentNode === parent) {

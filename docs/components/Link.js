@@ -2,8 +2,8 @@
 import { jsx, css } from '@emotion/core';
 import NextLink from 'next/link';
 
-import Colors from '../styles/Colors';
-import { prefixHref } from '../utils';
+import Colors from '@/docs/styles/Colors';
+import { prefixHref } from '@/docs/utils';
 
 const styles = {
   link: css({

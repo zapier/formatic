@@ -5,7 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-dom/test-utils';
 
-import Formatic from '../src/formatic';
+import Formatic from '@/src/formatic';
 
 describe('actions', function() {
   const mounted = function(element) {

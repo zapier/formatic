@@ -7,7 +7,7 @@ with Twitter Bootstrap.
 
 'use strict';
 
-import _ from '../undash';
+import _ from '@/src/undash';
 
 // Declare some classes and labels for each element.
 const modifiers = {

@@ -8,7 +8,7 @@ Render a dropdown to handle yes/no boolean values.
 
 import createReactClass from 'create-react-class';
 
-import FieldMixin from '../../mixins/field';
+import FieldMixin from '@/src/mixins/field';
 
 export default createReactClass({
   displayName: 'Boolean',

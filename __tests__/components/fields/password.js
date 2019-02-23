@@ -1,7 +1,7 @@
 /*global describe, it, expect*/
 
-import { renderFieldsToHtml } from '../../../FormaticTestUtils';
-import passwordExample from '../../../demo/examples/password';
+import { renderFieldsToHtml } from '@/src/FormaticTestUtils';
+import passwordExample from '@/demo/examples/password';
 
 describe('password field', () => {
   it('should render correctly', () => {

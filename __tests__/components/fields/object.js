@@ -4,10 +4,10 @@
 import React from 'react';
 import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
-import Formatic from '../../../src/formatic';
-import ObjectClass from '../../../src/components/fields/object';
-import { renderFieldsToHtml } from '../../../FormaticTestUtils';
-import objectExample from '../../../demo/examples/object';
+import Formatic from '@/src/formatic';
+import ObjectClass from '@/src/components/fields/object';
+import { renderFieldsToHtml } from '@/src/FormaticTestUtils';
+import objectExample from '@/demo/examples/object';
 
 const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');

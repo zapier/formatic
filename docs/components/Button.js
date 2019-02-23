@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
-import Colors from '../styles/Colors';
+import Colors from '@/docs/styles/Colors';
 
 const getTag = props => {
   if (props.isDisabled) {

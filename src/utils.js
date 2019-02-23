@@ -6,7 +6,7 @@ Just some shared utility functions.
 
 'use strict';
 
-import _ from './undash';
+import _ from '@/src/undash';
 import ReactDOM from 'react-dom';
 
 const utils = {};

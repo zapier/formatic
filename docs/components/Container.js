@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
-import { getMediaQueriesForWidths } from '../styles/Media';
+import { getMediaQueriesForWidths } from '@/docs/styles/Media';
 
 const styles = {
   container: css({

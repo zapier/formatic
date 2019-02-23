@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 
-import Typography from '../styles/Typography';
+import Typography from '@/docs/styles/Typography';
 
 const styles = {
   subSection: css({}),

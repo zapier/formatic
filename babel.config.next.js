@@ -9,6 +9,14 @@ module.exports = {
         sourceMap: true,
       },
     ],
+    // [
+    //   'module-resolver',
+    //   {
+    //     alias: {
+    //       root: '.',
+    //     },
+    //   },
+    // ],
   ],
   env: {
     test: {

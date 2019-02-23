@@ -14,16 +14,16 @@ is what is actually exported.
 
 import React from 'react';
 import createReactClass from 'create-react-class';
-import _ from './undash';
-import utils from './utils';
+import _ from '@/src/undash';
+import utils from '@/src/utils';
 import defaultConfigPlugin from './default-config';
 
-import ClickOutsideMixin from './mixins/click-outside.js';
-import FieldMixin from './mixins/field.js';
-import HelperMixin from './mixins/helper.js';
-import ResizeMixin from './mixins/resize.js';
-import ScrollMixin from './mixins/scroll.js';
-import UndoStackMixin from './mixins/undo-stack.js';
+import ClickOutsideMixin from '@/src/mixins/click-outside.js';
+import FieldMixin from '@/src/mixins/field.js';
+import HelperMixin from '@/src/mixins/helper.js';
+import ResizeMixin from '@/src/mixins/resize.js';
+import ScrollMixin from '@/src/mixins/scroll.js';
+import UndoStackMixin from '@/src/mixins/undo-stack.js';
 
 import bootstrapPlugin from './plugins/bootstrap';
 import cssPlugin from './plugins/css-plugin';

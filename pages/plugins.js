@@ -1,13 +1,13 @@
 import React from 'react';
 import 'isomorphic-unfetch';
 
-import Page from '../docs/components/Page';
-import Section from '../docs/components/Section';
-import CodeBlock from '../docs/components/CodeBlock';
-import Sections from '../docs/components/Sections';
-import Code from '../docs/components/Code';
+import Page from '@/docs/components/Page';
+import Section from '@/docs/components/Section';
+import CodeBlock from '@/docs/components/CodeBlock';
+import Sections from '@/docs/components/Sections';
+import Code from '@/docs/components/Code';
 
-import { loadSnippets } from '../docs/utils';
+import { loadSnippets } from '@/docs/utils';
 
 const Plugins = props => (
   <Page pageKey="plugins">

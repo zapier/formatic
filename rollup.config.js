@@ -1,4 +1,6 @@
+/* global __dirname */
 import babel from 'rollup-plugin-babel';
+import alias from 'rollup-plugin-alias';
 
 const baseConfig = {
   external: [
@@ -16,6 +18,9 @@ const baseConfig = {
   plugins: [
     babel({
       babelrc: false,
+    }),
+    alias({
+      '@': __dirname,
     }),
   ],
 };

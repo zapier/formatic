@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import Formatic from '../src/formatic';
+import Formatic from '@/src/formatic';
 
-import Page from '../docs/components/Page';
-import Sections from '../docs/components/Sections';
-import Section from '../docs/components/Section';
-import Button from '../docs/components/Button';
+import Page from '@/docs/components/Page';
+import Sections from '@/docs/components/Sections';
+import Section from '@/docs/components/Section';
+import Button from '@/docs/components/Button';
 
-import examples from '../demo/examples';
+import examples from '@/demo/examples';
 
-import customPlugin from '../demo/examples/custom-plugin';
-import cssPlugin from '../src/plugins/css-plugin';
+import customPlugin from '@/demo/examples/custom-plugin';
+import cssPlugin from '@/src/plugins/css-plugin';
 
 const Form = React.createFactory(Formatic);
 

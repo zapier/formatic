@@ -4,9 +4,9 @@
 import React from 'react';
 import TestUtils from 'react-dom/test-utils';
 
-import Formatic from '../../../src/formatic';
-import { renderFieldsToHtml } from '../../../FormaticTestUtils';
-import assocListExample from '../../../demo/examples/assoc-list';
+import Formatic from '@/src/formatic';
+import { renderFieldsToHtml } from '@/src/FormaticTestUtils';
+import assocListExample from '@/demo/examples/assoc-list';
 
 const renderedKeys = doc => {
   const inputs = TestUtils.scryRenderedDOMComponentsWithTag(doc, 'input');

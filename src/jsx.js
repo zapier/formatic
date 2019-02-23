@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { argumentsToArray } from './utils';
+import { argumentsToArray } from '@/src/utils';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 

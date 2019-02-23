@@ -2,8 +2,8 @@
 import * as React from 'react';
 import { jsx, css } from '@emotion/core';
 
-import { dashify } from '../utils';
-import { getMediaQueriesForWidths } from '../styles/Media';
+import { dashify } from '@/docs/utils';
+import { getMediaQueriesForWidths } from '@/docs/styles/Media';
 
 const styles = {
   wrapper: css({

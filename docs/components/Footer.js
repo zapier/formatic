@@ -2,7 +2,7 @@
 import { jsx, css } from '@emotion/core';
 
 import Container from './Container';
-import Colors from '../styles/Colors';
+import Colors from '@/docs/styles/Colors';
 
 const styles = {
   footer: css({

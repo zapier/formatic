@@ -4,8 +4,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import { mount } from 'enzyme';
 
-import FieldMixin from '../../../src/mixins/field';
-import HelperMixin from '../../../src/mixins/helper';
+import FieldMixin from '@/src/mixins/field';
+import HelperMixin from '@/src/mixins/helper';
 
 const MyHelper = createReactClass({
   displayName: 'MyHelper',

@@ -10,11 +10,11 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import cx from 'classnames';
 
-import HelperMixin from '../../mixins/helper';
-import { ref } from '../../utils';
+import HelperMixin from '@/src/mixins/helper';
+import { ref } from '@/src/utils';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 export default createReactClass({
   // This component also renders InfoChoice, ActionChoice, and SectionChoice.

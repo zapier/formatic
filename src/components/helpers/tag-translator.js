@@ -1,5 +1,5 @@
 'use strict';
-import _ from '../../undash';
+import _ from '@/src/undash';
 
 const buildChoicesMap = replaceChoices => {
   const choices = {};

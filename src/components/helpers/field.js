@@ -7,13 +7,13 @@ Used by any fields to put the label and help text around the field.
 'use strict';
 
 import createReactClass from 'create-react-class';
-import _ from '../../undash';
+import _ from '@/src/undash';
 import cx from 'classnames';
 
-import HelperMixin from '../../mixins/helper';
+import HelperMixin from '@/src/mixins/helper';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 export default createReactClass({
   displayName: 'Field',

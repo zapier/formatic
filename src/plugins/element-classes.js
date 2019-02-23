@@ -7,7 +7,7 @@ class to an element.
 
 'use strict';
 
-import _ from '../undash';
+import _ from '@/src/undash';
 
 export default function(config) {
   const createElement = config.createElement;

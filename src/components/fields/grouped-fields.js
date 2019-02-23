@@ -9,11 +9,11 @@ Render a fields in groups. Grouped by field.groupKey property.
 import createReactClass from 'create-react-class';
 import cx from 'classnames';
 
-import _ from '../../undash';
-import FieldMixin from '../../mixins/field';
+import _ from '@/src/undash';
+import FieldMixin from '@/src/mixins/field';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 const groupFields = function(fields, humanize) {
   const groupedFields = [];

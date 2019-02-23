@@ -1,7 +1,7 @@
 /*global describe, it, expect*/
 
-import { renderFieldsToHtml } from '../../../FormaticTestUtils';
-import checkboxBooleanExample from '../../../demo/examples/checkbox-boolean';
+import { renderFieldsToHtml } from '@/src/FormaticTestUtils';
+import checkboxBooleanExample from '@/demo/examples/checkbox-boolean';
 
 describe('checkbox-boolean field', () => {
   it('should render correctly', () => {

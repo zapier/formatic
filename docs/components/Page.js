@@ -2,12 +2,12 @@
 import { jsx, css } from '@emotion/core';
 import Layout from './Layout';
 
-import Typography from '../styles/Typography';
+import Typography from '@/docs/styles/Typography';
 
 import 'sanitize.css';
 import 'codemirror/lib/codemirror.css';
-import '../../static/css/app.css';
-import '../../static/css/formatic.css';
+import '@/static/css/app.css';
+import '@/static/css/formatic.css';
 
 const pages = {
   start: {

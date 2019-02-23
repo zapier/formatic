@@ -9,7 +9,7 @@ select drop down and supports fancier renderings.
 
 import createReactClass from 'create-react-class';
 
-import FieldMixin from '../../mixins/field';
+import FieldMixin from '@/src/mixins/field';
 
 export default createReactClass({
   displayName: 'PrettySelect',

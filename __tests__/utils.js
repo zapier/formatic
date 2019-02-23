@@ -1,7 +1,7 @@
 /*global describe, it, expect*/
 'use strict';
 
-import utils, { argumentsToArray } from '../src/utils';
+import utils, { argumentsToArray } from '@/src/utils';
 
 describe('utils', function() {
   it('should deep copy primitives', function() {

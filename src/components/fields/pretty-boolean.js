@@ -8,7 +8,7 @@ Render pretty boolean component with non-native drop-down
 
 import createReactClass from 'create-react-class';
 
-import FieldMixin from '../../mixins/field';
+import FieldMixin from '@/src/mixins/field';
 
 export default createReactClass({
   displayName: 'PrettyBoolean',

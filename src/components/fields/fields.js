@@ -9,11 +9,11 @@ Render a field to edit the values of an object with static properties.
 import createReactClass from 'create-react-class';
 import cx from 'classnames';
 
-import _ from '../../undash';
-import FieldMixin from '../../mixins/field';
+import _ from '@/src/undash';
+import FieldMixin from '@/src/mixins/field';
 
 /** @jsx jsx */
-import jsx from '../../jsx';
+import jsx from '@/src/jsx';
 
 export default createReactClass({
   displayName: 'Fields',

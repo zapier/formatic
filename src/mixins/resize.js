@@ -9,7 +9,7 @@ is only a single setInterval used for all elements. To use:
 ```js
 import createReactClass from 'create-react-class';
 
-import ResizeMixin from '../../mixins/resize';
+import ResizeMixin from '@/src/mixins/resize';
 
 export default createReactClass({
 
