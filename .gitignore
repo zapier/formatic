@@ -1,7 +1,4 @@
 node_modules
-/test.js
-/live
-/demo/test.html
 /build-docs
 /build
 .DS_Store

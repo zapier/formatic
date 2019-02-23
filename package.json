@@ -10,8 +10,8 @@
   "scripts": {
     "build-docs": "next build && next export -o build-docs",
     "build": "rollup -c",
-    "format": "zapier-scripts format '__tests__/**/*.js' 'demo/**/*.js' 'docs/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
-    "lint": "zapier-scripts lint '__tests__/**/*.js' 'demo/**/*.js' 'docs/**/*.js' 'lib/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
+    "format": "zapier-scripts format '__tests__/**/*.js' 'demo/**/*.js' 'docs/**/*.js' 'src/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
+    "lint": "zapier-scripts lint '__tests__/**/*.js' 'demo/**/*.js' 'docs/**/*.js' 'src/**/*.js' 'scripts/**/*.js' 'tasks/**/*.js' '*.js'",
     "major-release": "yarn version --major && yarn publish && git push --follow-tags",
     "minor-release": "yarn version --minor && yarn publish && git push --follow-tags",
     "patch-release": "yarn version --patch && yarn publish && git push --follow-tags",

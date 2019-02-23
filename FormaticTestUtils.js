@@ -1,7 +1,7 @@
 import React from 'react';
 import { mount } from 'enzyme';
 
-import Formatic from './lib/formatic';
+import Formatic from './src/formatic';
 
 // Render some Formatic fields to HTML so we can do a snapshot test of them.
 // Pass in a callback so you can do assertions on the components as well.

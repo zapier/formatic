@@ -24,7 +24,7 @@ export default [
   {
     ...baseConfig,
 
-    input: './lib/formatic.cjs.js',
+    input: './src/formatic.cjs.js',
 
     output: {
       format: 'cjs',
@@ -34,7 +34,7 @@ export default [
   {
     ...baseConfig,
 
-    input: './lib/formatic.js',
+    input: './src/formatic.js',
 
     output: {
       format: 'esm',

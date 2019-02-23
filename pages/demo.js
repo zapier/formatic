@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-import Formatic from '../lib/formatic';
+import Formatic from '../src/formatic';
 
 import Page from '../docs/components/Page';
 import Sections from '../docs/components/Sections';
@@ -10,7 +10,7 @@ import Button from '../docs/components/Button';
 import examples from '../demo/examples';
 
 import customPlugin from '../demo/examples/custom-plugin';
-import cssPlugin from '../lib/plugins/css-plugin';
+import cssPlugin from '../src/plugins/css-plugin';
 
 const Form = React.createFactory(Formatic);
 

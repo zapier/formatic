@@ -5,7 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import TestUtils from 'react-dom/test-utils';
 import _ from 'lodash';
-import Formatic from '../lib/formatic';
+import Formatic from '../src/formatic';
 
 const printTree = function(node, indent) {
   indent = indent || '';

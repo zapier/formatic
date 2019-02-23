@@ -22,7 +22,7 @@ const Plugins = props => (
           Almost all of Formatic's behavior is passed in via the{' '}
           <Code>config</Code> property. If you pass in no config, then Formatic
           uses it's own{' '}
-          <a href="https://github.com/zapier/formatic/blob/master/lib/default-config.js">
+          <a href="https://github.com/zapier/formatic/blob/master/src/default-config.js">
             default config plugin
           </a>{' '}
           to create a config for you. To change Formatic's behavior, you simply

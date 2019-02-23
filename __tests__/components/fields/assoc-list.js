@@ -4,7 +4,7 @@
 import React from 'react';
 import TestUtils from 'react-dom/test-utils';
 
-import Formatic from '../../../lib/formatic';
+import Formatic from '../../../src/formatic';
 import { renderFieldsToHtml } from '../../../FormaticTestUtils';
 import assocListExample from '../../../demo/examples/assoc-list';
 
