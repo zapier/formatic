@@ -1125,7 +1125,8 @@ body {
 
 .Formatic_PrettySelect_Choice:hover,
 .Formatic_PrettyBoolean_Choice:hover,
-.Formatic_PrettyText_Choice:hover {
+.Formatic_PrettyText_Choice:hover,
+.Formatic_ChoicesItem-isHovering {
   background-color: #eef0f2;
 }
 
