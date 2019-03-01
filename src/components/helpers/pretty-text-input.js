@@ -520,8 +520,12 @@ export default createReactClass({
     this.codeMirror.off('focus', this.onFocusCodeMirror);
 
     if (this.debouncedOnChangeAndTagCodeMirror) {
+      // Cancel any trailing invocation
       this.debouncedOnChangeAndTagCodeMirror.cancel();
       this.debouncedOnChangeAndTagCodeMirror = null;
+
+      // Flush changes
+      this.onChange(this.codeMirror.getValue());
     }
 
     this.codeMirror = null;
