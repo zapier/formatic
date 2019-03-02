@@ -87,7 +87,7 @@ const DisplayFormValue = props => (
 const generateAliases = aliases =>
   aliases
     .map((alias, idx) => (
-      <span key={idx} className="code">
+      <span className="code" key={idx}>
         {alias}
       </span>
     ))
@@ -183,23 +183,23 @@ class FormDemo extends Component {
               <Form
                 config={this.state.hints[id] ? hintConfig : config}
                 fields={this.state.fields}
-                value={this.state.formState}
-                onChange={this.onChange.bind(this)}
-                onFocus={e => this.onEvent('onFocus', e)}
                 onBlur={e => this.onEvent('onBlur', e)}
-                onOpenReplacements={info =>
-                  this.onCustomEvent('onOpenReplacements', info)
+                onChange={this.onChange.bind(this)}
+                onClearCurrentChoice={info =>
+                  this.onCustomEvent('onClearCurrentChoice', info)
                 }
                 onCloseReplacements={info =>
                   this.onCustomEvent('onCloseReplacements', info)
                 }
-                onClearCurrentChoice={info =>
-                  this.onCustomEvent('onClearCurrentChoice', info)
+                onFocus={e => this.onEvent('onFocus', e)}
+                onOpenReplacements={info =>
+                  this.onCustomEvent('onOpenReplacements', info)
                 }
                 onOrderGroceries={info =>
                   this.onCustomEvent('onOrderGroceries', info)
                 }
                 readOnly={false}
+                value={this.state.formState}
               />
             </div>
           </div>
