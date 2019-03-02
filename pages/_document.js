@@ -18,9 +18,9 @@ class Head extends NextHead {
     }
     return cssLinks.concat(
       <link
+        href={this.props.prefixHref(STYLES_CHUNK_HREF)}
         key="static/chunks/"
         rel="stylesheet"
-        href={this.props.prefixHref(STYLES_CHUNK_HREF)}
       />
     );
   }
@@ -36,95 +36,95 @@ export default class MyDocument extends Document {
     };
 
     return (
-      <html>
+      <html lang="en">
         <Head prefixHref={prefixHref}>
-          <meta name="viewport" content="initial-scale=1.0" />
+          <meta content="initial-scale=1.0" name="viewport" />
           <link
+            data-reactid=".2bkozp1wjk0.0.8"
+            href={prefixHref('/static/favicons/apple-touch-icon-57x57.png')}
             rel="apple-touch-icon"
             sizes="57x57"
-            href={prefixHref('/static/favicons/apple-touch-icon-57x57.png')}
-            data-reactid=".2bkozp1wjk0.0.8"
           />
           <link
+            data-reactid=".2bkozp1wjk0.0.9"
+            href={prefixHref('/static/favicons/apple-touch-icon-60x60.png')}
             rel="apple-touch-icon"
             sizes="60x60"
-            href={prefixHref('/static/favicons/apple-touch-icon-60x60.png')}
-            data-reactid=".2bkozp1wjk0.0.9"
           />
           <link
+            data-reactid=".2bkozp1wjk0.0.a"
+            href={prefixHref('/static/favicons/apple-touch-icon-72x72.png')}
             rel="apple-touch-icon"
             sizes="72x72"
-            href={prefixHref('/static/favicons/apple-touch-icon-72x72.png')}
-            data-reactid=".2bkozp1wjk0.0.a"
           />
           <link
+            data-reactid=".2bkozp1wjk0.0.b"
+            href={prefixHref('/static/favicons/apple-touch-icon-76x76.png')}
             rel="apple-touch-icon"
             sizes="76x76"
-            href={prefixHref('/static/favicons/apple-touch-icon-76x76.png')}
-            data-reactid=".2bkozp1wjk0.0.b"
           />
           <link
+            data-reactid=".2bkozp1wjk0.0.c"
+            href={prefixHref('/static/favicons/apple-touch-icon-114x114.png')}
             rel="apple-touch-icon"
             sizes="114x114"
-            href={prefixHref('/static/favicons/apple-touch-icon-114x114.png')}
-            data-reactid=".2bkozp1wjk0.0.c"
           />
           <link
+            data-reactid=".2bkozp1wjk0.0.d"
+            href={prefixHref('/static/favicons/apple-touch-icon-120x120.png')}
             rel="apple-touch-icon"
             sizes="120x120"
-            href={prefixHref('/static/favicons/apple-touch-icon-120x120.png')}
-            data-reactid=".2bkozp1wjk0.0.d"
           />
           <link
+            data-reactid=".2bkozp1wjk0.0.e"
+            href={prefixHref('/static/favicons/apple-touch-icon-144x144.png')}
             rel="apple-touch-icon"
             sizes="144x144"
-            href={prefixHref('/static/favicons/apple-touch-icon-144x144.png')}
-            data-reactid=".2bkozp1wjk0.0.e"
           />
           <link
+            data-reactid=".2bkozp1wjk0.0.f"
+            href={prefixHref('/static/favicons/apple-touch-icon-152x152.png')}
             rel="apple-touch-icon"
             sizes="152x152"
-            href={prefixHref('/static/favicons/apple-touch-icon-152x152.png')}
-            data-reactid=".2bkozp1wjk0.0.f"
           />
           <link
+            data-reactid=".2bkozp1wjk0.0.g"
+            href={prefixHref('/static/favicons/apple-touch-icon-180x180.png')}
             rel="apple-touch-icon"
             sizes="180x180"
-            href={prefixHref('/static/favicons/apple-touch-icon-180x180.png')}
-            data-reactid=".2bkozp1wjk0.0.g"
           />
           <link
-            rel="icon"
-            type="image/png"
-            href={prefixHref('/static/favicons/favicon-32x32.png')}
-            sizes="32x32"
             data-reactid=".2bkozp1wjk0.0.h"
+            href={prefixHref('/static/favicons/favicon-32x32.png')}
+            rel="icon"
+            sizes="32x32"
+            type="image/png"
           />
           <link
-            rel="icon"
-            type="image/png"
-            href={prefixHref('/static/favicons/android-chrome-192x192.png')}
-            sizes="192x192"
             data-reactid=".2bkozp1wjk0.0.i"
+            href={prefixHref('/static/favicons/android-chrome-192x192.png')}
+            rel="icon"
+            sizes="192x192"
+            type="image/png"
           />
           <link
-            rel="icon"
-            type="image/png"
-            href={prefixHref('/static/favicons/favicon-96x96.png')}
-            sizes="96x96"
             data-reactid=".2bkozp1wjk0.0.j"
-          />
-          <link
+            href={prefixHref('/static/favicons/favicon-96x96.png')}
             rel="icon"
+            sizes="96x96"
             type="image/png"
-            href={prefixHref('/static/favicons/favicon-16x16.png')}
-            sizes="16x16"
-            data-reactid=".2bkozp1wjk0.0.k"
           />
           <link
-            rel="manifest"
-            href={prefixHref('/static/favicons/manifest.json')}
+            data-reactid=".2bkozp1wjk0.0.k"
+            href={prefixHref('/static/favicons/favicon-16x16.png')}
+            rel="icon"
+            sizes="16x16"
+            type="image/png"
+          />
+          <link
             data-reactid=".2bkozp1wjk0.0.l"
+            href={prefixHref('/static/favicons/manifest.json')}
+            rel="manifest"
           />
           <link
             href="https://fonts.googleapis.com/css?family=Open+Sans"
