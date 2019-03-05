@@ -1,4 +1,4 @@
-/*global describe, it, expect*/
+/*global jest, describe, it, expect*/
 'use strict';
 
 import _ from '@/src/undash';
@@ -60,5 +60,44 @@ describe('utils', () => {
   it('should test for objects', () => {
     expect(_.isObject({})).toBe(true);
     expect(_.isObject(null)).toBeFalsy();
+  });
+
+  describe('debounce', () => {
+    it('should debounce invocations', done => {
+      const fn = jest.fn();
+      const debounced = _.debounce(fn, 0);
+
+      debounced();
+      debounced();
+      expect(fn.mock.calls.length).toBe(0);
+
+      setTimeout(() => {
+        expect(fn.mock.calls.length).toBe(1);
+        done();
+      }, 0);
+    });
+
+    it('should invoke a function immediatly if specified', () => {
+      const fn = jest.fn();
+      const debounced = _.debounce(fn, 0, true);
+
+      debounced();
+      expect(fn.mock.calls.length).toBe(1);
+    });
+
+    it('should be able to cancel any trailing debounced invocation', done => {
+      const fn = jest.fn();
+      const debounced = _.debounce(fn, 0);
+
+      expect(debounced).toHaveProperty('cancel');
+
+      debounced();
+      debounced.cancel();
+
+      setTimeout(() => {
+        expect(fn.mock.calls.length).toBe(0);
+        done();
+      }, 0);
+    });
   });
 });

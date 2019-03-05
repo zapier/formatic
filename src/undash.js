@@ -90,7 +90,7 @@ _.debounce = function(func, wait, immediate) {
     }
   };
 
-  return function() {
+  const debounced = function() {
     context = this;
     args = arguments;
     timestamp = _.now();
@@ -105,6 +105,12 @@ _.debounce = function(func, wait, immediate) {
 
     return result;
   };
+
+  debounced.cancel = function() {
+    clearTimeout(timeout);
+  };
+
+  return debounced;
 };
 
 export default _;

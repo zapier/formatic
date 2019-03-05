@@ -83,7 +83,7 @@ export default createReactClass({
   componentWillReceiveProps: function(nextProps) {
     // If we're debouncing a change, then we should just ignore this props change,
     // because there will be another when we hit the trailing edge of the debounce.
-    if (this.isDebouncingCodeMirrorChange) {
+    if (this.debouncedOnChangeAndTagCodeMirror) {
       return;
     }
 
@@ -179,14 +179,7 @@ export default createReactClass({
   },
 
   onBlur() {
-    if (this.isDebouncingCodeMirrorChange) {
-      this.onChangeAndTagCodeMirror();
-      this.isDebouncingCodeMirrorChange = false;
-      this.setState({ hasFocus: false }, this.props.onBlur);
-    } else {
-      this.setState({ hasFocus: false });
-      this.props.onBlur();
-    }
+    this.setState({ hasFocus: false }, this.props.onBlur);
   },
 
   insertBtn: function() {
@@ -409,11 +402,16 @@ export default createReactClass({
 
     const textBox = this.textBoxRef;
     textBox.innerHTML = ''; // release any previous read-only content so it can be GC'ed
-    const pos = this.codeMirror ? this.codeMirror.getCursor() : null;
+
     this.codeMirror = this.props.config.codeMirror()(textBox, options);
     this.codeMirror.on('change', this.onCodeMirrorChange);
     this.codeMirror.on('focus', this.onFocusCodeMirror);
 
+    this.debouncedOnChangeAndTagCodeMirror = _.debounce(() => {
+      this.onChangeAndTagCodeMirror();
+    }, 200);
+
+    const pos = this.codeMirror ? this.codeMirror.getCursor() : null;
     this.tagCodeMirror(pos);
   },
 
@@ -440,7 +438,7 @@ export default createReactClass({
     //
     // But if we are calling this function from CodeMirror itself, we want to stay
     // in sync with it's internal state.
-    if (this.isDebouncingCodeMirrorChange) {
+    if (this.debouncedOnChangeAndTagCodeMirror) {
       this.maybeCodeMirrorOperation(tagOps);
       this.maybeSetCursorPosition(cursorPosition);
     } else {
@@ -452,14 +450,6 @@ export default createReactClass({
   },
 
   onChangeAndTagCodeMirror() {
-    if (!this.codeMirror) {
-      // We might have erased our codemirror instance before hitting the trailing
-      // end of the debounce. If so, get the value out of state.
-      if (this.props.value !== this.state.value) {
-        this.onChange(this.state.value);
-      }
-      return;
-    }
     this.onChange(this.codeMirror.getValue());
     this.tagCodeMirror();
   },
@@ -471,20 +461,11 @@ export default createReactClass({
     // Immediately change and tag if inserting.
     if (this.isInserting) {
       this.onChangeAndTagCodeMirror();
-      return;
     }
-
     // Otherwise, debounce so CodeMirror doesn't die.
-    if (!this.debounceCodeMirrorChange) {
-      this.debounceCodeMirrorChange = _.debounce(() => {
-        if (this.isDebouncingCodeMirrorChange) {
-          this.onChangeAndTagCodeMirror();
-          this.isDebouncingCodeMirrorChange = false;
-        }
-      }, 200);
+    else {
+      this.debouncedOnChangeAndTagCodeMirror();
     }
-    this.isDebouncingCodeMirrorChange = true;
-    this.debounceCodeMirrorChange();
   },
 
   /* Return true if we should render the placeholder */
@@ -531,10 +512,22 @@ export default createReactClass({
 
   removeCodeMirrorEditor: function() {
     const textBoxNode = this.textBoxRef;
+
     const cmNode = textBoxNode.firstChild;
     textBoxNode.removeChild(cmNode);
+
     this.codeMirror.off('change', this.onCodeMirrorChange);
     this.codeMirror.off('focus', this.onFocusCodeMirror);
+
+    if (this.debouncedOnChangeAndTagCodeMirror) {
+      // Cancel any trailing invocation
+      this.debouncedOnChangeAndTagCodeMirror.cancel();
+      this.debouncedOnChangeAndTagCodeMirror = null;
+
+      // Flush changes
+      this.onChange(this.codeMirror.getValue());
+    }
+
     this.codeMirror = null;
   },
 
