@@ -83,7 +83,7 @@ export default createReactClass({
   componentWillReceiveProps: function(nextProps) {
     // If we're debouncing a change, then we should just ignore this props change,
     // because there will be another when we hit the trailing edge of the debounce.
-    if (this.debouncedOnChangeAndTagCodeMirror) {
+    if (this.isDebouncingCodeMirrorChange) {
       return;
     }
 
@@ -408,6 +408,7 @@ export default createReactClass({
     this.codeMirror.on('focus', this.onFocusCodeMirror);
 
     this.debouncedOnChangeAndTagCodeMirror = _.debounce(() => {
+      this.isDebouncingCodeMirrorChange = false;
       this.onChangeAndTagCodeMirror();
     }, 200);
 
@@ -438,7 +439,7 @@ export default createReactClass({
     //
     // But if we are calling this function from CodeMirror itself, we want to stay
     // in sync with it's internal state.
-    if (this.debouncedOnChangeAndTagCodeMirror) {
+    if (this.isDebouncingCodeMirrorChange) {
       this.maybeCodeMirrorOperation(tagOps);
       this.maybeSetCursorPosition(cursorPosition);
     } else {
@@ -464,6 +465,7 @@ export default createReactClass({
     }
     // Otherwise, debounce so CodeMirror doesn't die.
     else {
+      this.isDebouncingCodeMirrorChange = true;
       this.debouncedOnChangeAndTagCodeMirror();
     }
   },

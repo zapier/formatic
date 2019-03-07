@@ -4,18 +4,6 @@ const fields = [
     key: 'prettyText',
     type: 'pretty-text',
     default: 'Hi there {{firstName}} {{lastName}} {{middleName}}.',
-    choices: [
-      {
-        value: 'lastName',
-        label: 'Last Name',
-        sample: 'Smith',
-      },
-      {
-        value: 'middleName',
-        label:
-          'A really long label that should break somewhere in the middle and then definitely fill up all the space.',
-      },
-    ],
     replaceChoices: [
       {
         value: 'firstName',
@@ -112,6 +100,22 @@ const fields = [
         value: 'extraName',
         label: 'Extra Name',
         sample: 'Extra',
+      },
+    ],
+  },
+  {
+    label: 'Pretty Text with Dynamic Fields',
+    key: 'prettyTextDynamic',
+    type: 'pretty-text',
+    // Not a built-in, just for testing dynamic things.
+    dynamicReplaceChoices: [
+      {
+        value: 'something',
+        label: 'Something',
+      },
+      {
+        value: 'something-else',
+        label: 'Something Else',
       },
     ],
   },
