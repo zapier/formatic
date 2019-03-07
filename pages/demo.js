@@ -60,11 +60,42 @@ const hintPlugin = config => {
   );
 };
 
+const dynamicReplaceChoices = {};
+
+const loadDynamicReplaceChoices = (field, onLoaded) => {
+  if (field.dynamicReplaceChoices && !dynamicReplaceChoices[field.key]) {
+    console.info(`loading choices for ${field.key}...`);
+    setTimeout(() => {
+      dynamicReplaceChoices[field.key] = field.dynamicReplaceChoices;
+      console.info('loaded:', field.dynamicReplaceChoices);
+      onLoaded();
+    }, 2000);
+  }
+};
+
+// Simulate dynamic replace choices.
+const fakeDynamicPlugin = ({ fieldReplaceChoices }) => ({
+  fieldReplaceChoices: field => {
+    if (field.dynamicReplaceChoices) {
+      if (dynamicReplaceChoices[field.key]) {
+        return dynamicReplaceChoices[field.key];
+      }
+      return [
+        {
+          value: '///loading///',
+        },
+      ];
+    }
+    return fieldReplaceChoices(field);
+  },
+});
+
 const config = Formatic.createConfig(
   cssPlugin,
   Formatic.plugins.reference,
   Formatic.plugins.meta,
-  customPlugin
+  customPlugin,
+  fakeDynamicPlugin
 );
 
 const hintConfig = Formatic.createConfig(
@@ -72,6 +103,7 @@ const hintConfig = Formatic.createConfig(
   Formatic.plugins.reference,
   Formatic.plugins.meta,
   customPlugin,
+  fakeDynamicPlugin,
   hintPlugin
 );
 
@@ -192,9 +224,12 @@ class FormDemo extends Component {
                   this.onCustomEvent('onCloseReplacements', info)
                 }
                 onFocus={e => this.onEvent('onFocus', e)}
-                onOpenReplacements={info =>
-                  this.onCustomEvent('onOpenReplacements', info)
-                }
+                onOpenReplacements={info => {
+                  loadDynamicReplaceChoices(info.field, () => {
+                    this.setState({});
+                  });
+                  this.onCustomEvent('onOpenReplacements', info);
+                }}
                 onOrderGroceries={info =>
                   this.onCustomEvent('onOrderGroceries', info)
                 }
