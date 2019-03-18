@@ -14,10 +14,12 @@ export default {
   // Create a unique id for the field
   getInitialState: function() {
     return {
-      id: Math.random()
-        .toString(36)
-        .replace(/[^a-z]+/g, '')
-        .substr(0, 20),
+      id:
+        this.props.field.id ||
+        Math.random()
+          .toString(36)
+          .replace(/[^a-z]+/g, '')
+          .substr(0, 20),
     };
   },
 
