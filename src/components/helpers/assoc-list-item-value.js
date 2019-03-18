@@ -33,6 +33,7 @@ export default createReactClass({
 
     const fieldElem = config.createFieldElement({
       field,
+      labelledby: this.props.id ? `${this.props.id}_label` : undefined,
       onChange: this.onChangeField,
       plain: true,
       onAction: this.onBubbleAction,

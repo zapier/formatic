@@ -36,6 +36,7 @@ export default createReactClass({
 
     return (
       <input
+        aria-labelledby={this.props.id ? `${this.props.id}_label` : undefined}
         className={cx(classes)}
         onBlur={this.onBlurAction}
         onChange={this.onChange}
