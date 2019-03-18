@@ -292,6 +292,7 @@ export default createReactClass({
           'pretty-text-wrapper': true,
           'choices-open': this.state.isChoicesOpen,
         })}
+        id={this.props.id}
         onKeyDown={this.onKeyDown}
         onMouseEnter={this.switchToCodeMirror}
         onTouchStart={this.switchToCodeMirror}

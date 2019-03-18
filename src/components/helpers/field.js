@@ -77,6 +77,7 @@ export default createReactClass({
       field,
       index,
       onClick: config.fieldIsCollapsible(field) ? this.onClickLabel : null,
+      id: this.props.id,
     });
 
     const content = config.cssTransitionWrapper(
@@ -106,6 +107,7 @@ export default createReactClass({
       <div
         className={cx(classes)}
         renderWith={this.renderWith('Field')}
+        role={this.props.role}
         style={{ display: field.hidden ? 'none' : '' }}
       >
         {content}

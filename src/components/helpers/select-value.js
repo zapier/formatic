@@ -82,6 +82,7 @@ export default createReactClass({
         <select
           className={cx(this.props.classes)}
           disabled={this.isReadOnly()}
+          id={this.props.id}
           onBlur={this.onBlurAction}
           onChange={this.onChange}
           onFocus={this.onFocusAction}
