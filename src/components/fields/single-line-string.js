@@ -41,11 +41,13 @@ export default createReactClass({
         config,
         field,
         plain: this.props.plain,
+        id: this.state.id,
       },
       <input
         autoComplete={field.autoComplete}
         autoFocus={field.autoFocus}
         className={cx(this.props.classes)}
+        id={this.state.id}
         onBlur={this.onBlurAction}
         onChange={this.onChange}
         onFocus={this.onFocusAction}

@@ -37,6 +37,7 @@ export default createReactClass({
         typeName: 'Password',
         config,
         field,
+        id: this.state.id,
         plain: this.props.plain,
       },
       <input
@@ -44,6 +45,7 @@ export default createReactClass({
         autoFocus={field.autoFocus}
         className={cx(this.props.classes)}
         disabled={this.isReadOnly()}
+        id={this.state.id}
         onBlur={this.onBlurAction}
         onChange={this.onChange}
         onFocus={this.onFocusAction}

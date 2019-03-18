@@ -50,6 +50,7 @@ export default createReactClass({
           checked={field.value}
           className={cx(this.props.classes)}
           disabled={this.isReadOnly()}
+          id={this.state.id}
           key="input"
           onBlur={this.onBlurAction}
           onChange={this.onChange}
@@ -60,9 +61,13 @@ export default createReactClass({
         <span key="spacer" renderWith={this.renderWith('InputSpacer')}>
           {' '}
         </span>
-        <span key="label" renderWith={this.renderWith('InputLabel')}>
+        <label
+          htmlFor={this.state.id}
+          key="label"
+          renderWith={this.renderWith('InputLabel')}
+        >
           {fieldLabelOrHelp}
-        </span>
+        </label>
       </span>
     );
   },

@@ -80,11 +80,13 @@ export default createReactClass({
       {
         typeName: 'Json',
         field: config.fieldWithValue(field, this.state.value),
+        id: this.state.id,
         plain: this.props.plain,
       },
       <textarea
         className={cx(this.props.classes)}
         disabled={this.isReadOnly()}
+        id={this.state.id}
         onBlur={this.onBlurAction}
         onChange={this.onChange}
         onFocus={this.onFocusAction}

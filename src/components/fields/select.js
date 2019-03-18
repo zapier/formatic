@@ -43,11 +43,13 @@ export default createReactClass({
         typeName: 'Select',
         config,
         field,
+        id: this.state.id,
         plain: this.props.plain,
       },
       config.createElement('select-value', {
         choices: this.state.choices,
         field,
+        id: this.state.id,
         onChange: this.onChangeValue,
         onAction: this.onBubbleAction,
       })
