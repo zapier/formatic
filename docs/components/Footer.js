@@ -17,7 +17,7 @@ const styles = {
 };
 
 const Header = () => (
-  <footer css={styles.footer}>
+  <footer css={styles.footer} role="contentinfo">
     <Container>
       <p css={styles.content}>
         Code licensed by{' '}

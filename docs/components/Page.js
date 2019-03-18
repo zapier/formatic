@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { jsx, css } from '@emotion/core';
 import Layout from './Layout';
+import Head from 'next/head';
 
 import Typography from '@/docs/styles/Typography';
 
@@ -39,6 +40,12 @@ const styles = {
 
 const Page = props => (
   <Layout pageKey={props.pageKey} pages={pages}>
+    <Head>
+      <title>
+        Formatic
+        {props.title ? ` | ${props.title}` : ''}
+      </title>
+    </Head>
     <div css={styles.body}>{props.children}</div>
   </Layout>
 );
