@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'single-line-string-1',
     label: 'single line string',
     helpText: 'help for the single line string field',
     type: 'single-line-string',
@@ -8,6 +9,7 @@ const fields = [
     autoComplete: 'on',
   },
   {
+    id: 'single-line-string-2',
     label: 'Name (R)',
     type: 'string',
     isSingleLine: true,
@@ -17,6 +19,7 @@ const fields = [
     default: 'Unknown',
   },
   {
+    id: 'single-line-string-3',
     label: 'Readonly Name',
     type: 'single-line-string',
     key: 'readonlyName',
@@ -24,6 +27,7 @@ const fields = [
     readOnly: true,
   },
   {
+    id: 'single-line-string-4',
     label: 'Path',
     type: 'single-line-string',
     key: 'path',

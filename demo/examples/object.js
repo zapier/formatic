@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'object-1',
     label: 'Mapping Pretty Text',
     type: 'object',
     key: 'mapping',
@@ -8,6 +9,7 @@ const fields = [
         type: 'pretty-text',
         isSingleLine: true,
         hideLabel: true,
+        id: 'object-1-1',
         replaceChoices: [
           {
             label: 'Red',
@@ -30,11 +32,13 @@ const fields = [
     },
   },
   {
+    id: 'object-2',
     label: 'Dictionary',
     type: 'dict',
     key: 'dict',
     itemFields: [
       {
+        id: 'object-2-1',
         type: 'single-line-string',
         hideLabel: true,
       },

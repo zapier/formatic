@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'password-1',
     label: 'Password (R)',
     type: 'password',
     key: 'password',

@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'unknown-1',
     label: 'Unknown Field Example',
     type: 'junk-field-type',
   },

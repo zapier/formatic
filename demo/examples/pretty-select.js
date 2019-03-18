@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'pretty-select-1',
     label: 'Size',
     type: 'pretty-select',
     key: 'size',
@@ -11,6 +12,7 @@ const fields = [
     },
   },
   {
+    id: 'pretty-select-2',
     label: 'Readonly Size',
     type: 'pretty-select',
     key: 'readonlySize',
@@ -23,6 +25,7 @@ const fields = [
     },
   },
   {
+    id: 'pretty-select-3',
     label: 'Colors (R)',
     type: 'pretty-select',
     required: true,
@@ -31,6 +34,7 @@ const fields = [
     choices: 'red, green, yellow',
   },
   {
+    id: 'pretty-select-4',
     label: 'Colors 2',
     type: 'pretty-select',
     key: 'colors2',
@@ -40,6 +44,7 @@ const fields = [
     },
   },
   {
+    id: 'pretty-select-5',
     label: 'Colors 3',
     helpText: 'Tres colores',
     type: 'pretty-select',
@@ -100,6 +105,7 @@ const fields = [
     default: 'some default value',
   },
   {
+    id: 'pretty-select-6',
     label: 'Alphabet',
     type: 'pretty-select',
     key: 'alphabet',
@@ -133,6 +139,7 @@ const fields = [
     ],
   },
   {
+    id: 'pretty-select-7',
     label: 'Loading',
     key: 'loading',
     type: 'pretty-select',
@@ -140,12 +147,14 @@ const fields = [
     isAccordion: true,
   },
   {
+    id: 'pretty-select-8',
     label: 'Empty',
     key: 'empty',
     type: 'pretty-select',
     choices: [],
   },
   {
+    id: 'pretty-select-9',
     label: 'Yes/No',
     type: 'pretty-select',
     key: 'prettyBoolean',
@@ -171,6 +180,7 @@ const fields = [
     ],
   },
   {
+    id: 'pretty-select-10',
     label: 'Select with No Search',
     type: 'pretty-select',
     key: 'no-search',
@@ -183,6 +193,7 @@ const fields = [
     },
   },
   {
+    id: 'pretty-select-11',
     label: 'Select with Sections',
     type: 'pretty-select',
     key: 'section-select',

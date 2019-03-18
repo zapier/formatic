@@ -1,17 +1,19 @@
 const fields = [
   {
+    id: 'string-1',
     label: 'String',
-    id: 'string',
     key: 'string-example',
     type: 'string',
   },
   {
+    id: 'string-2',
     label: 'Note',
     type: 'text',
     key: 'note',
     required: true,
   },
   {
+    id: 'string-3',
     label: 'Groceries',
     type: 'text',
     key: 'groceries',

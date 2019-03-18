@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'checkbox-boolean-1',
     label: 'Enable Read-only',
     type: 'checkbox-boolean',
     key: 'readonly-checkbox-boolean',
@@ -7,6 +8,7 @@ const fields = [
     readOnly: true,
   },
   {
+    id: 'checkbox-boolean-2',
     label: 'Is this checked?',
     type: 'checkbox-boolean',
     key: 'checkbox-boolean',
@@ -14,6 +16,7 @@ const fields = [
     readOnly: false,
   },
   {
+    id: 'checkbox-boolean-3',
     label: 'Is this a checkbox?',
     type: 'checkbox',
     key: 'checkbox',

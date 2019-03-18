@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'assoc-list-1',
     label: 'Associative List',
     type: 'assoc-list',
     key: 'assoc-list',
@@ -7,6 +8,7 @@ const fields = [
       {
         type: 'single-line-string',
         hideLabel: true,
+        id: 'assoc-list-1-1',
       },
     ],
     default: [

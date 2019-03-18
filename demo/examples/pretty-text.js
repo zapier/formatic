@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'pretty-text-1',
     label: 'Pretty Text',
     key: 'prettyText',
     type: 'pretty-text',
@@ -26,6 +27,7 @@ const fields = [
     ],
   },
   {
+    id: 'pretty-text-2',
     label: 'Pretty Text with integer default',
     key: 'integerPrettyText',
     type: 'pretty-text',
@@ -33,6 +35,7 @@ const fields = [
     placeholder: 1,
   },
   {
+    id: 'pretty-text-3',
     label: 'Group',
     type: 'fields',
     fields: [
@@ -46,6 +49,7 @@ const fields = [
     ],
   },
   {
+    id: 'pretty-text-4',
     label: 'Readonly pretty text',
     key: 'readonlyPrettyText',
     type: 'pretty-text',
@@ -53,6 +57,7 @@ const fields = [
     readOnly: true,
   },
   {
+    id: 'pretty-text-5',
     label: 'Accordion Names',
     key: 'nestedPrettyText',
     type: 'pretty-text',
@@ -104,6 +109,7 @@ const fields = [
     ],
   },
   {
+    id: 'pretty-text-6',
     label: 'Pretty Text with Dynamic Fields',
     key: 'prettyTextDynamic',
     type: 'pretty-text',

@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'boolean-1',
     label: 'Do you like cookies?',
     type: 'boolean',
     key: 'likesCookies',
