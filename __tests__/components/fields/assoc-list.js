@@ -44,6 +44,7 @@ describe('assoc-list field', () => {
 
   it('should mark last duplicate key entered as invalid', () => {
     const initialValue = {
+      id: 'assoc-list',
       assocList: [
         { key: 'key1', value: 'value1' },
         { key: 'key2', value: 'value2' },

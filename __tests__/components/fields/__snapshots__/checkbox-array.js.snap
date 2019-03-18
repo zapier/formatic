@@ -13,7 +13,9 @@ exports[`checkbox-array field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="checkbox-array-1"
+                 id="checkbox-array-1_label"
+          >
             Colors
           </label>
           <span class="required-label not-required-text">
@@ -21,52 +23,69 @@ exports[`checkbox-array field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div class>
+        <div aria-labelledby="checkbox-array-1_label"
+             class
+             role="group"
+        >
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="colors"
+              <input aria-labelledby="checkbox-array-1_label"
+                     id="choice_0_checkbox-array-1"
+                     name="colors"
                      type="checkbox"
                      value="red"
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_0_checkbox-array-1"
+              >
                 Red
-              </span>
+              </label>
             </span>
           </span>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="colors"
+              <input aria-labelledby="checkbox-array-1_label"
+                     id="choice_1_checkbox-array-1"
+                     name="colors"
                      type="checkbox"
                      value="green"
                      checked
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_1_checkbox-array-1"
+              >
                 Green
-              </span>
+              </label>
             </span>
           </span>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="colors"
+              <input aria-labelledby="checkbox-array-1_label"
+                     id="choice_2_checkbox-array-1"
+                     name="colors"
                      type="checkbox"
                      value="blue"
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_2_checkbox-array-1"
+              >
                 Blue
-              </span>
+              </label>
             </span>
           </span>
         </div>
       </div>
       <div class="optional readonly">
         <div class>
-          <label>
+          <label for="checkbox-array-2"
+                 id="checkbox-array-2_label"
+          >
             Readonly Colors
           </label>
           <span class="required-label not-required-text">
@@ -74,24 +93,33 @@ exports[`checkbox-array field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div class>
+        <div aria-labelledby="checkbox-array-2_label"
+             class
+             role="group"
+        >
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input disabled
+              <input aria-labelledby="checkbox-array-2_label"
+                     disabled
+                     id="choice_0_checkbox-array-2"
                      name="readonly-colors"
                      type="checkbox"
                      value="red"
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_0_checkbox-array-2"
+              >
                 Red
-              </span>
+              </label>
             </span>
           </span>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input disabled
+              <input aria-labelledby="checkbox-array-2_label"
+                     disabled
+                     id="choice_1_checkbox-array-2"
                      name="readonly-colors"
                      type="checkbox"
                      value="green"
@@ -99,30 +127,38 @@ exports[`checkbox-array field should render correctly 1`] = `
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_1_checkbox-array-2"
+              >
                 Green
-              </span>
+              </label>
             </span>
           </span>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input disabled
+              <input aria-labelledby="checkbox-array-2_label"
+                     disabled
+                     id="choice_2_checkbox-array-2"
                      name="readonly-colors"
                      type="checkbox"
                      value="blue"
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_2_checkbox-array-2"
+              >
                 Blue
-              </span>
+              </label>
             </span>
           </span>
         </div>
       </div>
       <div class="optional">
         <div class>
-          <label>
+          <label for="checkbox-array-3"
+                 id="checkbox-array-3_label"
+          >
             Colors
           </label>
           <span class="required-label not-required-text">
@@ -130,44 +166,59 @@ exports[`checkbox-array field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <div class>
+        <div aria-labelledby="checkbox-array-3_label"
+             class
+             role="group"
+        >
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="colors-alt"
+              <input aria-labelledby="checkbox-array-3_label"
+                     id="choice_0_checkbox-array-3"
+                     name="colors-alt"
                      type="checkbox"
                      value="blue"
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_0_checkbox-array-3"
+              >
                 Blue
-              </span>
+              </label>
             </span>
           </span>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="colors-alt"
+              <input aria-labelledby="checkbox-array-3_label"
+                     id="choice_1_checkbox-array-3"
+                     name="colors-alt"
                      type="checkbox"
                      value="yellow"
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_1_checkbox-array-3"
+              >
                 Yellow
-              </span>
+              </label>
             </span>
           </span>
           <span class="field-choice">
             <span style="white-space: nowrap;">
-              <input name="colors-alt"
+              <input aria-labelledby="checkbox-array-3_label"
+                     id="choice_2_checkbox-array-3"
+                     name="colors-alt"
                      type="checkbox"
                      value="purple"
               >
               <span>
               </span>
-              <span class="field-choice-label">
+              <label class="field-choice-label"
+                     for="choice_2_checkbox-array-3"
+              >
                 Purple
-              </span>
+              </label>
             </span>
           </span>
         </div>

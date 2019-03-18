@@ -14,36 +14,39 @@ exports[`checkbox-boolean field should render correctly 1`] = `
       <span style="white-space: nowrap;">
         <input class
                disabled
+               id="checkbox-boolean-1"
                type="checkbox"
                checked
         >
         <span>
         </span>
-        <span>
+        <label for="checkbox-boolean-1">
           Enable Read-only
-        </span>
+        </label>
       </span>
       <span style="white-space: nowrap;">
         <input class
+               id="checkbox-boolean-2"
                type="checkbox"
                checked
         >
         <span>
         </span>
-        <span>
+        <label for="checkbox-boolean-2">
           Is this checked?
-        </span>
+        </label>
       </span>
       <span style="white-space: nowrap;">
         <input class
+               id="checkbox-boolean-3"
                type="checkbox"
                checked
         >
         <span>
         </span>
-        <span>
+        <label for="checkbox-boolean-3">
           Is this a checkbox?
-        </span>
+        </label>
       </span>
     </fieldset>
   </div>

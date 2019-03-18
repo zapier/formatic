@@ -13,7 +13,9 @@ exports[`assoc-list field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="assoc-list-1"
+                 id="assoc-list-1_label"
+          >
             Associative List
           </label>
           <span class="required-label not-required-text">
@@ -23,12 +25,15 @@ exports[`assoc-list field should render correctly 1`] = `
         </span>
         <div class>
           <div class>
-            <input class="validation-error-duplicate-key"
+            <input aria-labelledby="assoc-list-1_label"
+                   class="validation-error-duplicate-key"
                    type="text"
                    value
             >
             <div class>
-              <input class
+              <input aria-labelledby="assoc-list-1_label"
+                     class
+                     id="assoc-list-1-1"
                      tabindex="0"
                      type="text"
                      value
@@ -43,12 +48,15 @@ exports[`assoc-list field should render correctly 1`] = `
             </div>
           </div>
           <div class>
-            <input class="validation-error-duplicate-key"
+            <input aria-labelledby="assoc-list-1_label"
+                   class="validation-error-duplicate-key"
                    type="text"
                    value
             >
             <div class>
-              <input class
+              <input aria-labelledby="assoc-list-1_label"
+                     class
+                     id="assoc-list-1-1"
                      tabindex="0"
                      type="text"
                      value

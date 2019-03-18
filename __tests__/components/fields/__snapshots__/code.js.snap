@@ -31,6 +31,7 @@ exports[`code field should render correctly 1`] = `
                             autocapitalize="false"
                             spellcheck="false"
                             tabindex="0"
+                            aria-label="code block"
                   >
                   </textarea>
                 </div>

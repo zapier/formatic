@@ -13,7 +13,9 @@ exports[`string field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="string-1"
+                 id="string-1_label"
+          >
             String
           </label>
           <span class="required-label not-required-text">
@@ -21,12 +23,16 @@ exports[`string field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <textarea class>
+        <textarea class
+                  id="string-1"
+        >
         </textarea>
       </div>
       <div class="validation-error-required required">
         <div class>
-          <label>
+          <label for="string-2"
+                 id="string-2_label"
+          >
             Note
           </label>
           <span class="required-label required-text">
@@ -34,7 +40,9 @@ exports[`string field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <textarea class>
+        <textarea class
+                  id="string-2"
+        >
         </textarea>
       </div>
       <div class="optional">

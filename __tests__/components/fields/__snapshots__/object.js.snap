@@ -13,7 +13,9 @@ exports[`object field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="object-1"
+                 id="object-1_label"
+          >
             Mapping Pretty Text
           </label>
           <span class="required-label not-required-text">
@@ -23,7 +25,8 @@ exports[`object field should render correctly 1`] = `
         </span>
         <div class>
           <div class>
-            <input class
+            <input aria-labelledby="object-1_label"
+                   class
                    type="text"
                    value="key1"
             >
@@ -64,7 +67,8 @@ exports[`object field should render correctly 1`] = `
             </div>
           </div>
           <div class>
-            <input class
+            <input aria-labelledby="object-1_label"
+                   class
                    type="text"
                    value="key2"
             >
@@ -115,7 +119,9 @@ exports[`object field should render correctly 1`] = `
       </div>
       <div class="optional">
         <div class>
-          <label>
+          <label for="object-2"
+                 id="object-2_label"
+          >
             Dictionary
           </label>
           <span class="required-label not-required-text">
@@ -125,12 +131,15 @@ exports[`object field should render correctly 1`] = `
         </span>
         <div class>
           <div class>
-            <input class
+            <input aria-labelledby="object-2_label"
+                   class
                    type="text"
                    value="key1"
             >
             <div class>
-              <input class
+              <input aria-labelledby="object-2_label"
+                     class
+                     id="object-2-1"
                      tabindex="0"
                      type="text"
                      value="key1"
@@ -145,12 +154,15 @@ exports[`object field should render correctly 1`] = `
             </div>
           </div>
           <div class>
-            <input class
+            <input aria-labelledby="object-2_label"
+                   class
                    type="text"
                    value="key2"
             >
             <div class>
-              <input class
+              <input aria-labelledby="object-2_label"
+                     class
+                     id="object-2-1"
                      tabindex="0"
                      type="text"
                      value="key2"

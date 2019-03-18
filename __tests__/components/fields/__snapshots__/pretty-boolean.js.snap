@@ -13,7 +13,9 @@ exports[`pretty-boolean field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="pretty-boolean-1"
+                 id="pretty-boolean-1_label"
+          >
             Do you like pretty cookies with sprinkles?
           </label>
           <span class="required-label not-required-text">
@@ -27,6 +29,7 @@ exports[`pretty-boolean field should render correctly 1`] = `
         >
           <div>
             <div class="pretty-text-wrapper"
+                 id="pretty-boolean-1"
                  role="presentation"
             >
               <div class="pretty-text-click-wrapper"

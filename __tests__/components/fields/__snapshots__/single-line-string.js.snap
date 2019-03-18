@@ -13,7 +13,9 @@ exports[`single-line-string field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="single-line-string-1"
+                 id="single-line-string-1_label"
+          >
             single line string
           </label>
           <span class="required-label not-required-text">
@@ -24,6 +26,7 @@ exports[`single-line-string field should render correctly 1`] = `
         </div>
         <input autocomplete="on"
                class
+               id="single-line-string-1"
                placeholder="type something..."
                tabindex="0"
                type="text"
@@ -32,7 +35,9 @@ exports[`single-line-string field should render correctly 1`] = `
       </div>
       <div class="required">
         <div class>
-          <label>
+          <label for="single-line-string-2"
+                 id="single-line-string-2_label"
+          >
             Name (R)
           </label>
           <span class="required-label required-text">
@@ -42,6 +47,7 @@ exports[`single-line-string field should render correctly 1`] = `
           help for the required name field
         </div>
         <input class
+               id="single-line-string-2"
                tabindex="0"
                type="text"
                value="Unknown"
@@ -49,7 +55,9 @@ exports[`single-line-string field should render correctly 1`] = `
       </div>
       <div class="optional readonly">
         <div class>
-          <label>
+          <label for="single-line-string-3"
+                 id="single-line-string-3_label"
+          >
             Readonly Name
           </label>
           <span class="required-label not-required-text">
@@ -58,6 +66,7 @@ exports[`single-line-string field should render correctly 1`] = `
         <span>
         </span>
         <input class
+               id="single-line-string-3"
                readonly
                tabindex="-1"
                type="text"

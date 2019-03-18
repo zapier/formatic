@@ -13,7 +13,9 @@ exports[`array field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="array-1"
+                 id="array-1_label"
+          >
             Array
           </label>
           <span class="required-label not-required-text">
@@ -35,7 +37,9 @@ exports[`array field should render correctly 1`] = `
       </div>
       <div class="required">
         <div class>
-          <label>
+          <label for="array-robots"
+                 id="array-robots_label"
+          >
             Robots (R)
           </label>
           <span class="required-label required-text">
@@ -47,7 +51,9 @@ exports[`array field should render correctly 1`] = `
              tabindex="0"
         >
           <div class>
-            <select class>
+            <select class
+                    id="array-robots"
+            >
               <option value="0">
                 Simple
               </option>
@@ -65,7 +71,9 @@ exports[`array field should render correctly 1`] = `
       </div>
       <div class="optional">
         <div class>
-          <label>
+          <label for="array-pretty"
+                 id="array-pretty_label"
+          >
             Listing Pretty Text
           </label>
           <span class="required-label not-required-text">

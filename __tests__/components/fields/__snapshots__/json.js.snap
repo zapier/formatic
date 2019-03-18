@@ -13,7 +13,9 @@ exports[`json field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="json-1"
+                 id="json-1_label"
+          >
             The Blob
           </label>
           <span class="required-label not-required-text">
@@ -22,6 +24,7 @@ exports[`json field should render correctly 1`] = `
         <span>
         </span>
         <textarea class
+                  id="json-1"
                   rows="5"
         >
           {}

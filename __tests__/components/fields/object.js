@@ -122,6 +122,7 @@ describe('object field', () => {
 
   it('should render changes from outside', () => {
     let value = {
+      id: 'object-test',
       object: {
         key1: 'value1',
         key2: 'value2',
@@ -135,6 +136,8 @@ describe('object field', () => {
       formatic,
       ObjectClass
     );
+
+    delete object.state.id;
 
     expect(object.state).toEqual({
       assocList: [
@@ -151,6 +154,8 @@ describe('object field', () => {
     };
 
     renderToNode(value);
+
+    delete object.state.id;
 
     expect(object.state).toEqual({
       assocList: [
@@ -175,6 +180,8 @@ describe('object field', () => {
       formatic,
       ObjectClass
     );
+
+    delete object.state.id;
 
     expect(object.state).toEqual({
       assocList: [
@@ -207,6 +214,8 @@ describe('object field', () => {
     };
 
     renderToNode(value);
+
+    delete object.state.id;
 
     // no change:
     expect(object.state).toEqual({
