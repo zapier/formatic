@@ -107,7 +107,6 @@ export default createReactClass({
       <div
         className={cx(classes)}
         renderWith={this.renderWith('Field')}
-        role={this.props.role}
         style={{ display: field.hidden ? 'none' : '' }}
       >
         {content}

@@ -131,12 +131,13 @@ export default createReactClass({
         typeName: 'CheckboxArray',
         field,
         id: this.state.id,
-        role: 'group',
       },
       <div
+        aria-labelledby={`${this.state.id}_label`}
         className={cx(this.props.classes)}
         ref={ref(this, 'choices')}
         renderWith={this.renderWith('FieldBody')}
+        role="group"
       >
         {inputs}
       </div>
