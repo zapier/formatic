@@ -11,6 +11,16 @@ import shared from './shared';
 export default {
   ...shared,
 
+  // Create a unique id for the field
+  getInitialState: function() {
+    return {
+      id: Math.random()
+        .toString(36)
+        .replace(/[^a-z]+/g, '')
+        .substr(0, 20),
+    };
+  },
+
   // Signal a change in value.
   onChangeValue: function(value) {
     this.props.onChange(value, {
