@@ -45,9 +45,9 @@ export default createReactClass({
       parentTypeName: this.props.parentTypeName,
       field,
       id: this.props.id,
+      index: this.props.index,
       onChange: this.props.onChange,
       onAction: this.onBubbleAction,
-      index: this.props.index,
     });
 
     const assocListItemControl = config.createElement(

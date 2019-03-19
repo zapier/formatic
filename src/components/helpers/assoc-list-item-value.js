@@ -32,7 +32,10 @@ export default createReactClass({
     const field = this.props.field;
 
     const fieldElem = config.createFieldElement({
-      field,
+      field: {
+        ...field,
+        id: `${this.props.id}_${this.props.index}`,
+      },
       labelledby: this.props.id ? `${this.props.id}_label` : undefined,
       onChange: this.onChangeField,
       plain: true,
