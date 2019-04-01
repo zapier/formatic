@@ -36,7 +36,7 @@ export default createReactClass({
         ...field,
         id: `${this.props.id}_${this.props.index}`,
       },
-      labelledby: this.props.id ? `${this.props.id}_label` : undefined,
+      ariaLabel: `value_${this.props.index}`,
       onChange: this.onChangeField,
       plain: true,
       onAction: this.onBubbleAction,

@@ -44,6 +44,7 @@ export default createReactClass({
         id: this.state.id,
       },
       <input
+        aria-label={this.props.ariaLabel}
         aria-labelledby={this.props.labelledby}
         autoComplete={field.autoComplete}
         autoFocus={field.autoFocus}

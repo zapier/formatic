@@ -30,6 +30,7 @@ export default createReactClass({
 
     const element = config.createElement('pretty-text-input', {
       typeName: 'PrettyText',
+      ariaLabel: this.props.ariaLabel,
       classes: this.props.classes,
       tabIndex,
       onChange: this.onChangeValue,

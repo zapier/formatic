@@ -38,6 +38,7 @@ export default createReactClass({
       onAction: this.onBubbleAction,
       displayKey: this.props.displayKey,
       id: this.props.id,
+      index: this.props.index,
       isDuplicateKey: this.props.isDuplicateKey,
     });
 
