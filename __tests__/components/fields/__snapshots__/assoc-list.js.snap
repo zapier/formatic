@@ -25,15 +25,15 @@ exports[`assoc-list field should render correctly 1`] = `
         </span>
         <div class>
           <div class>
-            <input aria-labelledby="assoc-list-1_label"
+            <input aria-label="key_0"
                    class="validation-error-duplicate-key"
                    type="text"
                    value
             >
             <div class>
-              <input aria-labelledby="assoc-list-1_label"
+              <input aria-label="value_0"
                      class
-                     id="assoc-list-1-1"
+                     id="assoc-list-1_0"
                      tabindex="0"
                      type="text"
                      value
@@ -48,15 +48,15 @@ exports[`assoc-list field should render correctly 1`] = `
             </div>
           </div>
           <div class>
-            <input aria-labelledby="assoc-list-1_label"
+            <input aria-label="key_1"
                    class="validation-error-duplicate-key"
                    type="text"
                    value
             >
             <div class>
-              <input aria-labelledby="assoc-list-1_label"
+              <input aria-label="value_1"
                      class
-                     id="assoc-list-1-1"
+                     id="assoc-list-1_1"
                      tabindex="0"
                      type="text"
                      value
