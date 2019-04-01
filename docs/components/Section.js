@@ -23,7 +23,7 @@ const Section = props => (
     <h2 css={styles.sectionHead} id={dashify(props.title)}>
       {props.title}
       <a
-        aria-label="anchor link"
+        aria-label="example link"
         css={styles.link}
         href={`#${dashify(props.title)}`}
       >

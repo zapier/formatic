@@ -270,7 +270,7 @@ class FormDemo extends Component {
 const sortedExamples = _.sortBy(examples, ['title']);
 
 const DemoPage = () => (
-  <Page pageKey="demo" title="Field Types">
+  <Page pageKey="demo">
     <Sections>
       {sortedExamples.map((form, idx) => (
         <Section key={form.title} title={form.title}>

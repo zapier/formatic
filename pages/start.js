@@ -30,7 +30,7 @@ const basicExampleValue = {
 };
 
 const Start = props => (
-  <Page pageKey="start" title="Getting Started">
+  <Page pageKey="start">
     <Sections>
       <Section title="Install">
         <SubSection title="npm">

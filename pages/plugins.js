@@ -10,7 +10,7 @@ import Code from '@/docs/components/Code';
 import { loadSnippets } from '@/docs/utils';
 
 const Plugins = props => (
-  <Page pageKey="plugins" title="Plugins">
+  <Page pageKey="plugins">
     <Sections>
       <Section title="Config">
         <p>

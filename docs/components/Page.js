@@ -38,16 +38,19 @@ const styles = {
   }),
 };
 
-const Page = props => (
-  <Layout pageKey={props.pageKey} pages={pages}>
-    <Head>
-      <title>
-        Formatic
-        {props.title ? ` | ${props.title}` : ''}
-      </title>
-    </Head>
-    <div css={styles.body}>{props.children}</div>
-  </Layout>
-);
+const Page = props => {
+  const title = pages[props.pageKey].title;
+  return (
+    <Layout pageKey={props.pageKey} pages={pages}>
+      <Head>
+        <title>
+          Formatic
+          {title ? ` | ${title}` : ''}
+        </title>
+      </Head>
+      <div css={styles.body}>{props.children}</div>
+    </Layout>
+  );
+};
 
 export default Page;
