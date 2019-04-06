@@ -72,3 +72,8 @@ export function FieldContainer({ fieldKey, children, ...props }) {
       })
     : children;
 }
+
+export function TextInput({ id, fieldKey }) {
+  const { value, onChangeTargetValue } = useField(fieldKey);
+  return <input id={id} onChange={onChangeTargetValue} value={value} />;
+}
