@@ -60,3 +60,15 @@ export function useField(fieldKey) {
     onChangeTargetValue,
   };
 }
+
+export function FieldContainer({ fieldKey, children, ...props }) {
+  const { value, onChangeTargetValue } = useField(fieldKey);
+  return typeof children === 'function'
+    ? children({
+        fieldKey,
+        value,
+        onChangeTargetValue,
+        ...props,
+      })
+    : children;
+}
