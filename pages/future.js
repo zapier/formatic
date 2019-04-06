@@ -7,18 +7,22 @@ import Section from '@/docs/components/Section';
 const requireContext = require.context('@/demo/future', true, /\.js$/);
 
 const examples = requireContext.keys().map(key => {
+  const example = requireContext(key);
   return {
     key,
-    ...requireContext(key),
+    ...example,
+    defaultValue:
+      example.defaultValue === undefined ? example.value : example.defaultValue,
+    isControlled: example.value === undefined ? false : true,
   };
 });
 
-function ChangeDisplay({ children }) {
-  const [lastChange, setLastChange] = useState(null);
+function ChangeDisplay({ defaultValue, children }) {
+  const [value, setValue] = useState(defaultValue);
   return (
     <div>
-      {children({ onChange: setLastChange })}
-      <pre>{JSON.stringify(lastChange)}</pre>
+      {children({ value, onChange: setValue })}
+      <pre>{JSON.stringify(value)}</pre>
     </div>
   );
 }
@@ -26,11 +30,15 @@ function ChangeDisplay({ children }) {
 const FuturePage = () => (
   <Page pageKey="future">
     <Sections>
-      {examples.map(({ key, defaultValue, ExampleForm }) => (
+      {examples.map(({ key, isControlled, defaultValue, ExampleForm }) => (
         <Section key={key} title={key}>
-          <ChangeDisplay>
-            {({ onChange }) => (
-              <ExampleForm defaultValue={defaultValue} onChange={onChange} />
+          <ChangeDisplay defaultValue={defaultValue}>
+            {({ value, onChange }) => (
+              <ExampleForm
+                defaultValue={isControlled ? undefined : defaultValue}
+                onChange={onChange}
+                value={isControlled ? value : undefined}
+              />
             )}
           </ChangeDisplay>
         </Section>
