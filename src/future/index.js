@@ -77,3 +77,16 @@ export function TextInput({ id, fieldKey }) {
   const { value, onChangeTargetValue } = useField(fieldKey);
   return <input id={id} onChange={onChangeTargetValue} value={value} />;
 }
+
+export function TextField({ id, fieldKey, label }) {
+  return (
+    <div>
+      <div>
+        <label htmlFor={id}>{label}</label>
+      </div>
+      <div>
+        <TextInput fieldKey={fieldKey} id={id} />
+      </div>
+    </div>
+  );
+}
