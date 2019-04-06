@@ -6,7 +6,7 @@ import { ExampleForm, defaultValue } from '@/demo/future/BuiltInInput';
 
 afterEach(cleanup);
 
-describe('custom form with FieldContainer', () => {
+describe('built-in input', () => {
   test('should fire onChange correctly', () => {
     const onChangeSpy = jest.fn();
     const { getByLabelText } = render(

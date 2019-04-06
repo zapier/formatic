@@ -6,7 +6,7 @@ import { FormContainer, TextField } from '@/src/future';
 
 afterEach(cleanup);
 
-describe('custom form with FieldContainer', () => {
+describe('built-in field with auto input ids', () => {
   test('should have auto-generated input ids', () => {
     const onChangeSpy = jest.fn();
     const defaultValue = {
