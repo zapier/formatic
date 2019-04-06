@@ -130,13 +130,15 @@ const NavMenu = props => (
                 </RawLink>
               </div>
               <ul css={styles.items}>
-                {Object.keys(props.pages).map(pageKey => (
-                  <NavItem
-                    key={pageKey}
-                    {...props.pages[pageKey]}
-                    isCurrent={props.pageKey === pageKey}
-                  />
-                ))}
+                {Object.keys(props.pages)
+                  .filter(pageKey => !props.pages[pageKey].isHidden)
+                  .map(pageKey => (
+                    <NavItem
+                      key={pageKey}
+                      {...props.pages[pageKey]}
+                      isCurrent={props.pageKey === pageKey}
+                    />
+                  ))}
               </ul>
               <button css={styles.toggle} onClick={menuToggle.toggle}>
                 {menuToggle.on ? (
@@ -155,13 +157,15 @@ const NavMenu = props => (
             !menuToggle.on && styles.menuItemsNotActive,
           ]}
         >
-          {Object.keys(props.pages).map(pageKey => (
-            <NavItem
-              key={pageKey}
-              {...props.pages[pageKey]}
-              isCurrent={props.pageKey === pageKey}
-            />
-          ))}
+          {Object.keys(props.pages)
+            .filter(pageKey => !props.pages[pageKey].isHidden)
+            .map(pageKey => (
+              <NavItem
+                key={pageKey}
+                {...props.pages[pageKey]}
+                isCurrent={props.pageKey === pageKey}
+              />
+            ))}
         </ul>
       </div>
     )}

@@ -29,6 +29,11 @@ const pages = {
     url: 'http://github.com/zapier/formatic',
     title: 'GitHub',
   },
+  future: {
+    url: '/future',
+    title: 'Future Land',
+    isHidden: true,
+  },
 };
 
 const styles = {
