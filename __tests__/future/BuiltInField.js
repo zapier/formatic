@@ -1,11 +1,13 @@
-/*global jest, describe, it, expect*/
+/*global jest, describe, test, expect, afterEach*/
 import React from 'react';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent, cleanup } from 'react-testing-library';
 
 import { ExampleForm, defaultValue } from '@/demo/future/BuiltInField';
 
+afterEach(cleanup);
+
 describe('custom form with FieldContainer', () => {
-  it('should ', () => {
+  test('should fire onChange correctly', () => {
     const onChangeSpy = jest.fn();
     const { getByLabelText } = render(
       <ExampleForm defaultValue={defaultValue} onChange={onChangeSpy} />

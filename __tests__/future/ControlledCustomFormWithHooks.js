@@ -1,14 +1,16 @@
-/*global jest, describe, it, expect*/
+/*global jest, describe, test, expect, afterEach*/
 import React from 'react';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent, cleanup } from 'react-testing-library';
 
 import {
   ExampleForm,
   value,
 } from '@/demo/future/ControlledCustomFormWithHooks';
 
+afterEach(cleanup);
+
 describe('controlled custom form with hooks', () => {
-  it('should ', () => {
+  test('should fire onChange correctly', () => {
     const onChangeSpy = jest.fn();
     const { getByLabelText, rerender } = render(
       <ExampleForm onChange={onChangeSpy} value={value} />
