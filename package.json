@@ -62,6 +62,7 @@
     "react-powerplug": "^1.0.0",
     "react-svg-loader": "^2.1.0",
     "react-syntax-highlighter": "^9.0.0",
+    "react-testing-library": "^6.1.2",
     "rollup": "^1.2.1",
     "rollup-plugin-alias": "^1.5.1",
     "rollup-plugin-babel": "^4.3.2",
