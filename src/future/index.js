@@ -78,14 +78,30 @@ export function TextInput({ id, fieldKey }) {
   return <input id={id} onChange={onChangeTargetValue} value={value} />;
 }
 
+function createUniqueIdFn() {
+  let id = 0;
+  return function getUniqueId(prefix = 'id') {
+    id++;
+    return `${prefix}-${id}`;
+  };
+}
+
+const getUniqueId = createUniqueIdFn();
+
+function useInputId(id, fieldKey) {
+  const [inputId] = useState(() => id || getUniqueId(fieldKey));
+  return inputId;
+}
+
 export function TextField({ id, fieldKey, label }) {
+  const inputId = useInputId(id, fieldKey);
   return (
     <div>
       <div>
-        <label htmlFor={id}>{label}</label>
+        <label htmlFor={inputId}>{label}</label>
       </div>
       <div>
-        <TextInput fieldKey={fieldKey} id={id} />
+        <TextInput fieldKey={fieldKey} id={inputId} />
       </div>
     </div>
   );
