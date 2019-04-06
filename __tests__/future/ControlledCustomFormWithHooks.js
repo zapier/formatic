@@ -2,7 +2,10 @@
 import React from 'react';
 import { render, fireEvent } from 'react-testing-library';
 
-import { ExampleForm, value } from '@/demo/future/SimpleControlledCustomForm';
+import {
+  ExampleForm,
+  value,
+} from '@/demo/future/ControlledCustomFormWithHooks';
 
 describe('FormContainer', () => {
   it('should ', () => {
