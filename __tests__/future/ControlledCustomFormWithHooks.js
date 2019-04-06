@@ -7,7 +7,7 @@ import {
   value,
 } from '@/demo/future/ControlledCustomFormWithHooks';
 
-describe('FormContainer', () => {
+describe('controlled custom form with hooks', () => {
   it('should ', () => {
     const onChangeSpy = jest.fn();
     const { getByLabelText, rerender } = render(
