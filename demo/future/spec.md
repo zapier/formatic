@@ -19,6 +19,7 @@
   - Pretty text fields specifically have way too much complexity.
 - Not enough tests, so refactoring can be a little scary. (There are now at least snapshot tests for all of the fields.)
 - Some field components need to have "meta" state. For example, the object field component has to be able to keep the state of invalid (duplicate) keys. Right now, that can only exist as local state. But that state should be able to be bubbled up for validation.
+- Accessibility is pretty ad-hoc and not really covered by tests.
 
 ## Things that work pretty good in the current version
 
@@ -48,7 +49,7 @@
   - Most plugin methods should either be removed or replaced by props passed into components. The auto-form component _may_ need its own separate plugins.
   - Formatic should be broken up into smaller modules that can be used separately.
   - Pretty text fields and any reliance on CodeMirror should be removed and put into userland or a separate package. Formatic should only contain relatively simple "reference" components.
-- Add more tests!
+- Add more tests! Specifically, focus on integration tests with real-world examples. This plus using react-testing-library should lead to improved accessibility.
 - Allow components to send an envelope with onChange events, rather than just values. This way, components can bubble up invalid state (for example, an invalid blob of JSON being edited) for validation.
 - With the above, avoid complex stateful components by keeping rendering metadata in form state. For example, remove the complex logic for determining array item order by instead using identifiers for each array item that are stored in form state.
 - The `meta` plugin (and all need to pass along metadata for fields) should just be replaced by context and hooks.
