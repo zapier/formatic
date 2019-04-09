@@ -1,11 +1,13 @@
 /*global jest, describe, test, expect, afterEach*/
 import React from 'react';
-import { render, fireEvent } from 'react-testing-library';
+import { render, fireEvent, cleanup } from 'react-testing-library';
 
 import {
   ExampleForm,
   defaultValue,
 } from '@/demo/future/CustomFormWithFieldContainer';
+
+afterEach(cleanup);
 
 describe('custom form with FieldContainer', () => {
   test('should fire onChange correctly', () => {
