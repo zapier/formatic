@@ -242,20 +242,20 @@ The `renderTag` callback can be used to override the rendering of any DOM elemen
 
 The `renderComponent` callback can be used to override the rendering of other components that don't directly render DOM elements.
 
-Render keys are symbols (to avoid collision) that are used to target specific elements.
+Formatic's render keys are strings used to target specific elements. Userland render keys could be symbols to prevent collision.
 
 ```js
-import { TextField, renderKeys } from 'formatic';
+import { TextField } from 'formatic';
 
 const renderTag = (renderKey, Tag, props) => {
-  if (renderKey === renderKeys.TextInput) {
+  if (renderKey === 'TextInput') {
     return <Tag {...props} className="my-app-text-input" />;
   }
   return <Tag {...props} />;
 };
 
 const renderComponent = (renderKey, Component, props) => {
-  if (renderKey === renderKeys.TextField) {
+  if (renderKey === 'TextField') {
     return (
       <div className="my-app-field-wrapper">
         <Component {...props} label={props.fieldKey} />
@@ -522,13 +522,13 @@ React.render(
 You can override auto-generated fields just like other Formatic components. Just pass in render callbacks to override the rendering.
 
 ```js
-import { FormContainer, AutoFields, renderKeys } from 'formatic';
+import { FormContainer, AutoFields } from 'formatic';
 
 import { ChoicesProvider, useChoices } from 'my-app';
 
 const classNames = {
-  [renderKeys.TextInput]: 'my-auto-text-input',
-  [renderKeys.IntegerInput]: 'my-auto-integer-input',
+  TextInput: 'my-auto-text-input',
+  IntegerInput: 'my-auto-integer-input',
 };
 
 const renderTag = (renderKey, Tag, props) => {
@@ -544,7 +544,7 @@ const DynamicSelectInput = ({ SelectInput, ...props }) => {
 };
 
 const renderComponent = (renderKey, Component, props) => {
-  if (renderKey === renderKeys.SelectInput) {
+  if (renderKey === 'SelectInput') {
     return <DynamicSelectInput {...props} SelectInput={Component} />;
   }
   return <Component {...props} />;
