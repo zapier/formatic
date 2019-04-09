@@ -1,6 +1,7 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useMemo } from 'react';
 
 const FieldContext = createContext();
+const RenderContext = createContext({});
 
 export function ControlledFormContainer({ value, onChange, children }) {
   function onSetFieldValue(fieldKey, fieldValue) {
@@ -38,16 +39,23 @@ export function UncontrolledFormContainer({
   );
 }
 
-export function FormContainer({ value, defaultValue, ...props }) {
+export function FormContainer({ value, defaultValue, renderTag, ...props }) {
   const [savedDefaultValue] = useState(defaultValue);
   const [isControlled] = useState(savedDefaultValue === undefined);
-  if (isControlled) {
-    return <ControlledFormContainer value={value} {...props} />;
-  } else {
-    return (
-      <UncontrolledFormContainer defaultValue={savedDefaultValue} {...props} />
-    );
-  }
+  // Keep context object pure.
+  const renderContext = useMemo(() => ({ renderTag }), [renderTag]);
+  return (
+    <RenderContext.Provider value={renderContext}>
+      {isControlled ? (
+        <ControlledFormContainer value={value} {...props} />
+      ) : (
+        <UncontrolledFormContainer
+          defaultValue={savedDefaultValue}
+          {...props}
+        />
+      )}
+    </RenderContext.Provider>
+  );
 }
 
 export function useField(fieldKey) {
@@ -73,9 +81,30 @@ export function FieldContainer({ fieldKey, children, ...props }) {
     : children;
 }
 
-export function TextInput({ id, fieldKey }) {
+function createRenderWith(_meta) {
+  return function renderWith(_tag, _key) {
+    return {
+      _tag,
+      _key,
+      _meta,
+    };
+  };
+}
+
+export function TextInput({ id, fieldKey, fieldType = 'Text' }) {
   const { value, onChangeTargetValue } = useField(fieldKey);
-  return <input id={id} onChange={onChangeTargetValue} value={value} />;
+
+  const renderWith = createRenderWith({
+    fieldType,
+  });
+  return (
+    <Tag
+      {...renderWith('input', 'TextInput')}
+      id={id}
+      onChange={onChangeTargetValue}
+      value={value}
+    />
+  );
 }
 
 function createUniqueIdFn() {
@@ -93,16 +122,46 @@ function useInputId(id, fieldKey) {
   return inputId;
 }
 
-export function TextField({ id, fieldKey, label }) {
-  const inputId = useInputId(id, fieldKey);
-  return (
-    <div>
-      <div>
-        <label htmlFor={inputId}>{label}</label>
-      </div>
-      <div>
-        <TextInput fieldKey={fieldKey} id={inputId} />
-      </div>
-    </div>
+export const Tag = React.forwardRef(function Tag(
+  { _tag: RenderTag, _key, _meta, ...props },
+  ref
+) {
+  const renderContext = useContext(RenderContext);
+  if (!renderContext.renderTag) {
+    return <RenderTag {...props} ref={ref} />;
+  }
+  return renderContext.renderTag(
+    _key,
+    RenderTag,
+    {
+      ...props,
+      ref,
+    },
+    _meta
   );
+});
+
+export function Field({ id, fieldKey, label, fieldType, Input }) {
+  const inputId = useInputId(id, fieldKey);
+
+  const renderWith = createRenderWith({
+    fieldType,
+  });
+
+  return (
+    <Tag {...renderWith('div', 'Field')}>
+      <Tag {...renderWith('div', 'LabelWrapper')}>
+        <Tag {...renderWith('label', 'Label')} htmlFor={inputId}>
+          {label}
+        </Tag>
+      </Tag>
+      <Tag {...renderWith('div', 'InputWrapper')}>
+        <Input fieldKey={fieldKey} fieldType={fieldType} id={inputId} />
+      </Tag>
+    </Tag>
+  );
+}
+
+export function TextField(props) {
+  return <Field {...props} fieldType="Text" Input={TextInput} />;
 }
