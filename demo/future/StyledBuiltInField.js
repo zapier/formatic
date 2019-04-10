@@ -19,11 +19,19 @@ function renderTag(renderKey, Tag, props) {
   return <Tag {...props} />;
 }
 
+function renderComponent(renderKey, Component, props) {
+  if (renderKey === 'Field') {
+    return <Component {...props} label={props.label.toUpperCase()} />;
+  }
+  return <Component {...props} />;
+}
+
 export function ExampleForm({ defaultValue, onChange }) {
   return (
     <FormContainer
       defaultValue={defaultValue}
       onChange={onChange}
+      renderComponent={renderComponent}
       renderTag={renderTag}
     >
       <TextField fieldKey="firstName" id="firstName" label="First Name" />

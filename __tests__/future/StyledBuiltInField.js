@@ -12,14 +12,15 @@ describe('styled built-in field', () => {
     const { getByLabelText } = render(
       <ExampleForm defaultValue={defaultValue} onChange={onChangeSpy} />
     );
+    // Example upper-cases labels, and
     // Emotion generates a class with "css-" in it, so look for that.
     expect(
-      getByLabelText('First Name')
+      getByLabelText('FIRST NAME')
         .getAttribute('class')
         .indexOf('css-')
     ).toBeGreaterThan(-1);
     expect(
-      getByLabelText('Last Name')
+      getByLabelText('LAST NAME')
         .getAttribute('class')
         .indexOf('css-')
     ).toBeGreaterThan(-1);

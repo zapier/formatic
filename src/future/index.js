@@ -39,11 +39,20 @@ export function UncontrolledFormContainer({
   );
 }
 
-export function FormContainer({ value, defaultValue, renderTag, ...props }) {
+export function FormContainer({
+  value,
+  defaultValue,
+  renderTag,
+  renderComponent,
+  ...props
+}) {
   const [savedDefaultValue] = useState(defaultValue);
   const [isControlled] = useState(savedDefaultValue === undefined);
   // Keep context object pure.
-  const renderContext = useMemo(() => ({ renderTag }), [renderTag]);
+  const renderContext = useMemo(() => ({ renderTag, renderComponent }), [
+    renderTag,
+    renderComponent,
+  ]);
   return (
     <RenderContext.Provider value={renderContext}>
       {isControlled ? (
@@ -141,6 +150,20 @@ export const Tag = React.forwardRef(function Tag(
   );
 });
 
+Tag.displayName = 'Tag';
+
+function Component({ _component: RenderComponent, _key, ...props }) {
+  const renderContext = useContext(RenderContext);
+  if (!renderContext.renderComponent) {
+    return <RenderComponent {...props} />;
+  }
+  return renderContext.renderComponent(
+    _key || RenderComponent.displayName || RenderComponent.name,
+    RenderComponent,
+    props
+  );
+}
+
 export function Field({ id, fieldKey, label, fieldType, Input }) {
   const inputId = useInputId(id, fieldKey);
 
@@ -156,12 +179,24 @@ export function Field({ id, fieldKey, label, fieldType, Input }) {
         </Tag>
       </Tag>
       <Tag {...renderWith('div', 'InputWrapper')}>
-        <Input fieldKey={fieldKey} fieldType={fieldType} id={inputId} />
+        <Component
+          _component={Input}
+          fieldKey={fieldKey}
+          fieldType={fieldType}
+          id={inputId}
+        />
       </Tag>
     </Tag>
   );
 }
 
 export function TextField(props) {
-  return <Field {...props} fieldType="Text" Input={TextInput} />;
+  return (
+    <Component
+      _component={Field}
+      {...props}
+      fieldType="Text"
+      Input={TextInput}
+    />
+  );
 }
