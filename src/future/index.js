@@ -1,7 +1,13 @@
-import React, { createContext, useState, useContext, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 
-const FieldContext = createContext();
-const RenderContext = createContext({});
+import useField from '@/src/future/hooks/useField';
+
+import { FieldContext, RenderContext } from '@/src/future/context';
+
+import Component from '@/src/future/components/Component';
+import Field from '@/src/future/components/Field';
+
+import TextInput from '@/src/future/inputs/TextInput';
 
 export function ControlledFormContainer({ value, onChange, children }) {
   function onSetFieldValue(fieldKey, fieldValue) {
@@ -67,17 +73,6 @@ export function FormContainer({
   );
 }
 
-export function useField(fieldKey) {
-  const { formValue, onSetFieldValue } = useContext(FieldContext);
-  function onChangeTargetValue({ target }) {
-    onSetFieldValue(fieldKey, target.value);
-  }
-  return {
-    value: formValue[fieldKey],
-    onChangeTargetValue,
-  };
-}
-
 export function FieldContainer({ fieldKey, children, ...props }) {
   const { value, onChangeTargetValue } = useField(fieldKey);
   return typeof children === 'function'
@@ -90,113 +85,25 @@ export function FieldContainer({ fieldKey, children, ...props }) {
     : children;
 }
 
-function createRenderWith(_meta) {
-  return function renderWith(_tag, _key) {
-    return {
-      _tag,
-      _key,
-      _meta,
-    };
-  };
-}
-
-export function TextInput({ id, fieldKey, fieldType = 'Text' }) {
-  const { value, onChangeTargetValue } = useField(fieldKey);
-
-  const renderWith = createRenderWith({
-    fieldType,
-  });
-  return (
-    <Tag
-      {...renderWith('input', 'TextInput')}
-      id={id}
-      onChange={onChangeTargetValue}
-      value={value}
-    />
-  );
-}
-
-function createUniqueIdFn() {
-  let id = 0;
-  return function getUniqueId(prefix = 'id') {
-    id++;
-    return `${prefix}-${id}`;
-  };
-}
-
-const getUniqueId = createUniqueIdFn();
-
-function useInputId(id, fieldKey) {
-  const [inputId] = useState(() => id || getUniqueId(fieldKey));
-  return inputId;
-}
-
-export const Tag = React.forwardRef(function Tag(
-  { _tag: RenderTag, _key, _meta, ...props },
-  ref
-) {
-  const renderContext = useContext(RenderContext);
-  if (!renderContext.renderTag) {
-    return <RenderTag {...props} ref={ref} />;
+function createField(fieldType, Input) {
+  function FieldComponent(props) {
+    return (
+      <Component
+        _component={Field}
+        {...props}
+        fieldType={fieldType}
+        Input={Input}
+      />
+    );
   }
-  return renderContext.renderTag(
-    _key,
-    RenderTag,
-    {
-      ...props,
-      ref,
-    },
-    _meta
-  );
-});
-
-Tag.displayName = 'Tag';
-
-function Component({ _component: RenderComponent, _key, ...props }) {
-  const renderContext = useContext(RenderContext);
-  if (!renderContext.renderComponent) {
-    return <RenderComponent {...props} />;
-  }
-  return renderContext.renderComponent(
-    _key || RenderComponent.displayName || RenderComponent.name,
-    RenderComponent,
-    props
-  );
+  FieldComponent.displayName = `${fieldType}Field`;
+  return FieldComponent;
 }
 
-export function Field({ id, fieldKey, label, fieldType, Input }) {
-  const inputId = useInputId(id, fieldKey);
+const TextField = createField('Text', TextInput);
 
-  const renderWith = createRenderWith({
-    fieldType,
-  });
+export { TextField };
 
-  return (
-    <Tag {...renderWith('div', 'Field')}>
-      <Tag {...renderWith('div', 'LabelWrapper')}>
-        <Tag {...renderWith('label', 'Label')} htmlFor={inputId}>
-          {label}
-        </Tag>
-      </Tag>
-      <Tag {...renderWith('div', 'InputWrapper')}>
-        <Component
-          _component={Input}
-          fieldKey={fieldKey}
-          fieldType={fieldType}
-          id={inputId}
-        />
-      </Tag>
-    </Tag>
-  );
-}
+export { TextInput };
 
-export function TextField(props) {
-  return (
-    <Component
-      _component={Field}
-      {...props}
-      fieldType="Text"
-      Input={TextInput}
-    />
-  );
-}
+export { useField };
