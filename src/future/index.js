@@ -74,15 +74,20 @@ export function FormContainer({
 }
 
 export function FieldContainer({ fieldKey, children, ...props }) {
-  const { value, onChangeTargetValue } = useField(fieldKey);
-  return typeof children === 'function'
-    ? children({
-        fieldKey,
-        value,
-        onChangeTargetValue,
-        ...props,
-      })
-    : children;
+  const { value, onChange, onChangeTargetValue } = useField(fieldKey);
+  if (typeof children === 'function') {
+    return children({
+      fieldKey,
+      value,
+      onChangeTargetValue,
+      ...props,
+    });
+  }
+  return (
+    <ControlledFormContainer onChange={onChange} value={value}>
+      {children}
+    </ControlledFormContainer>
+  );
 }
 
 function createField(fieldType, Input) {

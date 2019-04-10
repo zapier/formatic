@@ -7,8 +7,12 @@ export default function useField(fieldKey) {
   function onChangeTargetValue({ target }) {
     onSetFieldValue(fieldKey, target.value);
   }
+  function onChange(newFieldValue) {
+    onSetFieldValue(fieldKey, newFieldValue);
+  }
   return {
     value: formValue[fieldKey],
     onChangeTargetValue,
+    onChange,
   };
 }
