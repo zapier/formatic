@@ -292,6 +292,7 @@ export default createReactClass({
           'pretty-text-wrapper': true,
           'choices-open': this.state.isChoicesOpen,
         })}
+        id={this.props.id}
         onKeyDown={this.onKeyDown}
         onMouseEnter={this.switchToCodeMirror}
         onTouchStart={this.switchToCodeMirror}
@@ -299,6 +300,7 @@ export default createReactClass({
         role="presentation"
       >
         <div
+          aria-label={this.props.ariaLabel}
           className="pretty-text-click-wrapper"
           onFocus={this.onFocusWrapper}
           renderWith={this.renderWith('PrettyTextInputClickWrapper')}
@@ -406,6 +408,12 @@ export default createReactClass({
     this.codeMirror = this.props.config.codeMirror()(textBox, options);
     this.codeMirror.on('change', this.onCodeMirrorChange);
     this.codeMirror.on('focus', this.onFocusCodeMirror);
+
+    const editor = textBox.getElementsByTagName('textarea')[0];
+    // Try to set aria-label on code block
+    if (editor) {
+      editor.setAttribute('aria-label', this.props.ariaLabel || 'code block');
+    }
 
     this.debouncedOnChangeAndTagCodeMirror = _.debounce(() => {
       this.isDebouncingCodeMirrorChange = false;

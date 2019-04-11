@@ -77,6 +77,7 @@ export default createReactClass({
       field,
       index,
       onClick: config.fieldIsCollapsible(field) ? this.onClickLabel : null,
+      id: this.props.id,
     });
 
     const content = config.cssTransitionWrapper(

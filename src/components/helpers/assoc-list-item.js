@@ -37,15 +37,18 @@ export default createReactClass({
       onChange: this.onChangeKey,
       onAction: this.onBubbleAction,
       displayKey: this.props.displayKey,
+      id: this.props.id,
+      index: this.props.index,
       isDuplicateKey: this.props.isDuplicateKey,
     });
 
     const assocListItemValue = config.createElement('assoc-list-item-value', {
       parentTypeName: this.props.parentTypeName,
       field,
+      id: this.props.id,
+      index: this.props.index,
       onChange: this.props.onChange,
       onAction: this.onBubbleAction,
-      index: this.props.index,
     });
 
     const assocListItemControl = config.createElement(

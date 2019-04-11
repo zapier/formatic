@@ -11,7 +11,9 @@ const Layout = props => {
     <div>
       <NavMenu pageKey={props.pageKey} pages={props.pages} />
       <Header {...page} />
-      <Container>{props.children}</Container>
+      <main role="main">
+        <Container>{props.children}</Container>
+      </main>
       <Footer />
     </div>
   );

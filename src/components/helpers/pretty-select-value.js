@@ -223,6 +223,7 @@ export default createReactClass({
     return this.props.config.createElement('pretty-select-input', {
       typeName: this.props.typeName,
       field: this.props.field,
+      id: this.props.id,
       ref: ref(this, 'customInput'),
       isEnteringCustomValue:
         this.state.isEnteringCustomValue && !this.hasCustomField(),

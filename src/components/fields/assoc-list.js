@@ -135,6 +135,7 @@ export default createReactClass({
             index: i,
             displayKey: row.key,
             field: fields[i],
+            id: this.state.id,
             isDuplicateKey: keyCounts[row.key] > 1,
             onChangeKey: this.onChangeKey,
             onChange: this.onChange,
@@ -156,6 +157,7 @@ export default createReactClass({
       {
         typeName: 'AssocList',
         field,
+        id: this.state.id,
         plain: this.props.plain,
       },
       <div

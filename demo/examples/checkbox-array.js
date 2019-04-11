@@ -1,5 +1,6 @@
 const fields = [
   {
+    id: 'checkbox-array-1',
     label: 'Colors',
     type: 'checkbox-array',
     key: 'colors',
@@ -8,6 +9,7 @@ const fields = [
     readOnly: false,
   },
   {
+    id: 'checkbox-array-2',
     label: 'Readonly Colors',
     type: 'checkbox-array',
     key: 'readonly-colors',
@@ -16,6 +18,7 @@ const fields = [
     readOnly: true,
   },
   {
+    id: 'checkbox-array-3',
     label: 'Colors',
     type: 'checkbox-list',
     key: 'colors-alt',

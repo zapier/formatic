@@ -133,6 +133,7 @@ export default createReactClass({
       config.createElement('array-control', {
         typeName: 'Array',
         field,
+        id: this.state.id,
         onAppend: this.onAppend,
       });
 
@@ -161,6 +162,7 @@ export default createReactClass({
       {
         typeName: 'Array',
         field,
+        id: this.state.id,
         plain: this.props.plain,
       },
       <div

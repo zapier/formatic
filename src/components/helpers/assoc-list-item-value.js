@@ -32,7 +32,11 @@ export default createReactClass({
     const field = this.props.field;
 
     const fieldElem = config.createFieldElement({
-      field,
+      field: {
+        ...field,
+        id: `${this.props.id}_${this.props.index}`,
+      },
+      ariaLabel: `value_${this.props.index}`,
       onChange: this.onChangeField,
       plain: true,
       onAction: this.onBubbleAction,

@@ -34,12 +34,14 @@ export default createReactClass({
       {
         typeName: 'PrettyBoolean',
         field,
+        id: this.state.id,
         plain: this.props.plain,
       },
       config.createElement('pretty-select-value', {
         typeName: 'PrettyBoolean',
         choices,
         field,
+        id: this.state.id,
         onChange: this.onChange,
         onAction: this.onBubbleAction,
       })

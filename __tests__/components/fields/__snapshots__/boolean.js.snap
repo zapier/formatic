@@ -13,7 +13,9 @@ exports[`boolean field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="boolean-1"
+                 id="boolean-1_label"
+          >
             Do you like cookies?
           </label>
           <span class="required-label not-required-text">
@@ -21,7 +23,9 @@ exports[`boolean field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <select class>
+        <select class
+                id="boolean-1"
+        >
           <option value="choice:0">
             yes
           </option>

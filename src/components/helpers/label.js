@@ -57,7 +57,15 @@ export default createReactClass({
         );
       }
 
-      label = <label renderWith={this.renderWith('LabelText')}>{text}</label>;
+      label = (
+        <label
+          htmlFor={this.props.id}
+          id={this.props.id ? `${this.props.id}_label` : undefined}
+          renderWith={this.renderWith('LabelText')}
+        >
+          {text}
+        </label>
+      );
     }
 
     return (

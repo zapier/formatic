@@ -64,14 +64,17 @@ export default createReactClass({
 
     const inputs = choices.map(
       function(choice, i) {
+        const choiceId = `choice_${i}_${this.state.id}`;
         const inputField = (
           <span
             renderWith={this.renderWith('InputWrapper')}
             style={{ whiteSpace: 'nowrap' }}
           >
             <input
+              aria-labelledby={`${this.state.id}_label`}
               checked={field.value.indexOf(choice.value) >= 0 ? true : false}
               disabled={this.isReadOnly()}
+              id={choiceId}
               name={field.key}
               onBlur={this.onBlurAction}
               onChange={this.onChange}
@@ -83,12 +86,13 @@ export default createReactClass({
             <span key="spacer" renderWith={this.renderWith('InputSpacer')}>
               {' '}
             </span>
-            <span
+            <label
               className="field-choice-label"
+              htmlFor={choiceId}
               renderWith={this.renderWith('ChoiceLabel')}
             >
               {choice.label}
-            </span>
+            </label>
           </span>
         );
 
@@ -126,11 +130,14 @@ export default createReactClass({
       {
         typeName: 'CheckboxArray',
         field,
+        id: this.state.id,
       },
       <div
+        aria-labelledby={`${this.state.id}_label`}
         className={cx(this.props.classes)}
         ref={ref(this, 'choices')}
         renderWith={this.renderWith('FieldBody')}
+        role="group"
       >
         {inputs}
       </div>

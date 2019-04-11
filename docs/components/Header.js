@@ -49,19 +49,19 @@ const styles = {
 
 const Header = props =>
   !props.title ? (
-    <div css={[styles.header, styles.leadHeader]}>
+    <header css={[styles.header, styles.leadHeader]} role="banner">
       <Container>
         <img alt="Formatic" css={styles.logo} src="static/images/logo.png" />
         <p css={styles.lead}>Automatic Forms for React</p>
       </Container>
-    </div>
+    </header>
   ) : (
-    <div css={styles.header}>
+    <header css={styles.header} role="banner">
       <Container>
         <h1 css={styles.title}>{props.title}</h1>
         <p css={styles.subTitle}>{props.subTitle}</p>
       </Container>
-    </div>
+    </header>
   );
 
 export default Header;

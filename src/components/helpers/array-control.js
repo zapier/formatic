@@ -51,6 +51,7 @@ export default createReactClass({
         typeName: this.props.typeName,
         field,
         fieldTemplateIndex: this.state.fieldTemplateIndex,
+        id: this.props.id,
         onSelect: this.onSelect,
       });
     }

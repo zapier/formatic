@@ -122,6 +122,7 @@ describe('object field', () => {
 
   it('should render changes from outside', () => {
     let value = {
+      id: 'object-test',
       object: {
         key1: 'value1',
         key2: 'value2',
@@ -136,12 +137,10 @@ describe('object field', () => {
       ObjectClass
     );
 
-    expect(object.state).toEqual({
-      assocList: [
-        { key: 'key1', value: 'value1' },
-        { key: 'key2', value: 'value2' },
-      ],
-    });
+    expect(object.state.assocList).toEqual([
+      { key: 'key1', value: 'value1' },
+      { key: 'key2', value: 'value2' },
+    ]);
 
     value = {
       object: {
@@ -152,12 +151,10 @@ describe('object field', () => {
 
     renderToNode(value);
 
-    expect(object.state).toEqual({
-      assocList: [
-        { key: 'key2', value: 'value2' },
-        { key: 'keyNew', value: 'value1' },
-      ],
-    });
+    expect(object.state.assocList).toEqual([
+      { key: 'key2', value: 'value2' },
+      { key: 'keyNew', value: 'value1' },
+    ]);
   });
 
   it('should ignore changes from outside when there are duplicate keys', () => {
@@ -176,12 +173,10 @@ describe('object field', () => {
       ObjectClass
     );
 
-    expect(object.state).toEqual({
-      assocList: [
-        { key: 'key1', value: 'value1' },
-        { key: 'key2', value: 'value2' },
-      ],
-    });
+    expect(object.state.assocList).toEqual([
+      { key: 'key1', value: 'value1' },
+      { key: 'key2', value: 'value2' },
+    ]);
 
     renderToNode(value);
 
@@ -193,12 +188,10 @@ describe('object field', () => {
     TestUtils.Simulate.change(input);
 
     // dups
-    expect(object.state).toEqual({
-      assocList: [
-        { key: 'key1', value: 'value1' },
-        { key: 'key1', value: 'value2' },
-      ],
-    });
+    expect(object.state.assocList).toEqual([
+      { key: 'key1', value: 'value1' },
+      { key: 'key1', value: 'value2' },
+    ]);
 
     value = {
       object: {
@@ -208,13 +201,13 @@ describe('object field', () => {
 
     renderToNode(value);
 
+    delete object.state.id;
+
     // no change:
-    expect(object.state).toEqual({
-      assocList: [
-        { key: 'key1', value: 'value1' },
-        { key: 'key1', value: 'value2' },
-      ],
-    });
+    expect(object.state.assocList).toEqual([
+      { key: 'key1', value: 'value1' },
+      { key: 'key1', value: 'value2' },
+    ]);
   });
 
   it('should render correctly', () => {

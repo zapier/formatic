@@ -50,6 +50,7 @@ export default createReactClass({
       onTagClick: this.onTagClick,
       readOnly: !this.props.isEnteringCustomValue,
       disabled: this.isReadOnly(),
+      id: this.props.id,
     });
   },
 });

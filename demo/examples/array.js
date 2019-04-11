@@ -1,10 +1,12 @@
 const fields = [
   {
+    id: 'array-1',
     label: 'Array',
     type: 'array',
     key: 'yoArray',
   },
   {
+    id: 'array-robots',
     label: 'Robots (R)',
     type: 'list',
     key: 'robots',
@@ -46,6 +48,7 @@ const fields = [
     ],
   },
   {
+    id: 'array-pretty',
     label: 'Listing Pretty Text',
     type: 'list',
     key: 'listing',

@@ -13,7 +13,9 @@ exports[`object field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="object-1"
+                 id="object-1_label"
+          >
             Mapping Pretty Text
           </label>
           <span class="required-label not-required-text">
@@ -23,7 +25,8 @@ exports[`object field should render correctly 1`] = `
         </span>
         <div class>
           <div class>
-            <input class
+            <input aria-label="key_0"
+                   class
                    type="text"
                    value="key1"
             >
@@ -31,7 +34,8 @@ exports[`object field should render correctly 1`] = `
               <div class="pretty-text-wrapper"
                    role="presentation"
               >
-                <div class="pretty-text-click-wrapper"
+                <div aria-label="value_0"
+                     class="pretty-text-click-wrapper"
                      role="textbox"
                      tabindex="0"
                 >
@@ -64,7 +68,8 @@ exports[`object field should render correctly 1`] = `
             </div>
           </div>
           <div class>
-            <input class
+            <input aria-label="key_1"
+                   class
                    type="text"
                    value="key2"
             >
@@ -72,7 +77,8 @@ exports[`object field should render correctly 1`] = `
               <div class="pretty-text-wrapper"
                    role="presentation"
               >
-                <div class="pretty-text-click-wrapper"
+                <div aria-label="value_1"
+                     class="pretty-text-click-wrapper"
                      role="textbox"
                      tabindex="0"
                 >
@@ -115,7 +121,9 @@ exports[`object field should render correctly 1`] = `
       </div>
       <div class="optional">
         <div class>
-          <label>
+          <label for="object-2"
+                 id="object-2_label"
+          >
             Dictionary
           </label>
           <span class="required-label not-required-text">
@@ -125,12 +133,15 @@ exports[`object field should render correctly 1`] = `
         </span>
         <div class>
           <div class>
-            <input class
+            <input aria-label="key_0"
+                   class
                    type="text"
                    value="key1"
             >
             <div class>
-              <input class
+              <input aria-label="value_0"
+                     class
+                     id="object-2_0"
                      tabindex="0"
                      type="text"
                      value="key1"
@@ -145,12 +156,15 @@ exports[`object field should render correctly 1`] = `
             </div>
           </div>
           <div class>
-            <input class
+            <input aria-label="key_1"
+                   class
                    type="text"
                    value="key2"
             >
             <div class>
-              <input class
+              <input aria-label="value_1"
+                     class
+                     id="object-2_1"
                      tabindex="0"
                      type="text"
                      value="key2"

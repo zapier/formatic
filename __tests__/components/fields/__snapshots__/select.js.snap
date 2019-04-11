@@ -13,7 +13,9 @@ exports[`select field should render correctly 1`] = `
     <fieldset class>
       <div class="optional">
         <div class>
-          <label>
+          <label for="select-1"
+                 id="select-1_label"
+          >
             Mood
           </label>
           <span class="required-label not-required-text">
@@ -21,7 +23,9 @@ exports[`select field should render correctly 1`] = `
         </div>
         <span>
         </span>
-        <select class>
+        <select class
+                id="select-1"
+        >
           <option value="value:">
           </option>
           <option value="choice:0">

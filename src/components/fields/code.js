@@ -123,6 +123,11 @@ export default createReactClass({
 
     const textBox = this.textBoxRef;
     this.codeMirror = config.codeMirror()(textBox, options);
+    const editor = textBox.getElementsByTagName('textarea')[0];
+    // Try to set aria-label on code block
+    if (editor) {
+      editor.setAttribute('aria-label', 'code block');
+    }
     this.codeMirror.on('change', this.onCodeMirrorChange);
   },
 

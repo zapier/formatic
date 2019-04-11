@@ -36,6 +36,7 @@ export default createReactClass({
     return fieldTemplates.length < 2 ? null : (
       <select
         className={cx(this.props.classes)}
+        id={this.props.id}
         onChange={this.onChange}
         renderWith={this.renderWith('FieldTemplateChoicesSelectInput')}
         value={this.fieldTemplateIndex}

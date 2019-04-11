@@ -37,11 +37,13 @@ export default createReactClass({
         typeName: this.props.typeName || 'String',
         config,
         field,
+        id: this.state.id,
         plain: this.props.plain,
       },
       <textarea
         className={cx(this.props.classes)}
         disabled={this.isReadOnly()}
+        id={this.state.id}
         onBlur={this.onBlurAction}
         onChange={this.onChange}
         onFocus={this.onFocusAction}
