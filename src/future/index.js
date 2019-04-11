@@ -9,7 +9,7 @@ import Field from '@/src/future/components/Field';
 
 import TextInput from '@/src/future/inputs/TextInput';
 
-export function ControlledFormContainer({ value, onChange, children }) {
+function ControlledFormContainer({ value, onChange, children }) {
   function onSetFieldValue(fieldKey, fieldValue) {
     const newValue = {
       ...value,
@@ -24,11 +24,7 @@ export function ControlledFormContainer({ value, onChange, children }) {
   );
 }
 
-export function UncontrolledFormContainer({
-  defaultValue,
-  onChange,
-  children,
-}) {
+function UncontrolledFormContainer({ defaultValue, onChange, children }) {
   const [formValue, setFormValue] = useState(defaultValue);
 
   function onChangeControlled(newValue) {
