@@ -30,18 +30,16 @@ export function UncontrolledFormContainer({
   children,
 }) {
   const [formValue, setFormValue] = useState(defaultValue);
-  function onSetFieldValue(fieldKey, fieldValue) {
-    const newValue = {
-      ...formValue,
-      [fieldKey]: fieldValue,
-    };
+
+  function onChangeControlled(newValue) {
     setFormValue(newValue);
     onChange(newValue);
   }
+
   return (
-    <FieldContext.Provider value={{ formValue, onSetFieldValue }}>
+    <ControlledFormContainer onChange={onChangeControlled} value={formValue}>
       {children}
-    </FieldContext.Provider>
+    </ControlledFormContainer>
   );
 }
 
