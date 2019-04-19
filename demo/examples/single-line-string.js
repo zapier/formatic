@@ -28,6 +28,14 @@ const fields = [
   },
   {
     id: 'single-line-string-4',
+    label: 'Disabled Name',
+    type: 'single-line-string',
+    key: 'readonlyName',
+    default: 'Robert',
+    isDisabled: true,
+  },
+  {
+    id: 'single-line-string-5',
     label: 'Path',
     type: 'single-line-string',
     key: 'path',

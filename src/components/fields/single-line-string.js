@@ -49,6 +49,7 @@ export default createReactClass({
         autoComplete={field.autoComplete}
         autoFocus={field.autoFocus}
         className={cx(this.props.classes)}
+        disabled={field.isDisabled}
         id={this.state.id}
         onBlur={this.onBlurAction}
         onChange={this.onChange}
