@@ -29,7 +29,9 @@ function UncontrolledFormContainer({ defaultValue, onChange, children }) {
 
   function onChangeControlled(newValue) {
     setFormValue(newValue);
-    onChange(newValue);
+    if (typeof onChange === 'function') {
+      onChange(newValue);
+    }
   }
 
   return (
