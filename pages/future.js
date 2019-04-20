@@ -27,19 +27,31 @@ function ChangeDisplay({ defaultValue, children }) {
   );
 }
 
+const PureForm = React.memo(function PureForm({
+  ExampleForm,
+  defaultValue,
+  onChange,
+}) {
+  return <ExampleForm defaultValue={defaultValue} onChange={onChange} />;
+});
+
 const FuturePage = () => (
   <Page pageKey="future">
     <Sections>
       {examples.map(({ key, isControlled, defaultValue, ExampleForm }) => (
         <Section key={key} title={key}>
           <ChangeDisplay defaultValue={defaultValue}>
-            {({ value, onChange }) => (
-              <ExampleForm
-                defaultValue={isControlled ? undefined : defaultValue}
-                onChange={onChange}
-                value={isControlled ? value : undefined}
-              />
-            )}
+            {({ value, onChange }) =>
+              isControlled ? (
+                <ExampleForm onChange={onChange} value={value} />
+              ) : (
+                <PureForm
+                  defaultValue={defaultValue}
+                  ExampleForm={ExampleForm}
+                  onChange={onChange}
+                />
+              )
+            }
           </ChangeDisplay>
         </Section>
       ))}
