@@ -30,9 +30,9 @@ const fields = [
     id: 'single-line-string-4',
     label: 'Disabled Name',
     type: 'single-line-string',
-    key: 'readonlyName',
+    key: 'disabledName',
     default: 'Robert',
-    isDisabled: true,
+    disabled: true,
   },
   {
     id: 'single-line-string-5',
