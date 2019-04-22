@@ -32,6 +32,7 @@ export default createReactClass({
     const field = this.props.field;
 
     const readOnly = config.fieldIsReadOnly(field);
+    const disabled = config.fieldIsDisabled(field);
     const tabIndex = readOnly ? -1 : this.props.tabIndex || 0;
 
     return config.createElement(
@@ -49,7 +50,7 @@ export default createReactClass({
         autoComplete={field.autoComplete}
         autoFocus={field.autoFocus}
         className={cx(this.props.classes)}
-        disabled={field.isDisabled}
+        disabled={disabled}
         id={this.state.id}
         onBlur={this.onBlurAction}
         onChange={this.onChange}

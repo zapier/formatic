@@ -26,6 +26,10 @@ export default {
     this.onStartAction('blur');
   },
 
+  isDisabled: function() {
+    return this.props.config.fieldIsDisabled(this.props.field);
+  },
+
   isReadOnly: function() {
     return this.props.config.fieldIsReadOnly(this.props.field);
   },
