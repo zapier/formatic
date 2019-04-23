@@ -75,6 +75,26 @@ exports[`single-line-string field should render correctly 1`] = `
       </div>
       <div class="optional">
         <div class>
+          <label for="single-line-string-4"
+                 id="single-line-string-4_label"
+          >
+            Disabled Name
+          </label>
+          <span class="required-label not-required-text">
+          </span>
+        </div>
+        <span>
+        </span>
+        <input class
+               disabled
+               id="single-line-string-4"
+               tabindex="0"
+               type="text"
+               value="Robert"
+        >
+      </div>
+      <div class="optional">
+        <div class>
           <label>
             Path
           </label>

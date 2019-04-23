@@ -1076,6 +1076,17 @@ export default function(config) {
       }
     },
 
+    // Return true if field is disabled, or is a descendant of a disabled field
+    fieldIsDisabled: function(field) {
+      if (field.disabled) {
+        return true;
+      } else if (field.parent) {
+        return config.fieldIsDisabled(field.parent);
+      } else {
+        return false;
+      }
+    },
+
     // Return true if field has read-only controls. Useful for read-only controls used
     // in demo screenshot type effects, where you want it to look just like the real
     // thing, but read-only.
