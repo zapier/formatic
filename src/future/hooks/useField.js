@@ -1,18 +1,15 @@
-import { useContext } from 'react';
-
-import { FieldContext } from '@/src/future/context';
+import { useReactiveValue } from '@/src/future/ReactiveValue';
 
 export default function useField(fieldKey) {
-  const { formValue, onSetFieldValue } = useContext(FieldContext);
+  const { value, setValue } = useReactiveValue(fieldKey);
+
   function onChangeTargetValue({ target }) {
-    onSetFieldValue(fieldKey, target.value);
+    setValue(target.value);
   }
-  function onChange(newFieldValue) {
-    onSetFieldValue(fieldKey, newFieldValue);
-  }
+
   return {
-    value: formValue[fieldKey],
+    value,
     onChangeTargetValue,
-    onChange,
+    onChange: setValue,
   };
 }

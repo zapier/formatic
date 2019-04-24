@@ -128,7 +128,9 @@ export function ReactiveValueContainer({ value, onChange, children }) {
   // Any time our wrapper's value changes, kick off our onChange handler.
   useEffect(
     () => {
-      return valueRef.current.subscribe(onChange);
+      return typeof onChange === 'function'
+        ? valueRef.current.subscribe(onChange)
+        : () => {};
     },
     [onChange]
   );

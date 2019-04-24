@@ -1,52 +1,25 @@
 import React, { useState, useMemo } from 'react';
 
+import {
+  ReactiveValueContainer,
+  useReactiveValue,
+} from '@/src/future/ReactiveValue';
 import useField from '@/src/future/hooks/useField';
 
-import { FieldContext, RenderContext } from '@/src/future/context';
+import { RenderContext } from '@/src/future/context';
 
 import Component from '@/src/future/components/Component';
 import Field from '@/src/future/components/Field';
 
 import TextInput from '@/src/future/inputs/TextInput';
 
-function ControlledFormContainer({ value, onChange, children }) {
-  function onSetFieldValue(fieldKey, fieldValue) {
-    const newValue = {
-      ...value,
-      [fieldKey]: fieldValue,
-    };
-    onChange(newValue);
-  }
-  return (
-    <FieldContext.Provider value={{ formValue: value, onSetFieldValue }}>
-      {children}
-    </FieldContext.Provider>
-  );
-}
-
-function UncontrolledFormContainer({ defaultValue, onChange, children }) {
-  const [formValue, setFormValue] = useState(defaultValue);
-
-  function onChangeControlled(newValue) {
-    setFormValue(newValue);
-    if (typeof onChange === 'function') {
-      onChange(newValue);
-    }
-  }
-
-  return (
-    <ControlledFormContainer onChange={onChangeControlled} value={formValue}>
-      {children}
-    </ControlledFormContainer>
-  );
-}
-
 export function FormContainer({
   value,
   defaultValue,
   renderTag,
   renderComponent,
-  ...props
+  onChange,
+  children,
 }) {
   const [savedDefaultValue] = useState(defaultValue);
   const [isControlled] = useState(savedDefaultValue === undefined);
@@ -57,32 +30,33 @@ export function FormContainer({
   ]);
   return (
     <RenderContext.Provider value={renderContext}>
-      {isControlled ? (
-        <ControlledFormContainer value={value} {...props} />
-      ) : (
-        <UncontrolledFormContainer
-          defaultValue={savedDefaultValue}
-          {...props}
-        />
-      )}
+      <ReactiveValueContainer
+        onChange={onChange}
+        value={isControlled ? value : savedDefaultValue}
+      >
+        {children}
+      </ReactiveValueContainer>
     </RenderContext.Provider>
   );
 }
 
 export function FieldContainer({ fieldKey, children, ...props }) {
-  const { value, onChange, onChangeTargetValue } = useField(fieldKey);
+  const { value, setValue } = useReactiveValue(fieldKey);
+
   if (typeof children === 'function') {
     return children({
       fieldKey,
       value,
-      onChangeTargetValue,
+      onChangeTargetValue: event => setValue(event.target.value),
+      onChange: setValue,
       ...props,
     });
   }
+
   return (
-    <ControlledFormContainer onChange={onChange} value={value}>
+    <ReactiveValueContainer onChange={setValue} value={value}>
       {children}
-    </ControlledFormContainer>
+    </ReactiveValueContainer>
   );
 }
 

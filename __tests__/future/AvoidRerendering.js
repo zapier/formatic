@@ -18,20 +18,17 @@ describe('avoid rerendering', () => {
     }
     function LastName() {
       renderSpy('lastName');
-      const { value } = useField('firstName');
+      const { value } = useField('lastName');
       return <div>First Name: {value}</div>;
     }
-    const renderForm = () => {
-      return (
-        <FormContainer defaultValue={defaultValue}>
-          <FirstName />
-          <LastName />
-          <TextField fieldKey="firstName" id="firstName" label="First Name" />
-          <TextField fieldKey="lastName" id="lastName" label="Last Name" />
-        </FormContainer>
-      );
-    };
-    const { getByLabelText } = render(renderForm());
+    const { getByLabelText } = render(
+      <FormContainer defaultValue={defaultValue}>
+        <FirstName />
+        <LastName />
+        <TextField fieldKey="firstName" id="firstName" label="First Name" />
+        <TextField fieldKey="lastName" id="lastName" label="Last Name" />
+      </FormContainer>
+    );
     fireEvent.change(getByLabelText('First Name'), {
       target: { value: 'Joe' },
     });
