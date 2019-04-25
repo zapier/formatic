@@ -7,20 +7,9 @@ import {
   IntegerField,
 } from '@/src/future';
 
-const fields = [
-  {
-    key: 'age',
-    type: 'Integer',
-  },
-];
-
 export function ExampleForm({ defaultValue, onChange }) {
   return (
-    <FormContainer
-      defaultValue={defaultValue}
-      fields={fields}
-      onChange={onChange}
-    >
+    <FormContainer defaultValue={defaultValue} onChange={onChange}>
       <FieldContainer fieldKey="name">
         <TextField fieldKey="firstName" label="First Name" />
         <TextField fieldKey="lastName" label="Last Name" />
