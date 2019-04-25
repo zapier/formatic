@@ -12,14 +12,15 @@ import Component from '@/src/future/components/Component';
 import Field from '@/src/future/components/Field';
 
 import TextInput from '@/src/future/inputs/TextInput';
+import IntegerInput from '@/src/future/inputs/IntegerInput';
 
 export function FormContainer({
-  value,
+  children,
   defaultValue,
+  onChange,
   renderTag,
   renderComponent,
-  onChange,
-  children,
+  value,
 }) {
   const [savedDefaultValue] = useState(defaultValue);
   const [isControlled] = useState(savedDefaultValue === undefined);
@@ -76,9 +77,10 @@ function createField(fieldType, Input) {
 }
 
 const TextField = createField('Text', TextInput);
+const IntegerField = createField('Text', IntegerInput);
 
-export { TextField };
+export { TextField, IntegerField };
 
-export { TextInput };
+export { TextInput, IntegerInput };
 
 export { useField };
