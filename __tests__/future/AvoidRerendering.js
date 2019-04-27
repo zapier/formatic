@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, fireEvent, cleanup } from 'react-testing-library';
 
-import { FormContainer, TextField, useField } from '@/src/future';
+import { FormContainer, AutoFields, TextField, useField } from '@/src/future';
 
 afterEach(cleanup);
 
@@ -32,6 +32,37 @@ describe('avoid rerendering', () => {
     fireEvent.change(getByLabelText('First Name'), {
       target: { value: 'Joe' },
     });
+    expect(renderSpy.mock.calls).toEqual([
+      ['firstName'],
+      ['lastName'],
+      ['firstName'],
+    ]);
+  });
+
+  test('avoids unnecessary renders of AutoFields', () => {
+    const renderSpy = jest.fn();
+    function FirstName() {
+      renderSpy('firstName');
+      const { value } = useField('firstName');
+      return <div>First Name: {value}</div>;
+    }
+    function LastName() {
+      renderSpy('lastName');
+      const { value } = useField('lastName');
+      return <div>First Name: {value}</div>;
+    }
+    const { getByLabelText } = render(
+      <FormContainer defaultValue={defaultValue}>
+        <FirstName />
+        <LastName />
+        <AutoFields />
+      </FormContainer>
+    );
+    fireEvent.change(getByLabelText('First Name'), {
+      target: { value: 'Joe' },
+    });
+
+    expect(renderSpy).toBeCalledTimes(3);
     expect(renderSpy.mock.calls).toEqual([
       ['firstName'],
       ['lastName'],
