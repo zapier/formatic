@@ -7,14 +7,12 @@ import {
 import useField from '@/src/future/hooks/useField';
 
 import { RenderContext } from '@/src/future/context';
-import { AutoFields } from '@/src/future/formatic-fields';
 
 export * from '@/src/future/formatic-fields';
 export * from '@/src/future/inputs';
 
 export function FormContainer({
   children,
-  components,
   defaultValue,
   onChange,
   renderTag,
@@ -34,7 +32,7 @@ export function FormContainer({
         onChange={onChange}
         value={isControlled ? value : savedDefaultValue}
       >
-        {children || <AutoFields components={components} />}
+        {children}
       </ReactiveValueContainer>
     </RenderContext.Provider>
   );
