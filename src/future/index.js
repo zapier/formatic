@@ -21,17 +21,15 @@ export function FormContainer({
 }) {
   const [savedDefaultValue] = useState(defaultValue);
   const [isControlled] = useState(savedDefaultValue === undefined);
+  const normalizedValue = isControlled ? value : savedDefaultValue;
   // Keep context object pure.
-  const renderContext = useMemo(() => ({ renderTag, renderComponent }), [
-    renderTag,
-    renderComponent,
-  ]);
+  const renderContext = useMemo(
+    () => ({ renderTag, renderComponent, initialValue: normalizedValue }),
+    [renderTag, renderComponent]
+  );
   return (
     <RenderContext.Provider value={renderContext}>
-      <ReactiveValueContainer
-        onChange={onChange}
-        value={isControlled ? value : savedDefaultValue}
-      >
+      <ReactiveValueContainer onChange={onChange} value={normalizedValue}>
         {children}
       </ReactiveValueContainer>
     </RenderContext.Provider>

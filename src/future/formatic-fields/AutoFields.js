@@ -1,5 +1,5 @@
-import React from 'react';
-import { useReactiveValue } from '@/src/future/ReactiveValue';
+import React, { useContext } from 'react';
+import { RenderContext } from '@/src/future/context';
 import { startCase } from '@/src/string-utils';
 
 const inferSchema = ([key, value]) => ({
@@ -10,7 +10,7 @@ const inferSchema = ([key, value]) => ({
 
 export default function createAutoFields(defaultFieldComponents) {
   return function AutoFields(props) {
-    const { value: formValues } = useReactiveValue();
+    const { initialValue: formValues } = useContext(RenderContext);
     const schema = Object.entries(formValues).map(inferSchema);
     const components = { ...defaultFieldComponents, ...props.components };
 

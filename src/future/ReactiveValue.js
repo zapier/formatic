@@ -23,10 +23,6 @@ const createReactiveValue = defaultValue => {
   }
 
   function getCurrentValueAt(key) {
-    if (key === undefined) {
-      return getValue();
-    }
-
     if (isObject(currentValue)) {
       return currentValue[key];
     }
