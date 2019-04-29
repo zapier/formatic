@@ -1,7 +1,7 @@
 /*global describe, test, expect*/
-import * as utils from '@/src/string-utils';
+import * as utils from '@/src/stringUtils';
 
-describe('string-utils', () => {
+describe('stringUtils', () => {
   describe('capitalize', () => {
     test('capitalizes the first letter in a string', () => {
       expect(utils.capitalize('ron')).toBe('Ron');

@@ -3,7 +3,7 @@ import Component from '@/src/future/components/Component';
 import Field from '@/src/future/components/Field';
 import TextInput from '@/src/future/inputs/TextInput';
 import IntegerInput from '@/src/future/inputs/IntegerInput';
-import createAutoFields from '@/src/future/formatic-fields/AutoFields';
+import createAutoFields from '@/src/future/builtin-fields/AutoFields';
 
 function createField(fieldType, Input) {
   function FieldComponent(props) {

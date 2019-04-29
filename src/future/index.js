@@ -8,7 +8,7 @@ import useField from '@/src/future/hooks/useField';
 
 import { RenderContext } from '@/src/future/context';
 
-export * from '@/src/future/formatic-fields';
+export * from '@/src/future/builtin-fields';
 export * from '@/src/future/inputs';
 
 export function FormContainer({

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { RenderContext } from '@/src/future/context';
-import { startCase } from '@/src/string-utils';
+import { startCase } from '@/src/stringUtils';
 
 const inferSchema = ([key, value]) => ({
   key,
