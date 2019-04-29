@@ -40,33 +40,42 @@ describe('avoid rerendering', () => {
   });
 
   test('avoids unnecessary renders of AutoFields', () => {
-    const renderSpy = jest.fn();
-    function FirstName() {
-      renderSpy('firstName');
-      const { value } = useField('firstName');
-      return <div>First Name: {value}</div>;
+    function CustomTextField({ fieldKey, label }) {
+      const { value, onChangeTargetValue } = useField(fieldKey);
+      const randomId = Math.random();
+      return (
+        <>
+          <label htmlFor={randomId}>{label}</label>
+          <input
+            id={randomId}
+            onChange={onChangeTargetValue}
+            type="text"
+            value={value}
+          />
+        </>
+      );
     }
-    function LastName() {
-      renderSpy('lastName');
-      const { value } = useField('lastName');
-      return <div>First Name: {value}</div>;
-    }
+
+    const components = {
+      string: CustomTextField,
+    };
+
     const { getByLabelText } = render(
       <FormContainer defaultValue={defaultValue}>
-        <FirstName />
-        <LastName />
-        <AutoFields />
+        <AutoFields components={components} />
       </FormContainer>
     );
+
+    const getInputId = id => getByLabelText(id).id;
+
+    const intitialLastNameId = getInputId('Last Name');
+    const initialFirstNameId = getInputId('First Name');
+
     fireEvent.change(getByLabelText('First Name'), {
       target: { value: 'Joe' },
     });
 
-    expect(renderSpy).toBeCalledTimes(3);
-    expect(renderSpy.mock.calls).toEqual([
-      ['firstName'],
-      ['lastName'],
-      ['firstName'],
-    ]);
+    expect(getInputId('First Name')).not.toBe(initialFirstNameId);
+    expect(getInputId('Last Name')).toBe(intitialLastNameId);
   });
 });
