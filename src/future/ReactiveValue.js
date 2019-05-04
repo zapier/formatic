@@ -11,104 +11,166 @@ function getPropertyValue(key, value) {
   return undefined;
 }
 
-// Wrap a value so that we can subscribe to changes to specific properties of
-// that value and ignore properties that don't change.
-const createReactiveValue = defaultValue => {
-  let currentValue = defaultValue;
-  const listeners = [];
-  const listenersByKey = {};
+function getTypeName(value) {
+  if (value === null) {
+    return 'null';
+  }
+  if (Array.isArray(value)) {
+    return 'array';
+  }
+  return typeof value;
+}
 
-  function getValue() {
-    return currentValue;
+class ReactiveValue {
+  constructor(defaultValue, key, parent) {
+    this.currentValue = defaultValue;
+    this.listeners = [];
+    this.key = key;
+    this.parent = parent;
+    this.children = {};
+    this.refCount = 0;
+    this.meta = null;
+    this.hasMetaChanged = false;
+    this.metaListeners = [];
   }
 
-  function getValueAt(key) {
-    if (isObject(currentValue)) {
-      return currentValue[key];
+  getValueAt(key) {
+    return getPropertyValue(key, this.currentValue);
+  }
+
+  getValue() {
+    return this.currentValue;
+  }
+
+  // Get the property type of this value and the property types of its children.
+  getMeta() {
+    if (!this.meta) {
+      this.meta = {
+        type: getTypeName(this.currentValue),
+        propertyTypes: isObject(this.currentValue)
+          ? Object.keys(this.currentValue).reduce((result, key) => {
+              result[key] = getTypeName(this.currentValue[key]);
+              return result;
+            }, {})
+          : {},
+      };
     }
-
-    return undefined;
+    return this.meta;
   }
 
-  function notifyForKey(key, newValueAtKey) {
-    listenersByKey[key].forEach(handler => {
-      handler(newValueAtKey);
-    });
+  updateMeta() {
+    this.meta = null;
+    this.hasMetaChanged = true;
+    this.getMeta();
   }
 
-  // Set value at a key and notify all subscribers to that key and the root
-  // value.
-  function setValueAt(key, newValue) {
-    if (getValueAt(key) !== newValue) {
-      if (isObject(currentValue)) {
-        currentValue = {
-          ...currentValue,
+  // Set property value and recurse up through parents.
+  setValueAt(key, newValue) {
+    if (newValue !== this.getValueAt(key)) {
+      if (isObject(this.currentValue)) {
+        this.currentValue = {
+          ...this.currentValue,
           [key]: newValue,
         };
-      }
-      // Notify of actual value, which could potentially be different from
-      // the desired value. For example, if the root value is not an object, or
-      // it's a proxy. At that point, we're pretty much into unsupported
-      // territory though, and the behavior is unknown.
-      const trueNewValue = getValueAt(key);
-      if (listenersByKey[key]) {
-        notifyForKey(key, trueNewValue);
-      }
-      // Notify any root value subscribers.
-      listeners.forEach(handler => {
-        handler(currentValue);
-      });
-    }
-  }
-
-  // Set the root value. Don't notify root listeners, since we don't want to
-  // cause a loop. But... if there are any listeners of properties, notify them
-  // if those properties have changed.
-  function setValue(newValue) {
-    if (newValue !== currentValue) {
-      const previousValue = currentValue;
-      currentValue = newValue;
-      for (const key in listenersByKey) {
-        const newValueAtKey = getPropertyValue(key, newValue);
-        if (getPropertyValue(key, previousValue) !== newValueAtKey) {
-          notifyForKey(key, newValueAtKey);
+        if (this.parent) {
+          this.parent.setValueAt(this.key, this.currentValue);
+          // Make sure our parent is actually holding the new value. If not,
+          // take the actual value from the parent.
+          this.currentValue = this.parent.getValueAt(this.key);
+        }
+        if (
+          this.meta &&
+          this.meta.propertyTypes[key] !== getTypeName(newValue)
+        ) {
+          this.updateMeta();
         }
       }
     }
   }
 
-  function subscribe(handler) {
-    listeners.push(handler);
-    return () => {
-      const i = listeners.indexOf(handler);
-      listeners.splice(i, 1);
-    };
-  }
-
-  function subscribeAt(key, handler) {
-    if (!(key in listenersByKey)) {
-      listenersByKey[key] = [];
+  notifyUp(shouldNotifyParent = true) {
+    // Notify listeners for this value.
+    this.listeners.forEach(handler => {
+      handler(this.currentValue);
+    });
+    if (this.hasMetaChanged) {
+      this.metaListeners.forEach(handler => {
+        handler(this.getMeta());
+      });
+      this.hasMetaChanged = false;
     }
-    const listenersAtKey = listenersByKey[key];
-    listenersAtKey.push(handler);
-    return () => {
-      const i = listenersAtKey.indexOf(handler);
-      listenersAtKey.splice(i, 1);
-      if (listenersAtKey.length === 0) {
-        delete listenersByKey[key];
+    // And maybe parent values.
+    if (this.parent && shouldNotifyParent) {
+      this.parent.notifyUp();
+    }
+  }
+
+  setValue(newValue, shouldNotifyParent = true) {
+    // Ignore this if it's the same value.
+    if (newValue !== this.currentValue) {
+      this.currentValue = newValue;
+      if (this.parent && shouldNotifyParent) {
+        this.parent.setValueAt(this.key, newValue);
+        // Make sure our parent is actually holding the new value. If not,
+        // take the actual value from the parent.
+        this.currentValue = this.parent.getValueAt(this.key);
       }
+      // Set our child values, making sure they don't call us back since we
+      // already know.
+      for (const key in this.children) {
+        const child = this.children[key];
+        child.setValue(this.getValueAt(key), false);
+      }
+      // Notify our subscribers and our parent's subscribers.
+      this.notifyUp(shouldNotifyParent);
+    }
+  }
+
+  subscribe(handler) {
+    this.listeners.push(handler);
+    return () => {
+      const i = this.listeners.indexOf(handler);
+      this.listeners.splice(i, 1);
     };
   }
 
-  return {
-    getValue,
-    getValueAt,
-    setValue,
-    setValueAt,
-    subscribe,
-    subscribeAt,
-  };
-};
+  subscribeMeta(handler) {
+    this.metaListeners.push(handler);
+    return () => {
+      const i = this.metaListeners.indexOf(handler);
+      this.metaListeners.splice(i, 1);
+    };
+  }
+
+  // Return child, creating it if necessary, with a zero reference count.
+  getChild(key) {
+    if (!this.children[key]) {
+      this.children[key] = new ReactiveValue(this.getValueAt(key), key, this);
+    }
+    return this.children[key];
+  }
+
+  // Increment the reference count, and return a dispose function that will
+  // decrement the reference count and throw away the child when the reference
+  // count reaches zero.
+  hold() {
+    if (this.parent) {
+      this.refCount++;
+      return () => {
+        this.refCount--;
+        if (this.refCount === 0) {
+          this.parent.releaseAt(this.key);
+        }
+      };
+    }
+    return () => {};
+  }
+
+  // Dispose of a child.
+  releaseAt(key) {
+    delete this.children[key];
+  }
+}
 
 const ReactiveValueContext = React.createContext();
 
@@ -118,7 +180,7 @@ export function ReactiveValueContainer({ value, onChange, children }) {
   const valueRef = useRef(null);
   // Initialize our wrapper once.
   if (valueRef.current === null) {
-    valueRef.current = createReactiveValue(value);
+    valueRef.current = new ReactiveValue(value);
   }
   // Any time we get a new value, set the wrapper's value to that value. The
   // wrapper will ignore equal values, so no worries of a loop here.
@@ -141,23 +203,40 @@ export function ReactiveValueContainer({ value, onChange, children }) {
   );
 }
 
+// Grabs a child and makes sure it gets disposed of when there are no more
+// references to it.
+function useChildReactiveValue(key) {
+  const parentReactiveValue = useContext(ReactiveValueContext);
+  const childReactiveValue = parentReactiveValue.getChild(key);
+  useEffect(
+    () => {
+      return childReactiveValue.hold();
+    },
+    [key]
+  );
+  return childReactiveValue;
+}
+
+// Get the current value and a setValue function for a particular property.
 export function useReactiveValueAt(key) {
-  const reactiveValue = useContext(ReactiveValueContext);
-  const [value, setValue] = useState(() => reactiveValue.getValueAt(key));
+  const childReactiveValue = useChildReactiveValue(key);
+  const [value, setValue] = useState(() => childReactiveValue.getValue());
   useEffect(
     () => {
       // Subscribe to changes to the property and set our value in state when
       // that property changes.
-      return reactiveValue.subscribeAt(key, setValue);
+      return childReactiveValue.subscribe(setValue);
     },
     [key]
   );
   function setValueInContext(newValue) {
-    reactiveValue.setValueAt(key, newValue);
+    childReactiveValue.setValue(newValue);
   }
   return { value, setValue: setValueInContext };
 }
 
+// Get the current value and a setValue function for the current property (or
+// root value).
 export function useReactiveValue() {
   const reactiveValue = useContext(ReactiveValueContext);
   const [value, setValue] = useState(() => reactiveValue.getValue());
@@ -170,4 +249,24 @@ export function useReactiveValue() {
     reactiveValue.setValue(newValue);
   }
   return { value, setValue: setValueInContext };
+}
+
+// Get the current property metadata.
+export function useReactiveValueMeta() {
+  const reactiveValue = useContext(ReactiveValueContext);
+  const [meta, setMeta] = useState(() => reactiveValue.getMeta());
+  useEffect(() => {
+    return reactiveValue.subscribeMeta(setMeta);
+  }, []);
+  return meta;
+}
+
+// Nest into a child.
+export function ReactiveChildContainer({ childKey, children }) {
+  const childReactiveValue = useChildReactiveValue(childKey);
+  return (
+    <ReactiveValueContext.Provider value={childReactiveValue}>
+      {children}
+    </ReactiveValueContext.Provider>
+  );
 }

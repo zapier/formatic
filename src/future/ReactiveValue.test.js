@@ -5,8 +5,10 @@ import { render, fireEvent, cleanup } from 'react-testing-library';
 
 import {
   ReactiveValueContainer,
+  ReactiveChildContainer,
   useReactiveValue,
   useReactiveValueAt,
+  useReactiveValueMeta,
 } from './ReactiveValue';
 
 afterEach(cleanup);
@@ -158,12 +160,11 @@ test(`should work with nesting, with no wasted renders`, () => {
   );
   const Age = createPureReactiveComponent('Age', 'age', ageRenderSpy);
   function Name({ children }) {
-    const { value, setValue } = useReactiveValueAt('name');
     nameRenderSpy();
     return (
-      <ReactiveValueContainer onChange={setValue} value={value}>
+      <ReactiveChildContainer childKey="name">
         {children}
-      </ReactiveValueContainer>
+      </ReactiveChildContainer>
     );
   }
   const { getByTestId } = render(
@@ -192,7 +193,7 @@ test(`should work with nesting, with no wasted renders`, () => {
   ]);
   expect(firstNameRenderSpy.mock.calls.length).toBe(2);
   expect(lastNameRenderSpy.mock.calls.length).toBe(1);
-  expect(nameRenderSpy.mock.calls.length).toBe(2);
+  expect(nameRenderSpy.mock.calls.length).toBe(1);
   expect(ageRenderSpy.mock.calls.length).toBe(1);
   fireEvent.change(getByTestId('age'), {
     // See above where we coerce value.
@@ -209,7 +210,7 @@ test(`should work with nesting, with no wasted renders`, () => {
   ]);
   expect(firstNameRenderSpy.mock.calls.length).toBe(2);
   expect(lastNameRenderSpy.mock.calls.length).toBe(1);
-  expect(nameRenderSpy.mock.calls.length).toBe(2);
+  expect(nameRenderSpy.mock.calls.length).toBe(1);
   expect(ageRenderSpy.mock.calls.length).toBe(2);
 });
 
@@ -267,4 +268,65 @@ test(`should be able to subscribe to the whole value`, () => {
   });
   expect(firstNameRenderSpy.mock.calls.length).toBe(2);
   expect(lastNameRenderSpy.mock.calls.length).toBe(2);
+});
+
+test('should notify when property types change', () => {
+  const onChangeSpy = jest.fn();
+  const propertyTypesRenderSpy = jest.fn();
+  const FirstName = createPureReactiveComponent('FirstName', 'firstName');
+  function PropertyTypes() {
+    const meta = useReactiveValueMeta();
+    propertyTypesRenderSpy();
+    return (
+      <div data-testid="meta">
+        {Object.keys(meta.propertyTypes)
+          .map(key => `${key}:${meta.propertyTypes[key]}`)
+          .join(',')}
+      </div>
+    );
+  }
+  function Age() {
+    const { value = 0, setValue } = useReactiveValueAt('age');
+    return (
+      <input
+        data-testid="age"
+        onChange={event => setValue(parseInt(event.target.value))}
+        type="text"
+        value={value}
+      />
+    );
+  }
+  const { getByTestId } = render(
+    <ReactiveValueContainer
+      onChange={onChangeSpy}
+      value={{ firstName: '', lastName: '' }}
+    >
+      <FirstName />
+      <Age />
+      <PropertyTypes />
+    </ReactiveValueContainer>
+  );
+  expect(getByTestId('meta').textContent).toBe(
+    'firstName:string,lastName:string'
+  );
+  fireEvent.change(getByTestId('firstName'), {
+    target: { value: 'Joe' },
+  });
+  expect(onChangeSpy).toHaveBeenLastCalledWith({
+    firstName: 'Joe',
+    lastName: '',
+  });
+  expect(propertyTypesRenderSpy.mock.calls.length).toBe(1);
+  fireEvent.change(getByTestId('age'), {
+    target: { value: 50 },
+  });
+  expect(onChangeSpy).toHaveBeenLastCalledWith({
+    firstName: 'Joe',
+    lastName: '',
+    age: 50,
+  });
+  expect(propertyTypesRenderSpy.mock.calls.length).toBe(2);
+  expect(getByTestId('meta').textContent).toBe(
+    'firstName:string,lastName:string,age:number'
+  );
 });
