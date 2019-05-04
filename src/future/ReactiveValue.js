@@ -4,7 +4,7 @@ function isObject(value) {
   return value != null && typeof value === 'object';
 }
 
-function getValueAt(key, value) {
+function getPropertyValue(key, value) {
   if (isObject(value)) {
     return value[key];
   }
@@ -22,7 +22,7 @@ const createReactiveValue = defaultValue => {
     return currentValue;
   }
 
-  function getCurrentValueAt(key) {
+  function getValueAt(key) {
     if (isObject(currentValue)) {
       return currentValue[key];
     }
@@ -39,7 +39,7 @@ const createReactiveValue = defaultValue => {
   // Set value at a key and notify all subscribers to that key and the root
   // value.
   function setValueAt(key, newValue) {
-    if (getCurrentValueAt(key) !== newValue) {
+    if (getValueAt(key) !== newValue) {
       if (isObject(currentValue)) {
         currentValue = {
           ...currentValue,
@@ -50,7 +50,7 @@ const createReactiveValue = defaultValue => {
       // the desired value. For example, if the root value is not an object, or
       // it's a proxy. At that point, we're pretty much into unsupported
       // territory though, and the behavior is unknown.
-      const trueNewValue = getCurrentValueAt(key);
+      const trueNewValue = getValueAt(key);
       if (listenersByKey[key]) {
         notifyForKey(key, trueNewValue);
       }
@@ -69,8 +69,8 @@ const createReactiveValue = defaultValue => {
       const previousValue = currentValue;
       currentValue = newValue;
       for (const key in listenersByKey) {
-        const newValueAtKey = getValueAt(key, newValue);
-        if (getValueAt(key, previousValue) !== newValueAtKey) {
+        const newValueAtKey = getPropertyValue(key, newValue);
+        if (getPropertyValue(key, previousValue) !== newValueAtKey) {
           notifyForKey(key, newValueAtKey);
         }
       }
@@ -102,7 +102,7 @@ const createReactiveValue = defaultValue => {
 
   return {
     getValue,
-    getValueAt: getCurrentValueAt,
+    getValueAt,
     setValue,
     setValueAt,
     subscribe,
