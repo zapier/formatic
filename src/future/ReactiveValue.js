@@ -141,19 +141,33 @@ export function ReactiveValueContainer({ value, onChange, children }) {
   );
 }
 
-export function useReactiveValue(key) {
-  const context = useContext(ReactiveValueContext);
-  const [value, setValue] = useState(() => context.getValueAt(key));
+export function useReactiveValueAt(key) {
+  const reactiveValue = useContext(ReactiveValueContext);
+  const [value, setValue] = useState(() => reactiveValue.getValueAt(key));
   useEffect(
     () => {
       // Subscribe to changes to the property and set our value in state when
       // that property changes.
-      return context.subscribeAt(key, setValue);
+      return reactiveValue.subscribeAt(key, setValue);
     },
     [key]
   );
   function setValueInContext(newValue) {
-    context.setValueAt(key, newValue);
+    reactiveValue.setValueAt(key, newValue);
+  }
+  return { value, setValue: setValueInContext };
+}
+
+export function useReactiveValue() {
+  const reactiveValue = useContext(ReactiveValueContext);
+  const [value, setValue] = useState(() => reactiveValue.getValue());
+  useEffect(() => {
+    // Subscribe to changes to the whoile value property and set our value in
+    // state when that property changes.
+    return reactiveValue.subscribe(setValue);
+  }, []);
+  function setValueInContext(newValue) {
+    reactiveValue.setValue(newValue);
   }
   return { value, setValue: setValueInContext };
 }

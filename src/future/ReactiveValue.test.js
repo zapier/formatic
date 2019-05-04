@@ -3,13 +3,17 @@
 import React, { useState } from 'react';
 import { render, fireEvent, cleanup } from 'react-testing-library';
 
-import { ReactiveValueContainer, useReactiveValue } from './ReactiveValue';
+import {
+  ReactiveValueContainer,
+  useReactiveValue,
+  useReactiveValueAt,
+} from './ReactiveValue';
 
 afterEach(cleanup);
 
 function createPureReactiveComponent(name, key, renderSpy) {
   const PureReactiveComponent = React.memo(function PureReactiveComponent() {
-    const { value, setValue } = useReactiveValue(key);
+    const { value, setValue } = useReactiveValueAt(key);
     if (renderSpy) {
       renderSpy();
     }
@@ -154,7 +158,7 @@ test(`should work with nesting, with no wasted renders`, () => {
   );
   const Age = createPureReactiveComponent('Age', 'age', ageRenderSpy);
   function Name({ children }) {
-    const { value, setValue } = useReactiveValue('name');
+    const { value, setValue } = useReactiveValueAt('name');
     nameRenderSpy();
     return (
       <ReactiveValueContainer onChange={setValue} value={value}>
@@ -207,4 +211,60 @@ test(`should work with nesting, with no wasted renders`, () => {
   expect(lastNameRenderSpy.mock.calls.length).toBe(1);
   expect(nameRenderSpy.mock.calls.length).toBe(2);
   expect(ageRenderSpy.mock.calls.length).toBe(2);
+});
+
+test(`should be able to subscribe to the whole value`, () => {
+  const firstNameRenderSpy = jest.fn();
+  const lastNameRenderSpy = jest.fn();
+  const FirstName = createPureReactiveComponent(
+    'FirstName',
+    'firstName',
+    firstNameRenderSpy
+  );
+  const LastName = createPureReactiveComponent(
+    'LastName',
+    'lastName',
+    lastNameRenderSpy
+  );
+  function Name() {
+    const { value, setValue } = useReactiveValue();
+    return (
+      <input
+        data-testid="name"
+        onChange={({ target }) => setValue(JSON.parse(target.value))}
+        type="text"
+        value={JSON.stringify(value)}
+      />
+    );
+  }
+  const { getByTestId } = render(
+    <ReactiveValueContainer value={{ firstName: '', lastName: '' }}>
+      <FirstName />
+      <LastName />
+      <Name />
+    </ReactiveValueContainer>
+  );
+  expect(firstNameRenderSpy.mock.calls.length).toBe(1);
+  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
+  fireEvent.change(getByTestId('firstName'), {
+    target: { value: 'Joe' },
+  });
+  expect(firstNameRenderSpy.mock.calls.length).toBe(2);
+  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
+  expect(getByTestId('name').value).toBe(
+    JSON.stringify({
+      firstName: 'Joe',
+      lastName: '',
+    })
+  );
+  fireEvent.change(getByTestId('name'), {
+    target: {
+      value: JSON.stringify({
+        firstName: 'Joe',
+        lastName: 'Foo',
+      }),
+    },
+  });
+  expect(firstNameRenderSpy.mock.calls.length).toBe(2);
+  expect(lastNameRenderSpy.mock.calls.length).toBe(2);
 });

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 
 import {
   ReactiveValueContainer,
-  useReactiveValue,
+  useReactiveValueAt,
 } from '@/src/future/ReactiveValue';
 import useField from '@/src/future/hooks/useField';
 
@@ -37,7 +37,7 @@ export function FormContainer({
 }
 
 export function FieldContainer({ fieldKey, children, ...props }) {
-  const { value, setValue } = useReactiveValue(fieldKey);
+  const { value, setValue } = useReactiveValueAt(fieldKey);
 
   if (typeof children === 'function') {
     return children({
