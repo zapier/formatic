@@ -1,17 +1,22 @@
-import React, { useContext } from 'react';
-import { RenderContext } from '@/src/future/context';
+import React from 'react';
+import { useReactiveValueMeta } from '@/src/future/ReactiveValue';
 import { startCase } from '@/src/stringUtils';
 
-const inferSchema = ([key, value]) => ({
+const inferSchema = ({ key, type }) => ({
   key,
   label: startCase(key),
-  type: typeof value,
+  type,
 });
 
 export default function createAutoFields(defaultFieldComponents) {
   return function AutoFields(props) {
-    const { initialValue: formValues } = useContext(RenderContext);
-    const schema = Object.entries(formValues).map(inferSchema);
+    const meta = useReactiveValueMeta();
+    const schema = Object.keys(meta.propertyTypes).map(key =>
+      inferSchema({
+        key,
+        type: meta.propertyTypes[key],
+      })
+    );
     const components = { ...defaultFieldComponents, ...props.components };
 
     return schema.map(field => {
