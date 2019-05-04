@@ -8,11 +8,8 @@ import useField from '@/src/future/hooks/useField';
 
 import { RenderContext } from '@/src/future/context';
 
-import Component from '@/src/future/components/Component';
-import Field from '@/src/future/components/Field';
-
-import TextInput from '@/src/future/inputs/TextInput';
-import IntegerInput from '@/src/future/inputs/IntegerInput';
+export * from '@/src/future/builtin-fields';
+export * from '@/src/future/inputs';
 
 export function FormContainer({
   children,
@@ -24,17 +21,15 @@ export function FormContainer({
 }) {
   const [savedDefaultValue] = useState(defaultValue);
   const [isControlled] = useState(savedDefaultValue === undefined);
+  const normalizedValue = isControlled ? value : savedDefaultValue;
   // Keep context object pure.
-  const renderContext = useMemo(() => ({ renderTag, renderComponent }), [
-    renderTag,
-    renderComponent,
-  ]);
+  const renderContext = useMemo(
+    () => ({ renderTag, renderComponent, initialValue: normalizedValue }),
+    [renderTag, renderComponent]
+  );
   return (
     <RenderContext.Provider value={renderContext}>
-      <ReactiveValueContainer
-        onChange={onChange}
-        value={isControlled ? value : savedDefaultValue}
-      >
+      <ReactiveValueContainer onChange={onChange} value={normalizedValue}>
         {children}
       </ReactiveValueContainer>
     </RenderContext.Provider>
@@ -60,27 +55,5 @@ export function FieldContainer({ fieldKey, children, ...props }) {
     </ReactiveValueContainer>
   );
 }
-
-function createField(fieldType, Input) {
-  function FieldComponent(props) {
-    return (
-      <Component
-        _component={Field}
-        {...props}
-        fieldType={fieldType}
-        Input={Input}
-      />
-    );
-  }
-  FieldComponent.displayName = `${fieldType}Field`;
-  return FieldComponent;
-}
-
-const TextField = createField('Text', TextInput);
-const IntegerField = createField('Text', IntegerInput);
-
-export { TextField, IntegerField };
-
-export { TextInput, IntegerInput };
 
 export { useField };

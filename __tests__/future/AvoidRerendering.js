@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, fireEvent, cleanup } from 'react-testing-library';
 
-import { FormContainer, TextField, useField } from '@/src/future';
+import { FormContainer, AutoFields, TextField, useField } from '@/src/future';
 
 afterEach(cleanup);
 
@@ -37,5 +37,45 @@ describe('avoid rerendering', () => {
       ['lastName'],
       ['firstName'],
     ]);
+  });
+
+  test('avoids unnecessary renders of AutoFields', () => {
+    function CustomTextField({ fieldKey, label }) {
+      const { value, onChangeTargetValue } = useField(fieldKey);
+      const randomId = Math.random();
+      return (
+        <>
+          <label htmlFor={randomId}>{label}</label>
+          <input
+            id={randomId}
+            onChange={onChangeTargetValue}
+            type="text"
+            value={value}
+          />
+        </>
+      );
+    }
+
+    const components = {
+      string: CustomTextField,
+    };
+
+    const { getByLabelText } = render(
+      <FormContainer defaultValue={defaultValue}>
+        <AutoFields components={components} />
+      </FormContainer>
+    );
+
+    const getInputId = id => getByLabelText(id).id;
+
+    const intitialLastNameId = getInputId('Last Name');
+    const initialFirstNameId = getInputId('First Name');
+
+    fireEvent.change(getByLabelText('First Name'), {
+      target: { value: 'Joe' },
+    });
+
+    expect(getInputId('First Name')).not.toBe(initialFirstNameId);
+    expect(getInputId('Last Name')).toBe(intitialLastNameId);
   });
 });
