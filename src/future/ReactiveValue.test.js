@@ -330,3 +330,37 @@ test('should notify when property types change', () => {
     'firstName:string,lastName:string,age:number'
   );
 });
+
+test('should notify when keys change', () => {
+  function PropertyTypes() {
+    const meta = useReactiveValueMeta();
+    return (
+      <div data-testid="meta">
+        {Object.entries(meta.propertyTypes)
+          .map(([key, type]) => `${key}:${type}`)
+          .join(',')}
+      </div>
+    );
+  }
+
+  const { getByTestId, rerender } = render(
+    <ReactiveValueContainer onChange={() => {}} value={{ firstName: 'Ron' }}>
+      <PropertyTypes />
+    </ReactiveValueContainer>
+  );
+
+  expect(getByTestId('meta').textContent).toBe('firstName:string');
+
+  rerender(
+    <ReactiveValueContainer
+      onChange={() => {}}
+      value={{ firstName: 'Ron', lastName: 'Burgundy' }}
+    >
+      <PropertyTypes />
+    </ReactiveValueContainer>
+  );
+
+  expect(getByTestId('meta').textContent).toBe(
+    'firstName:string,lastName:string'
+  );
+});

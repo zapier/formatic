@@ -7,6 +7,25 @@ import { ExampleForm, defaultValue } from '@/demo/future/AutoFields';
 afterEach(cleanup);
 
 describe('AutoFields', () => {
+  function UniqueField({ fieldKey, label }) {
+    const { value, onChangeTargetValue } = useField(fieldKey);
+    return (
+      <div>
+        <div>
+          <label htmlFor={fieldKey}>Custom {label}</label>
+        </div>
+        <div>
+          <input
+            id={fieldKey}
+            onChange={onChangeTargetValue}
+            type="text"
+            value={value}
+          />
+        </div>
+      </div>
+    );
+  }
+
   test('renders fields from defaultValues', () => {
     const onChangeSpy = jest.fn();
     const { getByLabelText } = render(
@@ -72,27 +91,8 @@ describe('AutoFields', () => {
   });
 
   test('component prop overrides default field components', () => {
-    function CustomTextField({ fieldKey, label }) {
-      const { value, onChangeTargetValue } = useField(fieldKey);
-      return (
-        <div>
-          <div>
-            <label htmlFor={fieldKey}>Custom {label}</label>
-          </div>
-          <div>
-            <input
-              id={fieldKey}
-              onChange={onChangeTargetValue}
-              type="text"
-              value={value}
-            />
-          </div>
-        </div>
-      );
-    }
-
     const onChangeSpy = jest.fn();
-    const components = { string: CustomTextField };
+    const components = { string: UniqueField };
     const { getByLabelText } = render(
       <ExampleForm
         components={components}
@@ -127,5 +127,34 @@ describe('AutoFields', () => {
       lastName: 'Foo',
       age: 32,
     });
+  });
+
+  test('AutoFields update children based on value', () => {
+    const components = { string: UniqueField };
+    const { queryByLabelText, rerender } = render(
+      <ExampleForm
+        components={components}
+        onChange={() => {}}
+        value={{ firstName: 'Joe' }}
+      />
+    );
+
+    expect(queryByLabelText('Custom First Name')).toBeTruthy();
+    expect(queryByLabelText('Custom Last Name')).toBeNull();
+
+    fireEvent.change(queryByLabelText('Custom First Name'), {
+      target: { value: 'Joey' },
+    });
+
+    rerender(
+      <ExampleForm
+        components={components}
+        onChange={() => {}}
+        value={{ firstName: 'Ron', lastName: 'Burgundy' }}
+      />
+    );
+
+    expect(queryByLabelText('Custom First Name')).toBeTruthy();
+    expect(queryByLabelText('Custom Last Name')).toBeTruthy();
   });
 });

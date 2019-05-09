@@ -66,26 +66,48 @@ class ReactiveValue {
 
   // Set property value and recurse up through parents.
   setValueAt(key, newValue) {
-    if (newValue !== this.getValueAt(key)) {
-      if (isObject(this.currentValue)) {
-        this.currentValue = {
-          ...this.currentValue,
-          [key]: newValue,
-        };
-        if (this.parent) {
-          this.parent.setValueAt(this.key, this.currentValue);
-          // Make sure our parent is actually holding the new value. If not,
-          // take the actual value from the parent.
-          this.currentValue = this.parent.getValueAt(this.key);
-        }
-        if (
-          this.meta &&
-          this.meta.propertyTypes[key] !== getTypeName(newValue)
-        ) {
-          this.updateMeta();
-        }
+    if (newValue === this.getValueAt(key)) {
+      return;
+    }
+
+    if (isObject(this.currentValue)) {
+      this.currentValue = {
+        ...this.currentValue,
+        [key]: newValue,
+      };
+      if (this.parent) {
+        this.parent.setValueAt(this.key, this.currentValue);
+        // Make sure our parent is actually holding the new value. If not,
+        // take the actual value from the parent.
+        this.currentValue = this.parent.getValueAt(this.key);
+      }
+      if (this.meta && this.meta.propertyTypes[key] !== getTypeName(newValue)) {
+        this.updateMeta();
       }
     }
+  }
+
+  setValue(newValue, shouldNotifyParent = true) {
+    if (newValue === this.currentValue) {
+      return;
+    }
+
+    this.currentValue = newValue;
+    if (this.parent && shouldNotifyParent) {
+      this.parent.setValueAt(this.key, newValue);
+      // Make sure our parent is actually holding the new value. If not,
+      // take the actual value from the parent.
+      this.currentValue = this.parent.getValueAt(this.key);
+    }
+    // Set our child values, making sure they don't call us back since we
+    // already know.
+    for (const key in this.children) {
+      const child = this.children[key];
+      child.setValue(this.getValueAt(key), false);
+    }
+    this.updateMeta();
+    // Notify our subscribers and our parent's subscribers.
+    this.notifyUp(shouldNotifyParent);
   }
 
   notifyUp(shouldNotifyParent = true) {
@@ -102,27 +124,6 @@ class ReactiveValue {
     // And maybe parent values.
     if (this.parent && shouldNotifyParent) {
       this.parent.notifyUp();
-    }
-  }
-
-  setValue(newValue, shouldNotifyParent = true) {
-    // Ignore this if it's the same value.
-    if (newValue !== this.currentValue) {
-      this.currentValue = newValue;
-      if (this.parent && shouldNotifyParent) {
-        this.parent.setValueAt(this.key, newValue);
-        // Make sure our parent is actually holding the new value. If not,
-        // take the actual value from the parent.
-        this.currentValue = this.parent.getValueAt(this.key);
-      }
-      // Set our child values, making sure they don't call us back since we
-      // already know.
-      for (const key in this.children) {
-        const child = this.children[key];
-        child.setValue(this.getValueAt(key), false);
-      }
-      // Notify our subscribers and our parent's subscribers.
-      this.notifyUp(shouldNotifyParent);
     }
   }
 
