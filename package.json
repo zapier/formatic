@@ -68,7 +68,7 @@
     "rollup-plugin-babel": "^4.3.2",
     "sanitize.css": "^8.0.0",
     "yargs": "^13.2.1",
-    "zapier-scripts": "^5.0.0"
+    "zapier-scripts": "^6.2.0"
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.3.3",
