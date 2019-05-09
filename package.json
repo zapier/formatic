@@ -51,6 +51,7 @@
     "gh-pages": "^2.0.1",
     "isomorphic-unfetch": "^2.1.1",
     "jest": "^23.6.0",
+    "jest-dom": "^3.2.2",
     "jest-serializer-html": "^6.0.0",
     "next": "^8.0.1",
     "next-plugin-custom-babel-config": "^1.0.0",

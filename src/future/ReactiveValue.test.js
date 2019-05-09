@@ -52,12 +52,10 @@ test('should notify of a change to a property', () => {
   fireEvent.change(getByTestId('firstName'), {
     target: { value: 'Joe' },
   });
-  expect(onChangeSpy.mock.calls[0]).toEqual([
-    {
-      firstName: 'Joe',
-      lastName: '',
-    },
-  ]);
+  expect(onChangeSpy).toHaveBeenLastCalledWith({
+    firstName: 'Joe',
+    lastName: '',
+  });
 });
 
 test(`should avoid signaling hook for properties that don't change`, () => {
@@ -86,14 +84,12 @@ test(`should avoid signaling hook for properties that don't change`, () => {
   fireEvent.change(getByTestId('firstName'), {
     target: { value: 'Joe' },
   });
-  expect(onChangeSpy.mock.calls[0]).toEqual([
-    {
-      firstName: 'Joe',
-      lastName: '',
-    },
-  ]);
-  expect(firstNameRenderSpy.mock.calls.length).toBe(2);
-  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
+  expect(onChangeSpy).toHaveBeenLastCalledWith({
+    firstName: 'Joe',
+    lastName: '',
+  });
+  expect(firstNameRenderSpy).toHaveBeenCalledTimes(2);
+  expect(lastNameRenderSpy).toHaveBeenCalledTimes(1);
 });
 
 test(`should avoid unnecessary renders as controlled component`, () => {
@@ -135,11 +131,11 @@ test(`should avoid unnecessary renders as controlled component`, () => {
   fireEvent.change(getByTestId('firstName'), {
     target: { value: 'Joe' },
   });
-  expect(firstNameRenderSpy.mock.calls.length).toBe(2);
-  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
+  expect(firstNameRenderSpy).toHaveBeenCalledTimes(2);
+  expect(lastNameRenderSpy).toHaveBeenCalledTimes(1);
   fireEvent.click(getByTestId('upperCase'));
-  expect(firstNameRenderSpy.mock.calls.length).toBe(3);
-  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
+  expect(firstNameRenderSpy).toHaveBeenCalledTimes(3);
+  expect(lastNameRenderSpy).toHaveBeenCalledTimes(1);
 });
 
 test(`should work with nesting, with no wasted renders`, () => {
@@ -182,36 +178,32 @@ test(`should work with nesting, with no wasted renders`, () => {
   fireEvent.change(getByTestId('firstName'), {
     target: { value: 'Joe' },
   });
-  expect(onChangeSpy.mock.calls[0]).toEqual([
-    {
-      name: {
-        firstName: 'Joe',
-        lastName: '',
-      },
-      age: 50,
+  expect(onChangeSpy).toHaveBeenLastCalledWith({
+    name: {
+      firstName: 'Joe',
+      lastName: '',
     },
-  ]);
-  expect(firstNameRenderSpy.mock.calls.length).toBe(2);
-  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
-  expect(nameRenderSpy.mock.calls.length).toBe(1);
-  expect(ageRenderSpy.mock.calls.length).toBe(1);
+    age: 50,
+  });
+  expect(firstNameRenderSpy).toHaveBeenCalledTimes(2);
+  expect(lastNameRenderSpy).toHaveBeenCalledTimes(1);
+  expect(nameRenderSpy).toHaveBeenCalledTimes(1);
+  expect(ageRenderSpy).toHaveBeenCalledTimes(1);
   fireEvent.change(getByTestId('age'), {
     // See above where we coerce value.
     target: { value: '51' },
   });
-  expect(onChangeSpy.mock.calls[1]).toEqual([
-    {
-      name: {
-        firstName: 'Joe',
-        lastName: '',
-      },
-      age: 51,
+  expect(onChangeSpy).toHaveBeenLastCalledWith({
+    name: {
+      firstName: 'Joe',
+      lastName: '',
     },
-  ]);
-  expect(firstNameRenderSpy.mock.calls.length).toBe(2);
-  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
-  expect(nameRenderSpy.mock.calls.length).toBe(1);
-  expect(ageRenderSpy.mock.calls.length).toBe(2);
+    age: 51,
+  });
+  expect(firstNameRenderSpy).toHaveBeenCalledTimes(2);
+  expect(lastNameRenderSpy).toHaveBeenCalledTimes(1);
+  expect(nameRenderSpy).toHaveBeenCalledTimes(1);
+  expect(ageRenderSpy).toHaveBeenCalledTimes(2);
 });
 
 test(`should be able to subscribe to the whole value`, () => {
@@ -245,13 +237,13 @@ test(`should be able to subscribe to the whole value`, () => {
       <Name />
     </ReactiveValueContainer>
   );
-  expect(firstNameRenderSpy.mock.calls.length).toBe(1);
-  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
+  expect(firstNameRenderSpy).toHaveBeenCalledTimes(1);
+  expect(lastNameRenderSpy).toHaveBeenCalledTimes(1);
   fireEvent.change(getByTestId('firstName'), {
     target: { value: 'Joe' },
   });
-  expect(firstNameRenderSpy.mock.calls.length).toBe(2);
-  expect(lastNameRenderSpy.mock.calls.length).toBe(1);
+  expect(firstNameRenderSpy).toHaveBeenCalledTimes(2);
+  expect(lastNameRenderSpy).toHaveBeenCalledTimes(1);
   expect(getByTestId('name').value).toBe(
     JSON.stringify({
       firstName: 'Joe',
@@ -266,8 +258,8 @@ test(`should be able to subscribe to the whole value`, () => {
       }),
     },
   });
-  expect(firstNameRenderSpy.mock.calls.length).toBe(2);
-  expect(lastNameRenderSpy.mock.calls.length).toBe(2);
+  expect(firstNameRenderSpy).toHaveBeenCalledTimes(2);
+  expect(lastNameRenderSpy).toHaveBeenCalledTimes(2);
 });
 
 test('should notify when property types change', () => {
@@ -306,7 +298,7 @@ test('should notify when property types change', () => {
       <PropertyTypes />
     </ReactiveValueContainer>
   );
-  expect(getByTestId('meta').textContent).toBe(
+  expect(getByTestId('meta')).toHaveTextContent(
     'firstName:string,lastName:string'
   );
   fireEvent.change(getByTestId('firstName'), {
@@ -316,7 +308,7 @@ test('should notify when property types change', () => {
     firstName: 'Joe',
     lastName: '',
   });
-  expect(propertyTypesRenderSpy.mock.calls.length).toBe(1);
+  expect(propertyTypesRenderSpy).toHaveBeenCalledTimes(1);
   fireEvent.change(getByTestId('age'), {
     target: { value: 50 },
   });
@@ -325,8 +317,8 @@ test('should notify when property types change', () => {
     lastName: '',
     age: 50,
   });
-  expect(propertyTypesRenderSpy.mock.calls.length).toBe(2);
-  expect(getByTestId('meta').textContent).toBe(
+  expect(propertyTypesRenderSpy).toHaveBeenCalledTimes(2);
+  expect(getByTestId('meta')).toHaveTextContent(
     'firstName:string,lastName:string,age:number'
   );
 });
@@ -349,7 +341,7 @@ test('should notify when keys change', () => {
     </ReactiveValueContainer>
   );
 
-  expect(getByTestId('meta').textContent).toBe('firstName:string');
+  expect(getByTestId('meta')).toHaveTextContent('firstName:string');
 
   rerender(
     <ReactiveValueContainer
@@ -360,7 +352,7 @@ test('should notify when keys change', () => {
     </ReactiveValueContainer>
   );
 
-  expect(getByTestId('meta').textContent).toBe(
+  expect(getByTestId('meta')).toHaveTextContent(
     'firstName:string,lastName:string'
   );
 });

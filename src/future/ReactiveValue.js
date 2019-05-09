@@ -189,14 +189,11 @@ export function ReactiveValueContainer({ value, onChange, children }) {
     valueRef.current.setValue(value);
   });
   // Any time our wrapper's value changes, kick off our onChange handler.
-  useEffect(
-    () => {
-      return typeof onChange === 'function'
-        ? valueRef.current.subscribe(onChange)
-        : () => {};
-    },
-    [onChange]
-  );
+  useEffect(() => {
+    return typeof onChange === 'function'
+      ? valueRef.current.subscribe(onChange)
+      : () => {};
+  }, [onChange]);
   return (
     <ReactiveValueContext.Provider value={valueRef.current}>
       {children}
@@ -209,12 +206,9 @@ export function ReactiveValueContainer({ value, onChange, children }) {
 function useChildReactiveValue(key) {
   const parentReactiveValue = useContext(ReactiveValueContext);
   const childReactiveValue = parentReactiveValue.getChild(key);
-  useEffect(
-    () => {
-      return childReactiveValue.hold();
-    },
-    [key]
-  );
+  useEffect(() => {
+    return childReactiveValue.hold();
+  }, [childReactiveValue, key]);
   return childReactiveValue;
 }
 
@@ -222,14 +216,11 @@ function useChildReactiveValue(key) {
 export function useReactiveValueAt(key) {
   const childReactiveValue = useChildReactiveValue(key);
   const [value, setValue] = useState(() => childReactiveValue.getValue());
-  useEffect(
-    () => {
-      // Subscribe to changes to the property and set our value in state when
-      // that property changes.
-      return childReactiveValue.subscribe(setValue);
-    },
-    [key]
-  );
+  useEffect(() => {
+    // Subscribe to changes to the property and set our value in state when
+    // that property changes.
+    return childReactiveValue.subscribe(setValue);
+  }, [childReactiveValue, key]);
   function setValueInContext(newValue) {
     childReactiveValue.setValue(newValue);
   }
@@ -245,7 +236,7 @@ export function useReactiveValue() {
     // Subscribe to changes to the whoile value property and set our value in
     // state when that property changes.
     return reactiveValue.subscribe(setValue);
-  }, []);
+  }, [reactiveValue]);
   function setValueInContext(newValue) {
     reactiveValue.setValue(newValue);
   }
@@ -258,7 +249,7 @@ export function useReactiveValueMeta() {
   const [meta, setMeta] = useState(() => reactiveValue.getMeta());
   useEffect(() => {
     return reactiveValue.subscribeMeta(setMeta);
-  }, []);
+  }, [reactiveValue]);
   return meta;
 }
 
