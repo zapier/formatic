@@ -59,9 +59,11 @@ class ReactiveValue {
   }
 
   updateMeta() {
-    this.meta = null;
-    this.hasMetaChanged = true;
-    this.getMeta();
+    if (this.meta) {
+      this.meta = null;
+      this.hasMetaChanged = true;
+      this.getMeta();
+    }
   }
 
   // Set property value and recurse up through parents.
