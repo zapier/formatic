@@ -59,33 +59,57 @@ class ReactiveValue {
   }
 
   updateMeta() {
-    this.meta = null;
-    this.hasMetaChanged = true;
-    this.getMeta();
+    if (this.meta) {
+      this.meta = null;
+      this.hasMetaChanged = true;
+      this.getMeta();
+    }
   }
 
   // Set property value and recurse up through parents.
   setValueAt(key, newValue) {
-    if (newValue !== this.getValueAt(key)) {
-      if (isObject(this.currentValue)) {
-        this.currentValue = {
-          ...this.currentValue,
-          [key]: newValue,
-        };
-        if (this.parent) {
-          this.parent.setValueAt(this.key, this.currentValue);
-          // Make sure our parent is actually holding the new value. If not,
-          // take the actual value from the parent.
-          this.currentValue = this.parent.getValueAt(this.key);
-        }
-        if (
-          this.meta &&
-          this.meta.propertyTypes[key] !== getTypeName(newValue)
-        ) {
-          this.updateMeta();
-        }
+    if (newValue === this.getValueAt(key)) {
+      return;
+    }
+
+    if (isObject(this.currentValue)) {
+      this.currentValue = {
+        ...this.currentValue,
+        [key]: newValue,
+      };
+      if (this.parent) {
+        this.parent.setValueAt(this.key, this.currentValue);
+        // Make sure our parent is actually holding the new value. If not,
+        // take the actual value from the parent.
+        this.currentValue = this.parent.getValueAt(this.key);
+      }
+      if (this.meta && this.meta.propertyTypes[key] !== getTypeName(newValue)) {
+        this.updateMeta();
       }
     }
+  }
+
+  setValue(newValue, shouldNotifyParent = true) {
+    if (newValue === this.currentValue) {
+      return;
+    }
+
+    this.currentValue = newValue;
+    if (this.parent && shouldNotifyParent) {
+      this.parent.setValueAt(this.key, newValue);
+      // Make sure our parent is actually holding the new value. If not,
+      // take the actual value from the parent.
+      this.currentValue = this.parent.getValueAt(this.key);
+    }
+    // Set our child values, making sure they don't call us back since we
+    // already know.
+    for (const key in this.children) {
+      const child = this.children[key];
+      child.setValue(this.getValueAt(key), false);
+    }
+    this.updateMeta();
+    // Notify our subscribers and our parent's subscribers.
+    this.notifyUp(shouldNotifyParent);
   }
 
   notifyUp(shouldNotifyParent = true) {
@@ -102,27 +126,6 @@ class ReactiveValue {
     // And maybe parent values.
     if (this.parent && shouldNotifyParent) {
       this.parent.notifyUp();
-    }
-  }
-
-  setValue(newValue, shouldNotifyParent = true) {
-    // Ignore this if it's the same value.
-    if (newValue !== this.currentValue) {
-      this.currentValue = newValue;
-      if (this.parent && shouldNotifyParent) {
-        this.parent.setValueAt(this.key, newValue);
-        // Make sure our parent is actually holding the new value. If not,
-        // take the actual value from the parent.
-        this.currentValue = this.parent.getValueAt(this.key);
-      }
-      // Set our child values, making sure they don't call us back since we
-      // already know.
-      for (const key in this.children) {
-        const child = this.children[key];
-        child.setValue(this.getValueAt(key), false);
-      }
-      // Notify our subscribers and our parent's subscribers.
-      this.notifyUp(shouldNotifyParent);
     }
   }
 
@@ -188,14 +191,11 @@ export function ReactiveValueContainer({ value, onChange, children }) {
     valueRef.current.setValue(value);
   });
   // Any time our wrapper's value changes, kick off our onChange handler.
-  useEffect(
-    () => {
-      return typeof onChange === 'function'
-        ? valueRef.current.subscribe(onChange)
-        : () => {};
-    },
-    [onChange]
-  );
+  useEffect(() => {
+    return typeof onChange === 'function'
+      ? valueRef.current.subscribe(onChange)
+      : () => {};
+  }, [onChange]);
   return (
     <ReactiveValueContext.Provider value={valueRef.current}>
       {children}
@@ -208,12 +208,9 @@ export function ReactiveValueContainer({ value, onChange, children }) {
 function useChildReactiveValue(key) {
   const parentReactiveValue = useContext(ReactiveValueContext);
   const childReactiveValue = parentReactiveValue.getChild(key);
-  useEffect(
-    () => {
-      return childReactiveValue.hold();
-    },
-    [key]
-  );
+  useEffect(() => {
+    return childReactiveValue.hold();
+  }, [childReactiveValue, key]);
   return childReactiveValue;
 }
 
@@ -221,14 +218,11 @@ function useChildReactiveValue(key) {
 export function useReactiveValueAt(key) {
   const childReactiveValue = useChildReactiveValue(key);
   const [value, setValue] = useState(() => childReactiveValue.getValue());
-  useEffect(
-    () => {
-      // Subscribe to changes to the property and set our value in state when
-      // that property changes.
-      return childReactiveValue.subscribe(setValue);
-    },
-    [key]
-  );
+  useEffect(() => {
+    // Subscribe to changes to the property and set our value in state when
+    // that property changes.
+    return childReactiveValue.subscribe(setValue);
+  }, [childReactiveValue, key]);
   function setValueInContext(newValue) {
     childReactiveValue.setValue(newValue);
   }
@@ -244,7 +238,7 @@ export function useReactiveValue() {
     // Subscribe to changes to the whoile value property and set our value in
     // state when that property changes.
     return reactiveValue.subscribe(setValue);
-  }, []);
+  }, [reactiveValue]);
   function setValueInContext(newValue) {
     reactiveValue.setValue(newValue);
   }
@@ -257,7 +251,7 @@ export function useReactiveValueMeta() {
   const [meta, setMeta] = useState(() => reactiveValue.getMeta());
   useEffect(() => {
     return reactiveValue.subscribeMeta(setMeta);
-  }, []);
+  }, [reactiveValue]);
   return meta;
 }
 

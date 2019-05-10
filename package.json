@@ -51,6 +51,7 @@
     "gh-pages": "^2.0.1",
     "isomorphic-unfetch": "^2.1.1",
     "jest": "^23.6.0",
+    "jest-dom": "^3.2.2",
     "jest-serializer-html": "^6.0.0",
     "next": "^8.0.1",
     "next-plugin-custom-babel-config": "^1.0.0",
@@ -68,7 +69,7 @@
     "rollup-plugin-babel": "^4.3.2",
     "sanitize.css": "^8.0.0",
     "yargs": "^13.2.1",
-    "zapier-scripts": "^5.0.0"
+    "zapier-scripts": "^6.2.0"
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.3.3",
