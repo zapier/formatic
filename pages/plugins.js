@@ -2,6 +2,7 @@ import React from 'react';
 import 'isomorphic-unfetch';
 
 import Page from '@/docs/components/Page';
+import SubSection from '@/docs/components/SubSection';
 import Section from '@/docs/components/Section';
 import CodeBlock from '@/docs/components/CodeBlock';
 import Sections from '@/docs/components/Sections';
@@ -94,6 +95,64 @@ const Plugins = props => (
           {props.snippets['plugin-field-type']}
         </CodeBlock>
       </Section>
+
+      <Section title="Plugin API">
+        <SubSection title="createElement( name, props, children) )">
+          <p>
+            You can override the rendering of every component using the{' '}
+            <Code>createElement</Code> method. This is useful for wrapping
+            components or injecting props into many components based on the
+            names of those components.
+          </p>
+        </SubSection>
+        <SubSection title="createElement_* ( props, children) )">
+          <p>
+            You can override the rendering of a specific component using the{' '}
+            <Code>createElement_</Code> methods. This way, you can change the
+            props or completely replace that component with a custom component.
+          </p>
+          <p>
+            See <a href="#Adding-Field-Types">Adding Field Types</a> above for
+            an example.
+          </p>
+        </SubSection>
+        <SubSection title="renderTag( tagName, tagProps, metaProps, children )">
+          <p>
+            The <Code>renderTag</Code> method allows you to override the
+            rendering of any element of any component. This is useful for adding
+            custom styling to components.
+          </p>
+          <p>
+            Here's a simple example where we add a custom <Code>style</Code>{' '}
+            attribute.
+          </p>
+          <CodeBlock language="jsx">
+            {props.snippets['plugin-api-renderTag-simple']}
+          </CodeBlock>
+          <p>
+            Ultimately, the default <Code>renderTag</Code> will call
+            <Code>React.createElement</Code>, so you have complete control over
+            rendering. That does mean you have to handle the{' '}
+            <Code>children</Code> properly though. If you render{' '}
+            <Code>children</Code>, and it happens to be an array, then you will
+            likely get a key warning.{' '}
+          </p>
+          <p>
+            Here's an example using <a href="https://emotion.sh">Emotion</a> for
+            CSS in various ways and proper handling of <Code>children</Code>.
+          </p>
+          <CodeBlock language="jsx">
+            {props.snippets['plugin-api-renderTag']}
+          </CodeBlock>
+        </SubSection>
+        <p>
+          Lots of other plugin methods can be found in the{' '}
+          <a href="https://github.com/zapier/formatic/blob/master/src/default-config.js">
+            default config
+          </a>
+          .
+        </p>
+      </Section>
     </Sections>
   </Page>
 );
@@ -107,6 +166,8 @@ const snippetKeys = [
   'plugin-using',
   'plugin-using-multiple',
   'plugin-field-type',
+  'plugin-api-renderTag',
+  'plugin-api-renderTag-simple',
 ];
 
 Plugins.getInitialProps = async () => {
