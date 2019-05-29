@@ -535,7 +535,9 @@ export default createReactClass({
       this.debouncedOnChangeAndTagCodeMirror = null;
 
       // Flush changes
-      this.onChange(this.codeMirror.getValue());
+      if (this.isDebouncingCodeMirrorChange) {
+        this.onChange(this.codeMirror.getValue());
+      }
     }
 
     this.codeMirror = null;
