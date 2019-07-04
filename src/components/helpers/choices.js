@@ -249,7 +249,7 @@ export default createReactClass({
       const rect = node.getBoundingClientRect();
       const top = rect.top;
       const windowHeight = window.innerHeight;
-      const height = windowHeight - top;
+      const height = (windowHeight - top) * 0.75;
       if (height !== this.state.maxHeight) {
         didSetState = true;
         this.setState(
