@@ -256,7 +256,7 @@ export default createReactClass({
       const clampedHeight = Math.min(Math.abs(propsMaxHeight), 1);
       const actualHeight = windowHeight - top;
       const desiredMaxHeight = actualHeight * clampedHeight;
-      if (actualHeight !== desiredMaxHeight) {
+      if (Math.round(actualHeight) !== Math.round(desiredMaxHeight)) {
         didSetState = true;
         this.setState(
           {
