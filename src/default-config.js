@@ -1283,5 +1283,9 @@ export default function(config) {
       }
       return require('codemirror');
     },
+
+    getChoicesMaxHeightRatio() {
+      return 1;
+    },
   };
 }

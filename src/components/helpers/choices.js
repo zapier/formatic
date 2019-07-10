@@ -249,12 +249,15 @@ export default createReactClass({
       const rect = node.getBoundingClientRect();
       const top = rect.top;
       const windowHeight = window.innerHeight;
-      const height = windowHeight - top;
-      if (height !== this.state.maxHeight) {
+      const maxHeightRatio = this.props.config.getChoicesMaxHeightRatio();
+      const clampedRatio = Math.min(Math.abs(maxHeightRatio), 1);
+      const actualHeight = windowHeight - top;
+      const desiredMaxHeight = actualHeight * clampedRatio;
+      if (Math.round(desiredMaxHeight) !== Math.round(this.state.maxHeight)) {
         didSetState = true;
         this.setState(
           {
-            maxHeight: height,
+            maxHeight: desiredMaxHeight,
           },
           cb
         );
