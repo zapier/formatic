@@ -506,7 +506,7 @@ exports[`pretty-select field should render open choices correctly (Alphabet) 1`]
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <div class="choices-search">
               <input placeholder="Search..."
@@ -887,7 +887,7 @@ exports[`pretty-select field should render open choices correctly (Colors (R)) 1
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <div class="choices-search">
               <input placeholder="Search..."
@@ -991,7 +991,7 @@ exports[`pretty-select field should render open choices correctly (Colors 2) 1`]
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <ul class="choices">
               <li class="choice">
@@ -1084,7 +1084,7 @@ exports[`pretty-select field should render open choices correctly (Colors 3) 1`]
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <div class="choices-search">
               <input placeholder="Search..."
@@ -1235,7 +1235,7 @@ exports[`pretty-select field should render open choices correctly (Empty) 1`] = 
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <ul class="choices">
               <li class="choice">
@@ -1308,7 +1308,7 @@ exports[`pretty-select field should render open choices correctly (Loading) 1`] 
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <ul class="choices">
               <li class="choice">
@@ -1443,7 +1443,7 @@ exports[`pretty-select field should render open choices correctly (Select with N
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <ul class="choices">
               <li class="choice">
@@ -1545,7 +1545,7 @@ exports[`pretty-select field should render open choices correctly (Select with S
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <div class="choices-search">
               <input placeholder="Search..."
@@ -1708,7 +1708,7 @@ exports[`pretty-select field should render open choices correctly (Size) 1`] = `
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <div class="choices-search">
               <input placeholder="Search..."
@@ -1815,7 +1815,7 @@ exports[`pretty-select field should render open choices correctly (Yes/No) 1`] =
           </div>
           <div class="choices-container"
                role="presentation"
-               style="user-select: none; position: absolute; max-height: 768px;"
+               style="user-select: none; position: absolute;"
           >
             <div class="choices-search">
               <input placeholder="Search..."
