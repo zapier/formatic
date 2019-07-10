@@ -253,7 +253,7 @@ export default createReactClass({
       const clampedRatio = Math.min(Math.abs(maxHeightRatio), 1);
       const actualHeight = windowHeight - top;
       const desiredMaxHeight = actualHeight * clampedRatio;
-      if (Math.round(actualHeight) !== Math.round(desiredMaxHeight)) {
+      if (Math.round(desiredMaxHeight) !== Math.round(this.state.maxHeight)) {
         didSetState = true;
         this.setState(
           {
