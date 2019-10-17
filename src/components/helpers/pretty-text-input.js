@@ -417,7 +417,12 @@ export default createReactClass({
 
     this.debouncedOnChangeAndTagCodeMirror = _.debounce(() => {
       this.isDebouncingCodeMirrorChange = false;
-      this.onChangeAndTagCodeMirror();
+
+      // If this.codeMirror no longer exists don't tag, to avoid this error:
+      // https://cdn.zapier.com/storage/photos/69d375365045c5fd6e9c7e2a68c43905.png
+      if (this.codeMirror) {
+        this.onChangeAndTagCodeMirror();
+      }
     }, 200);
 
     const pos = this.codeMirror ? this.codeMirror.getCursor() : null;
