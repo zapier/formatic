@@ -1,6 +1,6 @@
 {
   "name": "formatic",
-  "version": "2.3.0",
+  "version": "2.1.1",
   "description": "Automatic, pluggable form generation",
   "main": "./build/lib/index.cjs.js",
   "module": "./build/lib/index.esm.js",
