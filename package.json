@@ -52,7 +52,7 @@
     "isomorphic-unfetch": "^2.1.1",
     "jest": "^23.6.0",
     "jest-serializer-html": "^6.0.0",
-    "next": "^8.0.1",
+    "next": "^9.3.2",
     "next-plugin-custom-babel-config": "^1.0.0",
     "polished": "^2.3.0",
     "raw-loader": "^1.0.0",
