@@ -62,6 +62,7 @@ export default createReactClass({
         isAccordion: field.isAccordion,
         isAccordionAlwaysCollapsable: field.isAccordionAlwaysCollapsable,
         field,
+        id: this.props.id,
         onChange: this.onChange,
         onAction: this.onBubbleAction,
       })
